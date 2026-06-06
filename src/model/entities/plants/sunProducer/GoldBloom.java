@@ -1,5 +1,5 @@
 package model.entities.plants.sunProducer;
 
-public class GoldBloom extends BaseSunProducer {
+public class GoldBloom extends BaseSunFlower {
 }
 

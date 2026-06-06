@@ -1,5 +1,6 @@
 package model.entities.plants.sunProducer;
 
-public class SunShroom extends BaseSunProducer {
+public class SunShroom extends BaseSunFlower {
+    private int growLvl;
 }
 
