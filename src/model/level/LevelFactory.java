@@ -1,46 +1,41 @@
 package model.level;
 
-import model.level.delivery.CardDeliveryStrategy;
-import model.level.delivery.ConveyorDeliveryStrategy;
-import model.level.delivery.DeliveryStrategy;
-import model.level.delivery.RegularDeliveryStrategy;
-import model.level.special.*;
+import model.level.behavior.LevelBehavior;
+import model.level.behavior.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class LevelFactory {
 
-    private static final Map<String, Supplier<Level>> LEVEL_REGISTRY = new HashMap<>();
-    private static final Map<String, Supplier<DeliveryStrategy>> STRATEGY_REGISTRY = new HashMap<>();
+    private static final Map<String, Supplier<LevelBehavior>> BEHAVIOR_REGISTRY = new HashMap<>();
 
     static {
-        LEVEL_REGISTRY.put("RegularLevel", RegularLevel::new);
-        LEVEL_REGISTRY.put("ConveyorBeltLevel", ConveyorBeltLevel::new);
-        LEVEL_REGISTRY.put("NightOpsLevel", NightOpsLevel::new);
-        LEVEL_REGISTRY.put("TimedWarLevel", TimedWarLevel::new);
-        LEVEL_REGISTRY.put("DeadLineLevel", DeadLineLevel::new);
-        LEVEL_REGISTRY.put("SaveOurSeedsLevel", SaveOurSeedsLevel::new);
-        LEVEL_REGISTRY.put("LockedPlantsLevel", LockedPlantsLevel::new);
-        LEVEL_REGISTRY.put("LoveYourPlantsLevel", LoveYourPlantsLevel::new);
-        LEVEL_REGISTRY.put("PlantWhatYouGetLevel", PlantWhatYouGetLevel::new);
-
-        STRATEGY_REGISTRY.put("RegularDeliveryStrategy", RegularDeliveryStrategy::new);
-        STRATEGY_REGISTRY.put("ConveyorDeliveryStrategy", ConveyorDeliveryStrategy::new);
-        STRATEGY_REGISTRY.put("CardDeliveryStrategy", CardDeliveryStrategy::new);
+        BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
+        BEHAVIOR_REGISTRY.put("SaveOurSeedsBehavior", SaveOurSeedsBehavior::new);
+        BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
+        BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
-        return null;
-    }
+        Level level = new Level();
+        level.setId(data.id);
+        level.setOrder(data.order);
+        level.setSunFalling(data.sunFalling);
+        level.setTimeLimitSeconds(data.timeLimitSeconds);
+        level.setDeadlineColumn(data.deadlineColumn);
+        level.setAllowedPlantsLost(data.allowedPlantsLost);
+        level.setLockedPlants(data.lockedPlants);
+        /// the following should be implemented some other place first
+        //level.setDeliveryStrategy(StrategyFactory.create(data.deliveryStrategy));
+        //level.setAllowedZombies(buildZombies(data.allowedZombies));
+        //level.setWaves(buildWaves(data.waves));
 
-    private static List<Wave> buildWaves(List<JsonContainer.JsonWaveData> raw) {
-        return null;
-    }
+        if (data.behavior != null && !data.behavior.isBlank()) {
+            level.setBehavior(BEHAVIOR_REGISTRY.get(data.behavior).get());
+        }
 
-    private static <T> Supplier<T> getFromRegistry(Map<String, Supplier<T>> registry, String key, String label) {
-        return null;
+        return level;
     }
 }

@@ -1,63 +1,113 @@
 package model.level;
 
+import model.level.behavior.LevelBehavior;
 import model.level.delivery.DeliveryStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Level {
+public class Level {
 
-    protected String id;
-    protected int order;
-    protected List<Wave> waves;
-    protected List<String> allowedZombies;
-    protected DeliveryStrategy deliveryStrategy;
+    private String id;
+    private int order;
+    private String type;
 
-    public abstract void onStart();
+    private boolean sunFalling = true;
+    private int timeLimitSeconds = 0;
+    private int deadlineColumn = -1;
+    private int allowedPlantsLost = -1;
+    private List<String> lockedPlants = new ArrayList<>();
+    private List<String> seedPlants = new ArrayList<>();
 
-    public abstract void onWaveComplete(int waveNumber);
+    private DeliveryStrategy deliveryStrategy;
 
-    public abstract void onComplete();
+    private List<String> allowedZombies;
+    private List<Wave> waves;
 
-    public abstract boolean isBossLevel();
+    private LevelBehavior behavior;
 
-    public String getId() {
-        return id;
+    public void onStart() {
+        if (behavior != null) behavior.onStart(this);
+    }
+
+    public void onWaveComplete(int wave) {
+        if (behavior != null) behavior.onWaveComplete(this, wave);
+    }
+
+    public void onComplete() {
+        if (behavior != null) behavior.onComplete(this);
+    }
+
+    public boolean isFailed() {
+        return behavior != null && behavior.isFailed(this);
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public int getOrder() {
-        return order;
-    }
-
     public void setOrder(int order) {
         this.order = order;
     }
 
-    public List<Wave> getWaves() {
-        return waves;
+    public void setSunFalling(boolean sunFalling) {
+        this.sunFalling = sunFalling;
     }
 
-    public void setWaves(List<Wave> waves) {
-        this.waves = waves;
+    public void setTimeLimitSeconds(int timeLimitSeconds) {
+        this.timeLimitSeconds = timeLimitSeconds;
     }
 
-    public DeliveryStrategy getDeliveryStrategy() {
-        return deliveryStrategy;
+    public void setDeadlineColumn(int deadlineColumn) {
+        this.deadlineColumn = deadlineColumn;
     }
 
-    public void setDeliveryStrategy(DeliveryStrategy ds) {
-        this.deliveryStrategy = ds;
+    public void setAllowedPlantsLost(int allowedPlantsLost) {
+        this.allowedPlantsLost = allowedPlantsLost;
     }
 
-    public List<String> getAllowedZombies() {
-        return allowedZombies;
+    public void setLockedPlants(List<String> lockedPlants) {
+        this.lockedPlants = lockedPlants;
     }
 
-    public void setAllowedZombies(List<String> list) {
-        this.allowedZombies = list;
+    public void setBehavior(LevelBehavior levelBehavior) {
+        this.behavior = levelBehavior;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public boolean isSunFalling() {
+        return sunFalling;
+    }
+
+    public int getTimeLimitSeconds() {
+        return timeLimitSeconds;
+    }
+
+    public int getDeadlineColumn() {
+        return deadlineColumn;
+    }
+
+    public int getAllowedPlantsLost() {
+        return allowedPlantsLost;
+    }
+
+    public List<String> getLockedPlants() {
+        return lockedPlants;
+    }
+
+    public List<String> getSeedPlants() {
+        return seedPlants;
+    }
+
+    public void setSeedPlants(List<String> seedPlants) {
+        this.seedPlants = seedPlants;
     }
 }
 
