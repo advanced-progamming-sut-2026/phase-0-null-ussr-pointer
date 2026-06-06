@@ -10,4 +10,8 @@ public class Zombie extends GameEntity {
     private int hp;
 
 
+    @Override
+    public void tick() {
+
+    }
 }

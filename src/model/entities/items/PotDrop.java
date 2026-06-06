@@ -1,2 +1,11 @@
 package model.entities.items;
-public class PotDrop extends GroundItem {}
+
+import model.engine.GameSession;
+
+public class PotDrop extends GroundItem {
+
+    @Override
+    public void applyRewards(GameSession session) {
+
+    }
+}
