@@ -7,6 +7,7 @@ import model.engine.GameSession;
 public abstract  class GroundItem extends GameEntity {
     private double lifetime;
     private double collectRadius;
+    private boolean collected;
 
     public void collect() {}
     public boolean isExpired() {

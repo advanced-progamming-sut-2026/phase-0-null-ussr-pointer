@@ -8,6 +8,7 @@ public class SunToken extends GroundItem {
     private final SunDropType dropType;
     private final int sunValue;
     private boolean falling;
+    private double fallTargetY;
 
     public SunToken(SunDropType dropType, int sunValue) {
         this.dropType = dropType;
@@ -19,4 +20,9 @@ public class SunToken extends GroundItem {
     public void applyRewards(GameSession session) {
 
     }
+
+    @Override
+    public void tick() {}
+
+
 }

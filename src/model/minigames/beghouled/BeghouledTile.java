@@ -1,2 +1,9 @@
 package model.minigames.beghouled;
-public class BeghouledTile extends model.board.terrain.Tile {}
+
+import model.entities.plants.BasePlant;
+
+public class BeghouledTile extends model.board.terrain.Tile {
+    private BasePlant plant;
+    private boolean matched;
+    private boolean crater;
+}

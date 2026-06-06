@@ -5,7 +5,13 @@ public enum SunDropType {
     NORMAL(50),
     LARGE(75);
 
-    SunDropType(int i) {
+    private final int value;
+    SunDropType(int value) {
 
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
     }
 }
