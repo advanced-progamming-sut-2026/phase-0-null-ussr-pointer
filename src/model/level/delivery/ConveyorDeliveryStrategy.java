@@ -1,5 +1,19 @@
 package model.level.delivery;
 
-public class ConveyorDeliveryStrategy implements CardDeliveryStrategy {
+import java.util.List;
+
+public class ConveyorDeliveryStrategy implements DeliveryStrategy {
+    @Override
+    public void deliver() {
+    }
+
+    @Override
+    public void onLevelStart() {
+    }
+
+    @Override
+    public List<String> getAvailablePlants(List<String> chapterPlants) {
+        return chapterPlants;
+    }
 }
 

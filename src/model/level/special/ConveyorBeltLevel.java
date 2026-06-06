@@ -1,2 +1,25 @@
 package model.level.special;
-public class ConveyorBeltLevel extends model.level.Level {}
+
+import model.level.Level;
+
+public class ConveyorBeltLevel extends Level {
+    @Override
+    public void onStart() {
+
+    }
+
+    @Override
+    public void onWaveComplete(int waveNumber) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
+
+    @Override
+    public boolean isBossLevel() {
+        return false;
+    }
+}

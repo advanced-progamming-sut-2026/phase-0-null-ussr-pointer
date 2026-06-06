@@ -1,2 +1,25 @@
 package model.level.special;
-public class DeadLineLevel extends model.level.Level {}
+
+import model.level.Level;
+
+public class DeadLineLevel extends Level {
+    @Override
+    public void onStart() {
+
+    }
+
+    @Override
+    public void onWaveComplete(int waveNumber) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
+
+    @Override
+    public boolean isBossLevel() {
+        return false;
+    }
+}
