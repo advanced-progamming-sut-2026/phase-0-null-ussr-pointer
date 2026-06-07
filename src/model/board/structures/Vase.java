@@ -10,7 +10,7 @@ public class Vase extends InteractableStructure {
     private Zombie containedZombie;
 
     @Override
-    public void onInteract(GameSession session) {
+    public void onDestroy(GameSession session) {
 
     }
     @Override public void tick() {}

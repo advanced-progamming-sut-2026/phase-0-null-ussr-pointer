@@ -7,7 +7,7 @@ public class LawnMower extends InteractableStructure {
 
 
     @Override
-    public void onInteract(GameSession session) {
+    public void onDestroy(GameSession session) {
 
     }
 

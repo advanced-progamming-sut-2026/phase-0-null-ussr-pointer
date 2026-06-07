@@ -7,7 +7,7 @@ public class Grave extends InteractableStructure {
     private boolean cleared;
 
     @Override
-    public void onInteract(GameSession session) {
+    public void onDestroy(GameSession session) {
 
     }
 

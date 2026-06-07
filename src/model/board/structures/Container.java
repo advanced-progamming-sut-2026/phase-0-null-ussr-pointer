@@ -7,7 +7,7 @@ public class Container extends InteractableStructure{
     private String containedZombieId;
 
     @Override
-    public void onInteract(GameSession session) {
+    public void onDestroy(GameSession session) {
 
     }
     @Override public void tick() {}
