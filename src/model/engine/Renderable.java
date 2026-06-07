@@ -1,2 +1,8 @@
 package model.engine;
-public interface Renderable {}
+
+import model.state.ItemState;
+
+public interface Renderable {
+
+    public ItemState getState();
+}

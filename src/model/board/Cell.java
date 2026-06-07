@@ -12,22 +12,49 @@ public class Cell {
     private int row;
     private int col;
     private Tile tile;
+    private BasePlant plant;
+    private InteractableStructure interactableStructure;
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public Tile getTile() {
+        return tile;
+    }
 
     public BasePlant getPlant() {
-        return null;
+        return plant;
     }
-    public List<Zombie> getZombies() {
-        return List.of();
+
+    public InteractableStructure getInteractableStructure() {
+        return interactableStructure;
     }
-    public InteractableStructure getStructure() {
-        return null;
+
+    public void setRow(int row) {
+        this.row = row;
     }
-    public List<GroundItem> getItems() {
-        return List.of();
+
+    public void setCol(int col) {
+        this.col = col;
     }
-    public Tile getTile() {return this.tile;}
-    public boolean isEmpty() {
-        return false;
+
+    public void setTile(Tile tile) {
+        this.tile = tile;
     }
+
+    public void setPlant(BasePlant plant) {
+        this.plant = plant;
+    }
+
+
+    public void setStructure(InteractableStructure interactableStructure) {
+        this.interactableStructure = interactableStructure;
+    }
+    public boolean isEmpty() {return plant == null;}
 }
 

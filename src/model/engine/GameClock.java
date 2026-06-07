@@ -1,2 +1,14 @@
 package model.engine;
-public class GameClock {}
+
+import java.util.List;
+
+public class GameClock {
+    private int tick;
+    private List<Tickable> entities;
+    public void tick() {
+
+    }
+    public int getTicks() {
+        return 0;
+    }
+}
