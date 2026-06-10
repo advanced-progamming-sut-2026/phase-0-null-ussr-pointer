@@ -1,5 +1,7 @@
 package model.level;
 
+import model.board.terrain.TileType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,11 +13,13 @@ public class Chapter {
     private final GameMode gameMode;
     private List<String> allowedPlants;
     private final List<Level> levels;
+    private final List<TileType> allowedTiles;
 
-    public Chapter(String id, String name, GameMode gameMode) {
+    public Chapter(String id, String name, GameMode gameMode, List<TileType> allowedTiles) {
         this.id = id;
         this.name = name;
         this.gameMode = gameMode;
+        this.allowedTiles = allowedTiles;
         this.levels = new ArrayList<>();
     }
 
@@ -49,5 +53,9 @@ public class Chapter {
 
     public List<Level> getLevels() {
         return Collections.unmodifiableList(levels);
+    }
+
+    public List<TileType> getAllowedTiles() {
+        return allowedTiles;
     }
 }

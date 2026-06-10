@@ -9,6 +9,7 @@ public class SunToken extends GroundItem {
     private final int sunValue;
     private boolean falling;
     private double fallTargetY;
+    private long fallTime;
 
     public SunToken(SunDropType dropType, int sunValue) {
         this.dropType = dropType;

@@ -10,7 +10,7 @@ public class Level {
 
     private String id;
     private int order;
-    private String type;
+    private String chapter;
 
     private boolean sunFalling = true;
     private int timeLimitSeconds = 0;
