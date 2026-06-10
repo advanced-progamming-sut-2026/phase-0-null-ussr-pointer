@@ -1,0 +1,2950 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>D:/University/Term2/AP/Project/main repo/pvz-2</OriginalElement>
+  <nodes>
+    <node x="1765.0833333333335" y="3281.0">model.greenhouse.SproutPlant</node>
+    <node x="1679.0" y="4959.0">Main</node>
+    <node x="11576.0" y="2192.0">model.entities.plants.strikethrough.BaseStrikethrough</node>
+    <node x="4787.333333333333" y="3244.0">view.mainmenu.gamemenu.GameMenu</node>
+    <node x="16039.0" y="4959.0">model.entities.zombies.core.ZombieFactory</node>
+    <node x="-222.0" y="5092.0">service.ShopService</node>
+    <node x="9966.333333333332" y="3197.0">model.entities.zombies.effect.PoisonEffect</node>
+    <node x="445.625" y="1200.5">model.state.BoostPlantCmd</node>
+    <node x="10194.0" y="4959.0">model.entities.zombies.behavior.SunDrainBehavior</node>
+    <node x="4783.15807404729" y="2663.5">model.entities.plants.shooter.PeaPod</node>
+    <node x="17953.333333333332" y="3119.0">controller.command.maincommand.MainCommand</node>
+    <node x="10435.333333333332" y="3119.0">model.entities.zombies.effect.EffectStatus</node>
+    <node x="10295.333333333332" y="3197.0">model.entities.zombies.effect.SpinEffect</node>
+    <node x="11845.5" y="2192.0">model.entities.plants.homing.BaseHoming</node>
+    <node x="21086.07742402314" y="2663.5">model.minigames.VasebreakerMinigame</node>
+    <node x="16204.333333333332" y="3119.0">controller.command.maincommand.SettingCommand</node>
+    <node x="18237.333333333332" y="3119.0">model.quest.QuestCriterion</node>
+    <node x="10308.875" y="1694.0">model.entities.projectiles.hit.IceHit</node>
+    <node x="19542.333333333332" y="3119.0">controller.LoginController</node>
+    <node x="15900.333333333332" y="3119.0">controller.command.RegisterCommand</node>
+    <node x="987.5384304207121" y="4039.0">model.quest.ConfigurableQuest</node>
+    <node x="8537.15807404729" y="2663.5">model.entities.plants.explosive.GrapeShot</node>
+    <node x="10127.15807404729" y="2663.5">model.entities.plants.sunProducer.TwinSunflower</node>
+    <node x="8030.0" y="4959.0">model.entities.zombies.zombotany.ZombotanyZombie</node>
+    <node x="19817.333333333332" y="3119.0">controller.maincontroller.gamecontroller.CollectionController</node>
+    <node x="362.0" y="5092.0">model.entities.zombies.chapter.darkages.DarkZombie</node>
+    <node x="-27.0" y="5092.0">model.entities.plants.PlantFactory</node>
+    <node x="9808.15807404729" y="2663.5">model.entities.plants.sunProducer.SunShroom</node>
+    <node x="14339.333333333332" y="3119.0">model.entities.zombies.behavior.ActionBehaviorType</node>
+    <node x="9068.15807404729" y="2663.5">model.entities.plants.explosive.Squash</node>
+    <node x="20377.07742402314" y="2663.5">model.minigames.ZombotanyMinigame</node>
+    <node x="9240.0" y="4959.0">model.entities.zombies.behavior.DynamiteBehavior</node>
+    <node x="7842.15807404729" y="2663.5">model.entities.plants.explosive.DoomShroom</node>
+    <node x="5281.0" y="4959.0">service.LeaderBoardService</node>
+    <node x="764.0" y="632.5">model.level.JsonContainer.JsonWaveData</node>
+    <node x="-117.75" y="1706.5">model.level.JsonContainer.JsonChapterData</node>
+    <node x="3539.53307404729" y="2663.5">model.entities.plants.shooter.Repeater</node>
+    <node x="6061.15807404729" y="2663.5">model.entities.plants.lobber.MelonPult</node>
+    <node x="889.1271104678726" y="154.0">model.state.CollectItemCmd</node>
+    <node x="17530.0" y="4959.0">model.state.ProjectileState</node>
+    <node x="9865.40807404729" y="-297.0">model.util.Vec2</node>
+    <node x="3637.0" y="4959.0">model.entities.zombies.chapter.egypt.EgyptGargantuarZombie</node>
+    <node x="11507.333333333332" y="3119.0">model.entities.zombies.defense.DefenseBehavior</node>
+    <node x="5194.15807404729" y="2663.5">model.entities.plants.shooter.FirePeashooter</node>
+    <node x="9497.315183309183" y="1200.5">model.entities.projectiles.hit.HitEffectStrategy</node>
+    <node x="12287.0" y="4959.0">model.constraint.TimedConstraint</node>
+    <node x="9103.15807404729" y="-152.5">model.engine.Tickable</node>
+    <node x="168.0" y="5092.0">service.game.PlantService</node>
+    <node x="9451.875" y="1694.0">model.entities.projectiles.hit.PoisonHit</node>
+    <node x="11123.333333333332" y="3197.0">model.entities.zombies.defense.ImmuneDefense</node>
+    <node x="6547.0" y="4959.0">model.constraint.DeadLineConstraint</node>
+    <node x="8209.15807404729" y="2663.5">model.entities.plants.explosive.CherryBomb</node>
+    <node x="19618.0" y="4959.0">model.entities.zombies.chapter.common.AllStarZombie</node>
+    <node x="8225.333333333332" y="3197.0">model.entities.zombies.attack.SmashAttack</node>
+    <node x="6798.0" y="4959.0">model.constraint.NightOpsConstraint</node>
+    <node x="6998.098257356472" y="596.0">model.level.delivery.RegularDeliveryStrategy</node>
+    <node x="7159.15807404729" y="2663.5">model.entities.plants.homing.CatTail</node>
+    <node x="17087.333333333332" y="3119.0">controller.command.maincommand.gamecommand.GameCommand</node>
+    <node x="2468.0" y="4959.0">model.constraint.LoveYourPlantsConstraint</node>
+    <node x="20092.333333333332" y="3119.0">controller.maincontroller.ProfileController</node>
+    <node x="16502.333333333332" y="3119.0">controller.command.maincommand.ProfileCommand</node>
+    <node x="19654.51492402314" y="1200.5">model.level.special.LoveYourPlantsLevel</node>
+    <node x="18791.0" y="4959.0">model.entities.zombies.chapter.frostbite.HunterZombie</node>
+    <node x="11597.0" y="4959.0">model.entities.zombies.behavior.KingBuffBehavior</node>
+    <node x="10589.333333333332" y="3197.0">model.entities.zombies.effect.FreezeEffect</node>
+    <node x="5536.0" y="4959.0">model.entities.zombies.izombie.SunProducerZombie</node>
+    <node x="8316.065183309183" y="1682.0">model.entities.plants.lobber.LobberBulletType</node>
+    <node x="15527.804480221932" y="1706.5">model.entities.plants.BasePlant</node>
+    <node x="11319.333333333332" y="3197.0">model.entities.zombies.defense.NormalDefense</node>
+    <node x="3924.0" y="4959.0">model.entities.zombies.behavior.OctopusThrowBehavior</node>
+    <node x="5652.333333333333" y="3244.0">view.mainmenu.NetworkMenu</node>
+    <node x="5022.0" y="4959.0">model.entities.zombies.chapter.beach.FastSwimmerZombie</node>
+    <node x="1842.0" y="5092.0">model.state.PlantState</node>
+    <node x="7502.065183309183" y="1670.0">model.board.structures.InteractableStructure</node>
+    <node x="17202.26492402314" y="1152.0">model.level.behavior.SaveOurSeedsBehavior</node>
+    <node x="10513.15807404729" y="2663.5">model.entities.plants.sunProducer.Sunflower</node>
+    <node x="10663.15807404729" y="2663.5">model.entities.plants.modifier.Torchwood</node>
+    <node x="89.75" y="178.5">model.state.AdvanceTimeCmd</node>
+    <node x="7786.0" y="4959.0">model.entities.zombies.chapter.common.BarrelRollerZombie</node>
+    <node x="742.0" y="5092.0">model.entities.zombies.archetypes.FlagZombie</node>
+    <node x="2933.0" y="5092.0">model.entities.zombies.behavior.ActionBehavior</node>
+    <node x="12279.15807404729" y="2663.5">model.entities.plants.wallnut.Pumpkin</node>
+    <node x="20267.51492402314" y="1200.5">model.level.special.ConveyorBeltLevel</node>
+    <node x="6210.15807404729" y="2663.5">model.entities.plants.lobber.CabbagePult</node>
+    <node x="4078.9187771345396" y="1706.5">model.entities.projectiles.Projectile</node>
+    <node x="7296.0" y="4959.0">model.entities.zombies.archetypes.GargantuanZombie</node>
+    <node x="21040.0" y="4959.0">service.game.GameService</node>
+    <node x="1480.0" y="5092.0">model.state.WaveState</node>
+    <node x="4482.0" y="4959.0">model.entities.zombies.chapter.frostbite.WeaselHoarderZombie</node>
+    <node x="2239.833333333333" y="3119.0">model.shop.ShopItemType</node>
+    <node x="18780.333333333332" y="3119.0">model.entities.zombies.armor.ArmorType</node>
+    <node x="18009.26492402314" y="1694.0">model.level.LevelFactory</node>
+    <node x="11365.0" y="4959.0">model.entities.zombies.chapter.common.TurquoiseZombie</node>
+    <node x="10293.348257356472" y="620.0">model.entities.zombies.Zombie</node>
+    <node x="20964.51492402314" y="1200.5">model.level.special.LockedPlantsLevel</node>
+    <node x="11828.0" y="4959.0">model.entities.zombies.chapter.beach.BeachImpZombie</node>
+    <node x="4114.66877713454" y="2179.5">model.entities.projectiles.move.StraightMove</node>
+    <node x="12513.0" y="4959.0">model.entities.zombies.behavior.IceSlingBehavior</node>
+    <node x="15719.26492402314" y="2047.0">model.board.Cell</node>
+    <node x="553.0" y="5092.0">model.entities.zombies.chapter.darkages.KingZombie</node>
+    <node x="14077.0" y="4959.0">model.entities.zombies.behavior.FishingBehavior</node>
+    <node x="19487.76492402314" y="2179.5">model.board.terrain.SlipperyTile</node>
+    <node x="4143.53307404729" y="2663.5">model.entities.plants.shooter.Starfruit</node>
+    <node x="6043.0" y="4959.0">model.entities.zombies.zomboss.ZombossWarwagon</node>
+    <node x="17106.0" y="4959.0">model.entities.zombies.zombotany.SquashZombie</node>
+    <node x="952.4550970873788" y="3239.0">model.quest.QuestType</node>
+    <node x="16467.0" y="4959.0">model.entities.zombies.chapter.beach.SnorkelZombie</node>
+    <node x="21400.95242402314" y="608.0">model.level.GameMode</node>
+    <node x="7287.15807404729" y="2663.5">model.entities.plants.homing.ElectricBlueberry</node>
+    <node x="18468.76492402314" y="2179.5">model.board.terrain.WaterTile</node>
+    <node x="18374.0" y="4959.0">model.entities.zombies.chapter.common.ArcadeZombie</node>
+    <node x="13414.0" y="4959.0">model.entities.zombies.chapter.beach.OctopusZombie</node>
+    <node x="15656.804480221932" y="1152.0">model.level.behavior.BossBehavior</node>
+    <node x="13345.333333333332" y="3119.0">controller.command.maincommand.LeaderBoardCommand</node>
+    <node x="9615.333333333332" y="3197.0">model.entities.zombies.attack.KingBuff</node>
+    <node x="1317.1271104678726" y="178.5">model.state.FeedPlantCmd</node>
+    <node x="1224.4550970873788" y="3264.0">model.quest.QuestPriority</node>
+    <node x="-171.0" y="2192.0">model.level.JsonContainer.JsonWorldData</node>
+    <node x="2157.0" y="4959.0">model.entities.zombies.chapter.frostbite.FrostbiteGargantuarZombie</node>
+    <node x="11851.15807404729" y="2663.5">model.entities.plants.melee.WasabiWhip</node>
+    <node x="13021.15807404729" y="2663.5">model.entities.plants.wallnut.SunBean</node>
+    <node x="11266.15807404729" y="2663.5">model.entities.plants.melee.PhatBeet</node>
+    <node x="16744.76492402314" y="2131.5">model.level.behavior.WallnutBowlingBehavior</node>
+    <node x="20367.333333333332" y="3119.0">controller.maincontroller.LeaderBoardController</node>
+    <node x="6382.15807404729" y="2663.5">model.entities.plants.lobber.PepperPult</node>
+    <node x="4490.54377713454" y="2167.5">model.board.structures.LawnMower</node>
+    <node x="12739.0" y="4959.0">model.entities.zombies.behavior.IcePushBehavior</node>
+    <node x="3681.53307404729" y="2663.5">model.entities.plants.shooter.PuffShroom</node>
+    <node x="14517.0" y="4959.0">model.entities.zombies.chapter.darkages.DarkImpZombie</node>
+    <node x="8037.065183309183" y="1694.0">model.entities.items.PotDrop</node>
+    <node x="19433.51492402314" y="1176.0">model.board.terrain.TileType</node>
+    <node x="7114.333333333333" y="3232.0">service.minigame.IZombieService</node>
+    <node x="4227.333333333333" y="3119.0">model.state.ItemState</node>
+    <node x="8491.15807404729" y="154.5">model.level.delivery.DeliveryStrategy</node>
+    <node x="18671.76492402314" y="2179.5">model.minigames.beghouled.BeghouledTile</node>
+    <node x="21439.0" y="4959.0">model.state.ZombieState</node>
+    <node x="6538.15807404729" y="2663.5">model.entities.plants.lobber.KernelPult</node>
+    <node x="19690.960443801207" y="-225.5">model.level.SpawnData</node>
+    <node x="15392.0" y="4959.0">model.entities.zombies.chapter.egypt.MummyZombie</node>
+    <node x="6295.0" y="4959.0">model.entities.zombies.chapter.frostbite.FrostbiteImpZombie</node>
+    <node x="11113.0" y="2192.0">model.entities.plants.lobber.BaseLobber</node>
+    <node x="19412.0" y="4959.0">model.entities.zombies.chapter.common.PianistZombie</node>
+    <node x="8783.333333333332" y="3197.0">model.entities.zombies.attack.TorchBurn</node>
+    <node x="20642.333333333332" y="3119.0">controller.maincontroller.gamecontroller.ChoosePlantController</node>
+    <node x="11408.15807404729" y="2663.5">model.entities.plants.melee.Kiwibeast</node>
+    <node x="1543.9914073806212" y="-152.5">model.level.JsonContainer</node>
+    <node x="7306.333333333333" y="3232.0">service.minigame.WallNutBowlingService</node>
+    <node x="6600.333333333333" y="3244.0">view.mainmenu.MainMenu</node>
+    <node x="11556.15807404729" y="2663.5">model.entities.plants.melee.Chomper</node>
+    <node x="9479.0" y="4959.0">model.entities.zombies.behavior.BarrelRollBehavior</node>
+    <node x="8759.0" y="4959.0">model.entities.zombies.behavior.DodoPilotBehavior</node>
+    <node x="12964.0" y="4959.0">model.entities.zombies.zomboss.ZombossDragon</node>
+    <node x="3190.6687771345396" y="1694.0">model.entities.items.CoinDrop</node>
+    <node x="15288.333333333332" y="3119.0">controller.command.maincommand.NetworkCommand</node>
+    <node x="6858.15807404729" y="2663.5">model.entities.plants.strikethrough.Cactus</node>
+    <node x="3060.0" y="4959.0">model.entities.zombies.chapter.beach.BeachGargantuarZombie</node>
+    <node x="20917.333333333332" y="3119.0">controller.maincontroller.GreenHouseController</node>
+    <node x="1023.7884304207121" y="3657.0">model.quest.Quest</node>
+    <node x="18265.76492402314" y="2179.5">model.board.terrain.NormalTile</node>
+    <node x="1528.75" y="178.5">model.level.JsonContainer.JsonZombieEntry</node>
+    <node x="7491.15807404729" y="2663.5">model.entities.plants.homing.Caulipower</node>
+    <node x="19690.76492402314" y="2179.5">model.board.terrain.CraterTile</node>
+    <node x="7698.098257356472" y="596.0">model.level.delivery.ConveyorDeliveryStrategy</node>
+    <node x="3673.1687771345396" y="2179.5">model.entities.projectiles.move.ArcMove</node>
+    <node x="7988.333333333334" y="3232.0">service.minigame.VaseBreakService</node>
+    <node x="9280.333333333332" y="3197.0">model.entities.zombies.attack.LaserAttack</node>
+    <node x="7651.15807404729" y="2663.5">model.entities.plants.homing.MagnetShroom</node>
+    <node x="9445.333333333332" y="3197.0">model.entities.zombies.attack.TombSpawn</node>
+    <node x="-60.25" y="178.5">model.state.PluckCmd</node>
+    <node x="5917.15807404729" y="2663.5">model.entities.plants.shooter.SnowPea</node>
+    <node x="12849.15807404729" y="2663.5">model.entities.plants.wallnut.SweetPotato</node>
+    <node x="3480.333333333333" y="3119.0">model.account.AccountState</node>
+    <node x="5015.5437771345405" y="2167.5">model.board.structures.Grave</node>
+    <node x="8900.15807404729" y="2663.5">model.entities.plants.explosive.GraveBuster</node>
+    <node x="498.1271104678726" y="178.5">model.state.CollectSunCmd</node>
+    <node x="8692.15807404729" y="2663.5">model.entities.plants.explosive.PrimalPotatoMine</node>
+    <node x="21192.333333333332" y="3119.0">controller.RegisterController</node>
+    <node x="13635.0" y="4959.0">model.minigames.beghouled.BeghouledState</node>
+    <node x="16796.333333333332" y="3119.0">model.entities.plants.melee.MeleeFightType</node>
+    <node x="1843.0" y="4959.0">model.constraint.PlantWhatYouGetConstraint</node>
+    <node x="18583.0" y="4959.0">model.entities.zombies.chapter.darkages.WizardZombie</node>
+    <node x="10664.0" y="4959.0">model.entities.zombies.chapter.beach.FishermanZombie</node>
+    <node x="5718.15807404729" y="2663.5">model.entities.plants.shooter.MegaGatlingPea</node>
+    <node x="8096.2232573564725" y="1176.0">model.engine.GameSession</node>
+    <node x="11511.333333333332" y="3197.0">model.entities.zombies.defense.ParasolDefense</node>
+    <node x="14297.0" y="4959.0">model.entities.zombies.behavior.ReflectBehavior</node>
+    <node x="12.5" y="4697.5">model.quest.QuestFactory</node>
+    <node x="4205.0" y="4959.0">model.entities.zombies.chapter.darkages.DarkGargantuarZombie</node>
+    <node x="9970.15807404729" y="2663.5">model.entities.plants.sunProducer.GoldBloom</node>
+    <node x="15213.804480221932" y="1140.0">model.level.behavior.IZombieBehavior</node>
+    <node x="5482.333333333333" y="3244.0">view.mainmenu.SettingMenu</node>
+    <node x="19657.960443801207" y="129.5">model.level.Wave</node>
+    <node x="12557.15807404729" y="2663.5">model.entities.plants.wallnut.Garlic</node>
+    <node x="14299.01492402314" y="2192.0">model.entities.plants.modifier.BaseModifier</node>
+    <node x="12097.333333333332" y="3197.0">model.entities.zombies.move.SprintMove</node>
+    <node x="19661.460443801207" y="367.0">model.level.Level</node>
+    <node x="17318.0" y="4959.0">model.entities.zombies.chapter.common.ParasolZombie</node>
+    <node x="9198.15807404729" y="2663.5">model.entities.plants.explosive.HotPotato</node>
+    <node x="8273.0" y="4959.0">model.entities.zombies.chapter.common.NewspaperZombie</node>
+    <node x="612.2467637540454" y="3215.0">model.quest.QuestReward</node>
+    <node x="10429.0" y="4959.0">model.entities.zombies.chapter.frostbite.TroglobiteZombie</node>
+    <node x="6940.065183309183" y="1682.0">model.entities.plants.shooter.ShooterBulletType</node>
+    <node x="43.246763754045446" y="3300.5">model.quest.JsonContainer</node>
+    <node x="4069.333333333333" y="3403.0">model.entities.zombies.armore.Armor</node>
+    <node x="12333.833333333332" y="3119.0">model.entities.zombies.move.MoveBehavior</node>
+    <node x="8936.333333333332" y="3197.0">model.entities.zombies.attack.CrushAttack</node>
+    <node x="2116.0854438012066" y="1682.0">model.entities.items.sun.SunToken</node>
+    <node x="20075.51492402314" y="1200.5">model.level.special.TimedWarLevel</node>
+    <node x="5318.333333333333" y="3244.0">view.mainmenu.ProfileMenu</node>
+    <node x="5257.454301075269" y="3119.0">view.AppMenu</node>
+    <node x="1163.1271104678726" y="178.5">model.state.CheatCmd</node>
+    <node x="11132.0" y="4959.0">service.CollectionService</node>
+    <node x="9943.90807404729" y="117.0">model.engine.GameEntity</node>
+    <node x="-202.0" y="2627.0">model.level.LevelLoader</node>
+    <node x="19442.01492402314" y="1669.0">model.board.terrain.Tile</node>
+    <node x="3933.333333333333" y="3119.0">model.entities.zombies.armore.ArmorType</node>
+    <node x="31.0" y="3789.5">model.quest.JsonContainer.JsonCriterionData</node>
+    <node x="10690.190183309183" y="1682.0">model.board.structures.VaseType</node>
+    <node x="12675.15807404729" y="2663.5">model.entities.plants.wallnut.ExplodeONut</node>
+    <node x="11705.333333333332" y="3197.0">model.entities.zombies.defense.JesterDefense</node>
+    <node x="19890.085443801207" y="2554.0">model.minigames.BeghouledMinigame</node>
+    <node x="5034.15807404729" y="2663.5">model.entities.plants.shooter.Peashooter</node>
+    <node x="4947.333333333333" y="3244.0">view.LoginMenu</node>
+    <node x="16049.26492402314" y="2143.5">model.level.behavior.ZombotanyBehavior</node>
+    <node x="5318.2937771345405" y="2192.0">model.board.structures.IceBlock</node>
+    <node x="21374.45242402314" y="1055.0">model.level.Chapter</node>
+    <node x="21182.51492402314" y="1200.5">model.level.special.DeadLineLevel</node>
+    <node x="14736.0" y="4959.0">model.entities.zombies.behavior.WizardBehavior</node>
+    <node x="11135.15807404729" y="2663.5">model.entities.plants.modifier.Imitater</node>
+    <node x="9350.15807404729" y="2663.5">model.entities.plants.explosive.Jalapeno</node>
+    <node x="15306.01492402314" y="2192.0">model.entities.plants.wallnut.BaseDefensive</node>
+    <node x="20839.0" y="4959.0">service.QuestService</node>
+    <node x="17612.181590689805" y="2591.0">model.level.behavior.VaseBreakerBehavior</node>
+    <node x="1901.4080740472882" y="1151.0">model.entities.items.sun.SunDropType</node>
+    <node x="2279.333333333333" y="3305.0">model.shop.ShopItem</node>
+    <node x="5832.333333333333" y="3244.0">view.mainmenu.TravelLogMenu</node>
+    <node x="10950.333333333332" y="3197.0">model.entities.zombies.effect.FireEffect</node>
+    <node x="14741.01492402314" y="2192.0">model.entities.plants.melee.BaseMelee</node>
+    <node x="10824.15807404729" y="2663.5">model.entities.plants.modifier.HypnoShroom</node>
+    <node x="5790.0" y="4959.0">model.entities.zombies.behavior.ArcadeCartBehavior</node>
+    <node x="12019.15807404729" y="2663.5">model.entities.plants.wallnut.TallNut</node>
+    <node x="4746.5437771345405" y="2167.5">model.board.structures.Container</node>
+    <node x="227.24676375404545" y="3119.0">model.quest.CriterionProgress</node>
+    <node x="14596.01492402314" y="2192.0">model.entities.plants.MintPlant</node>
+    <node x="10137.333333333332" y="3197.0">model.entities.zombies.effect.RageEffect</node>
+    <node x="4007.53307404729" y="2663.5">model.entities.plants.shooter.SplitPea</node>
+    <node x="9012.333333333332" y="3119.0">model.entities.zombies.attack.AttackBehavior</node>
+    <node x="8605.333333333332" y="3197.0">model.entities.zombies.attack.ChompAttack</node>
+    <node x="1114.0" y="5092.0">model.state.GameState</node>
+    <node x="1824.0833333333335" y="3119.0">model.greenhouse.PlantState</node>
+    <node x="19889.51492402314" y="1200.5">model.level.special.NightOpsLevel</node>
+    <node x="-222.0" y="4959.0">controller.maincontroller.NewsController</node>
+    <node x="15931.804480221932" y="1152.0">model.level.behavior.ConveyorBehavior</node>
+    <node x="8049.0982573564725" y="632.5">model.state.ResourceState</node>
+    <node x="15824.0" y="4959.0">model.entities.zombies.zombotany.WallNutZombie</node>
+    <node x="1428.0" y="4959.0">service.GreenHouseService</node>
+    <node x="4279.53307404729" y="2663.5">model.entities.plants.shooter.GooPeashooter</node>
+    <node x="19081.76492402314" y="2179.5">model.board.terrain.GraveTile</node>
+    <node x="14955.0" y="4959.0">model.entities.zombies.chapter.egypt.ExplorerZombie</node>
+    <node x="2767.0" y="4959.0">model.constraint.SaveOurSeedsConstraint</node>
+    <node x="7776.333333333333" y="3232.0">service.minigame.BeghouledService</node>
+    <node x="1662.0" y="5092.0">model.state.LawnState</node>
+    <node x="19293.333333333332" y="3119.0">model.entities.items.ItemType</node>
+    <node x="929.0" y="5092.0">service.game.SunService</node>
+    <node x="2495.0" y="5092.0">model.entities.zombies.behavior.ZombieBehavior</node>
+    <node x="19893.76492402314" y="2179.5">model.board.terrain.FrozenTile</node>
+    <node x="-173.0" y="3789.5">model.quest.JsonContainer.JsonRewardData</node>
+    <node x="11007.15807404729" y="2663.5">model.entities.plants.modifier.LilyPad</node>
+    <node x="10315.15807404729" y="2663.5">model.entities.plants.sunProducer.PrimalSunflower</node>
+    <node x="7348.098257356472" y="596.0">model.level.delivery.CardDeliveryStrategy</node>
+    <node x="252.5" y="1200.5">model.level.JsonContainer.JsonLevelData</node>
+    <node x="3913.6687771345396" y="2179.5">model.entities.projectiles.move.BounceMove</node>
+    <node x="17665.333333333332" y="3119.0">controller.command.LoginCommand</node>
+    <node x="9104.333333333332" y="3197.0">model.entities.zombies.attack.HunterFreeze</node>
+    <node x="9431.51492402314" y="2192.0">model.board.structures.ArcadeCart</node>
+    <node x="19284.76492402314" y="2179.5">model.board.terrain.NecromancyTile</node>
+    <node x="11699.15807404729" y="2663.5">model.entities.plants.melee.BonkChoy</node>
+    <node x="9641.875" y="1682.0">model.entities.plants.explosive.ExplosiveMineType</node>
+    <node x="12259.333333333332" y="3197.0">model.entities.zombies.move.PusherMove</node>
+    <node x="351.1271104678726" y="178.5">model.state.PlantCmd</node>
+    <node x="3391.53307404729" y="2663.5">model.entities.plants.shooter.Rotobaga</node>
+    <node x="20486.51492402314" y="1200.5">model.level.special.PlantWhatYouGetLevel</node>
+    <node x="2019.0" y="5092.0">model.entities.zombies.chapter.egypt.RaZombie</node>
+    <node x="14656.333333333332" y="3119.0">controller.command.maincommand.TravelLogCommand</node>
+    <node x="11889.333333333332" y="3197.0">model.entities.zombies.defense.ArmorDefense</node>
+    <node x="1540.0833333333333" y="3300.5">model.quest.QuestContext</node>
+    <node x="12147.15807404729" y="2663.5">model.entities.plants.wallnut.WallNut</node>
+    <node x="690.1271104678726" y="178.5">model.level.JsonContainer.JsonSpawnData</node>
+    <node x="17376.333333333332" y="3119.0">controller.command.maincommand.NewsCommand</node>
+    <node x="7558.333333333333" y="3232.0">service.minigame.ZombotanyService</node>
+    <node x="14010.333333333332" y="3119.0">controller.command.maincommand.GreenHouseCommand</node>
+    <node x="12427.333333333332" y="3197.0">model.entities.zombies.move.JumpMove</node>
+    <node x="7758.065183309183" y="1694.0">model.entities.items.PlantFoodDrop</node>
+    <node x="18998.0" y="4959.0">model.entities.zombies.chapter.frostbite.IceAgeZombie</node>
+    <node x="1297.0" y="5092.0">model.entities.zombies.archetypes.ImpZombie</node>
+    <node x="1845.8333333333335" y="3565.0">model.greenhouse.Greenhouse</node>
+    <node x="6432.333333333333" y="3244.0">view.mainmenu.GreenHouse</node>
+    <node x="8592.065183309183" y="1694.0">model.entities.projectiles.hit.NormalHit</node>
+    <node x="4324.333333333333" y="3353.0">model.engine.Renderable</node>
+    <node x="6688.15807404729" y="2663.5">model.entities.plants.lobber.WinterMelon</node>
+    <node x="12334.375" y="2192.0">model.entities.plants.explosive.BaseExplosive</node>
+    <node x="15608.0" y="4959.0">model.entities.zombies.behavior.ZombieContext</node>
+    <node x="6239.333333333333" y="3244.0">view.mainmenu.gamemenu.CollectionMenu</node>
+    <node x="9928.875" y="1694.0">model.entities.projectiles.hit.PierceHit</node>
+    <node x="6917.098257356472" y="153.5">model.engine.GameClock</node>
+    <node x="15174.0" y="4959.0">model.entities.zombies.chapter.egypt.PharaohZombie</node>
+    <node x="9753.333333333332" y="3197.0">model.entities.zombies.attack.OctopusThrow</node>
+    <node x="6910.333333333333" y="3244.0">view.RegisterMenu</node>
+    <node x="9000.0" y="4959.0">model.entities.zombies.chapter.common.ProspectorZombie</node>
+    <node x="4608.333333333333" y="3232.0">view.AppView</node>
+    <node x="-222.0" y="4280.5">model.quest.JsonContainer.JsonQuestData</node>
+    <node x="3845.53307404729" y="2663.5">model.entities.plants.shooter.SeaShroom</node>
+    <node x="19040.333333333332" y="3119.0">model.minigames.vasebreaker.VaseType</node>
+    <node x="10118.875" y="1694.0">model.entities.projectiles.hit.FireHit</node>
+    <node x="17489.26492402314" y="1152.0">model.level.behavior.PlantWhatYouGetBehavior</node>
+    <node x="5105.333333333333" y="3244.0">view.mainmenu.gamemenu.ChoosePlantMenu</node>
+    <node x="10448.333333333332" y="3197.0">model.entities.zombies.effect.SunThief</node>
+    <node x="53.0" y="4959.0">controller.maincontroller.TravelLogController</node>
+    <node x="9653.15807404729" y="2663.5">model.entities.plants.explosive.IceShroom</node>
+    <node x="16253.0" y="4959.0">model.entities.zombies.ZombieFactory</node>
+    <node x="7564.833333333333" y="3119.0">service.minigame.MinigameService</node>
+    <node x="10760.333333333332" y="3197.0">model.entities.zombies.effect.DynamiteTimer</node>
+    <node x="5383.15807404729" y="2663.5">model.entities.plants.shooter.BowlingBulb</node>
+    <node x="13161.15807404729" y="2614.5">model.board.Row</node>
+    <node x="8574.565183309183" y="2192.0">model.entities.plants.shooter.BaseShooter</node>
+    <node x="2638.333333333333" y="3166.5">model.account.NewsItem</node>
+    <node x="2716.0" y="5092.0">model.constraint.LevelConstraint</node>
+    <node x="328.0" y="4959.0">controller.maincontroller.NetworkController</node>
+    <node x="9492.15807404729" y="2663.5">model.entities.plants.explosive.PotatoMine</node>
+    <node x="18517.333333333332" y="3119.0">model.entities.zombies.ZombieSize</node>
+    <node x="9957.0" y="4959.0">model.entities.zombies.chapter.frostbite.DodoRiderZombie</node>
+    <node x="17785.26492402314" y="1139.0">model.entities.plants.Tag</node>
+    <node x="3070.083333333333" y="3493.0">model.account.Account</node>
+    <node x="12417.15807404729" y="2663.5">model.entities.plants.wallnut.Endurian</node>
+    <node x="4914.15807404729" y="2663.5">model.entities.plants.shooter.Citron</node>
+    <node x="20612.07742402314" y="2663.5">model.minigames.IZombieMinigame</node>
+    <node x="12775.333333333332" y="3119.0">service.AccountService</node>
+    <node x="8378.15807404729" y="2663.5">model.entities.plants.explosive.TangleKelp</node>
+    <node x="20869.57742402314" y="2192.0">model.minigames.BaseMinigame</node>
+    <node x="6985.15807404729" y="2663.5">model.entities.plants.strikethrough.FumeShroom</node>
+    <node x="2152.408074047288" y="1176.0">model.entities.items.CoinDrop.CoinTier</node>
+    <node x="4755.0" y="4959.0">model.entities.zombies.behavior.GraveRaisingBehavior</node>
+    <node x="7049.0" y="4959.0">model.entities.zombies.chapter.egypt.TombRaiserZombie</node>
+    <node x="13190.40807404729" y="2888.0">model.board.Lawn</node>
+    <node x="20028.0" y="4959.0">model.entities.zombies.chapter.beach.BeachZombie</node>
+    <node x="8516.0" y="4959.0">model.entities.zombies.zombotany.PeashooterZombie</node>
+    <node x="19823.0" y="4959.0">model.shop.ShopManager</node>
+    <node x="20231.0" y="4959.0">model.entities.zombies.chapter.egypt.CamelZombie</node>
+    <node x="13678.333333333332" y="3119.0">controller.command.maincommand.gamecommand.ChoosePlantCommand</node>
+    <node x="3283.333333333333" y="3214.5">model.account.ScoreRecord</node>
+    <node x="20820.07742402314" y="2663.5">model.minigames.WallnutBowlingMinigame</node>
+    <node x="15547.804480221932" y="1218.0">model.entities.plants.Plant</node>
+    <node x="2194.0" y="5092.0">model.state.CellState</node>
+    <node x="16680.0" y="4959.0">model.entities.zombies.archetypes.RegularZombie</node>
+    <node x="3349.0" y="4959.0">model.entities.zombies.behavior.HunterSnowballBehavior</node>
+    <node x="7222.065183309183" y="1694.0">model.entities.items.DiamondDrop</node>
+    <node x="8218.76492402314" y="2167.5">model.board.structures.Vase</node>
+    <node x="18874.76492402314" y="2179.5">model.board.terrain.ShallowCoastTile</node>
+    <node x="2362.0" y="5092.0">model.App</node>
+    <node x="20637.0" y="4959.0">model.entities.zombies.chapter.beach.SurferZombie</node>
+    <node x="603.0" y="4959.0">controller.maincontroller.gamecontroller.GameController</node>
+    <node x="13856.0" y="4959.0">model.entities.zombies.zomboss.ZombossSphinx</node>
+    <node x="455.375" y="650.0">model.state.InputEvent</node>
+    <node x="1223.0586569579289" y="4637.0">model.quest.QuestManager</node>
+    <node x="15595.333333333332" y="3119.0">model.entities.plants.homing.HomingBulletType</node>
+    <node x="16893.0" y="4959.0">service.game.ZombieService</node>
+    <node x="878.0" y="4959.0">controller.maincontroller.SettingController</node>
+    <node x="19205.0" y="4959.0">model.entities.zombies.zomboss.BaseZomboss</node>
+    <node x="10898.0" y="4959.0">model.entities.zombies.behavior.SunStealBehavior</node>
+    <node x="17741.0" y="4959.0">model.entities.zombies.behavior.TorchBehavior</node>
+    <node x="6025.333333333333" y="3244.0">view.mainmenu.LeaderBoardMenu</node>
+    <node x="18339.012240713957" y="142.5">model.level.behavior.LevelBehavior</node>
+    <node x="1153.0" y="4959.0">controller.maincontroller.MainController</node>
+    <node x="16941.26492402314" y="1139.0">model.entities.plants.PlantType</node>
+    <node x="21396.45242402314" y="1573.0">model.level.LevelManager</node>
+    <node x="20434.0" y="4959.0">model.entities.zombies.chapter.darkages.JesterZombie</node>
+    <node x="13000.333333333332" y="3119.0">model.entities.plants.strikethrough.StrikeThroughBulletType</node>
+    <node x="8235.098257356472" y="583.5">model.entities.items.GroundItem</node>
+    <node x="14972.333333333332" y="3119.0">controller.command.maincommand.gamecommand.CollectionCommand</node>
+    <node x="12059.0" y="4959.0">model.entities.zombies.chapter.egypt.EgyptImpZombie</node>
+    <node x="2720.241407380622" y="1200.5">model.entities.projectiles.move.MoveStrategy</node>
+    <node x="7541.0" y="4959.0">model.entities.zombies.behavior.PianoLaneBehavior</node>
+    <node x="17952.0" y="4959.0">model.entities.zombies.chapter.frostbite.WeaselZombie</node>
+    <node x="8020.158074047289" y="2663.5">model.entities.plants.explosive.IcebergLettuce</node>
+    <node x="18163.0" y="4959.0">service.SettingService</node>
+    <node x="6752.333333333333" y="3244.0">view.mainmenu.NewsMenu</node>
+    <node x="20736.51492402314" y="1200.5">model.level.special.SaveOurSeedsLevel</node>
+    <node x="12585.333333333332" y="3197.0">model.entities.zombies.move.NormalWalk</node>
+    <node x="13189.0" y="4959.0">model.entities.zombies.zombotany.JalapenoZombie</node>
+    <node x="13614.460443801207" y="2192.0">model.entities.plants.sunProducer.BaseSunFlower</node>
+    <node x="2884.333333333333" y="3142.5">model.account.AdventureProgress</node>
+    <node x="9718.0" y="4959.0">model.entities.zombies.chapter.darkages.ImpDragonZombie</node>
+    <node x="21240.0" y="4959.0">service.NewsService</node>
+    <node x="8399.333333333332" y="3197.0">model.entities.zombies.attack.WizardTransform</node>
+    <node x="20889.57742402314" y="1724.0">model.minigames.Minigame</node>
+    <node x="5551.15807404729" y="2663.5">model.entities.plants.shooter.Threepeater</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="model.board.structures.IceBlock" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5377.2937771345405" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.quest.Quest" target="model.quest.QuestContext" relationship="DEPENDENCY">
+      <point x="0.0" y="-164.0" />
+      <point x="1178.788430420712" y="3626.0" />
+      <point x="1620.0833333333333" y="3626.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.GrapeShot" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8604.65807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.Sunflower" target="model.entities.plants.sunProducer.BaseSunFlower" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10578.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2462.0" />
+      <point x="13700.460443801207" y="2462.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonChapterData" target="model.level.JsonContainer.JsonLevelData" relationship="TO_MANY">
+      <point x="47.0" y="-31.5" />
+      <point x="23.25" y="1551.0" />
+      <point x="294.25" y="1551.0" />
+      <point x="-41.75" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.lobber.WinterMelon" target="model.entities.plants.lobber.BaseLobber" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6763.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2502.0" />
+      <point x="11185.5" y="2502.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.attack.KingBuff" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9674.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.items.DiamondDrop" target="model.entities.items.GroundItem" relationship="GENERALIZATION">
+      <point x="64.75" y="-44.0" />
+      <point x="7416.315183309183" y="1501.0" />
+      <point x="8889.190183309183" y="1501.0" />
+      <point x="8889.190183309183" y="1033.0" />
+      <point x="8122.0982573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="983.0" />
+      <point x="8278.264924023137" y="983.0" />
+      <point x="-86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.greenhouse.Greenhouse" target="model.greenhouse.SproutPlant" relationship="TO_MANY">
+      <point x="0.0" y="-189.0" />
+      <point x="81.75" y="117.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.GooPeashooter" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="4365.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.Projectile" target="model.entities.projectiles.move.MoveStrategy" relationship="TO_ONE">
+      <point x="41.33333333333303" y="-31.5" />
+      <point x="4182.252110467873" y="1551.0" />
+      <point x="4166.585443801206" y="1551.0" />
+      <point x="4166.585443801206" y="1441.0" />
+      <point x="2871.074740713955" y="1441.0" />
+      <point x="60.333333333333485" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.lobber.MelonPult" target="model.entities.plants.lobber.BaseLobber" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6125.65807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2502.0" />
+      <point x="11185.5" y="2502.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.PlantFoodDrop" target="model.entities.items.GroundItem" relationship="GENERALIZATION">
+      <point x="64.75" y="-44.0" />
+      <point x="7952.315183309183" y="1511.0" />
+      <point x="9028.690183309183" y="1511.0" />
+      <point x="9028.690183309183" y="1033.0" />
+      <point x="8122.0982573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="983.0" />
+      <point x="8278.264924023137" y="983.0" />
+      <point x="-86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.board.structures.Grave" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="59.0" y="-56.0" />
+      <point x="5192.5437771345405" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.behavior.SaveOurSeedsBehavior" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="17329.76492402314" y="1451.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.PuffShroom" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="3753.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.state.CollectSunCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-43.0" y="31.5" />
+      <point x="541.1271104678726" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.level.behavior.ZombotanyBehavior" target="model.entities.plants.BasePlant" relationship="TO_MANY">
+      <point x="0.0" y="-80.0" />
+      <point x="16193.76492402314" y="2025.0" />
+      <point x="16348.76492402314" y="2025.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.state.FeedPlantCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-41.25" y="31.5" />
+      <point x="1358.3771104678726" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonLevelData" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="-41.75" y="-31.5" />
+      <point x="294.25" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonZombieEntry" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="1622.25" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.melee.PhatBeet" target="model.entities.plants.melee.BaseMelee" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11327.15807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2442.0" />
+      <point x="14809.51492402314" y="2442.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.Quest" target="model.quest.CriterionProgress" relationship="DEPENDENCY">
+      <point x="0.0" y="-164.0" />
+      <point x="1178.788430420712" y="3586.0" />
+      <point x="500.99676375404545" y="3586.0" />
+      <point x="91.25" y="213.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.LaserAttack" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9352.833333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.GoldBloom" target="model.entities.plants.sunProducer.BaseSunFlower" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10038.65807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2462.0" />
+      <point x="13700.460443801207" y="2462.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonSpawnData" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="779.6271104678726" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.Garlic" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12606.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.Quest" relationship="REALIZATION">
+      <point x="0.0" y="-273.0" />
+      <point x="1193.038430420712" y="4017.0" />
+      <point x="1178.788430420712" y="4017.0" />
+      <point x="0.0" y="164.0" />
+    </edge>
+    <edge source="model.entities.zombies.defense.ImmuneDefense" target="model.entities.zombies.defense.DefenseBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11211.333333333332" y="3172.0" />
+      <point x="11598.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.zombies.effect.SunThief" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.minigames.WallnutBowlingMinigame" target="model.minigames.BaseMinigame" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20943.07742402314" y="2532.0" />
+      <point x="20952.07742402314" y="2532.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.gamemenu.GameMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="4857.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.Zombie" target="model.engine.GameEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="10349.848257356472" y="345.0" />
+      <point x="9543.723257356472" y="345.0" />
+      <point x="9543.723257356472" y="325.0" />
+      <point x="10014.90807404729" y="325.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="model.entities.zombies.effect.RageEffect" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10206.333333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.projectiles.Projectile" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="TO_ONE">
+      <point x="41.33333333333303" y="-31.5" />
+      <point x="4182.252110467873" y="1551.0" />
+      <point x="4166.585443801206" y="1551.0" />
+      <point x="4166.585443801206" y="1441.0" />
+      <point x="9544.315183309183" y="1441.0" />
+      <point x="-47.0" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.WallnutBowlingBehavior" target="model.entities.plants.BasePlant" relationship="TO_MANY">
+      <point x="-110.66666666666788" y="-92.0" />
+      <point x="16800.098257356472" y="2025.0" />
+      <point x="16348.76492402314" y="2025.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.NewsItem" relationship="TO_MANY">
+      <point x="-60.0" y="-44.0" />
+      <point x="3130.083333333333" y="3473.0" />
+      <point x="3040.352564102564" y="3473.0" />
+      <point x="3040.352564102564" y="3463.0" />
+      <point x="2751.333333333333" y="3463.0" />
+      <point x="0.0" y="104.5" />
+    </edge>
+    <edge source="model.quest.QuestManager" target="model.quest.QuestType" relationship="DEPENDENCY">
+      <point x="94.75" y="-128.5" />
+      <point x="1507.3086569579289" y="4616.0" />
+      <point x="1552.9890776699028" y="4616.0" />
+      <point x="1552.9890776699028" y="4606.0" />
+      <point x="1544.9227346278317" y="4606.0" />
+      <point x="1544.9227346278317" y="3586.0" />
+      <point x="1326.0" y="3586.0" />
+      <point x="1326.0" y="3566.0" />
+      <point x="1145.788430420712" y="3566.0" />
+      <point x="77.33333333333326" y="93.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.Squash" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9123.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.engine.GameClock" relationship="TO_ONE">
+      <point x="56.75" y="-56.0" />
+      <point x="8266.473257356472" y="1023.0" />
+      <point x="9203.356849975851" y="1023.0" />
+      <point x="9203.356849975851" y="993.0" />
+      <point x="6987.598257356472" y="993.0" />
+      <point x="0.0" y="56.5" />
+    </edge>
+    <edge source="model.entities.zombies.move.NormalWalk" target="model.entities.zombies.move.MoveBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12657.833333333332" y="3172.0" />
+      <point x="12414.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.board.Cell" target="model.entities.plants.BasePlant" relationship="TO_ONE">
+      <point x="0.0" y="-176.5" />
+      <point x="15874.26492402314" y="1995.0" />
+      <point x="16348.76492402314" y="1995.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.greenhouse.SproutPlant" target="model.greenhouse.SproutPlant" relationship="DEPENDENCY">
+      <point x="-81.75" y="117.0" />
+      <point x="1846.8333333333335" y="3535.0" />
+      <point x="1745.0833333333335" y="3535.0" />
+      <point x="1745.0833333333335" y="3398.0" />
+      <point x="-163.5" y="-0.0" />
+    </edge>
+    <edge source="model.board.structures.Vase" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-78.66666666666606" y="-56.0" />
+      <point x="8258.098257356472" y="2015.0" />
+      <point x="7491.565183309183" y="2015.0" />
+      <point x="7491.565183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="view.mainmenu.ProfileMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5390.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.SweetPotato" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12925.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="service.minigame.VaseBreakService" target="service.minigame.MinigameService" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="8084.333333333334" y="3207.0" />
+      <point x="7657.333333333333" y="3207.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.effect.FreezeEffect" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10664.833333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.util.Vec2" target="model.util.Vec2" relationship="DEPENDENCY">
+      <point x="-51.5" y="176.0" />
+      <point x="9916.90807404729" y="75.0" />
+      <point x="9845.40807404729" y="75.0" />
+      <point x="9845.40807404729" y="-121.0" />
+      <point x="-103.0" y="-0.0" />
+    </edge>
+    <edge source="model.entities.plants.strikethrough.BaseStrikethrough" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11673.5" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.VaseBreakerBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-104.0" />
+      <point x="17799.181590689805" y="2522.0" />
+      <point x="17467.76492402314" y="2522.0" />
+      <point x="17467.76492402314" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.board.structures.Grave" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-59.0" y="-56.0" />
+      <point x="5074.5437771345405" y="2015.0" />
+      <point x="7211.565183309183" y="2015.0" />
+      <point x="7211.565183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.quest.JsonContainer.JsonQuestData" target="model.quest.JsonContainer.JsonRewardData" relationship="TO_ONE">
+      <point x="43.0" y="-31.5" />
+      <point x="-93.0" y="4017.0" />
+      <point x="-107.75" y="4017.0" />
+      <point x="-107.75" y="4007.0" />
+      <point x="-127.0" y="4007.0" />
+      <point x="-46.0" y="31.5" />
+    </edge>
+    <edge source="model.level.special.LoveYourPlantsLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="19762.01492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.BaseExplosive" target="model.entities.plants.explosive.ExplosiveMineType" relationship="TO_ONE">
+      <point x="-41.0" y="-31.5" />
+      <point x="12375.375" y="1955.0" />
+      <point x="9775.375" y="1955.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.shop.ShopItemType" target="model.shop.ShopItemType" relationship="DEPENDENCY">
+      <point x="-65.5" y="68.0" />
+      <point x="2305.333333333333" y="3275.0" />
+      <point x="2219.833333333333" y="3275.0" />
+      <point x="2219.833333333333" y="3187.0" />
+      <point x="-131.0" y="-0.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.HitEffectStrategy" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="0.0" y="-31.5" />
+      <point x="9591.315183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.entities.plants.modifier.HypnoShroom" target="model.entities.plants.modifier.BaseModifier" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10905.65807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2452.0" />
+      <point x="14376.01492402314" y="2452.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.BounceMove" target="model.entities.projectiles.move.MoveStrategy" relationship="REALIZATION">
+      <point x="-45.25" y="-44.0" />
+      <point x="3958.9187771345396" y="2015.0" />
+      <point x="3460.1687771345396" y="2015.0" />
+      <point x="3460.1687771345396" y="1481.0" />
+      <point x="2740.241407380622" y="1481.0" />
+      <point x="2740.241407380622" y="1441.0" />
+      <point x="2750.408074047289" y="1441.0" />
+      <point x="-60.333333333333485" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.ArcMove" target="model.entities.projectiles.Projectile" relationship="DEPENDENCY">
+      <point x="45.25" y="-44.0" />
+      <point x="3808.9187771345396" y="2025.0" />
+      <point x="4140.91877713454" y="2025.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.board.structures.Vase" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="8336.76492402314" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.FireHit" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="42.5" y="-44.0" />
+      <point x="10246.375" y="1541.0" />
+      <point x="10463.315183309183" y="1541.0" />
+      <point x="10463.315183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.JsonContainer.JsonRewardData" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="27.125" y="4616.0" />
+      <point x="27.125" y="4017.0" />
+      <point x="-35.0" y="4017.0" />
+      <point x="46.0" y="31.5" />
+    </edge>
+    <edge source="model.level.delivery.ConveyorDeliveryStrategy" target="model.level.delivery.DeliveryStrategy" relationship="REALIZATION">
+      <point x="0.0" y="-68.0" />
+      <point x="7863.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="335.0" />
+      <point x="8573.65807404729" y="335.0" />
+      <point x="-82.5" y="55.5" />
+    </edge>
+    <edge source="model.state.PluckCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-32.5" y="31.5" />
+      <point x="-27.75" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.CherryBomb" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8283.65807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.sun.SunToken" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="86.33333333333348" y="-56.0" />
+      <point x="2331.9187771345405" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="view.RegisterMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6989.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.SplitPea" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="4065.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.IceHit" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="REALIZATION">
+      <point x="-42.5" y="-44.0" />
+      <point x="10351.375" y="1551.0" />
+      <point x="8752.815183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1431.0" />
+      <point x="9638.315183309183" y="1431.0" />
+      <point x="47.0" y="31.5" />
+    </edge>
+    <edge source="model.level.special.SaveOurSeedsLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20840.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.state.BoostPlantCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-43.0" y="-31.5" />
+      <point x="-33.25" y="14.0" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.QuestReward" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="579.125" y="4616.0" />
+      <point x="579.125" y="3636.0" />
+      <point x="797.4967637540454" y="3636.0" />
+      <point x="61.75" y="117.0" />
+    </edge>
+    <edge source="model.level.behavior.BossBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="63.75" y="-80.0" />
+      <point x="15848.054480221932" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.modifier.Torchwood" target="model.entities.plants.modifier.BaseModifier" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10733.65807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2452.0" />
+      <point x="14376.01492402314" y="2452.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.board.Row" target="model.board.Cell" relationship="DEPENDENCY">
+      <point x="0.0" y="-80.5" />
+      <point x="13233.15807404729" y="2532.0" />
+      <point x="13274.40807404729" y="2532.0" />
+      <point x="13274.40807404729" y="2422.0" />
+      <point x="15874.26492402314" y="2422.0" />
+      <point x="0.0" y="176.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.StraightMove" target="model.entities.projectiles.move.MoveStrategy" relationship="REALIZATION">
+      <point x="-45.25" y="-44.0" />
+      <point x="4159.91877713454" y="2005.0" />
+      <point x="3565.6687771345396" y="2005.0" />
+      <point x="3565.6687771345396" y="1481.0" />
+      <point x="2740.241407380622" y="1481.0" />
+      <point x="2740.241407380622" y="1441.0" />
+      <point x="2750.408074047289" y="1441.0" />
+      <point x="-60.333333333333485" y="31.5" />
+    </edge>
+    <edge source="model.board.structures.Vase" target="model.board.structures.VaseType" relationship="TO_ONE">
+      <point x="78.66666666666606" y="-56.0" />
+      <point x="8415.431590689805" y="2015.0" />
+      <point x="10794.190183309183" y="2015.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.quest.Quest" target="model.quest.QuestType" relationship="DEPENDENCY">
+      <point x="0.0" y="-164.0" />
+      <point x="1178.788430420712" y="3596.0" />
+      <point x="1326.0" y="3596.0" />
+      <point x="1326.0" y="3566.0" />
+      <point x="1145.788430420712" y="3566.0" />
+      <point x="77.33333333333326" y="93.0" />
+    </edge>
+    <edge source="view.mainmenu.gamemenu.CollectionMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6325.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.JsonContainer" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="3636.0" />
+      <point x="166.24676375404545" y="3636.0" />
+      <point x="41.0" y="31.5" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.behavior.PlantWhatYouGetBehavior" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="17617.26492402314" y="1451.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.ChompAttack" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8684.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.zombies.defense.ParasolDefense" target="model.entities.zombies.defense.DefenseBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.account.AccountState" target="model.account.AccountState" relationship="DEPENDENCY">
+      <point x="-97.0" y="152.0" />
+      <point x="3577.333333333333" y="3443.0" />
+      <point x="3460.333333333333" y="3443.0" />
+      <point x="3460.333333333333" y="3271.0" />
+      <point x="-194.0" y="-0.0" />
+    </edge>
+    <edge source="model.level.behavior.VaseBreakerBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="124.66666666666788" y="-104.0" />
+      <point x="17923.848257356472" y="2532.0" />
+      <point x="18255.26492402314" y="2532.0" />
+      <point x="18255.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.BaseShooter" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="38.0" y="-31.5" />
+      <point x="8688.565183309183" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonWaveData" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="42.25" y="-31.5" />
+      <point x="890.75" y="345.0" />
+      <point x="1152.6271104678726" y="345.0" />
+      <point x="1152.6271104678726" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestPriority" target="model.quest.QuestPriority" relationship="DEPENDENCY">
+      <point x="-81.33333333333331" y="68.0" />
+      <point x="1265.1217637540456" y="3420.0" />
+      <point x="1204.4550970873788" y="3420.0" />
+      <point x="1204.4550970873788" y="3332.0" />
+      <point x="-122.0" y="-0.0" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.behavior.ConveyorBehavior" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="16059.304480221932" y="1451.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="model.entities.plants.strikethrough.FumeShroom" target="model.entities.plants.strikethrough.BaseStrikethrough" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7062.15807404729" y="2532.0" />
+      <point x="6986.90807404729" y="2532.0" />
+      <point x="6986.90807404729" y="2492.0" />
+      <point x="11673.5" y="2492.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.PotatoMine" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9562.65807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.QuestReward" relationship="TO_ONE">
+      <point x="-137.0" y="-273.0" />
+      <point x="1056.038430420712" y="4017.0" />
+      <point x="748.375" y="4017.0" />
+      <point x="748.375" y="4007.0" />
+      <point x="738.375" y="4007.0" />
+      <point x="738.375" y="3626.0" />
+      <point x="673.9967637540454" y="3626.0" />
+      <point x="-61.75" y="117.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.IceShroom" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9720.65807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="service.minigame.IZombieService" target="service.minigame.MinigameService" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="7200.333333333333" y="3207.0" />
+      <point x="7657.333333333333" y="3207.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.VaseBreakerBehavior" target="model.board.structures.Vase" relationship="TO_MANY">
+      <point x="-124.66666666666788" y="-104.0" />
+      <point x="17674.514924023137" y="2532.0" />
+      <point x="16348.76492402314" y="2532.0" />
+      <point x="16348.76492402314" y="2522.0" />
+      <point x="8336.76492402314" y="2522.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.BasePlant" target="model.entities.plants.PlantType" relationship="TO_ONE">
+      <point x="43.0" y="-31.5" />
+      <point x="15635.304480221932" y="1551.0" />
+      <point x="17122.01492402314" y="1551.0" />
+      <point x="60.25" y="93.0" />
+    </edge>
+    <edge source="model.entities.plants.lobber.BaseLobber" target="model.entities.plants.lobber.LobberBulletType" relationship="TO_ONE">
+      <point x="-36.25" y="-31.5" />
+      <point x="11149.25" y="1965.0" />
+      <point x="8444.065183309183" y="1965.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.Pumpkin" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12338.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.Chapter" target="model.level.Level" relationship="TO_MANY">
+      <point x="0.0" y="-177.0" />
+      <point x="21508.95242402314" y="1003.0" />
+      <point x="21359.01492402314" y="1003.0" />
+      <point x="21359.01492402314" y="993.0" />
+      <point x="19849.585443801207" y="993.0" />
+      <point x="80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.WallNut" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12203.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.shop.ShopItem" target="model.shop.ShopItem" relationship="DEPENDENCY">
+      <point x="0.0" y="249.0" />
+      <point x="2436.333333333333" y="3823.0" />
+      <point x="2259.333333333333" y="3823.0" />
+      <point x="2259.333333333333" y="3554.0" />
+      <point x="-157.0" y="-0.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.FireHit" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="REALIZATION">
+      <point x="-42.5" y="-44.0" />
+      <point x="10161.375" y="1551.0" />
+      <point x="8752.815183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1431.0" />
+      <point x="9638.315183309183" y="1431.0" />
+      <point x="47.0" y="31.5" />
+    </edge>
+    <edge source="model.board.terrain.GraveTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="19173.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.board.terrain.FrozenTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="19985.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.level.special.PlantWhatYouGetLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20601.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.Level" relationship="CREATE">
+      <point x="56.25" y="-44.0" />
+      <point x="18178.01492402314" y="1551.0" />
+      <point x="19644.01492402314" y="1551.0" />
+      <point x="19644.01492402314" y="1003.0" />
+      <point x="19742.085443801207" y="1003.0" />
+      <point x="-26.875" y="297.0" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonWaveData" target="model.level.JsonContainer.JsonSpawnData" relationship="TO_MANY">
+      <point x="-42.25" y="-31.5" />
+      <point x="806.25" y="345.0" />
+      <point x="779.6271104678726" y="345.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.minigames.ZombotanyMinigame" target="model.minigames.BaseMinigame" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20484.57742402314" y="2532.0" />
+      <point x="20952.07742402314" y="2532.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.lobber.CabbagePult" target="model.entities.plants.lobber.BaseLobber" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6286.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2502.0" />
+      <point x="11185.5" y="2502.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.CheatCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="1263.6271104678726" y="325.0" />
+      <point x="33.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.PlantType" target="model.entities.plants.PlantType" relationship="DEPENDENCY">
+      <point x="-60.25" y="93.0" />
+      <point x="17001.51492402314" y="1345.0" />
+      <point x="16921.26492402314" y="1345.0" />
+      <point x="16921.26492402314" y="1232.0" />
+      <point x="-120.5" y="-0.0" />
+    </edge>
+    <edge source="model.level.special.ConveyorBeltLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20367.01492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.state.CheatCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-33.5" y="31.5" />
+      <point x="1196.6271104678726" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.quest.JsonContainer.JsonQuestData" target="model.quest.JsonContainer.JsonCriterionData" relationship="TO_MANY">
+      <point x="43.0" y="-31.5" />
+      <point x="-93.0" y="4017.0" />
+      <point x="-107.75" y="4017.0" />
+      <point x="-107.75" y="4007.0" />
+      <point x="79.25" y="4007.0" />
+      <point x="-48.25" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.Tag" target="model.entities.plants.Tag" relationship="DEPENDENCY">
+      <point x="-50.75" y="93.0" />
+      <point x="17836.01492402314" y="1345.0" />
+      <point x="17765.26492402314" y="1345.0" />
+      <point x="17765.26492402314" y="1232.0" />
+      <point x="-101.5" y="-0.0" />
+    </edge>
+    <edge source="model.board.terrain.NormalTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="18357.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.board.terrain.Tile" target="model.board.terrain.TileType" relationship="TO_ONE">
+      <point x="0.0" y="-69.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.TwinSunflower" target="model.entities.plants.sunProducer.BaseSunFlower" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10211.15807404729" y="2462.0" />
+      <point x="13700.460443801207" y="2462.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.BaseSunFlower" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="13700.460443801207" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.AppView" target="view.AppMenu" relationship="TO_ONE">
+      <point x="0.0" y="-56.0" />
+      <point x="4687.833333333333" y="3202.0" />
+      <point x="5288.954301075269" y="3202.0" />
+      <point x="-31.5" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestType" target="model.quest.QuestType" relationship="DEPENDENCY">
+      <point x="-77.33333333333331" y="93.0" />
+      <point x="991.1217637540456" y="3445.0" />
+      <point x="932.4550970873788" y="3445.0" />
+      <point x="932.4550970873788" y="3332.0" />
+      <point x="-116.0" y="-0.0" />
+    </edge>
+    <edge source="model.entities.items.GroundItem" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="0.0" y="80.5" />
+      <point x="8364.598257356472" y="1013.0" />
+      <point x="8152.9732573564725" y="1013.0" />
+      <point x="-56.75" y="-56.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.BaseShooter" target="model.entities.plants.shooter.ShooterBulletType" relationship="TO_ONE">
+      <point x="-38.0" y="-31.5" />
+      <point x="8612.565183309183" y="2005.0" />
+      <point x="7070.565183309183" y="2005.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.quest.QuestManager" target="model.quest.QuestManager" relationship="DEPENDENCY">
+      <point x="0.0" y="128.5" />
+      <point x="1412.5586569579289" y="4914.0" />
+      <point x="1203.0586569579289" y="4914.0" />
+      <point x="1203.0586569579289" y="4765.5" />
+      <point x="-189.5" y="-0.0" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.CollectSunCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="627.1271104678726" y="325.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.AccountState" relationship="CREATE">
+      <point x="60.0" y="-44.0" />
+      <point x="3250.083333333333" y="3473.0" />
+      <point x="3384.352564102564" y="3473.0" />
+      <point x="3384.352564102564" y="3453.0" />
+      <point x="3771.333333333333" y="3453.0" />
+      <point x="97.0" y="152.0" />
+    </edge>
+    <edge source="model.engine.GameEntity" target="model.util.Vec2" relationship="TO_ONE">
+      <point x="35.5" y="-93.0" />
+      <point x="10050.40807404729" y="96.0" />
+      <point x="10019.90807404729" y="96.0" />
+      <point x="51.5" y="176.0" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.Endurian" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12477.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.greenhouse.Greenhouse" target="model.greenhouse.Greenhouse" relationship="DEPENDENCY">
+      <point x="0.0" y="189.0" />
+      <point x="2010.3333333333335" y="3963.0" />
+      <point x="1825.8333333333335" y="3963.0" />
+      <point x="1825.8333333333335" y="3754.0" />
+      <point x="-164.5" y="-0.0" />
+    </edge>
+    <edge source="model.minigames.beghouled.BeghouledTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="45.75" y="-44.0" />
+      <point x="18809.01492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.minigames.BeghouledMinigame" target="model.minigames.BaseMinigame" relationship="GENERALIZATION">
+      <point x="107.75" y="-141.0" />
+      <point x="20213.335443801207" y="2532.0" />
+      <point x="20952.07742402314" y="2532.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.lobber.PepperPult" target="model.entities.plants.lobber.BaseLobber" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6450.15807404729" y="2502.0" />
+      <point x="11185.5" y="2502.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.SeaShroom" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="3916.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.ExplodeONut" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12752.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Rotobaga" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="3455.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.CriterionProgress" relationship="TO_MANY">
+      <point x="-137.0" y="-273.0" />
+      <point x="1056.038430420712" y="4017.0" />
+      <point x="748.375" y="4017.0" />
+      <point x="748.375" y="4007.0" />
+      <point x="590.125" y="4007.0" />
+      <point x="590.125" y="3626.0" />
+      <point x="318.49676375404545" y="3626.0" />
+      <point x="-91.25" y="213.0" />
+    </edge>
+    <edge source="model.entities.plants.homing.ElectricBlueberry" target="model.entities.plants.homing.BaseHoming" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7379.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2482.0" />
+      <point x="11920.5" y="2482.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Repeater" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="3600.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.StraightMove" target="model.entities.projectiles.Projectile" relationship="DEPENDENCY">
+      <point x="45.25" y="-44.0" />
+      <point x="4250.41877713454" y="2025.0" />
+      <point x="4140.91877713454" y="2025.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.BasePlant" target="model.entities.plants.BasePlant" relationship="TO_ONE">
+      <point x="-43.0" y="31.5" />
+      <point x="15549.304480221932" y="1789.5" />
+      <point x="15507.804480221932" y="1789.5" />
+      <point x="15507.804480221932" y="1738.0" />
+      <point x="-64.5" y="-0.0" />
+    </edge>
+    <edge source="model.level.special.TimedWarLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20161.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.NormalHit" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="REALIZATION">
+      <point x="42.5" y="-44.0" />
+      <point x="8719.565183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1431.0" />
+      <point x="9638.315183309183" y="1431.0" />
+      <point x="47.0" y="31.5" />
+    </edge>
+    <edge source="model.board.structures.InteractableStructure" target="model.engine.GameEntity" relationship="GENERALIZATION">
+      <point x="59.0" y="-68.0" />
+      <point x="7679.065183309183" y="1531.0" />
+      <point x="9235.440183309183" y="1531.0" />
+      <point x="9235.440183309183" y="345.0" />
+      <point x="9543.723257356472" y="345.0" />
+      <point x="9543.723257356472" y="325.0" />
+      <point x="10014.90807404729" y="325.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.OctopusThrow" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9837.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.quest.JsonContainer.JsonQuestData" target="model.quest.JsonContainer" relationship="INNER_CLASS">
+      <point x="-43.0" y="-31.5" />
+      <point x="-179.0" y="4017.0" />
+      <point x="-183.5" y="4017.0" />
+      <point x="-183.5" y="3636.0" />
+      <point x="-28.0" y="3636.0" />
+      <point x="-28.0" y="3626.0" />
+      <point x="84.24676375404545" y="3626.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.move.JumpMove" target="model.entities.zombies.move.MoveBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12496.333333333332" y="3172.0" />
+      <point x="12414.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.items.CoinDrop" target="model.entities.items.GroundItem" relationship="GENERALIZATION">
+      <point x="32.375" y="-44.0" />
+      <point x="3352.5437771345396" y="1491.0" />
+      <point x="8085.7232573564725" y="1491.0" />
+      <point x="8085.7232573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="983.0" />
+      <point x="8278.264924023137" y="983.0" />
+      <point x="-86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.board.terrain.ShallowCoastTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="18968.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.TombSpawn" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9520.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.IcebergLettuce" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8104.658074047289" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonLevelData" target="model.level.JsonContainer.JsonZombieEntry" relationship="TO_MANY">
+      <point x="41.75" y="-31.5" />
+      <point x="377.75" y="1033.0" />
+      <point x="848.5" y="1033.0" />
+      <point x="848.5" y="1023.0" />
+      <point x="1622.25" y="1023.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.PotDrop" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-64.75" y="-44.0" />
+      <point x="8101.815183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.melee.Kiwibeast" target="model.entities.plants.melee.BaseMelee" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11472.15807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2442.0" />
+      <point x="14809.51492402314" y="2442.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.LeaderBoardMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6122.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestManager" target="model.quest.QuestPriority" relationship="DEPENDENCY">
+      <point x="94.75" y="-128.5" />
+      <point x="1507.3086569579289" y="4616.0" />
+      <point x="1552.9890776699028" y="4616.0" />
+      <point x="1552.9890776699028" y="4606.0" />
+      <point x="1557.9890776699028" y="4606.0" />
+      <point x="1557.9890776699028" y="3576.0" />
+      <point x="1471.8843042071196" y="3576.0" />
+      <point x="1471.8843042071196" y="3566.0" />
+      <point x="1427.788430420712" y="3566.0" />
+      <point x="81.33333333333326" y="68.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Starfruit" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="4201.53307404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.PierceHit" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="REALIZATION">
+      <point x="-42.5" y="-44.0" />
+      <point x="9971.375" y="1551.0" />
+      <point x="8752.815183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1431.0" />
+      <point x="9638.315183309183" y="1431.0" />
+      <point x="47.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.PlantFoodDrop" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-64.75" y="-44.0" />
+      <point x="7822.815183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="service.minigame.BeghouledService" target="service.minigame.MinigameService" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="7872.333333333333" y="3207.0" />
+      <point x="7657.333333333333" y="3207.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.minigames.IZombieMinigame" target="model.minigames.BaseMinigame" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="20706.07742402314" y="2532.0" />
+      <point x="20952.07742402314" y="2532.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.BasePlant" target="model.entities.plants.Tag" relationship="TO_MANY">
+      <point x="43.0" y="-31.5" />
+      <point x="15635.304480221932" y="1551.0" />
+      <point x="17122.01492402314" y="1551.0" />
+      <point x="17122.01492402314" y="1531.0" />
+      <point x="17937.51492402314" y="1531.0" />
+      <point x="50.75" y="93.0" />
+    </edge>
+    <edge source="model.level.LevelManager" target="model.level.Level" relationship="TO_ONE">
+      <point x="0.0" y="-165.0" />
+      <point x="21508.95242402314" y="1551.0" />
+      <point x="21359.01492402314" y="1551.0" />
+      <point x="21359.01492402314" y="993.0" />
+      <point x="19849.585443801207" y="993.0" />
+      <point x="80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.melee.WasabiWhip" target="model.entities.plants.melee.BaseMelee" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11925.15807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2442.0" />
+      <point x="14809.51492402314" y="2442.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.JsonContainer" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="6906.598257356471" y="1451.0" />
+      <point x="6906.598257356472" y="96.0" />
+      <point x="2378.491407380622" y="96.0" />
+      <point x="2378.491407380622" y="86.0" />
+      <point x="1666.9914073806212" y="86.0" />
+      <point x="41.0" y="31.5" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.behavior.LevelBehavior" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="17478.76492402314" y="1451.0" />
+      <point x="17478.76492402314" y="345.0" />
+      <point x="19581.522943801207" y="345.0" />
+      <point x="19581.522943801207" y="325.0" />
+      <point x="18466.512240713957" y="325.0" />
+      <point x="0.0" y="67.5" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.AdventureProgress" relationship="CREATE">
+      <point x="60.0" y="-44.0" />
+      <point x="3250.083333333333" y="3473.0" />
+      <point x="3384.352564102564" y="3473.0" />
+      <point x="3384.352564102564" y="3453.0" />
+      <point x="3168.583333333333" y="3453.0" />
+      <point x="94.75" y="128.5" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.QuestPriority" relationship="TO_ONE">
+      <point x="-137.0" y="-273.0" />
+      <point x="1056.038430420712" y="4017.0" />
+      <point x="748.375" y="4017.0" />
+      <point x="748.375" y="4007.0" />
+      <point x="950.0384304207121" y="4007.0" />
+      <point x="950.0384304207121" y="3606.0" />
+      <point x="1346.4550970873788" y="3606.0" />
+      <point x="0.0" y="68.0" />
+    </edge>
+    <edge source="model.entities.projectiles.move.BounceMove" target="model.entities.projectiles.Projectile" relationship="DEPENDENCY">
+      <point x="45.25" y="-44.0" />
+      <point x="4049.4187771345396" y="2025.0" />
+      <point x="4140.91877713454" y="2025.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.melee.BonkChoy" target="model.entities.plants.melee.BaseMelee" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11765.15807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2532.0" />
+      <point x="11617.65807404729" y="2442.0" />
+      <point x="14809.51492402314" y="2442.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.DoomShroom" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7921.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.engine.GameClock" target="model.engine.Tickable" relationship="TO_MANY">
+      <point x="0.0" y="-56.5" />
+      <point x="6987.598257356472" y="96.0" />
+      <point x="9132.65807404729" y="96.0" />
+      <point x="-29.5" y="31.5" />
+    </edge>
+    <edge source="model.board.Cell" target="model.board.terrain.Tile" relationship="TO_ONE">
+      <point x="0.0" y="-176.5" />
+      <point x="15874.26492402314" y="1935.0" />
+      <point x="19487.76492402314" y="1935.0" />
+      <point x="-45.75" y="69.0" />
+    </edge>
+    <edge source="model.level.behavior.WallnutBowlingBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-92.0" />
+      <point x="16910.76492402314" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.entities.plants.melee.BaseMelee" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="14809.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.move.SprintMove" target="model.entities.zombies.move.MoveBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12168.333333333332" y="3172.0" />
+      <point x="12414.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.behavior.BossBehavior" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="15784.304480221932" y="1451.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="model.minigames.BaseMinigame" target="model.minigames.Minigame" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.items.CoinDrop.CoinTier" target="model.entities.items.CoinDrop" relationship="INNER_CLASS">
+      <point x="-49.5" y="56.0" />
+      <point x="2201.908074047288" y="1521.0" />
+      <point x="3223.0437771345396" y="1521.0" />
+      <point x="-97.125" y="-44.0" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonChapterData" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="-47.0" y="-31.5" />
+      <point x="-70.75" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.level.Level" target="model.level.behavior.LevelBehavior" relationship="TO_ONE">
+      <point x="53.75" y="-297.0" />
+      <point x="19822.710443801207" y="345.0" />
+      <point x="19773.960443801207" y="345.0" />
+      <point x="19773.960443801207" y="335.0" />
+      <point x="18551.512240713957" y="335.0" />
+      <point x="85.0" y="67.5" />
+    </edge>
+    <edge source="model.shop.ShopItem" target="model.shop.ShopItemType" relationship="TO_ONE">
+      <point x="0.0" y="-249.0" />
+      <point x="65.5" y="68.0" />
+    </edge>
+    <edge source="model.greenhouse.SproutPlant" target="model.greenhouse.PlantState" relationship="TO_ONE">
+      <point x="0.0" y="-117.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.board.structures.InteractableStructure" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-59.0" y="-68.0" />
+      <point x="7561.065183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.JsonContainer.JsonQuestData" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="-136.0" y="4616.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.state.InputEvent" relationship="DEPENDENCY">
+      <point x="-56.75" y="-56.0" />
+      <point x="8152.9732573564725" y="1003.0" />
+      <point x="498.625" y="1003.0" />
+      <point x="498.625" y="993.0" />
+      <point x="555.125" y="993.0" />
+      <point x="33.25" y="14.0" />
+    </edge>
+    <edge source="model.level.behavior.PlantWhatYouGetBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-64.0" y="-80.0" />
+      <point x="17553.26492402314" y="993.0" />
+      <point x="17467.76492402314" y="993.0" />
+      <point x="17467.76492402314" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.TangleKelp" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8447.65807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.Level" target="model.level.delivery.DeliveryStrategy" relationship="TO_ONE">
+      <point x="53.75" y="-297.0" />
+      <point x="19822.710443801207" y="345.0" />
+      <point x="19773.960443801207" y="345.0" />
+      <point x="19773.960443801207" y="335.0" />
+      <point x="8738.65807404729" y="335.0" />
+      <point x="82.5" y="55.5" />
+    </edge>
+    <edge source="model.entities.zombies.effect.SpinEffect" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10361.833333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.level.behavior.ConveyorBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-63.75" y="-80.0" />
+      <point x="15995.554480221932" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.CollectItemCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="1078.8771104678726" y="325.0" />
+      <point x="63.25" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.SunShroom" target="model.entities.plants.sunProducer.BaseSunFlower" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9879.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2462.0" />
+      <point x="13700.460443801207" y="2462.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.LevelLoader" target="model.level.LevelLoader" relationship="DEPENDENCY">
+      <point x="0.0" y="68.0" />
+      <point x="-85.5" y="2783.0" />
+      <point x="-222.0" y="2783.0" />
+      <point x="-222.0" y="2695.0" />
+      <point x="-116.5" y="-0.0" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.QuestType" relationship="TO_ONE">
+      <point x="-137.0" y="-273.0" />
+      <point x="1056.038430420712" y="4017.0" />
+      <point x="748.375" y="4017.0" />
+      <point x="748.375" y="4007.0" />
+      <point x="908.5" y="4007.0" />
+      <point x="908.5" y="3596.0" />
+      <point x="1068.4550970873788" y="3596.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="model.entities.zombies.effect.FireEffect" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11014.333333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.AdvanceTimeCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="235.25" y="325.0" />
+      <point x="48.5" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.ConveyorBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="63.75" y="-80.0" />
+      <point x="16123.054480221932" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.NormalHit" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="-42.5" y="-44.0" />
+      <point x="8634.565183309183" y="1541.0" />
+      <point x="9486.815183309183" y="1541.0" />
+      <point x="9486.815183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.level.Level" relationship="TO_ONE">
+      <point x="56.75" y="-56.0" />
+      <point x="8266.473257356472" y="1023.0" />
+      <point x="9203.356849975851" y="1023.0" />
+      <point x="9203.356849975851" y="1013.0" />
+      <point x="21359.01492402314" y="1013.0" />
+      <point x="21359.01492402314" y="993.0" />
+      <point x="19849.585443801207" y="993.0" />
+      <point x="80.625" y="297.0" />
+    </edge>
+    <edge source="model.engine.GameEntity" target="model.engine.Tickable" relationship="REALIZATION">
+      <point x="-35.5" y="-93.0" />
+      <point x="9979.40807404729" y="96.0" />
+      <point x="9191.65807404729" y="96.0" />
+      <point x="29.5" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.ZombotanyBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-96.33333333333394" y="-80.0" />
+      <point x="16097.431590689805" y="1945.0" />
+      <point x="10679.690183309183" y="1945.0" />
+      <point x="10679.690183309183" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.entities.zombies.attack.WizardTransform" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8492.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.zombies.effect.DynamiteTimer" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10845.333333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.SnowPea" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5979.15807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.Quest" target="model.quest.QuestReward" relationship="DEPENDENCY">
+      <point x="0.0" y="-164.0" />
+      <point x="1178.788430420712" y="3576.0" />
+      <point x="797.4967637540454" y="3576.0" />
+      <point x="61.75" y="117.0" />
+    </edge>
+    <edge source="model.level.LevelManager" target="model.level.Chapter" relationship="TO_MANY">
+      <point x="0.0" y="-165.0" />
+      <point x="0.0" y="177.0" />
+    </edge>
+    <edge source="model.entities.plants.BasePlant" target="model.engine.GameEntity" relationship="GENERALIZATION">
+      <point x="-43.0" y="-31.5" />
+      <point x="15549.304480221932" y="1551.0" />
+      <point x="10668.690183309183" y="1551.0" />
+      <point x="10668.690183309183" y="345.0" />
+      <point x="9543.723257356472" y="345.0" />
+      <point x="9543.723257356472" y="325.0" />
+      <point x="10014.90807404729" y="325.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="model.board.structures.ArcadeCart" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9501.51492402314" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.entities.items.DiamondDrop" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-64.75" y="-44.0" />
+      <point x="7286.815183309183" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.items.sun.SunToken" target="model.entities.items.GroundItem" relationship="GENERALIZATION">
+      <point x="0.0" y="-56.0" />
+      <point x="2245.5854438012066" y="1531.0" />
+      <point x="2360.908074047288" y="1531.0" />
+      <point x="2360.908074047288" y="1033.0" />
+      <point x="8122.0982573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="983.0" />
+      <point x="8278.264924023137" y="983.0" />
+      <point x="-86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.state.ResourceState" relationship="TO_ONE">
+      <point x="56.75" y="-56.0" />
+      <point x="8266.473257356472" y="1023.0" />
+      <point x="9203.356849975851" y="1023.0" />
+      <point x="9203.356849975851" y="993.0" />
+      <point x="8132.0982573564725" y="993.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.minigames.VasebreakerMinigame" target="model.minigames.BaseMinigame" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="21198.07742402314" y="2532.0" />
+      <point x="20952.07742402314" y="2532.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.BaseExplosive" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="41.0" y="-31.5" />
+      <point x="12457.375" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.MoveStrategy" target="model.entities.projectiles.Projectile" relationship="DEPENDENCY">
+      <point x="0.0" y="31.5" />
+      <point x="2810.741407380622" y="1461.0" />
+      <point x="4140.91877713454" y="1461.0" />
+      <point x="0.0" y="-31.5" />
+    </edge>
+    <edge source="model.level.behavior.ZombotanyBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="96.33333333333394" y="-80.0" />
+      <point x="16290.098257356472" y="2005.0" />
+      <point x="17998.76492402314" y="2005.0" />
+      <point x="17998.76492402314" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="service.minigame.ZombotanyService" target="service.minigame.MinigameService" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Citron" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="4964.15807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.gamemenu.ChoosePlantMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5201.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.CriterionProgress" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="454.0060679611652" y="4616.0" />
+      <point x="454.0060679611652" y="3636.0" />
+      <point x="500.99676375404545" y="3636.0" />
+      <point x="91.25" y="213.0" />
+    </edge>
+    <edge source="model.board.structures.Container" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-59.0" y="-56.0" />
+      <point x="4805.5437771345405" y="2015.0" />
+      <point x="4450.54377713454" y="2015.0" />
+      <point x="4450.54377713454" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="view.LoginMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5016.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.homing.CatTail" target="model.entities.plants.homing.BaseHoming" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7213.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2482.0" />
+      <point x="11920.5" y="2482.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.ScoreRecord" relationship="CREATE">
+      <point x="60.0" y="-44.0" />
+      <point x="3250.083333333333" y="3473.0" />
+      <point x="3384.352564102564" y="3473.0" />
+      <point x="3384.352564102564" y="3453.0" />
+      <point x="3401.083333333333" y="3453.0" />
+      <point x="39.25" y="56.5" />
+    </edge>
+    <edge source="model.board.structures.Container" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="59.0" y="-56.0" />
+      <point x="4923.5437771345405" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.quest.ConfigurableQuest" target="model.quest.QuestContext" relationship="DEPENDENCY">
+      <point x="137.0" y="-273.0" />
+      <point x="1330.038430420712" y="4017.0" />
+      <point x="1364.038430420712" y="4017.0" />
+      <point x="1364.038430420712" y="3636.0" />
+      <point x="1620.0833333333333" y="3636.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.Wave" target="model.level.SpawnData" relationship="TO_MANY">
+      <point x="0.0" y="-80.5" />
+      <point x="0.0" y="104.5" />
+    </edge>
+    <edge source="model.level.behavior.PlantWhatYouGetBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="64.0" y="-80.0" />
+      <point x="17681.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.AdventureProgress" relationship="TO_ONE">
+      <point x="-60.0" y="-44.0" />
+      <point x="3130.083333333333" y="3473.0" />
+      <point x="3040.352564102564" y="3473.0" />
+      <point x="3040.352564102564" y="3463.0" />
+      <point x="2979.083333333333" y="3463.0" />
+      <point x="-94.75" y="128.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.TallNut" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12073.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.minigames.BeghouledMinigame" target="model.minigames.beghouled.BeghouledTile" relationship="TO_MANY">
+      <point x="-107.75" y="-141.0" />
+      <point x="19997.835443801207" y="2532.0" />
+      <point x="18763.26492402314" y="2532.0" />
+      <point x="0.0" y="44.0" />
+    </edge>
+    <edge source="model.entities.plants.BasePlant" target="model.entities.plants.Plant" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.Jalapeno" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9411.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.homing.BaseHoming" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11920.5" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.modifier.BaseModifier" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="14376.01492402314" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.PoisonHit" target="model.entities.projectiles.hit.HitEffectStrategy" relationship="REALIZATION">
+      <point x="-42.5" y="-44.0" />
+      <point x="9494.375" y="1551.0" />
+      <point x="8752.815183309183" y="1551.0" />
+      <point x="8752.815183309183" y="1431.0" />
+      <point x="9638.315183309183" y="1431.0" />
+      <point x="47.0" y="31.5" />
+    </edge>
+    <edge source="model.level.delivery.RegularDeliveryStrategy" target="model.level.delivery.DeliveryStrategy" relationship="REALIZATION">
+      <point x="0.0" y="-68.0" />
+      <point x="7163.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="335.0" />
+      <point x="8573.65807404729" y="335.0" />
+      <point x="-82.5" y="55.5" />
+    </edge>
+    <edge source="model.level.LevelLoader" target="model.level.JsonContainer.JsonWorldData" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.defense.JesterDefense" target="model.entities.zombies.defense.DefenseBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11787.333333333332" y="3172.0" />
+      <point x="11598.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.board.structures.Vase" target="model.entities.plants.BasePlant" relationship="TO_ONE">
+      <point x="78.66666666666606" y="-56.0" />
+      <point x="8415.431590689805" y="2015.0" />
+      <point x="10794.190183309183" y="2015.0" />
+      <point x="10794.190183309183" y="1985.0" />
+      <point x="16348.76492402314" y="1985.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.state.PlantCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-31.75" y="31.5" />
+      <point x="382.8771104678726" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.PierceHit" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="42.5" y="-44.0" />
+      <point x="10056.375" y="1531.0" />
+      <point x="10363.315183309183" y="1531.0" />
+      <point x="10363.315183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonLevelData" target="model.level.JsonContainer.JsonWaveData" relationship="TO_MANY">
+      <point x="41.75" y="-31.5" />
+      <point x="377.75" y="1033.0" />
+      <point x="848.5" y="1033.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.TravelLogMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.IZombieBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-78.5" y="-92.0" />
+      <point x="15292.304480221932" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.level.behavior.IZombieBehavior" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="78.5" y="-92.0" />
+      <point x="15449.304480221932" y="1033.0" />
+      <point x="16096.179480221932" y="1033.0" />
+      <point x="16096.179480221932" y="983.0" />
+      <point x="10378.098257356472" y="983.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.PrimalPotatoMine" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8786.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.Projectile" target="model.engine.GameEntity" relationship="GENERALIZATION">
+      <point x="-41.33333333333303" y="-31.5" />
+      <point x="4099.585443801207" y="1471.0" />
+      <point x="2709.741407380622" y="1471.0" />
+      <point x="2709.741407380622" y="1023.0" />
+      <point x="8038.5982573564725" y="1023.0" />
+      <point x="8038.5982573564725" y="345.0" />
+      <point x="9543.723257356472" y="345.0" />
+      <point x="9543.723257356472" y="325.0" />
+      <point x="10014.90807404729" y="325.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="view.mainmenu.NetworkMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5732.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.level.Chapter" target="model.level.GameMode" relationship="TO_ONE">
+      <point x="0.0" y="-177.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.board.terrain.WaterTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="18560.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.level.behavior.BossBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-63.75" y="-80.0" />
+      <point x="15720.554480221932" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.entities.plants.sunProducer.PrimalSunflower" target="model.entities.plants.sunProducer.BaseSunFlower" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10404.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2532.0" />
+      <point x="10211.15807404729" y="2462.0" />
+      <point x="13700.460443801207" y="2462.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.LevelLoader" target="model.level.JsonContainer" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="-85.5" y="2532.0" />
+      <point x="1726.25" y="2532.0" />
+      <point x="1726.25" y="96.0" />
+      <point x="2378.491407380622" y="96.0" />
+      <point x="2378.491407380622" y="86.0" />
+      <point x="1666.9914073806212" y="86.0" />
+      <point x="41.0" y="31.5" />
+    </edge>
+    <edge source="model.board.terrain.NecromancyTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="19376.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.entities.plants.modifier.Imitater" target="model.entities.plants.modifier.BaseModifier" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11190.65807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2452.0" />
+      <point x="14376.01492402314" y="2452.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.NewsMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6821.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.level.special.LockedPlantsLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="21063.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.entities.items.CoinDrop" target="model.entities.items.CoinDrop.CoinTier" relationship="TO_ONE">
+      <point x="-32.375" y="-44.0" />
+      <point x="3287.7937771345396" y="1511.0" />
+      <point x="2300.908074047288" y="1511.0" />
+      <point x="49.5" y="56.0" />
+    </edge>
+    <edge source="model.level.LevelFactory" target="model.level.JsonContainer.JsonLevelData" relationship="DEPENDENCY">
+      <point x="-56.25" y="-44.0" />
+      <point x="18065.51492402314" y="1541.0" />
+      <point x="15921.804480221932" y="1541.0" />
+      <point x="15921.804480221932" y="1451.0" />
+      <point x="377.75" y="1451.0" />
+      <point x="41.75" y="31.5" />
+    </edge>
+    <edge source="model.state.CollectItemCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-63.25" y="56.0" />
+      <point x="952.3771104678726" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.quest.QuestManager" target="model.quest.ConfigurableQuest" relationship="TO_MANY">
+      <point x="-94.75" y="-128.5" />
+      <point x="1317.8086569579289" y="4616.0" />
+      <point x="1295.788430420712" y="4616.0" />
+      <point x="102.75" y="273.0" />
+    </edge>
+    <edge source="model.engine.Renderable" target="model.state.ItemState" relationship="DEPENDENCY">
+      <point x="0.0" y="-31.5" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="model.entities.zombies.defense.NormalDefense" target="model.entities.zombies.defense.DefenseBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11405.333333333332" y="3172.0" />
+      <point x="11598.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.homing.MagnetShroom" target="model.entities.plants.homing.BaseHoming" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7736.65807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2482.0" />
+      <point x="11920.5" y="2482.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.quest.Quest" target="model.quest.QuestPriority" relationship="DEPENDENCY">
+      <point x="0.0" y="-164.0" />
+      <point x="1178.788430420712" y="3616.0" />
+      <point x="1471.8843042071196" y="3616.0" />
+      <point x="1471.8843042071196" y="3566.0" />
+      <point x="1427.788430420712" y="3566.0" />
+      <point x="81.33333333333326" y="68.0" />
+    </edge>
+    <edge source="model.board.Lawn" target="model.board.Cell" relationship="DEPENDENCY">
+      <point x="42.0" y="-93.0" />
+      <point x="13315.65807404729" y="2532.0" />
+      <point x="13274.40807404729" y="2532.0" />
+      <point x="13274.40807404729" y="2422.0" />
+      <point x="15874.26492402314" y="2422.0" />
+      <point x="0.0" y="176.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.SunBean" target="model.entities.plants.wallnut.BaseDefensive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="13081.15807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2532.0" />
+      <point x="12541.65807404729" y="2432.0" />
+      <point x="15390.01492402314" y="2432.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.projectiles.move.ArcMove" target="model.entities.projectiles.move.MoveStrategy" relationship="REALIZATION">
+      <point x="-45.25" y="-44.0" />
+      <point x="3718.4187771345396" y="2025.0" />
+      <point x="3180.1687771345396" y="2025.0" />
+      <point x="3180.1687771345396" y="1481.0" />
+      <point x="2740.241407380622" y="1481.0" />
+      <point x="2740.241407380622" y="1441.0" />
+      <point x="2750.408074047289" y="1441.0" />
+      <point x="-60.333333333333485" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.homing.Caulipower" target="model.entities.plants.homing.BaseHoming" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="7561.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2532.0" />
+      <point x="7470.15807404729" y="2482.0" />
+      <point x="11920.5" y="2482.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.FeedPlantCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="1440.8771104678726" y="325.0" />
+      <point x="41.25" y="31.5" />
+    </edge>
+    <edge source="model.quest.QuestManager" target="model.quest.QuestContext" relationship="DEPENDENCY">
+      <point x="94.75" y="-128.5" />
+      <point x="1507.3086569579289" y="4616.0" />
+      <point x="1552.9890776699028" y="4616.0" />
+      <point x="1552.9890776699028" y="4606.0" />
+      <point x="1574.8843042071196" y="4606.0" />
+      <point x="1574.8843042071196" y="3636.0" />
+      <point x="1620.0833333333333" y="3636.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.armore.Armor" target="model.entities.zombies.armore.ArmorType" relationship="TO_ONE">
+      <point x="0.0" y="-31.5" />
+      <point x="62.0" y="117.0" />
+    </edge>
+    <edge source="model.quest.JsonContainer.JsonCriterionData" target="model.quest.JsonContainer" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="127.5" y="3636.0" />
+      <point x="-28.0" y="3636.0" />
+      <point x="-28.0" y="3626.0" />
+      <point x="84.24676375404545" y="3626.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.state.AdvanceTimeCmd" target="model.state.InputEvent" relationship="REALIZATION">
+      <point x="-48.5" y="31.5" />
+      <point x="138.25" y="335.0" />
+      <point x="488.625" y="335.0" />
+      <point x="-33.25" y="-14.0" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.JsonContainer.JsonCriterionData" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="137.5" y="4616.0" />
+      <point x="137.5" y="4017.0" />
+      <point x="175.75" y="4017.0" />
+      <point x="48.25" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.MintPlant" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="14658.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.SaveOurSeedsBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="63.75" y="-80.0" />
+      <point x="17393.51492402314" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Peashooter" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5104.15807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.entities.zombies.Zombie" relationship="TO_MANY">
+      <point x="56.75" y="-56.0" />
+      <point x="8266.473257356472" y="1023.0" />
+      <point x="9203.356849975851" y="1023.0" />
+      <point x="9203.356849975851" y="1003.0" />
+      <point x="10368.098257356472" y="1003.0" />
+      <point x="10368.098257356472" y="983.0" />
+      <point x="10321.598257356472" y="983.0" />
+      <point x="-28.25" y="44.0" />
+    </edge>
+    <edge source="service.minigame.WallNutBowlingService" target="service.minigame.MinigameService" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="7422.333333333333" y="3207.0" />
+      <point x="7657.333333333333" y="3207.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.Level" target="model.level.Wave" relationship="TO_MANY">
+      <point x="53.75" y="-297.0" />
+      <point x="19822.710443801207" y="345.0" />
+      <point x="19773.960443801207" y="345.0" />
+      <point x="0.0" y="80.5" />
+    </edge>
+    <edge source="model.board.structures.LawnMower" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="-59.0" y="-56.0" />
+      <point x="4549.54377713454" y="2025.0" />
+      <point x="4317.54377713454" y="2025.0" />
+      <point x="4317.54377713454" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.entities.plants.modifier.LilyPad" target="model.entities.plants.modifier.BaseModifier" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11061.15807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2532.0" />
+      <point x="10983.40807404729" y="2452.0" />
+      <point x="14376.01492402314" y="2452.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.SettingMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="5557.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.move.PusherMove" target="model.entities.zombies.move.MoveBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="12333.333333333332" y="3172.0" />
+      <point x="12414.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.quest.JsonContainer.JsonRewardData" target="model.quest.JsonContainer" relationship="INNER_CLASS">
+      <point x="0.0" y="-31.5" />
+      <point x="-81.0" y="3636.0" />
+      <point x="-28.0" y="3636.0" />
+      <point x="-28.0" y="3626.0" />
+      <point x="84.24676375404545" y="3626.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.board.structures.Vase" target="model.entities.zombies.Zombie" relationship="TO_ONE">
+      <point x="78.66666666666606" y="-56.0" />
+      <point x="8415.431590689805" y="2015.0" />
+      <point x="10794.190183309183" y="2015.0" />
+      <point x="10794.190183309183" y="1975.0" />
+      <point x="10638.815183309183" y="1975.0" />
+      <point x="10638.815183309183" y="993.0" />
+      <point x="10368.098257356472" y="993.0" />
+      <point x="10368.098257356472" y="983.0" />
+      <point x="10321.598257356472" y="983.0" />
+      <point x="-28.25" y="44.0" />
+    </edge>
+    <edge source="view.mainmenu.GreenHouse" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6506.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.LevelBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="0.0" y="67.5" />
+      <point x="18466.512240713957" y="325.0" />
+      <point x="19581.522943801207" y="325.0" />
+      <point x="19581.522943801207" y="345.0" />
+      <point x="19715.210443801207" y="345.0" />
+      <point x="-53.75" y="-297.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.Threepeater" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5624.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.melee.Chomper" target="model.entities.plants.melee.BaseMelee" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11617.65807404729" y="2442.0" />
+      <point x="14809.51492402314" y="2442.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.WallnutBowlingBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="110.66666666666788" y="-92.0" />
+      <point x="17021.43159068981" y="2015.0" />
+      <point x="18244.76492402314" y="2015.0" />
+      <point x="18244.76492402314" y="1023.0" />
+      <point x="17968.26492402314" y="1023.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonWorldData" target="model.level.JsonContainer" relationship="INNER_CLASS">
+      <point x="-42.75" y="-31.5" />
+      <point x="-128.25" y="96.0" />
+      <point x="83.0" y="96.0" />
+      <point x="83.0" y="86.0" />
+      <point x="1584.9914073806212" y="86.0" />
+      <point x="-41.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.armore.ArmorType" target="model.entities.zombies.armore.ArmorType" relationship="DEPENDENCY">
+      <point x="-62.0" y="117.0" />
+      <point x="3995.333333333333" y="3373.0" />
+      <point x="3913.333333333333" y="3373.0" />
+      <point x="3913.333333333333" y="3236.0" />
+      <point x="-124.0" y="-0.0" />
+    </edge>
+    <edge source="model.board.Cell" target="model.board.structures.InteractableStructure" relationship="TO_ONE">
+      <point x="0.0" y="-176.5" />
+      <point x="15874.26492402314" y="1935.0" />
+      <point x="7679.065183309182" y="1935.0" />
+      <point x="59.0" y="68.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.SmashAttack" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8302.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.PeaPod" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.explosive.HotPotato" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9264.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.minigames.beghouled.BeghouledTile" target="model.entities.plants.BasePlant" relationship="TO_ONE">
+      <point x="-45.75" y="-44.0" />
+      <point x="18717.51492402314" y="2025.0" />
+      <point x="16348.76492402314" y="2025.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.CoinDrop" target="model.engine.GameSession" relationship="DEPENDENCY">
+      <point x="97.125" y="-44.0" />
+      <point x="3417.2937771345396" y="1541.0" />
+      <point x="7269.848257356472" y="1541.0" />
+      <point x="7269.848257356472" y="1431.0" />
+      <point x="8209.723257356472" y="1431.0" />
+      <point x="0.0" y="56.0" />
+    </edge>
+    <edge source="model.board.structures.LawnMower" target="model.board.structures.InteractableStructure" relationship="GENERALIZATION">
+      <point x="59.0" y="-56.0" />
+      <point x="4667.54377713454" y="2025.0" />
+      <point x="7561.065183309183" y="2025.0" />
+      <point x="-59.0" y="68.0" />
+    </edge>
+    <edge source="model.quest.QuestFactory" target="model.quest.ConfigurableQuest" relationship="DEPENDENCY">
+      <point x="0.0" y="-68.0" />
+      <point x="234.5" y="4616.0" />
+      <point x="1090.288430420712" y="4616.0" />
+      <point x="-102.75" y="273.0" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.IceHit" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="42.5" y="-44.0" />
+      <point x="10436.375" y="1551.0" />
+      <point x="10563.315183309183" y="1551.0" />
+      <point x="10563.315183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.level.special.DeadLineLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="21265.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.entities.plants.explosive.GraveBuster" target="model.entities.plants.explosive.BaseExplosive" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8974.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2532.0" />
+      <point x="8880.15807404729" y="2472.0" />
+      <point x="12416.375" y="2472.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.attack.TorchBurn" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="8849.833333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.level.behavior.IZombieBehavior" target="model.level.Level" relationship="DEPENDENCY">
+      <point x="78.5" y="-92.0" />
+      <point x="15449.304480221932" y="1033.0" />
+      <point x="16096.179480221932" y="1033.0" />
+      <point x="16096.179480221932" y="1003.0" />
+      <point x="17968.26492402314" y="1003.0" />
+      <point x="17968.26492402314" y="993.0" />
+      <point x="19688.335443801207" y="993.0" />
+      <point x="-80.625" y="297.0" />
+    </edge>
+    <edge source="model.entities.zombies.attack.HunterFreeze" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9182.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.shooter.FirePeashooter" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5278.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.level.JsonContainer.JsonWorldData" target="model.level.JsonContainer.JsonChapterData" relationship="TO_MANY">
+      <point x="42.75" y="-31.5" />
+      <point x="-42.75" y="2025.0" />
+      <point x="-23.75" y="2025.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.engine.GameSession" target="model.entities.items.GroundItem" relationship="TO_MANY">
+      <point x="56.75" y="-56.0" />
+      <point x="8266.473257356472" y="1023.0" />
+      <point x="9203.356849975851" y="1023.0" />
+      <point x="9203.356849975851" y="993.0" />
+      <point x="8450.931590689805" y="993.0" />
+      <point x="86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.level.delivery.CardDeliveryStrategy" target="model.level.delivery.DeliveryStrategy" relationship="REALIZATION">
+      <point x="0.0" y="-68.0" />
+      <point x="7513.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="345.0" />
+      <point x="7688.098257356472" y="335.0" />
+      <point x="8573.65807404729" y="335.0" />
+      <point x="-82.5" y="55.5" />
+    </edge>
+    <edge source="model.level.behavior.SaveOurSeedsBehavior" target="model.level.behavior.LevelBehavior" relationship="REALIZATION">
+      <point x="-63.75" y="-80.0" />
+      <point x="17266.01492402314" y="345.0" />
+      <point x="16374.92948022193" y="345.0" />
+      <point x="16374.92948022193" y="325.0" />
+      <point x="18381.512240713957" y="325.0" />
+      <point x="-85.0" y="67.5" />
+    </edge>
+    <edge source="model.entities.zombies.attack.CrushAttack" target="model.entities.zombies.attack.AttackBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="9010.333333333332" y="3172.0" />
+      <point x="9096.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.entities.plants.lobber.KernelPult" target="model.entities.plants.lobber.BaseLobber" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6603.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2532.0" />
+      <point x="6450.15807404729" y="2502.0" />
+      <point x="11185.5" y="2502.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.wallnut.BaseDefensive" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="15390.01492402314" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.PluckCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="37.25" y="325.0" />
+      <point x="32.5" y="31.5" />
+    </edge>
+    <edge source="model.board.Lawn" target="model.board.Row" relationship="TO_MANY">
+      <point x="-42.0" y="-93.0" />
+      <point x="0.0" y="80.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.BowlingBulb" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5457.15807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.shooter.MegaGatlingPea" target="model.entities.plants.shooter.BaseShooter" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="5807.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2532.0" />
+      <point x="4838.65807404729" y="2512.0" />
+      <point x="8650.565183309183" y="2512.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="view.mainmenu.MainMenu" target="view.AppMenu" relationship="REALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="6666.333333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3212.0" />
+      <point x="5918.833333333333" y="3202.0" />
+      <point x="5351.954301075269" y="3202.0" />
+      <point x="31.5" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.strikethrough.Cactus" target="model.entities.plants.strikethrough.BaseStrikethrough" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="6911.65807404729" y="2532.0" />
+      <point x="6986.90807404729" y="2532.0" />
+      <point x="6986.90807404729" y="2492.0" />
+      <point x="11673.5" y="2492.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.plants.lobber.BaseLobber" target="model.entities.plants.BasePlant" relationship="GENERALIZATION">
+      <point x="36.25" y="-31.5" />
+      <point x="11221.75" y="2005.0" />
+      <point x="14192.51492402314" y="2005.0" />
+      <point x="14192.51492402314" y="1925.0" />
+      <point x="15592.304480221932" y="1925.0" />
+      <point x="0.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.zombies.effect.PoisonEffect" target="model.entities.zombies.effect.EffectStatus" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="10041.833333333332" y="3172.0" />
+      <point x="10508.833333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.level.special.NightOpsLevel" target="model.level.Level" relationship="GENERALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="19972.51492402314" y="1033.0" />
+      <point x="20257.585443801207" y="1033.0" />
+      <point x="20257.585443801207" y="1003.0" />
+      <point x="19795.835443801207" y="1003.0" />
+      <point x="26.875" y="297.0" />
+    </edge>
+    <edge source="model.entities.zombies.defense.ArmorDefense" target="model.entities.zombies.defense.DefenseBehavior" relationship="REALIZATION">
+      <point x="0.0" y="-31.5" />
+      <point x="11970.833333333332" y="3172.0" />
+      <point x="11598.333333333332" y="3172.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="model.board.terrain.CraterTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="19782.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.BoostPlantCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="14.0" />
+      <point x="555.125" y="993.0" />
+      <point x="498.625" y="993.0" />
+      <point x="498.625" y="1023.0" />
+      <point x="574.625" y="1023.0" />
+      <point x="43.0" y="-31.5" />
+    </edge>
+    <edge source="model.entities.items.PotDrop" target="model.entities.items.GroundItem" relationship="GENERALIZATION">
+      <point x="64.75" y="-44.0" />
+      <point x="8231.315183309183" y="1521.0" />
+      <point x="9033.690183309183" y="1521.0" />
+      <point x="9033.690183309183" y="1033.0" />
+      <point x="8122.0982573564725" y="1033.0" />
+      <point x="8122.0982573564725" y="983.0" />
+      <point x="8278.264924023137" y="983.0" />
+      <point x="-86.33333333333394" y="80.5" />
+    </edge>
+    <edge source="model.account.Account" target="model.account.ScoreRecord" relationship="TO_ONE">
+      <point x="-60.0" y="-44.0" />
+      <point x="3130.083333333333" y="3473.0" />
+      <point x="3040.352564102564" y="3473.0" />
+      <point x="3040.352564102564" y="3463.0" />
+      <point x="3322.583333333333" y="3463.0" />
+      <point x="-39.25" y="56.5" />
+    </edge>
+    <edge source="model.entities.projectiles.hit.PoisonHit" target="model.entities.zombies.Zombie" relationship="DEPENDENCY">
+      <point x="42.5" y="-44.0" />
+      <point x="9579.375" y="1521.0" />
+      <point x="10119.815183309183" y="1521.0" />
+      <point x="10119.815183309183" y="1033.0" />
+      <point x="10378.098257356472" y="1033.0" />
+      <point x="28.25" y="44.0" />
+    </edge>
+    <edge source="model.state.InputEvent" target="model.state.PlantCmd" relationship="DEPENDENCY">
+      <point x="33.25" y="-14.0" />
+      <point x="555.125" y="345.0" />
+      <point x="498.625" y="345.0" />
+      <point x="498.625" y="325.0" />
+      <point x="446.3771104678726" y="325.0" />
+      <point x="31.75" y="31.5" />
+    </edge>
+    <edge source="model.level.behavior.VaseBreakerBehavior" target="model.entities.plants.BasePlant" relationship="TO_MANY">
+      <point x="-124.66666666666788" y="-104.0" />
+      <point x="17674.514924023137" y="2532.0" />
+      <point x="16348.76492402314" y="2532.0" />
+      <point x="16348.76492402314" y="1925.0" />
+      <point x="15635.304480221932" y="1925.0" />
+      <point x="43.0" y="31.5" />
+    </edge>
+    <edge source="model.entities.items.GroundItem" target="model.engine.GameEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-80.5" />
+      <point x="8364.598257356472" y="345.0" />
+      <point x="9543.723257356472" y="345.0" />
+      <point x="9543.723257356472" y="325.0" />
+      <point x="10014.90807404729" y="325.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="model.entities.items.sun.SunToken" target="model.entities.items.sun.SunDropType" relationship="TO_ONE">
+      <point x="-86.33333333333348" y="-56.0" />
+      <point x="2159.2521104678726" y="1551.0" />
+      <point x="2016.9080740472882" y="1551.0" />
+      <point x="0.0" y="81.0" />
+    </edge>
+    <edge source="model.board.terrain.SlipperyTile" target="model.board.terrain.Tile" relationship="GENERALIZATION">
+      <point x="0.0" y="-44.0" />
+      <point x="19579.26492402314" y="2015.0" />
+      <point x="19572.815183309183" y="2015.0" />
+      <point x="19572.815183309183" y="2005.0" />
+      <point x="19579.26492402314" y="2005.0" />
+      <point x="45.75" y="69.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.02836516494562735" showDependencies="true" x="11524.80283505154" y="3877.384020618556" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
