@@ -1,4 +1,4 @@
-package model.entities.zombies.armore;
+package model.entities.zombies.armor;
 
 public enum ArmorType {
     CONE("cone" , 370),

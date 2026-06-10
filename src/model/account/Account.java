@@ -10,8 +10,9 @@ public class Account {
     private AdventureProgress adventureProgress;
     private ScoreRecord scoreRecord;
     private List<NewsItem> personalNews;
+    private Collection collection;
 
-    public Account(AccountState state , String password) {
+    public Account(AccountState state , String password, Collection collection) {
         this.name = state.username();
         this.password = password;
         this.email = state.email();
@@ -20,6 +21,7 @@ public class Account {
         scoreRecord = new ScoreRecord(state.score());
 
         personalNews = new ArrayList<>(state.personalNews());
+        this.collection = collection;
     }
 
     public AccountState toState() {
