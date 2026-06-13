@@ -26,5 +26,5 @@ sourceSets {
 }
 
 dependencies {
-    // You can add your external package dependencies here later
+    implementation 'com.google.code.gson:gson:2.14.0'
 }
