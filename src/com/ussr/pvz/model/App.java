@@ -8,8 +8,8 @@ public class App {
     private Account account;
     private GameSession gameSession;
 
-    public App(MenuState menuState) {
-        this.menuState = menuState;
+    public App() {
+        this.menuState = MenuState.REGISTER;
     }
 
     public MenuState getMenuState() {

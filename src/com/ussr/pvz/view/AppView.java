@@ -11,14 +11,43 @@ import java.util.Scanner;
 
 public class AppView {
     private AppMenu currentMenu;
-    private App app;
+    private final App app;
+
+    private final MainMenu mainMenu;
+    private final RegisterMenu registerMenu;
+    private final LoginMenu loginMenu;
+    private final GameMenu gameMenu;
+    private final NewsMenu newsMenu;
+    private final NetworkMenu networkMenu;
+    private final ProfileMenu profileMenu;
+    private final SettingMenu settingMenu;
+    private final CollectionMenu collectionMenu;
+    private final GreenHouse greenHouse;
+    private final TravelLogMenu travelLogMenu;
+    private final LeaderBoardMenu leaderBoardMenu;
+    private final ChoosePlantMenu choosePlantMenu;
 
     public AppView() {
-        app = new App(MenuState.MAIN);
+        app = new App();
+
+        // Initialize all menu instances
+        mainMenu = new MainMenu();
+        registerMenu = new RegisterMenu();
+        loginMenu = new LoginMenu();
+        gameMenu = new GameMenu();
+        newsMenu = new NewsMenu();
+        networkMenu = new NetworkMenu();
+        profileMenu = new ProfileMenu();
+        settingMenu = new SettingMenu();
+        collectionMenu = new CollectionMenu();
+        greenHouse = new GreenHouse();
+        travelLogMenu = new TravelLogMenu();
+        leaderBoardMenu = new LeaderBoardMenu();
+        choosePlantMenu = new ChoosePlantMenu();
     }
 
     public void run(Scanner scanner) {
-        while (true) {
+        while (scanner.hasNextLine()) {
             setCurrentMenu(app.getMenuState());
             if (currentMenu != null) {
                 currentMenu.run(scanner);
@@ -30,43 +59,43 @@ public class AppView {
     public void setCurrentMenu(MenuState menuState) {
         switch (menuState) {
             case MAIN:
-                currentMenu = new MainMenu();
+                currentMenu = mainMenu;
                 break;
             case REGISTER:
-                currentMenu = new RegisterMenu();
+                currentMenu = registerMenu;
                 break;
             case LOGIN:
-                currentMenu = new LoginMenu();
+                currentMenu = loginMenu;
                 break;
             case GAME:
-                currentMenu = new GameMenu();
+                currentMenu = gameMenu;
                 break;
             case NEWS:
-                currentMenu = new NewsMenu();
+                currentMenu = newsMenu;
                 break;
             case NETWORK:
-                currentMenu = new NetworkMenu();
+                currentMenu = networkMenu;
                 break;
             case PROFILE:
-                currentMenu = new ProfileMenu();
+                currentMenu = profileMenu;
                 break;
             case SETTING:
-                currentMenu = new SettingMenu();
+                currentMenu = settingMenu;
                 break;
             case COLLECTION:
-                currentMenu = new CollectionMenu();
+                currentMenu = collectionMenu;
                 break;
             case GREENHOUSE:
-                currentMenu = new GreenHouse();
+                currentMenu = greenHouse;
                 break;
             case TRAVEL_LOG:
-                currentMenu = new TravelLogMenu();
+                currentMenu = travelLogMenu;
                 break;
             case LEADERBOARD:
-                currentMenu = new LeaderBoardMenu();
+                currentMenu = leaderBoardMenu;
                 break;
             case CHOOSE_PLANT:
-                currentMenu = new ChoosePlantMenu();
+                currentMenu = choosePlantMenu;
                 break;
             case null, default:
                 currentMenu = null;

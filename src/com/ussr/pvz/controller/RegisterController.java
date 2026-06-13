@@ -1,5 +1,11 @@
 package com.ussr.pvz.controller;
 
 public class RegisterController {
-    void handleCommand(String command) {}
+    public RegisterController() {
+
+    }
+
+    public String handleCommand(String command) {
+        return "";
+    }
 }
