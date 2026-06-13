@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.team'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+// Tells Gradle 8.14.5 to safely use your local Java 25 installation
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+// Tells Gradle to read your custom flat folder layout directly
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+
+dependencies {
+    // You can add your external package dependencies here later
+}
