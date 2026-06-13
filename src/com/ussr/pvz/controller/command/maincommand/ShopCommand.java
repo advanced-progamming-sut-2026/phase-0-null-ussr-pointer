@@ -3,13 +3,14 @@ package com.ussr.pvz.controller.command.maincommand;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum LeaderBoardCommand {
-    SHOW("^show\\s+leaderboard(?:\\s+.*)?$"),
-    SORT("^leaderboard\\s+sort\\s+-c\\s+(?<column>\\S+)\\s+-o\\s+(?<order>\\S+)(?:\\s+.*)?$");
+public enum ShopCommand {
+    SHOP_LIST("^shop\\s+list(?:\\s+.*)?$"),
+    SHOP_DAILY("^shop\\s+daily(?:\\s+.*)?$"),
+    SHOP_BUY("^shop\\s+buy\\s+-i\\s+(?<itemId>\\S+)\\s+-n\\s+(?<count>\\S+)(?:\\s+-t\\s+(?<plantType>\\S+))?(?:\\s+.*)?$");
 
     private final String pattern;
 
-    LeaderBoardCommand(String pattern) {
+    ShopCommand(String pattern) {
         this.pattern = pattern;
     }
 

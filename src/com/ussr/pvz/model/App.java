@@ -4,35 +4,31 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 
 public class App {
-    private MenuState menuState;
-    private Account account;
-    private GameSession gameSession;
+    private static MenuState menuState = MenuState.REGISTER;
+    private static Account account;
+    private static GameSession gameSession;
 
-    public App() {
-        this.menuState = MenuState.REGISTER;
+    public static MenuState getMenuState() {
+        return App.menuState;
     }
 
-    public MenuState getMenuState() {
-        return menuState;
+    public static void setMenuState(MenuState menuState) {
+        App.menuState = menuState;
     }
 
-    public void setMenuState(MenuState menuState) {
-        this.menuState = menuState;
+    public static void login(Account account) {
+        App.account = account;
     }
 
-    public void login(Account account) {
-        this.account = account;
+    public static Account getAccount() {
+        return App.account;
     }
 
-    public Account getAccount() {
-        return account;
+    public static GameSession getGameSession() {
+        return App.gameSession;
     }
 
-    public GameSession getGameSession() {
-        return gameSession;
-    }
-
-    public void setGameSession(GameSession gameSession) {
-        this.gameSession = gameSession;
+    public static void setGameSession(GameSession gameSession) {
+        App.gameSession = gameSession;
     }
 }

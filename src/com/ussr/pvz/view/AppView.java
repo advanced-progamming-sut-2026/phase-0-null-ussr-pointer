@@ -11,7 +11,6 @@ import java.util.Scanner;
 
 public class AppView {
     private AppMenu currentMenu;
-    private final App app;
 
     private final MainMenu mainMenu;
     private final RegisterMenu registerMenu;
@@ -28,9 +27,6 @@ public class AppView {
     private final ChoosePlantMenu choosePlantMenu;
 
     public AppView() {
-        app = new App();
-
-        // Initialize all menu instances
         mainMenu = new MainMenu();
         registerMenu = new RegisterMenu();
         loginMenu = new LoginMenu();
@@ -48,7 +44,7 @@ public class AppView {
 
     public void run(Scanner scanner) {
         while (scanner.hasNextLine()) {
-            setCurrentMenu(app.getMenuState());
+            setCurrentMenu(App.getMenuState());
             if (currentMenu != null) {
                 currentMenu.run(scanner);
             } else
