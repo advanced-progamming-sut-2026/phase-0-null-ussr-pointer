@@ -35,4 +35,6 @@ public enum GlobalCommand {
     public Matcher getMatcher(String input) {
         return Pattern.compile(this.pattern).matcher(input);
     }
+
+    public String getPattern() { return this.pattern; }
 }

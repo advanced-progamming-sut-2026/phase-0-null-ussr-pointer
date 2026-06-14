@@ -1,12 +1,15 @@
 package com.ussr.pvz.controller;
 
 import com.ussr.pvz.controller.command.RegisterCommand;
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
+import com.ussr.pvz.service.RegisterService;
 
 import java.util.regex.Matcher;
 
 public class RegisterController {
+    RegisterService service = new RegisterService();
 
     public RegisterController() {
     }
@@ -20,6 +23,8 @@ public class RegisterController {
                         return handleRegister(matcher);
                     case PICK_QUESTION:
                         return handlePickQuestion(matcher);
+                    case SHOW_CURRENT_MENU:
+                        return handleShowMenu();
                     default:
                         return "";
                 }
@@ -39,8 +44,7 @@ public class RegisterController {
         );
 
         // TODO: call registerService.register(request) and return its message
-
-        return "";
+        return service.register(request);
     }
 
     private String handlePickQuestion(Matcher matcher) {
@@ -53,5 +57,9 @@ public class RegisterController {
         // TODO: call registerService.pickQuestion(request) and return its message
 
         return "";
+    }
+
+    private String handleShowMenu() {
+        return "current menu:" + App.getMenuState().getName();
     }
 }
