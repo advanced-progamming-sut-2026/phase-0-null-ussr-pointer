@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Wave {
     private int waveNumber;
+    private int cost;
     private List<SpawnData> spawnData;
 
     public int getWaveNumber() {

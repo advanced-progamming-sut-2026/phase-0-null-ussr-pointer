@@ -1,11 +1,12 @@
 package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.NewsCommand;
+import com.ussr.pvz.service.NewsService;
 
 import java.util.regex.Matcher;
 
 public class NewsController {
-
+    //TODO: Debug
     public NewsController() {
     }
 
@@ -23,12 +24,10 @@ public class NewsController {
     }
 
     private String handleShowUnread() {
-        // TODO: call newsService.showUnread() and return its message
-        return "";
+        return NewsService.showUnread();
     }
 
     private String handleShowAll() {
-        // TODO: call newsService.showAll() and return its message
-        return "";
+        return NewsService.showAll();
     }
 }

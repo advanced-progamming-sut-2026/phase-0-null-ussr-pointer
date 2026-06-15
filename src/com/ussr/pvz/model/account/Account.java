@@ -35,5 +35,9 @@ public class Account {
                 adventureProgress.getPlantLvls() ,
                 personalNews);
     }
+
+    public List<NewsItem> getPersonalNews() {
+        return personalNews;
+    }
 }
 
