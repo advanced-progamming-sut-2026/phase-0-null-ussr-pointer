@@ -43,12 +43,13 @@ public class AppView {
     }
 
     public void run(Scanner scanner) {
-        while (scanner.hasNextLine()) {
+        while (true) {
             setCurrentMenu(App.getMenuState());
             if (currentMenu != null) {
                 currentMenu.run(scanner);
-            } else
+            } else {
                 break;
+            }
         }
     }
 

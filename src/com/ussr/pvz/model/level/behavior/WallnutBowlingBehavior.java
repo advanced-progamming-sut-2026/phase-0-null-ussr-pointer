@@ -1,15 +1,15 @@
 package com.ussr.pvz.model.level.behavior;
 
-import com.ussr.pvz.model.entities.plants.BasePlant;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.Level;
 
 import java.util.Queue;
 
 public class WallnutBowlingBehavior implements LevelBehavior{
-    private final Queue<BasePlant> conveyorBelt;
+    private final Queue<Plant> conveyorBelt;
     private double redLineX;
 
-    public WallnutBowlingBehavior(Queue<BasePlant> conveyorBelt) {
+    public WallnutBowlingBehavior(Queue<Plant> conveyorBelt) {
         this.conveyorBelt = conveyorBelt;
     }
 

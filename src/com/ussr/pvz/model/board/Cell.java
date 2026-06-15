@@ -2,13 +2,13 @@ package com.ussr.pvz.model.board;
 
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.board.terrain.Tile;
-import com.ussr.pvz.model.entities.plants.BasePlant;
+import com.ussr.pvz.model.entities.plants.Plant;
 
 public class Cell {
     private int row;
     private int col;
     private Tile tile;
-    private BasePlant plant;
+    private Plant plant;
     private InteractableStructure interactableStructure;
 
     public int getRow() {
@@ -23,7 +23,7 @@ public class Cell {
         return tile;
     }
 
-    public BasePlant getPlant() {
+    public Plant getPlant() {
         return plant;
     }
 
@@ -43,7 +43,7 @@ public class Cell {
         this.tile = tile;
     }
 
-    public void setPlant(BasePlant plant) {
+    public void setPlant(Plant plant) {
         this.plant = plant;
     }
 

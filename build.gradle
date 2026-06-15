@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application' // 1. Added application plugin to enable 'gradle run'
 }
 
 group = 'com.team'
@@ -9,14 +10,12 @@ repositories {
     mavenCentral()
 }
 
-// Tells Gradle 8.14.5 to safely use your local Java 25 installation
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
-// Tells Gradle to read your custom flat folder layout directly
 sourceSets {
     main {
         java {
@@ -27,4 +26,14 @@ sourceSets {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.14.0'
+}
+
+// 2. Point Gradle to the file containing your main method
+application {
+    mainClass = 'Main'
+}
+
+// 3. CRITICAL: Allows Gradle to pass keyboard inputs (Scanner) to your CLI app
+run {
+    standardInput = System.in
 }

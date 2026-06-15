@@ -1,14 +1,14 @@
 package com.ussr.pvz.model.level.behavior;
 
-import com.ussr.pvz.model.entities.plants.BasePlant;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.Level;
 
 import java.util.List;
 
 public class ZombotanyBehavior implements LevelBehavior{
-    private final List<BasePlant> availableHybrids;
+    private final List<Plant> availableHybrids;
 
-    public ZombotanyBehavior(List<BasePlant> availableHybrids) {
+    public ZombotanyBehavior(List<Plant> availableHybrids) {
         this.availableHybrids = availableHybrids;
     }
 
