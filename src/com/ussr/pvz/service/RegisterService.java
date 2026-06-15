@@ -27,6 +27,7 @@ public class RegisterService {
             return "invalid gender";
 
 
+        return "";
     }
 
     private boolean validUsername(String username) {

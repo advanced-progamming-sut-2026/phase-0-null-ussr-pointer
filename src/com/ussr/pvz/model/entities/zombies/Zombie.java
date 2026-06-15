@@ -11,10 +11,10 @@ import java.util.ArrayList;
 
 public class Zombie extends GameEntity {
     private final String name;
-    private final ArrayList<MoveBehavior> moveBehaviors = new ArrayList<>();
-    private final ArrayList<EffectStatus> effectStatuses = new ArrayList<>();
-    private final ArrayList<DefenseBehavior> defenseBehaviors = new ArrayList<>();
-    private final ArrayList<AttackBehavior> attackBehaviors =  new ArrayList<>();
+    private MoveBehavior moveBehavior;
+    private EffectStatus effectStatus;
+    private DefenseBehavior defenseBehavior;
+    private AttackBehavior attackBehavior;
     private final Armor armor;
     private int hp;
 

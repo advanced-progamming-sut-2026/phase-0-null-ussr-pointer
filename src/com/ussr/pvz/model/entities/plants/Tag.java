@@ -3,36 +3,49 @@ package com.ussr.pvz.model.entities.plants;
 public enum Tag {
     DAY("Day"),
     SHROOM("Shroom"),
-    WARM_UP("Warm-up"),
-    NIGHT("Night"),
+    WARM_UP("wramp-up"), // matches json value
+    NIGHT("night"),
     PEA("Pea"),
     ICE("Ice"),
-    STACK("Stack"),
-    CHARGE("Charge"),
+    STACK("stack"),
+    CHARGE("charge"),
     MAGIC("Magic"),
     FIRE("Fire"),
     POISON("Poison"),
     WATER("Water"),
-    AOE("AoE"),
-    TRAP("Trap"),
-    MOVE_ZOMBIE("MoveZombie"),
-    EXPLOSIVE("Explosive"),
+    BOUNCE("bounce"),
+    PIERCE("pierce"),
+    DELAYED("delayed"),
+    SPLASH("Splash"),
+    INSTANT("Instant"),
+    LANE("Lane"),
+    STUN("Stun"),
+    MULTIDIRECTIONAL("multidirectional"),
+    GATLING("Gatling"),
+    TIMED("timed"),
+    SHIELD("Shield"),
+    TALL("Tall"),
+    MELEE("Melee"),
+    DIVERT("Divert"),
+    ATTRACT("Attract"),
+    POCKETS("pockets"),
+    DISARM("Disarm"),
+    HYPNO("Hypno"),
+    CLONE("Clone"),
+    BESTER("Bester"),
     SUN("Sun");
 
     private final String name;
 
-    //constructor
     Tag(String name) {
         this.name = name;
     }
 
-    //getter
     public String getName() { return this.name; }
 
-    //helper
     public static Tag getByName(String name) {
-        for(Tag t : Tag.values()) {
-            if(t.getName().equals(name))
+        for (Tag t : Tag.values()) {
+            if (t.getName().equalsIgnoreCase(name.strip()) || t.name().equalsIgnoreCase(name.strip()))
                 return t;
         }
         return null;
