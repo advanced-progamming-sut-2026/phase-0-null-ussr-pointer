@@ -1,33 +1,114 @@
 package com.ussr.pvz.service;
 
 import com.ussr.pvz.controller.command.ValidationRegex;
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.*;
+import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
 
+import java.util.List;
+import java.util.Map;
+
 public class RegisterService {
+
+    private AccountState pendingAccount;
+
     public String register(RegisterRequest request) {
-        if(!validUsername(request.username()))
+        if (usernameExists(request.username()))
+            return "username already exists";
+        else if (!validUsername(request.username()))
             return "invalid username";
-        else if(!validPasswordLength(request.password()))
+        else if (!validPasswordLength(request.password()))
             return "invalid password length";
-        else if(!validPasswordLower(request.password()))
+        else if (!validPasswordLower(request.password()))
             return "password must contain a lowercase character";
-        else if(!validPasswordUpper(request.password()))
+        else if (!validPasswordUpper(request.password()))
             return "password must contain an uppercase character";
-        else if(!validPasswordNumber(request.password()))
+        else if (!validPasswordNumber(request.password()))
             return "password must contain a number";
-        else if(!validPasswordSpecific(request.password()))
+        else if (!validPasswordSpecific(request.password()))
             return "password must contain a specific character";
-        else if(!request.password().equals(request.passwordConfirm()))
+        else if (!request.password().equals(request.passwordConfirm()))
             return "password confirm does not match to the password";
-        else if(!validEmail(request.email()))
+        else if (!validEmail(request.email()))
             return "invalid email format";
-        else if(!validNickname(request.nickname()))
+        else if (!validNickname(request.nickname()))
             return "invalid nickname length";
-        else if(!validGender(request.gender()))
+        else if (!validGender(request.gender()))
             return "invalid gender";
 
+        pendingAccount = new AccountState(
+                request.username(),
+                request.nickname(),
+                request.password(),
+                request.email(),
+                Gender.from(request.gender()),
+                null,  // securityQuestion — not picked yet
+                null,  // securityAnswer — not picked yet
+                1,     // starting level
+                0,     // coin
+                0,     // gem
+                0,     // score
+                Map.of(),
+                List.of()
+        );
 
-        return "";
+        StringBuilder sb = new StringBuilder("pick a security question:\n");
+        for (SecurityQuestion q : SecurityQuestion.values()) {
+            sb.append(q.ordinal() + 1).append(". ").append(q.getText()).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    public String pickQuestion(PickQuestionRequest request) {
+        if (pendingAccount == null) {
+            return "no pending registration";
+        }
+
+        int questionNumber;
+        try {
+            questionNumber = Integer.parseInt(request.questionNumber());
+        } catch (NumberFormatException e) {
+            return "invalid question number";
+        }
+
+        SecurityQuestion[] questions = SecurityQuestion.values();
+        if (questionNumber < 1 || questionNumber > questions.length) {
+            return "invalid question number";
+        }
+
+        if (!request.answer().equals(request.answerConfirm())) {
+            return "answer does not match";
+        }
+
+        SecurityQuestion chosenQuestion = questions[questionNumber - 1];
+
+        AccountState finalState = new AccountState(
+                pendingAccount.username(),
+                pendingAccount.nickname(),
+                pendingAccount.password(),
+                pendingAccount.email(),
+                pendingAccount.gender(),
+                chosenQuestion,
+                request.answer(),
+                pendingAccount.currentLvl(),
+                pendingAccount.coin(),
+                pendingAccount.gem(),
+                pendingAccount.score(),
+                pendingAccount.plantLvl(),
+                pendingAccount.personalNews()
+        );
+
+        App.addAccount(new Account(finalState, finalState.password(), new Collection(List.of(), List.of())));
+        pendingAccount = null;
+        App.setMenuState(MenuState.LOGIN);
+        return "registered successfully";
+    }
+
+    private boolean usernameExists(String username) {
+        return App.getAccounts().stream()
+                .anyMatch(a -> a.getName().equals(username));
     }
 
     private boolean validUsername(String username) {

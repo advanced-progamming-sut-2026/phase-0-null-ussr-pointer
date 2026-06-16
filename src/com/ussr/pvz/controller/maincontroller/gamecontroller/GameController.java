@@ -2,11 +2,12 @@ package com.ussr.pvz.controller.maincontroller.gamecontroller;
 
 import com.ussr.pvz.controller.command.maincommand.gamecommand.GameCommand;
 import com.ussr.pvz.model.dto.*;
+import com.ussr.pvz.service.AccountService;
 
 import java.util.regex.Matcher;
 
 public class GameController {
-
+    private final AccountService accountService = new AccountService();
     public GameController() {
     }
 
@@ -83,8 +84,7 @@ public class GameController {
         return "";
     }
     private String handleMenuLogout() {
-        // TODO: call gameService.menuLogout() and return its message
-        return "";
+        return accountService.logoutAccount();
     }
 
     private String handleAdvanceTime(Matcher matcher) {

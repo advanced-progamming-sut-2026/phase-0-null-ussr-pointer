@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class Zombie extends GameEntity {
     private final String name;
+    //fragile : moveBehavior must be an arrayList.
     private MoveBehavior moveBehavior;
     private EffectStatus effectStatus;
     private DefenseBehavior defenseBehavior;

@@ -4,10 +4,12 @@ import com.ussr.pvz.controller.command.LoginCommand;
 import com.ussr.pvz.model.dto.LoginRequest;
 import com.ussr.pvz.model.dto.ForgetPasswordRequest;
 import com.ussr.pvz.model.dto.AnswerRequest;
+import com.ussr.pvz.service.LoginService;
 
 import java.util.regex.Matcher;
 
 public class LoginController {
+    private final LoginService loginService = new LoginService();
 
     public LoginController() {
     }
@@ -40,9 +42,8 @@ public class LoginController {
                 stayLoggedIn
         );
 
-        // TODO: call loginService.login(request) and return its message
 
-        return "";
+        return loginService.login(request);
     }
 
     private String handleForgetPassword(Matcher matcher) {
@@ -51,9 +52,8 @@ public class LoginController {
                 matcher.group("email")
         );
 
-        // TODO: call loginService.forgetPassword(request) and return its message
 
-        return "";
+        return loginService.forgetPassword(request);
     }
 
     private String handleAnswer(Matcher matcher) {
@@ -61,8 +61,7 @@ public class LoginController {
                 matcher.group("answer")
         );
 
-        // TODO: call loginService.answer(request) and return its message
 
-        return "";
+        return loginService.answer(request);
     }
 }

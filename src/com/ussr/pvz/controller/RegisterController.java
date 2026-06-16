@@ -43,7 +43,6 @@ public class RegisterController {
                 matcher.group("gender")
         );
 
-        // TODO: call registerService.register(request) and return its message
         return service.register(request);
     }
 
@@ -54,9 +53,8 @@ public class RegisterController {
                 matcher.group("answerConfirm")
         );
 
-        // TODO: call registerService.pickQuestion(request) and return its message
 
-        return "";
+        return service.pickQuestion(request);
     }
 
     private String handleShowMenu() {

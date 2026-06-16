@@ -2,12 +2,16 @@ package com.ussr.pvz.controller;
 
 import com.ussr.pvz.controller.command.GlobalCommand;
 import com.ussr.pvz.model.dto.*;
+import com.ussr.pvz.service.GlobalService;
 
 import java.util.regex.Matcher;
 
 public class GlobalController {
 
+    private final GlobalService globalService;
+
     public GlobalController() {
+        this.globalService = new GlobalService();
     }
 
     public String handleCommand(String command) {
@@ -26,18 +30,15 @@ public class GlobalController {
 
     private String handleMenuEnter(Matcher matcher) {
         MenuEnterRequest request = new MenuEnterRequest(matcher.group("menuName"));
-        // TODO: call globalService.menuEnter(request) and return its message
-        return "";
+        return globalService.menuEnter(request);
     }
 
     private String handleMenuShowCurrent() {
-        // TODO: call globalService.menuShowCurrent() and return its message
-        return "";
+        return globalService.menuShowCurrentMenu();
     }
 
     private String handleMenuExit() {
-        // TODO: call globalService.menuExit() and return its message
-        return "";
+        return globalService.menuExit();
     }
 
 }
