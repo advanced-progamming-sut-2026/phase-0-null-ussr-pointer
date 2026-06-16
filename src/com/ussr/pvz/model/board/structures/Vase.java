@@ -13,7 +13,10 @@ public class Vase extends InteractableStructure {
     public void onDestroy(GameSession session) {
 
     }
-    @Override public void tick() {}
+
+    @Override
+    public void tick() {
+    }
 
 }
 

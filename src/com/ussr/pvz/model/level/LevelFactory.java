@@ -1,7 +1,6 @@
 package com.ussr.pvz.model.level;
 
 import com.ussr.pvz.model.level.behavior.*;
-import com.ussr.pvz.model.level.behavior.*;
 
 import java.util.HashMap;
 import java.util.Map;

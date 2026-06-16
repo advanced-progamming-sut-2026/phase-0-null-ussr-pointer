@@ -1,4 +1,4 @@
 package com.ussr.pvz.model.entities.zombies.attack;
 
-public class ChompAttack implements AttackBehavior{
+public class ChompAttack implements AttackBehavior {
 }

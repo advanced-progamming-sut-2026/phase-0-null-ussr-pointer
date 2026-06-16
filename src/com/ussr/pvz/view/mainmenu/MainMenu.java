@@ -7,9 +7,11 @@ import java.util.Scanner;
 
 public class MainMenu implements AppMenu {
     GlobalController controller;
-    public MainMenu(){
+
+    public MainMenu() {
         controller = new GlobalController();
     }
+
     @Override
     public void run(Scanner scanner) {
         System.out.println(controller.handleCommand(scanner.nextLine()));

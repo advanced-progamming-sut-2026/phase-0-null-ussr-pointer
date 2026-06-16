@@ -7,7 +7,11 @@ public enum SecurityQuestion {
 
     private final String text;
 
-    SecurityQuestion(String text) { this.text = text; }
+    SecurityQuestion(String text) {
+        this.text = text;
+    }
 
-    public String getText() { return text; }
+    public String getText() {
+        return text;
+    }
 }

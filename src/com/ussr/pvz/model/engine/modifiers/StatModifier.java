@@ -36,5 +36,7 @@ public class StatModifier {
         };
     }
 
-    public String getId() { return id; }
+    public String getId() {
+        return id;
+    }
 }

@@ -6,7 +6,7 @@ import com.ussr.pvz.model.level.Level;
 
 import java.util.List;
 
-public class VaseBreakerBehavior implements LevelBehavior{
+public class VaseBreakerBehavior implements LevelBehavior {
     private final List<Vase> vases;
     private final List<Plant> collectedPlants;
 
@@ -15,8 +15,11 @@ public class VaseBreakerBehavior implements LevelBehavior{
         this.collectedPlants = collectedPlants;
     }
 
-    public void breakVase(Vase vase) {}
-    public void placePlant(Plant plant, int row, int column) {}
+    public void breakVase(Vase vase) {
+    }
+
+    public void placePlant(Plant plant, int row, int column) {
+    }
 
 
     @Override

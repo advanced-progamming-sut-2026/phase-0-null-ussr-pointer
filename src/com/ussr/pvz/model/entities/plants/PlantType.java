@@ -20,12 +20,14 @@ public enum PlantType {
     }
 
     //getter
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 
     //helper
     public static PlantType getByName(String name) {
-        for(PlantType type : PlantType.values()) {
-            if(type.getName().equals(name))
+        for (PlantType type : PlantType.values()) {
+            if (type.getName().equals(name))
                 return type;
         }
         return null;

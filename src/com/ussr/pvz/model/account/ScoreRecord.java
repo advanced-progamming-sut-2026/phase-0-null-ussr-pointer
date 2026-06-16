@@ -8,5 +8,7 @@ public class ScoreRecord {
     }
 
     //getter
-    public int getScore() { return this.score; }
+    public int getScore() {
+        return this.score;
+    }
 }

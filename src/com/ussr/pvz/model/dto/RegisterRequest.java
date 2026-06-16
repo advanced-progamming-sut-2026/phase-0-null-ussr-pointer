@@ -7,4 +7,5 @@ public record RegisterRequest(
         String nickname,
         String email,
         String gender
-) {}
+) {
+}

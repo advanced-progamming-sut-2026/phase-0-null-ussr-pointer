@@ -41,7 +41,9 @@ public enum Tag {
         this.name = name;
     }
 
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 
     public static Tag getByName(String name) {
         for (Tag t : Tag.values()) {

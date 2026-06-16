@@ -36,7 +36,8 @@ public class ConfigurableQuest implements Quest {
     }
 
     @Override
-    public void onComplete() {  }
+    public void onComplete() {
+    }
 
     @Override
     public void reset() {

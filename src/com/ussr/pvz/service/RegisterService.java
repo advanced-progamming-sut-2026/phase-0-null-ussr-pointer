@@ -79,7 +79,7 @@ public class RegisterService {
         }
 
         if (!request.answer().equals(request.answerConfirm())) {
-            return "answer does not match";
+            return "answers are not identical";
         }
 
         SecurityQuestion chosenQuestion = questions[questionNumber - 1];

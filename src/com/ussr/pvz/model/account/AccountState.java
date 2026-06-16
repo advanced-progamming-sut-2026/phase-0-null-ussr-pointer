@@ -17,4 +17,5 @@ public record AccountState(
         int score,
         Map<String, Integer> plantLvl,
         List<NewsItem> personalNews
-) {}
+) {
+}

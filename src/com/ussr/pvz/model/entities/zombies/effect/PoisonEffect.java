@@ -1,4 +1,4 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
-public class PoisonEffect implements EffectStatus{
+public class PoisonEffect implements EffectStatus {
 }

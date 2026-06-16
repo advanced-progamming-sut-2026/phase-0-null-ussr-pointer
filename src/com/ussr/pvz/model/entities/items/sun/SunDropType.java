@@ -6,6 +6,7 @@ public enum SunDropType {
     LARGE(75);
 
     private final int value;
+
     SunDropType(int value) {
 
         this.value = value;

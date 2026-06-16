@@ -5,7 +5,7 @@ import com.ussr.pvz.model.level.Level;
 
 import java.util.Queue;
 
-public class WallnutBowlingBehavior implements LevelBehavior{
+public class WallnutBowlingBehavior implements LevelBehavior {
     private final Queue<Plant> conveyorBelt;
     private double redLineX;
 
@@ -13,7 +13,8 @@ public class WallnutBowlingBehavior implements LevelBehavior{
         this.conveyorBelt = conveyorBelt;
     }
 
-    public void roll() {}
+    public void roll() {
+    }
 
     @Override
     public void onStart(Level level) {

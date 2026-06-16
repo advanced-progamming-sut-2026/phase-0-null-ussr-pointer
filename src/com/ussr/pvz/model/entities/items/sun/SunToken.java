@@ -22,7 +22,8 @@ public class SunToken extends GroundItem {
     }
 
     @Override
-    public void tick() {}
+    public void tick() {
+    }
 
 
 }

@@ -1,3 +1,4 @@
 package com.ussr.pvz.model.dto;
 
-public record MenuEnterRequest(String menuName) {}
+public record MenuEnterRequest(String menuName) {
+}

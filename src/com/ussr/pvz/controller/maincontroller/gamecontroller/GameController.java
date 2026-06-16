@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 
 public class GameController {
     private final AccountService accountService = new AccountService();
+
     public GameController() {
     }
 
@@ -83,6 +84,7 @@ public class GameController {
         // TODO: call gameService.menuSwitchWorld(request) and return its message
         return "";
     }
+
     private String handleMenuLogout() {
         return accountService.logoutAccount();
     }

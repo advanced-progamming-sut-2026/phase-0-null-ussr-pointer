@@ -7,8 +7,6 @@ import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 
-import java.util.ArrayList;
-
 public class Zombie extends GameEntity {
     private final String name;
     //fragile : moveBehavior must be an arrayList.

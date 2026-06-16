@@ -2,8 +2,8 @@ package com.ussr.pvz.controller;
 
 import com.ussr.pvz.controller.command.RegisterCommand;
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
+import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.service.RegisterService;
 
 import java.util.regex.Matcher;

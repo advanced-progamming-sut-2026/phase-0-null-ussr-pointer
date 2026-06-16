@@ -6,9 +6,9 @@ public class AdventureProgress {
     private int coin;
     private int gem;
     private int currentLvl;
-    private final Map<String , Integer> plantLvls;
+    private final Map<String, Integer> plantLvls;
 
-    public AdventureProgress(int currentLvl , int coin , int gem , Map<String , Integer> plantLvls) {
+    public AdventureProgress(int currentLvl, int coin, int gem, Map<String, Integer> plantLvls) {
         this.currentLvl = currentLvl;
         this.coin = coin;
         this.gem = gem;
@@ -16,9 +16,20 @@ public class AdventureProgress {
     }
 
     //getters
-    public int getCurrentLvl() { return this.currentLvl; }
-    public int getCoin() { return this.coin; }
-    public int getGem() { return this.gem; }
-    public Map<String , Integer> getPlantLvls() { return this.plantLvls; }
+    public int getCurrentLvl() {
+        return this.currentLvl;
+    }
+
+    public int getCoin() {
+        return this.coin;
+    }
+
+    public int getGem() {
+        return this.gem;
+    }
+
+    public Map<String, Integer> getPlantLvls() {
+        return this.plantLvls;
+    }
 }
 

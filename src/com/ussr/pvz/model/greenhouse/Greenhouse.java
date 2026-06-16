@@ -44,6 +44,7 @@ public class Greenhouse {
     public int speedUp(int x, int y) {
         return 0;
     }
+
     public void printGrid() {
     }
 

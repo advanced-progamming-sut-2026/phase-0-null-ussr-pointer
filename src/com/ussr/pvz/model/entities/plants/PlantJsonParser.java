@@ -43,7 +43,8 @@ public class PlantJsonParser {
 
     public static Map<Integer, PlantConfig> loadConfigs(InputStream stream) {
         try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            Type listType = new TypeToken<List<PlantConfig>>() {}.getType();
+            Type listType = new TypeToken<List<PlantConfig>>() {
+            }.getType();
             List<PlantConfig> list = new Gson().fromJson(reader, listType);
 
             Map<Integer, PlantConfig> configMap = new HashMap<>();

@@ -7,9 +7,14 @@ public abstract class InteractableStructure extends GameEntity {
     private boolean destroyed;
     private int hp;
 
-    public void takeDamage(int damage) {}
+    public void takeDamage(int damage) {
+    }
+
     public abstract void onDestroy(GameSession session);
-    @Override public void tick() {}
+
+    @Override
+    public void tick() {
+    }
 
 }
 

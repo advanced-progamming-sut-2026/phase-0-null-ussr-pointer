@@ -5,7 +5,7 @@ import com.ussr.pvz.model.level.Level;
 
 import java.util.List;
 
-public class ZombotanyBehavior implements LevelBehavior{
+public class ZombotanyBehavior implements LevelBehavior {
     private final List<Plant> availableHybrids;
 
     public ZombotanyBehavior(List<Plant> availableHybrids) {

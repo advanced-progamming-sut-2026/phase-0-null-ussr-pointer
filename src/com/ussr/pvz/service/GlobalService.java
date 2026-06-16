@@ -4,7 +4,6 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ public class GlobalService {
             case LOGIN -> to == MenuState.MAIN && App.getAccount() != null;
             case MAIN -> to == MenuState.GAME || to == MenuState.SETTING || to == MenuState.NETWORK ||
                     to == MenuState.NEWS || to == MenuState.PROFILE;
-            case GAME ->  to == MenuState.COLLECTION;
+            case GAME -> to == MenuState.COLLECTION;
             default -> false;
         };
 
@@ -40,9 +39,11 @@ public class GlobalService {
         App.setMenuState(to);
         return "menu changed to: " + to.getName();
     }
+
     public String menuShowCurrentMenu() {
         return "current menu: " + App.getMenuState().getName();
     }
+
     public String menuExit() {
         MenuState current = App.getMenuState();
 

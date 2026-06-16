@@ -51,6 +51,9 @@ public class Cell {
     public void setStructure(InteractableStructure interactableStructure) {
         this.interactableStructure = interactableStructure;
     }
-    public boolean isEmpty() {return plant == null;}
+
+    public boolean isEmpty() {
+        return plant == null;
+    }
 }
 

@@ -1,10 +1,10 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
+import com.ussr.pvz.model.entities.plants.PlantJsonParser.UpgradeConfig;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.UpgradeConfig;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -117,7 +117,8 @@ public class PlantFactory {
                     case KNOCKBACK_BLAST -> {
                         // Apply backwards force velocities to enemies in lane
                     }
-                    default -> {}
+                    default -> {
+                    }
                 }
             }
 

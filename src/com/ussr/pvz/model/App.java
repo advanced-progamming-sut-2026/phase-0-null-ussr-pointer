@@ -12,9 +12,13 @@ public class App {
     private static GameSession gameSession;
     private static List<Account> accounts = new ArrayList<>();
 
-    public static List<Account> getAccounts() { return accounts; }
+    public static List<Account> getAccounts() {
+        return accounts;
+    }
 
-    public static void addAccount(Account account) { accounts.add(account); }
+    public static void addAccount(Account account) {
+        accounts.add(account);
+    }
 
     public static MenuState getMenuState() {
         return App.menuState;

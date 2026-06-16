@@ -12,6 +12,8 @@ public class LawnMower extends InteractableStructure {
 
     }
 
-    @Override public void tick() {}
+    @Override
+    public void tick() {
+    }
 
 }

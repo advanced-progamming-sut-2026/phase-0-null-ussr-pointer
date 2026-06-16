@@ -1,4 +1,4 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
-public class SpinEffect implements EffectStatus{
+public class SpinEffect implements EffectStatus {
 }

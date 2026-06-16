@@ -18,5 +18,7 @@ public enum GlobalCommand {
         return Pattern.compile(this.pattern).matcher(input);
     }
 
-    public String getPattern() { return this.pattern; }
+    public String getPattern() {
+        return this.pattern;
+    }
 }

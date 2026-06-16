@@ -1,7 +1,7 @@
 package com.ussr.pvz.controller;
 
 import com.ussr.pvz.controller.command.GlobalCommand;
-import com.ussr.pvz.model.dto.*;
+import com.ussr.pvz.model.dto.MenuEnterRequest;
 import com.ussr.pvz.service.GlobalService;
 
 import java.util.regex.Matcher;

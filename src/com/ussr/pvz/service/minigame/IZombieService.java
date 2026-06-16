@@ -1,6 +1,6 @@
 package com.ussr.pvz.service.minigame;
 
-public class IZombieService implements MinigameService{
+public class IZombieService implements MinigameService {
     @Override
     public void start() {
 

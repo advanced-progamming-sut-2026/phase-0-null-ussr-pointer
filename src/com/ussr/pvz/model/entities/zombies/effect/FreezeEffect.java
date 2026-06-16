@@ -1,4 +1,4 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
-public class FreezeEffect implements EffectStatus{
+public class FreezeEffect implements EffectStatus {
 }

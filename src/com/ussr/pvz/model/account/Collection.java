@@ -13,7 +13,7 @@ public class Collection {
         this.lockedPlants = lockedPlants;
     }
 
-    public void unlockPlant(Plant plant){
+    public void unlockPlant(Plant plant) {
         unlockedPlants.add(plant);
         lockedPlants.remove(plant);
     }

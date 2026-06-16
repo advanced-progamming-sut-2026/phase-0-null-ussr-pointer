@@ -12,6 +12,7 @@ public class CoinDrop extends GroundItem {
         SILVER,
         GOLD;
     }
+
     private final CoinTier tier;
 
     @Override

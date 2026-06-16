@@ -11,6 +11,8 @@ public class Grave extends InteractableStructure {
 
     }
 
-    @Override public void tick() {}
+    @Override
+    public void tick() {
+    }
 
 }

@@ -21,5 +21,7 @@ public enum MenuState {
         this.name = name;
     }
 
-    public String getName() { return this.name; }
+    public String getName() {
+        return this.name;
+    }
 }
