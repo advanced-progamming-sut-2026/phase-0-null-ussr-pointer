@@ -30,6 +30,7 @@ public class Account {
         personalNews = new ArrayList<>(state.personalNews());
         this.collection = collection;
     }
+
     public AccountState toState() {
         return new AccountState(
                 this.name,
@@ -78,5 +79,21 @@ public class Account {
 
     public List<NewsItem> getPersonalNews() {
         return personalNews;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

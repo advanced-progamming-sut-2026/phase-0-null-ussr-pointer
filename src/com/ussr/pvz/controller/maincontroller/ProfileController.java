@@ -1,14 +1,17 @@
 package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.ProfileCommand;
-import com.ussr.pvz.model.dto.ChangeUsernameRequest;
-import com.ussr.pvz.model.dto.ChangeNicknameRequest;
 import com.ussr.pvz.model.dto.ChangeEmailRequest;
+import com.ussr.pvz.model.dto.ChangeNicknameRequest;
 import com.ussr.pvz.model.dto.ChangePasswordRequest;
+import com.ussr.pvz.model.dto.ChangeUsernameRequest;
+import com.ussr.pvz.service.ProfileService;
 
 import java.util.regex.Matcher;
 
 public class ProfileController {
+
+    private final ProfileService profileService = new ProfileService();
 
     public ProfileController() {
     }
@@ -31,20 +34,17 @@ public class ProfileController {
 
     private String handleChangeUsername(Matcher matcher) {
         ChangeUsernameRequest request = new ChangeUsernameRequest(matcher.group("username"));
-        // TODO: call profileService.changeUsername(request) and return its message
-        return "";
+        return profileService.changeUsername(request);
     }
 
     private String handleChangeNickname(Matcher matcher) {
         ChangeNicknameRequest request = new ChangeNicknameRequest(matcher.group("nickname"));
-        // TODO: call profileService.changeNickname(request) and return its message
-        return "";
+        return profileService.changeNickname(request);
     }
 
     private String handleChangeEmail(Matcher matcher) {
         ChangeEmailRequest request = new ChangeEmailRequest(matcher.group("email"));
-        // TODO: call profileService.changeEmail(request) and return its message
-        return "";
+        return profileService.changeEmail(request);
     }
 
     private String handleChangePassword(Matcher matcher) {
@@ -52,12 +52,10 @@ public class ProfileController {
                 matcher.group("newPassword"),
                 matcher.group("oldPassword")
         );
-        // TODO: call profileService.changePassword(request) and return its message
-        return "";
+        return profileService.changePassword(request);
     }
 
     private String handleShowInfo() {
-        // TODO: call profileService.showInfo() and return its message
-        return "";
+        return profileService.showInfo();
     }
 }
