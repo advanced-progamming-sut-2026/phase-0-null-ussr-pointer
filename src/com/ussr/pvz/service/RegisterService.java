@@ -6,9 +6,7 @@ import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.*;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
-
 import java.util.List;
-import java.util.Map;
 
 public class RegisterService {
 
@@ -50,8 +48,8 @@ public class RegisterService {
                 0,     // coin
                 0,     // gem
                 0,     // score
-                Map.of(),
-                List.of()
+                AdventureProgress.initializePlantsLvl(),
+                List.of(NewsItem.initialNews())
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");
@@ -84,23 +82,15 @@ public class RegisterService {
 
         SecurityQuestion chosenQuestion = questions[questionNumber - 1];
 
-        AccountState finalState = new AccountState(
-                pendingAccount.username(),
-                pendingAccount.nickname(),
-                pendingAccount.password(),
-                pendingAccount.email(),
-                pendingAccount.gender(),
-                chosenQuestion,
-                request.answer(),
-                pendingAccount.currentLvl(),
-                pendingAccount.coin(),
-                pendingAccount.gem(),
-                pendingAccount.score(),
-                pendingAccount.plantLvl(),
-                pendingAccount.personalNews()
-        );
+        AccountState finalState = pendingAccount.finalizeRegistration(chosenQuestion , request.answer());
 
-        App.addAccount(new Account(finalState, finalState.password(), new Collection(List.of(), List.of())));
+        App.addAccount(new Account(finalState, new Collection(List.of(), List.of())));
+
+        List<AccountState> allUpdatedStates = App.getAccounts().stream()
+                .map(Account::toState)
+                .toList();
+        SaveService.saveAccounts(allUpdatedStates);
+
         pendingAccount = null;
         App.setMenuState(MenuState.LOGIN);
         return "registered successfully";

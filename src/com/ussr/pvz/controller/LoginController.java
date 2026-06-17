@@ -26,7 +26,7 @@ public class LoginController {
                     case ANSWER:
                         return handleAnswer(matcher);
                     default:
-                        return "";
+                        return handleResetPassword(command);
                 }
             }
         }
@@ -60,8 +60,10 @@ public class LoginController {
         AnswerRequest request = new AnswerRequest(
                 matcher.group("answer")
         );
-
-
         return loginService.answer(request);
+    }
+
+    private String handleResetPassword(String newPass) {
+        return loginService.resetPassword(newPass);
     }
 }

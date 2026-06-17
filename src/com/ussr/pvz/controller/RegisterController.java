@@ -18,16 +18,12 @@ public class RegisterController {
         for (RegisterCommand cmd : RegisterCommand.values()) {
             Matcher matcher = cmd.getMatcher(command);
             if (matcher.matches()) {
-                switch (cmd) {
-                    case REGISTER:
-                        return handleRegister(matcher);
-                    case PICK_QUESTION:
-                        return handlePickQuestion(matcher);
-                    case SHOW_CURRENT_MENU:
-                        return handleShowMenu();
-                    default:
-                        return "";
-                }
+                return switch (cmd) {
+                    case REGISTER -> handleRegister(matcher);
+                    case PICK_QUESTION -> handlePickQuestion(matcher);
+                    case SHOW_CURRENT_MENU -> handleShowMenu();
+                    default -> "";
+                };
             }
         }
         return "";

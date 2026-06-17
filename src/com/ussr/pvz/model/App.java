@@ -1,7 +1,9 @@
 package com.ussr.pvz.model;
 
 import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.service.SaveService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,10 @@ public class App {
     private static MenuState menuState = MenuState.REGISTER;
     private static Account account;
     private static GameSession gameSession;
-    private static List<Account> accounts = new ArrayList<>();
+    private static List<Account> accounts = new ArrayList<>(
+            SaveService.loadAccounts().stream()
+                    .map(state -> new Account
+                            (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
 
     public static List<Account> getAccounts() {
         return accounts;

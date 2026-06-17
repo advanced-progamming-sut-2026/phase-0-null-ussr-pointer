@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.account;
 
+import com.ussr.pvz.model.util.SecurityUtil;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,4 +20,21 @@ public record AccountState(
         Map<String, Integer> plantLvl,
         List<NewsItem> personalNews
 ) {
+    public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
+        return new AccountState(
+                this.username,
+                this.nickname,
+                SecurityUtil.hashPassword(this.password),
+                this.email,
+                this.gender,
+                question,
+                answer,
+                this.currentLvl,
+                this.coin,
+                this.gem,
+                this.score,
+                this.plantLvl,
+                this.personalNews
+        );
+    }
 }

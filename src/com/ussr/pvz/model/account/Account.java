@@ -16,10 +16,10 @@ public class Account {
     private List<NewsItem> personalNews;
     private Collection collection;
 
-    public Account(AccountState state, String password, Collection collection) {
+    public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();
-        this.password = password;
+        this.password = state.password();
         this.email = state.email();
         this.gender = state.gender();
         this.securityQuestion = state.securityQuestion();

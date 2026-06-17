@@ -5,6 +5,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import java.util.List;
 
 public class Collection {
+    //this class my me unused in the future the unlocked plants will be known by their lvl(0) now
     private List<Plant> unlockedPlants;
     private List<Plant> lockedPlants;
 

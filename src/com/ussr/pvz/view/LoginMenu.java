@@ -16,6 +16,7 @@ public class LoginMenu implements AppMenu {
 
     @Override
     public void run(Scanner scanner) {
+        //we may change this later
         String input = scanner.nextLine();
         String output = controllerGlobal.handleCommand(input);
         if (output.isEmpty()) {
