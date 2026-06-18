@@ -5,14 +5,13 @@ import com.ussr.pvz.model.entities.items.GroundItem;
 
 public class SunToken extends GroundItem {
     private final SunDropType dropType;
-    private final int sunValue;
     private boolean falling;
     private double fallTargetY;
     private long fallTime;
 
-    public SunToken(SunDropType dropType, int sunValue) {
+    public SunToken(SunDropType dropType, boolean falling) {
         this.dropType = dropType;
-        this.sunValue = sunValue;
+        this.falling = falling;
     }
 
 
@@ -26,4 +25,19 @@ public class SunToken extends GroundItem {
     }
 
 
+    public SunDropType getDropType() {
+        return dropType;
+    }
+
+    public int getValue() {
+        return dropType.getValue();
+    }
+
+    public boolean isFalling() {
+        return falling;
+    }
+
+    public void setFalling(boolean falling) {
+        this.falling = falling;
+    }
 }
