@@ -1,6 +1,7 @@
 package com.ussr.pvz.controller;
 
 import com.ussr.pvz.controller.command.GlobalCommand;
+import com.ussr.pvz.model.dto.AdvanceTimeRequest;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
 import com.ussr.pvz.service.GlobalService;
 
@@ -21,6 +22,7 @@ public class GlobalController {
                 return switch (cmd) {
                     case MENU_ENTER -> handleMenuEnter(matcher);
                     case MENU_SHOW_CURRENT -> handleMenuShowCurrent();
+                    case ADVANCE_TIME -> handleAdvanceTime(matcher);
                     case MENU_EXIT -> handleMenuExit();
                 };
             }
@@ -31,6 +33,11 @@ public class GlobalController {
     private String handleMenuEnter(Matcher matcher) {
         MenuEnterRequest request = new MenuEnterRequest(matcher.group("menuName"));
         return globalService.menuEnter(request);
+    }
+
+    private String handleAdvanceTime(Matcher matcher) {
+        AdvanceTimeRequest request = new AdvanceTimeRequest(matcher.group("count"));
+        return globalService.advanceTime(request);
     }
 
     private String handleMenuShowCurrent() {

@@ -12,7 +12,6 @@ public enum GameCommand {
     MENU_GEM_WALLET("^menu\\s+gem-wallet(?:\\s+.*)?$"),
     MENU_SWITCH_WORLD("^menu\\s+switch\\s+world\\s+-w\\s+(?<worldName>\\S+)(?:\\s+.*)?$"),
     MENU_LOGOUT("^menu\\s+logout(?:\\s+.*)?$"),
-    ADVANCE_TIME("^advance\\s+time\\s+-t\\s+(?<count>\\S+)\\s+ticks(?:\\s+.*)?$"),
     COLLECT_SUN("^collect\\s+sun\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     SHOW_SUN_AMOUNT("^show\\s+sun\\s+amount(?:\\s+.*)?$"),
     CHEAT_ADD_SUNS("^cheat\\s+add\\s+-n\\s+(?<count>\\S+)\\s+suns(?:\\s+.*)?$"),

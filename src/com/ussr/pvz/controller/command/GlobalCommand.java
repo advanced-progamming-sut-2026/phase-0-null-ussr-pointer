@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 public enum GlobalCommand {
     MENU_ENTER("^menu\\s+enter\\s+(?<menuName>\\S+)(?:\\s+.*)?$"),
     MENU_SHOW_CURRENT("^menu\\s+show\\s+current(?:\\s+.*)?$"),
+    ADVANCE_TIME("^advance\\s+time\\s+-t\\s+(?<count>\\S+)\\s+ticks(?:\\s+.*)?$"),
     MENU_EXIT("^menu\\s+exit(?:\\s+.*)?$");
 
     private final String pattern;

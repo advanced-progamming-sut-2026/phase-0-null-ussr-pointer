@@ -17,6 +17,7 @@ public class Account {
     private Collection collection;
 
     public Account(AccountState state, Collection collection) {
+        //TODO: ADd difficulty property and it's needed methods
         this.name = state.username();
         this.nickname = state.nickname();
         this.password = state.password();
@@ -95,5 +96,13 @@ public class Account {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Collection getCollection() {
+        return collection;
+    }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
     }
 }

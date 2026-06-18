@@ -22,7 +22,6 @@ public class RegisterController {
                     case REGISTER -> handleRegister(matcher);
                     case PICK_QUESTION -> handlePickQuestion(matcher);
                     case SHOW_CURRENT_MENU -> handleShowMenu();
-                    default -> "";
                 };
             }
         }

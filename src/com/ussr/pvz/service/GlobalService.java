@@ -2,6 +2,7 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.dto.AdvanceTimeRequest;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
 
 import java.util.Arrays;
@@ -59,5 +60,21 @@ public class GlobalService {
         };
         App.setMenuState(parent);
         return parent != null ? "menu changed to " + parent.getName() : "bye bye";
+    }
+
+    public String advanceTime(AdvanceTimeRequest request) {
+        //TODO: some mechanism should added to account or App or both
+        int count = 0;
+        try {
+            count = Integer.parseInt(request.count());
+        } catch (NumberFormatException e) {
+            return "invalid count";
+        }
+        if (App.getAccount() != null) {
+            for (int i = 0; i < count; i++) {
+                App.getGameSession().tick();
+            }
+        }
+        return "";
     }
 }

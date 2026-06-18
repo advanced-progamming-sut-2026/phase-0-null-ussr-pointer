@@ -46,7 +46,7 @@ public class AdventureProgress {
         Map<String, Integer> defaultPlantLevels = new HashMap<>();
         Gson gson = new Gson();
 
-        File allPlantsFile = new File("plants.json");
+        File allPlantsFile = new File("src/resources/plants.json");
         File defaultUnlockedFile = new File("default_unlocked_plants.json");
 
         if (!allPlantsFile.exists()) {

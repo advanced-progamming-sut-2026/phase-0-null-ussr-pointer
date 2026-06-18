@@ -25,7 +25,6 @@ public class GameController {
                     case MENU_GEM_WALLET -> handleMenuGemWallet();
                     case MENU_SWITCH_WORLD -> handleMenuSwitchWorld(matcher);
                     case MENU_LOGOUT -> handleMenuLogout();
-                    case ADVANCE_TIME -> handleAdvanceTime(matcher);
                     case COLLECT_SUN -> handleCollectSun(matcher);
                     case SHOW_SUN_AMOUNT -> handleShowSunAmount();
                     case CHEAT_ADD_SUNS -> handleCheatAddSuns(matcher);
@@ -87,12 +86,6 @@ public class GameController {
 
     private String handleMenuLogout() {
         return accountService.logoutAccount();
-    }
-
-    private String handleAdvanceTime(Matcher matcher) {
-        AdvanceTimeRequest request = new AdvanceTimeRequest(matcher.group("count"));
-        // TODO: call gameService.advanceTime(request) and return its message
-        return "";
     }
 
     private String handleCollectSun(Matcher matcher) {

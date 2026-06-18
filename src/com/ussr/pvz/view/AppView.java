@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class AppView {
     private AppMenu currentMenu;
 
-    //private final MainMenu mainMenu;
+    private final MainMenu mainMenu;
     private final RegisterMenu registerMenu;
     private final LoginMenu loginMenu;
     private final GameMenu gameMenu;
@@ -27,7 +27,7 @@ public class AppView {
     private final ChoosePlantMenu choosePlantMenu;
 
     public AppView() {
-        //mainMenu = new MainMenu();
+        mainMenu = new MainMenu();
         registerMenu = new RegisterMenu();
         loginMenu = new LoginMenu();
         gameMenu = new GameMenu();
@@ -56,7 +56,7 @@ public class AppView {
     public void setCurrentMenu(MenuState menuState) {
         switch (menuState) {
             case MAIN:
-                //currentMenu = mainMenu;
+                currentMenu = mainMenu;
                 break;
             case REGISTER:
                 currentMenu = registerMenu;
