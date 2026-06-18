@@ -5,9 +5,9 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import java.util.List;
 
 public class Collection {
-    //this class my me unused in the future the unlocked plants will be known by their lvl(0) now
-    private List<Plant> unlockedPlants;
-    private List<Plant> lockedPlants;
+    //this class may be unused in the future the unlocked plants will be known by their lvl(0) now
+    private final List<Plant> unlockedPlants;
+    private final List<Plant> lockedPlants;
 
     public Collection(List<Plant> unlockedPlants, List<Plant> lockedPlants) {
         this.unlockedPlants = unlockedPlants;

@@ -2,12 +2,15 @@ package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.GreenHouseCommand;
 import com.ussr.pvz.model.dto.GreenhousePotRequest;
+import com.ussr.pvz.service.GreenHouseService;
 
 import java.util.regex.Matcher;
 
 public class GreenHouseController {
+    GreenHouseService greenHouseService;
 
     public GreenHouseController() {
+        greenHouseService = new GreenHouseService();
     }
 
     public String handleCommand(String command) {
@@ -33,8 +36,7 @@ public class GreenHouseController {
 
     private String handlePlantPot(Matcher matcher) {
         GreenhousePotRequest request = new GreenhousePotRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call greenHouseService.plantPot(request) and return its message
-        return "";
+        return greenHouseService.plant(request);
     }
 
     private String handleCollect(Matcher matcher) {

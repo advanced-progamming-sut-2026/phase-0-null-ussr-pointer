@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.account;
 
+import com.ussr.pvz.model.greenhouse.Greenhouse;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class Account {
     private ScoreRecord scoreRecord;
     private List<NewsItem> personalNews;
     private Collection collection;
+    private Greenhouse greenhouse;
 
     public Account(AccountState state, Collection collection) {
         //TODO: ADd difficulty property and it's needed methods
@@ -30,6 +33,7 @@ public class Account {
         scoreRecord = new ScoreRecord(state.score());
         personalNews = new ArrayList<>(state.personalNews());
         this.collection = collection;
+        this.greenhouse = new Greenhouse();
     }
 
     public AccountState toState() {
@@ -104,5 +108,13 @@ public class Account {
 
     public void setCollection(Collection collection) {
         this.collection = collection;
+    }
+
+    public Greenhouse getGreenhouse() {
+        return greenhouse;
+    }
+
+    public void setGreenhouse(Greenhouse greenhouse) {
+        this.greenhouse = greenhouse;
     }
 }

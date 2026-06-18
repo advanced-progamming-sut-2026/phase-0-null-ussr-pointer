@@ -4,6 +4,7 @@ import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
+import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Plant extends GameEntity {
 
     private ActStrategy actStrategy;
     private PlantFoodEffect plantFoodEffect;
+    private PlantFoodType plantFoodType;
     private double internalTimer = 0.0;
 
     // Kept to track applied upgrades
@@ -169,5 +171,13 @@ public class Plant extends GameEntity {
 
     public void setBottom(Plant bottom) {
         this.bottom = bottom;
+    }
+
+    public PlantFoodType getPlantFoodType() {
+        return plantFoodType;
+    }
+
+    public void setPlantFoodType(PlantFoodType plantFoodType) {
+        this.plantFoodType = plantFoodType;
     }
 }
