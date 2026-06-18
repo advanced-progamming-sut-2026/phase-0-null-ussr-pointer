@@ -9,12 +9,12 @@ public class NewsService {
                 newsItem -> {
                     if (!newsItem.isRead()) {
                         output.append(newsItem.getTitle()).append("\n");
-                        output.append(newsItem.getTitle()).append("\n");
+                        output.append(newsItem.getDate()).append("\n");
                         output.append(newsItem.getContent()).append("\n");
+                        newsItem.markAsRead();
                     }
                 }
         );
-
         return output.toString();
     }
 
@@ -23,11 +23,10 @@ public class NewsService {
         App.getAccount().getPersonalNews().forEach(
                 newsItem -> {
                     output.append(newsItem.getTitle()).append("\n");
-                    output.append(newsItem.getTitle()).append("\n");
+                    output.append(newsItem.getDate()).append("\n");
                     output.append(newsItem.getContent()).append("\n");
                 }
         );
         return output.toString();
     }
 }
-

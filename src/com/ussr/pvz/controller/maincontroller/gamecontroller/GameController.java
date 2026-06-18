@@ -1,13 +1,21 @@
 package com.ussr.pvz.controller.maincontroller.gamecontroller;
 
 import com.ussr.pvz.controller.command.maincommand.gamecommand.GameCommand;
-import com.ussr.pvz.model.dto.*;
+import com.ussr.pvz.model.dto.CheatAddCurrencyRequest;
+import com.ussr.pvz.model.dto.CheatAddSunsRequest;
+import com.ussr.pvz.model.dto.CheatSpawnZombieRequest;
+import com.ussr.pvz.model.dto.LocationRequest;
+import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
+import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
+import com.ussr.pvz.model.dto.PlantPlantRequest;
 import com.ussr.pvz.service.AccountService;
+import com.ussr.pvz.service.game.GameService;
 
 import java.util.regex.Matcher;
 
 public class GameController {
     private final AccountService accountService = new AccountService();
+    private final GameService gameService = new GameService();
 
     public GameController() {
     }
@@ -49,39 +57,32 @@ public class GameController {
 
     private String handleMenuEnterChapter(Matcher matcher) {
         MenuEnterChapterRequest request = new MenuEnterChapterRequest(matcher.group("chapterName"));
-        // TODO: call gameService.menuEnterChapter(request) and return its message
-        return "";
+        return gameService.menuEnterChapter(request);
     }
 
     private String handleMenuGreenhouse() {
-        // TODO: call gameService.menuGreenhouse() and return its message
-        return "";
+        return gameService.menuGreenhouse();
     }
 
     private String handleMenuTravelLog() {
-        // TODO: call gameService.menuTravelLog() and return its message
-        return "";
+        return gameService.menuTravelLog();
     }
 
     private String handleMenuLeaderboard() {
-        // TODO: call gameService.menuLeaderboard() and return its message
-        return "";
+        return gameService.menuLeaderboard();
     }
 
     private String handleMenuCoinWallet() {
-        // TODO: call gameService.menuCoinWallet() and return its message
-        return "";
+        return gameService.menuCoinWallet();
     }
 
     private String handleMenuGemWallet() {
-        // TODO: call gameService.menuGemWallet() and return its message
-        return "";
+        return gameService.menuGemWallet();
     }
 
     private String handleMenuSwitchWorld(Matcher matcher) {
         MenuSwitchWorldRequest request = new MenuSwitchWorldRequest(matcher.group("worldName"));
-        // TODO: call gameService.menuSwitchWorld(request) and return its message
-        return "";
+        return gameService.menuSwitchWorld(request);
     }
 
     private String handleMenuLogout() {
@@ -90,35 +91,29 @@ public class GameController {
 
     private String handleCollectSun(Matcher matcher) {
         LocationRequest request = new LocationRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call gameService.collectSun(request) and return its message
-        return "";
+        return gameService.collectSun(request);
     }
 
     private String handleShowSunAmount() {
-        // TODO: call gameService.showSunAmount() and return its message
-        return "";
+        return gameService.showSunAmount();
     }
 
     private String handleCheatAddSuns(Matcher matcher) {
         CheatAddSunsRequest request = new CheatAddSunsRequest(matcher.group("count"));
-        // TODO: call gameService.cheatAddSuns(request) and return its message
-        return "";
+        return gameService.cheatAddSuns(request);
     }
 
     private String handleReleaseTheNuke() {
-        // TODO: call gameService.releaseTheNuke() and return its message
-        return "";
+        return gameService.releaseTheNuke();
     }
 
     private String handleCheatRemoveCooldown() {
-        // TODO: call gameService.cheatRemoveCooldown() and return its message
-        return "";
+        return gameService.cheatRemoveCooldown();
     }
 
     private String handlePluckPlant(Matcher matcher) {
         LocationRequest request = new LocationRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call gameService.pluckPlant(request) and return its message
-        return "";
+        return gameService.pluckPlant(request);
     }
 
     private String handlePlantPlant(Matcher matcher) {
@@ -127,40 +122,33 @@ public class GameController {
                 matcher.group("x"),
                 matcher.group("y")
         );
-        // TODO: call gameService.plantPlant(request) and return its message
-        return "";
+        return gameService.plantPlant(request);
     }
 
     private String handleFeedPlant(Matcher matcher) {
         LocationRequest request = new LocationRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call gameService.feedPlant(request) and return its message
-        return "";
+        return gameService.feedPlant(request);
     }
 
     private String handleCheatAddPlantFood() {
-        // TODO: call gameService.cheatAddPlantFood() and return its message
-        return "";
+        return gameService.cheatAddPlantFood();
     }
 
     private String handleShowMap() {
-        // TODO: call gameService.showMap() and return its message
-        return "";
+        return gameService.showMap();
     }
 
     private String handleShowPlantsStatus() {
-        // TODO: call gameService.showPlantsStatus() and return its message
-        return "";
+        return gameService.showPlantsStatus();
     }
 
     private String handleShowTileStatus(Matcher matcher) {
         LocationRequest request = new LocationRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call gameService.showTileStatus(request) and return its message
-        return "";
+        return gameService.showTileStatus(request);
     }
 
     private String handleZombiesInfo() {
-        // TODO: call gameService.zombiesInfo() and return its message
-        return "";
+        return gameService.zombiesInfo();
     }
 
     private String handleCheatSpawnZombie(Matcher matcher) {
@@ -169,8 +157,7 @@ public class GameController {
                 matcher.group("x"),
                 matcher.group("y")
         );
-        // TODO: call gameService.cheatSpawnZombie(request) and return its message
-        return "";
+        return gameService.cheatSpawnZombie(request);
     }
 
     private String handleCheatAddCurrency(Matcher matcher) {
@@ -178,12 +165,10 @@ public class GameController {
                 matcher.group("amount"),
                 matcher.group("currency")
         );
-        // TODO: call gameService.cheatAddCurrency(request) and return its message
-        return "";
+        return gameService.cheatAddCurrency(request);
     }
 
     private String handleStartZombieWaves() {
-        // TODO: call gameService.startZombieWaves() and return its message
-        return "";
+        return gameService.startZombieWaves();
     }
 }

@@ -20,7 +20,6 @@ public class Account {
     private Greenhouse greenhouse;
 
     public Account(AccountState state, Collection collection) {
-        //TODO: ADd difficulty property and it's needed methods
         this.name = state.username();
         this.nickname = state.nickname();
         this.password = state.password();
@@ -86,6 +85,18 @@ public class Account {
         return personalNews;
     }
 
+    public Collection getCollection() {
+        return collection;
+    }
+
+    public Greenhouse getGreenhouse() {
+        return greenhouse;
+    }
+
+    public AdventureProgress getAdventureProgress() {
+        return adventureProgress;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -102,16 +113,8 @@ public class Account {
         this.email = email;
     }
 
-    public Collection getCollection() {
-        return collection;
-    }
-
     public void setCollection(Collection collection) {
         this.collection = collection;
-    }
-
-    public Greenhouse getGreenhouse() {
-        return greenhouse;
     }
 
     public void setGreenhouse(Greenhouse greenhouse) {

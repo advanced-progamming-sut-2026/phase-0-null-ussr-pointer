@@ -6,7 +6,6 @@ public class NewsItem {
     private int date;
     private boolean isRead;
 
-    //constructor
     public NewsItem(String title, String content, int date) {
         this.title = title;
         this.content = content;
@@ -14,7 +13,6 @@ public class NewsItem {
         this.isRead = false;
     }
 
-    //getter
     public String getTitle() {
         return this.title;
     }
@@ -31,12 +29,14 @@ public class NewsItem {
         return this.isRead;
     }
 
-    //helper
+    public void markAsRead() {
+        this.isRead = true;
+    }
+
     public static NewsItem initialNews() {
         String topic = "Welcome to Plants vs. Zombies!";
         String context = "Thank you for registering your account. Protect your lawn, plant your defenses, and don't let the zombies eat your brains!";
         int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
         return new NewsItem(topic, context, currentTimestamp);
     }
-
 }

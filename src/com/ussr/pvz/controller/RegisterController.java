@@ -25,7 +25,7 @@ public class RegisterController {
                 };
             }
         }
-        return "";
+        return "invalid command";
     }
 
     private String handleRegister(Matcher matcher) {

@@ -24,7 +24,6 @@ public class AdventureProgress {
         this.plantLvls = plantLvls;
     }
 
-    //getters
     public int getCurrentLvl() {
         return this.currentLvl;
     }
@@ -41,8 +40,19 @@ public class AdventureProgress {
         return this.plantLvls;
     }
 
-    //helper
-    public static Map<String , Integer> initializePlantsLvl() {
+    public void addCoin(int amount) {
+        this.coin += amount;
+    }
+
+    public void addGem(int amount) {
+        this.gem += amount;
+    }
+
+    public void setCurrentLvl(int level) {
+        this.currentLvl = level;
+    }
+
+    public static Map<String, Integer> initializePlantsLvl() {
         Map<String, Integer> defaultPlantLevels = new HashMap<>();
         Gson gson = new Gson();
 
@@ -75,7 +85,6 @@ public class AdventureProgress {
             if (complexPlantsList != null) {
                 for (Map<String, Object> plantData : complexPlantsList) {
                     Object nameObj = plantData.get("name");
-
                     if (nameObj != null) {
                         String plantName = nameObj.toString().trim().toUpperCase();
                         if (starterPlantNames.contains(plantName)) {
@@ -92,4 +101,3 @@ public class AdventureProgress {
         return defaultPlantLevels;
     }
 }
-
