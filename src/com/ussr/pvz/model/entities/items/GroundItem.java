@@ -7,6 +7,7 @@ public abstract class GroundItem extends GameEntity {
     private double lifetime;
     private double collectRadius;
     private boolean collected;
+    private ItemType itemType;
 
     public void collect() {
     }

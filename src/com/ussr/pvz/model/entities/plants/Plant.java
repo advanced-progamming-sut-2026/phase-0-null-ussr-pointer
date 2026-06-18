@@ -18,7 +18,7 @@ public class Plant extends GameEntity {
     private double actionInterval;
     private int cost;
     private final ArrayList<Tag> tags = new ArrayList<>();
-    private String damage; // Kept as String to handle structural variations like "20x2" or "20 + 10/s"
+    private int damage;
     private PlantType type;
     private Plant bottom = null;
 
@@ -123,11 +123,11 @@ public class Plant extends GameEntity {
         this.cost = cost;
     }
 
-    public String getDamage() {
+    public int getDamage() {
         return damage;
     }
 
-    public void setDamage(String damage) {
+    public void setDamage(int damage) {
         this.damage = damage;
     }
 

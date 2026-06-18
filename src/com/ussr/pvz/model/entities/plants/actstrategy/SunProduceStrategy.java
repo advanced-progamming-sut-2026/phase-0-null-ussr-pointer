@@ -6,6 +6,5 @@ import com.ussr.pvz.model.entities.plants.Plant;
 public class SunProduceStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
-
     }
 }
