@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'application' // 1. Added application plugin to enable 'gradle run'
+    id 'application'
 }
 
 group = 'com.team'
@@ -22,18 +22,37 @@ sourceSets {
             srcDirs = ['src']
         }
     }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
 }
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.14.0'
+
+    // Upgraded testing framework to fully support JDK 25 features
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
 }
 
-// 2. Point Gradle to the file containing your main method
 application {
     mainClass = 'Main'
 }
 
-// 3. CRITICAL: Allows Gradle to pass keyboard inputs (Scanner) to your CLI app
 run {
     standardInput = System.in
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+    // Show standard test output streams
+    testLogging {
+        showStandardStreams = true
+    }
 }
