@@ -54,13 +54,21 @@ public class GreenHouseController {
 
     private String handlePlantPot(Matcher matcher) {
         GreenhousePotRequest request = new GreenhousePotRequest(matcher.group("x"), matcher.group("y"));
-        return greenHouseService.plant(request);
+        try {
+            return greenHouseService.plant(request);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
+
 
     private String handleCollect(Matcher matcher) {
         GreenhousePotRequest request = new GreenhousePotRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call greenHouseService.collect(request) and return its message
-        return "";
+        try {
+            return greenHouseService.collect(request);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     private String handleGrow(Matcher matcher) {

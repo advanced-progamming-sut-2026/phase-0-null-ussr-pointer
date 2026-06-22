@@ -1,11 +1,10 @@
 package com.ussr.pvz.model.greenhouse;
 
-import com.ussr.pvz.model.entities.plants.PlantType;
-
 import java.util.Map;
+import java.util.HashMap;
 
 public class SproutPlant {
-
+    //todo check this logically
     private final String plantKey;
     private final boolean isMarigold;
     private PlantState state;
@@ -31,24 +30,40 @@ public class SproutPlant {
     }
 
     public long getRemainingMillis() {
-        return 0;
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = currentTime - plantedAtMillis;
+        long remaining = growthDurationMillis - elapsedTime;
+        return Math.max(0, remaining);
     }
 
     public int getRemainingHoursCeil() {
-        return 0;
+        long remainingMillis = getRemainingMillis();
+        long remainingHours = (remainingMillis + 3599999) / 3600000; // Ceiling division
+        return (int) remainingHours;
     }
 
     public boolean isReady() {
-        return getState() == PlantState.READY;
+        return getRemainingMillis() == 0 || state == PlantState.READY;
     }
-
-    // serialization
     public Map<String, Object> toMap() {
-        return null;
+        Map<String, Object> map = new HashMap<>();
+        map.put("plantKey", plantKey);
+        map.put("isMarigold", isMarigold);
+        map.put("state", state.name());
+        map.put("type", type);
+        map.put("plantedAtMillis", plantedAtMillis);
+        map.put("growthDurationMillis", growthDurationMillis);
+        return map;
     }
 
     public static SproutPlant fromMap(Map<String, Object> map) {
-        return null;
+        String plantKey = (String) map.get("plantKey");
+        boolean isMarigold = (boolean) map.get("isMarigold");
+        PlantState state = PlantState.valueOf((String) map.get("state"));
+        String type = (String) map.get("type");
+        long plantedAtMillis = (long) map.get("plantedAtMillis");
+        long growthDurationMillis = (long) map.get("growthDurationMillis");
+        return new SproutPlant(plantKey, isMarigold, state, type, plantedAtMillis, growthDurationMillis);
     }
 
     public long getPlantedAtMillis() {
@@ -83,4 +98,3 @@ public class SproutPlant {
         return plantKey;
     }
 }
-

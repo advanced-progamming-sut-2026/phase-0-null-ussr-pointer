@@ -77,7 +77,19 @@ public class Greenhouse {
     }
 
     public int speedUp(int x, int y) {
-        return 0;
+        if(pots.get(new Location(x, y)).getPlant().isReady()) {
+            throw new IllegalStateException("SproutPlant is ready");
+        }
+
+        return pots.get(new Location(x,y)).getPlant().getRemainingHoursCeil();
+    }
+
+    public void grow(int x, int y) {
+        if(pots.get(new Location(x, y)).getPlant().isReady()) {
+            throw new IllegalStateException("SproutPlant is ready");
+        }
+
+        pots.get(new Location(x, y)).getPlant().setState(PlantState.READY);
     }
 
     public void printGrid() {
