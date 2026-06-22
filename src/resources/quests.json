@@ -1,0 +1,400 @@
+[
+  {
+    "id": "q_daily_sun_collector",
+    "title": "Daily Sun Collector",
+    "type": "DAILY",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "COLLECT_SUN",
+        "target": 3000,
+        "params": {
+          "variableOptions": [3000, 4000, 5000]
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 30,
+      "formula": "sun_amount / 100"
+    }
+  },
+  {
+    "id": "q_chapter_hunter",
+    "title": "Chapter Hunter",
+    "type": "CHALLENGE",
+    "priority": "HIGH",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_IN_CHAPTER",
+        "target": 50,
+        "params": {
+          "chapter": "any"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "SEED_PACK",
+      "amount": 10,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_pro_plant_user",
+    "title": "Professional Plant User",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_WITH_SPECIFIC_PLANT",
+        "target": 10,
+        "params": {
+          "plantType": "any_offensive"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "SEED_PACK",
+      "amount": 1,
+      "formula": "random_new_plant"
+    }
+  },
+  {
+    "id": "q_only_cactus",
+    "title": "Only Cactus",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_WITH_SPECIFIC_PLANT",
+        "target": 10,
+        "params": {
+          "plantType": "cactus"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 20,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_efficient_herbivore",
+    "title": "Efficient Herbivore",
+    "type": "CHALLENGE",
+    "priority": "HIGH",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_MAX_PLANTS_LOST",
+        "target": 1,
+        "params": {
+          "maxPlantsLost": 2,
+          "variableOptions": [0, 1, 2, 3, 4, 5]
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "SEED_PACK",
+      "amount": 18,
+      "formula": "20 - n"
+    }
+  },
+  {
+    "id": "q_defense_master",
+    "title": "Defense Master",
+    "type": "EPIC",
+    "priority": "CRITICAL",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_EXACT_SUN_LEFT",
+        "target": 1,
+        "params": {
+          "exactSunLeft": 0
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 200,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_quick_reflexes",
+    "title": "Quick Reflexes",
+    "type": "CHALLENGE",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_TIME_LIMIT",
+        "target": 10,
+        "params": {
+          "timeLimitSeconds": 30,
+          "fromWave": 1
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 500,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_pro_destroyer",
+    "title": "Professional Destroyer",
+    "type": "DAILY",
+    "priority": "LOW",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "USE_EXPLOSIVE_PLANTS",
+        "target": 3,
+        "params": {}
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 100,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_symmetry",
+    "title": "Symmetry",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_SYMMETRIC",
+        "target": 1,
+        "params": {
+          "requireSymmetric": true
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 500,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_family_slaughter",
+    "title": "Family Slaughter",
+    "type": "DAILY",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_EXCLUSIVE_FAMILY",
+        "target": 1,
+        "params": {
+          "familyType": "chosen_family"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 1000,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_restricted_growth",
+    "title": "Restricted Growth",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_FORBIDDEN_FAMILY",
+        "target": 1,
+        "params": {
+          "forbiddenFamilyType": "chosen_family"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 100,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_night_or_morning",
+    "title": "Night or Morning",
+    "type": "EPIC",
+    "priority": "HIGH",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "WIN_DAY_LEVEL_WITH_NIGHT_PLANTS",
+        "target": 1,
+        "params": {
+          "allowedType": "mushrooms"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 20,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_streak_master",
+    "title": "Streak Master",
+    "type": "DAILY",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_CONSECUTIVE_LEVELS_MAX_DIFFICULTY",
+        "target": 5,
+        "params": {
+          "difficulty": "max"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 5000,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_almost_victorious",
+    "title": "Almost Victorious",
+    "type": "DAILY",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_FIRST_COLUMN_NO_LAWNMOWER",
+        "target": 10,
+        "params": {}
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 300,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_asymmetry_challenge",
+    "title": "Asymmetry Challenge",
+    "type": "DAILY",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_ASYMMETRIC",
+        "target": 1,
+        "params": {
+          "excludeMiddleRow": true
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "COIN",
+      "amount": 800,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_cloudy_day",
+    "title": "Cloudy Day",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_MAX_SUN_PRODUCERS",
+        "target": 1,
+        "params": {
+          "maxSunProducers": 3
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 10,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_one_column_less",
+    "title": "One Column Less",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_EMPTY_COLUMN",
+        "target": 1,
+        "params": {
+          "targetColumnIndex": "n"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 10,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_defenseless_row",
+    "title": "Defenseless Row",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_EMPTY_ROW",
+        "target": 1,
+        "params": {
+          "targetRowIndex": "n"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 20,
+      "formula": ""
+    }
+  },
+  {
+    "id": "q_defenseless_cross",
+    "title": "Defenseless Cross",
+    "type": "DAILY",
+    "priority": "HIGH",
+    "expiresAfterSeconds": 86400,
+    "criteria": [
+      {
+        "type": "WIN_LEVEL_EMPTY_ROW_AND_COLUMN",
+        "target": 1,
+        "params": {
+          "targetRowIndex": "n",
+          "targetColumnIndex": "n"
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 25,
+      "formula": ""
+    }
+  }
+]

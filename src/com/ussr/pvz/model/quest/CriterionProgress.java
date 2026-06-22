@@ -7,13 +7,14 @@ public class CriterionProgress {
 
     private final String type;
     private final int target;
-    private int current;
     private final Map<String, Object> params;
+    private int current;
 
     public CriterionProgress(String type, int target, Map<String, Object> params) {
         this.type = type;
         this.target = target;
         this.params = params != null ? params : new HashMap<>();
+        this.current = 0;
     }
 
     public boolean isMet() {
@@ -32,29 +33,23 @@ public class CriterionProgress {
         current = 0;
     }
 
-    public String getType() {
-        return type;
-    }
+    public String getType() { return type; }
+    public int getTarget() { return target; }
+    public int getCurrent() { return current; }
+    public Map<String, Object> getParams() { return params; }
 
-    public int getTarget() {
-        return target;
-    }
-
-    public int getCurrent() {
-        return current;
-    }
-
-    public Map<String, Object> getParams() {
-        return params;
-    }
-
-    // convenience — criteria check their own params without casting everywhere
     public String getString(String key) {
-        return (String) params.getOrDefault(key, null);
+        return (String) params.get(null);
     }
 
     public int getInt(String key, int def) {
-        return params.containsKey(key) ? ((Number) params.get(key)).intValue() : def;
+        if (params.containsKey(key)) {
+            Object val = params.get(key);
+            if (val instanceof Number) {
+                return ((Number) val).intValue();
+            }
+        }
+        return def;
     }
 
     public boolean getBoolean(String key) {
