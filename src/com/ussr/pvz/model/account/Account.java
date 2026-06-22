@@ -18,7 +18,8 @@ public class Account {
     private List<NewsItem> personalNews;
     private Collection collection;
     private Greenhouse greenhouse;
-
+    //todo add the difficulty property and set 3 and can reset or change from setting menu
+    //todo add the properties property so we can save things that get bought in shop
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();

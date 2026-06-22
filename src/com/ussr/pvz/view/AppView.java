@@ -40,6 +40,7 @@ public class AppView {
         travelLogMenu = new TravelLogMenu();
         leaderBoardMenu = new LeaderBoardMenu();
         choosePlantMenu = new ChoosePlantMenu();
+        App.initShop();
     }
 
     public void run(Scanner scanner) {

@@ -3,6 +3,7 @@ package com.ussr.pvz.model;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.shop.ShopManager;
 import com.ussr.pvz.service.SaveService;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ public class App {
     private static MenuState menuState = MenuState.REGISTER;
     private static Account account;
     private static GameSession gameSession;
+    //todo check this shop manager and see if it shouldn't be here
+    private static ShopManager shopManager;
     private static List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
@@ -47,5 +50,17 @@ public class App {
 
     public static void setGameSession(GameSession gameSession) {
         App.gameSession = gameSession;
+    }
+
+    public static ShopManager getShopManager() {
+        return shopManager;
+    }
+
+    public static void setShopManager(ShopManager shopManager) {
+        App.shopManager = shopManager;
+    }
+
+    public static void initShop(){
+        App.shopManager = new ShopManager();
     }
 }

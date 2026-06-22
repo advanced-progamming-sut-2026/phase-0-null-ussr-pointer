@@ -1,16 +1,22 @@
 package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.GreenHouseCommand;
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.dto.GreenhousePotRequest;
 import com.ussr.pvz.service.GreenHouseService;
+import com.ussr.pvz.controller.command.maincommand.ShopCommand;
+import com.ussr.pvz.service.ShopService;
 
 import java.util.regex.Matcher;
 
 public class GreenHouseController {
     GreenHouseService greenHouseService;
+    ShopService shopService;
 
     public GreenHouseController() {
         greenHouseService = new GreenHouseService();
+        shopService = new ShopService();
     }
 
     public String handleCommand(String command) {
@@ -23,6 +29,18 @@ public class GreenHouseController {
                     case COLLECT -> handleCollect(matcher);
                     case GROW -> handleGrow(matcher);
                     case ENTER_SHOP -> handleEnterShop();
+
+                };
+            }
+        }
+
+        for (ShopCommand cmd : ShopCommand.values()) {
+            Matcher matcher = cmd.getMatcher(command);
+            if (matcher.matches()) {
+                return switch (cmd) {
+                    case SHOP_BUY -> handleShopBuy(matcher);
+                    case SHOP_LIST -> handleShopList();
+                    case SHOP_DAILY -> handleShopDaily();
                 };
             }
         }
@@ -52,20 +70,16 @@ public class GreenHouseController {
     }
 
     private String handleEnterShop() {
-        // TODO: call greenHouseService.enterShop() and return its message
-        return "";
+        App.setMenuState(MenuState.SHOP);
+        return "You are currently shopping";
     }
 
-    // Add inside GreenHouseController if shop stays here:
-
     private String handleShopList() {
-        // TODO: call greenHouseService.shopList() and return its message
-        return "";
+        return shopService.shopList();
     }
 
     private String handleShopDaily() {
-        // TODO: call greenHouseService.shopDaily() and return its message
-        return "";
+        return shopService.shopDaily();
     }
 
     private String handleShopBuy(Matcher matcher) {
@@ -74,7 +88,11 @@ public class GreenHouseController {
                 matcher.group("count"),
                 matcher.group("plantType")
         );
-        // TODO: call greenHouseService.shopBuy(request) and return its message
-        return "";
+
+        try {
+            return shopService.buy(request);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }

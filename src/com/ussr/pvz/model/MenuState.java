@@ -13,7 +13,8 @@ public enum MenuState {
     SETTING("setting"),
     TRAVEL_LOG("travel log"),
     CHOOSE_PLANT("choose plant"),
-    COLLECTION("collection");
+    COLLECTION("collection"),
+    SHOP("shop");
 
     private String name;
 
