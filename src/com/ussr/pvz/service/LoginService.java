@@ -29,6 +29,7 @@ public class LoginService {
 
         App.login(account);
         return "logged in successfully";
+        //check if user wants to stay logged in
     }
 
     public String forgetPassword(ForgetPasswordRequest request) {

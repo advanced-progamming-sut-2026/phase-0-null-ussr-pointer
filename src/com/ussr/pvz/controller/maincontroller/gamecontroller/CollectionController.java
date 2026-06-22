@@ -4,11 +4,12 @@ import com.ussr.pvz.controller.command.maincommand.gamecommand.CollectionCommand
 import com.ussr.pvz.model.dto.CollectionShowPlantRequest;
 import com.ussr.pvz.model.dto.CollectionShowZombieRequest;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
+import com.ussr.pvz.service.CollectionService;
 
 import java.util.regex.Matcher;
 
 public class CollectionController {
-
+    private final CollectionService collectionService = new CollectionService();
     public CollectionController() {
     }
 
@@ -32,35 +33,29 @@ public class CollectionController {
     }
 
     private String handleShowPlants() {
-        // TODO: call collectionService.showPlants() and return its message
-        return "";
+        return collectionService.showPlants();
     }
 
     private String handleShowAllPlants() {
-        // TODO: call collectionService.showAllPlants() and return its message
-        return "";
+        return collectionService.showAllPlants();
     }
 
     private String handleShowZombies() {
-        // TODO: call collectionService.showZombies() and return its message
-        return "";
+        return collectionService.showZombies();
     }
 
     private String handleShowAllZombies() {
-        // TODO: call collectionService.showAllZombies() and return its message
-        return "";
+        return collectionService.showAllZombies();
     }
 
     private String handleShowPlant(Matcher matcher) {
         CollectionShowPlantRequest request = new CollectionShowPlantRequest(matcher.group("plantName"));
-        // TODO: call collectionService.showPlant(request) and return its message
-        return "";
+        return collectionService.showPlant(request.plantName());
     }
 
     private String handleShowZombie(Matcher matcher) {
         CollectionShowZombieRequest request = new CollectionShowZombieRequest(matcher.group("zombieName"));
-        // TODO: call collectionService.showZombie(request) and return its message
-        return "";
+        return collectionService.showZombie(request);
     }
 
     private String handleUpgradePlant(Matcher matcher) {

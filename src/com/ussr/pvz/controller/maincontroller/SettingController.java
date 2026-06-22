@@ -2,11 +2,12 @@ package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.SettingCommand;
 import com.ussr.pvz.model.dto.ChangeDifficultyRequest;
+import com.ussr.pvz.service.SettingService;
 
 import java.util.regex.Matcher;
 
 public class SettingController {
-
+    private final SettingService settingService = new SettingService();
     public SettingController() {
     }
 
@@ -25,7 +26,6 @@ public class SettingController {
 
     private String handleChangeDifficulty(Matcher matcher) {
         ChangeDifficultyRequest request = new ChangeDifficultyRequest(matcher.group("level"));
-        // TODO: call settingService.changeDifficulty(request) and return its message
-        return "";
+        return settingService.changeDifficulty(request);
     }
 }

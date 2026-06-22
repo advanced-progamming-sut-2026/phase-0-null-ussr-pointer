@@ -16,13 +16,19 @@ public class AdventureProgress {
     private int gem;
     private int currentLvl;
     private final Map<String, Integer> plantLvls;
+    private final List<String> seenZombies;
 
     public AdventureProgress(int currentLvl, int coin, int gem, Map<String, Integer> plantLvls) {
         this.currentLvl = currentLvl;
         this.coin = coin;
         this.gem = gem;
         this.plantLvls = plantLvls;
+        this.seenZombies = new ArrayList<>();
     }
+
+    public List<String> getSeenZombies() { return this.seenZombies; }
+
+    public void addSeenZombies(String newSeen) { seenZombies.add(newSeen); }
 
     public int getCurrentLvl() {
         return this.currentLvl;

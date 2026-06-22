@@ -18,7 +18,7 @@ public class Account {
     private List<NewsItem> personalNews;
     private Collection collection;
     private Greenhouse greenhouse;
-    //todo add the difficulty property and set 3 and can reset or change from setting menu
+    private int difficultyLvl;
     //todo add the properties property so we can save things that get bought in shop
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
@@ -28,6 +28,7 @@ public class Account {
         this.gender = state.gender();
         this.securityQuestion = state.securityQuestion();
         this.securityAnswer = state.securityAnswer();
+        this.difficultyLvl = 3;
 
         adventureProgress = new AdventureProgress(state.currentLvl(), state.coin(), state.gem(), state.plantLvl());
         scoreRecord = new ScoreRecord(state.score());
@@ -43,6 +44,7 @@ public class Account {
                 this.password,
                 this.email,
                 this.gender,
+                this.difficultyLvl,
                 this.securityQuestion,
                 this.securityAnswer,
                 adventureProgress.getCurrentLvl(),
@@ -50,6 +52,7 @@ public class Account {
                 adventureProgress.getGem(),
                 scoreRecord.getScore(),
                 adventureProgress.getPlantLvls(),
+                adventureProgress.getSeenZombies(),
                 personalNews
         );
     }
@@ -73,6 +76,8 @@ public class Account {
     public Gender getGender() {
         return gender;
     }
+
+    public int getDifficultyLvl() { return difficultyLvl; }
 
     public SecurityQuestion getSecurityQuestion() {
         return securityQuestion;
@@ -113,6 +118,8 @@ public class Account {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public void setDifficultyLvl(int difficultyLvl) { this.difficultyLvl = difficultyLvl; }
 
     public void setCollection(Collection collection) {
         this.collection = collection;

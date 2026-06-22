@@ -6,6 +6,8 @@ import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.*;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class RegisterService {
@@ -42,6 +44,7 @@ public class RegisterService {
                 request.password(),
                 request.email(),
                 Gender.from(request.gender()),
+                3,         // default difficulty level
                 null,  // securityQuestion — not picked yet
                 null,  // securityAnswer — not picked yet
                 1,     // starting level
@@ -49,6 +52,7 @@ public class RegisterService {
                 0,     // gem
                 0,     // score
                 AdventureProgress.initializePlantsLvl(),
+                new ArrayList<>(),
                 List.of(NewsItem.initialNews())
         );
 

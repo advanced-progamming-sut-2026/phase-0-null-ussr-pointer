@@ -106,6 +106,7 @@ class RegisterServiceTest {
                         "pass",
                         "existing@example.com",
                         null,
+                        3,
                         null,
                         null,
                         1,

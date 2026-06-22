@@ -11,6 +11,7 @@ public record AccountState(
         String password,
         String email,
         Gender gender,
+        int difficultyLvl,
         SecurityQuestion securityQuestion,
         String securityAnswer,
         int currentLvl,
@@ -18,6 +19,7 @@ public record AccountState(
         int gem,
         int score,
         Map<String, Integer> plantLvl,
+        List<String> seenZombies,
         List<NewsItem> personalNews
 ) {
     public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
@@ -27,6 +29,7 @@ public record AccountState(
                 SecurityUtil.hashPassword(this.password),
                 this.email,
                 this.gender,
+                this.difficultyLvl,
                 question,
                 answer,
                 this.currentLvl,
@@ -34,6 +37,7 @@ public record AccountState(
                 this.gem,
                 this.score,
                 this.plantLvl,
+                this.seenZombies,
                 this.personalNews
         );
     }
