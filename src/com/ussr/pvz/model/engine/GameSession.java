@@ -20,6 +20,8 @@ public class GameSession {
     private int plantFoodCount;
     private boolean wavesStarted;
     private Lawn lawn;
+    private boolean gameOver = false;
+    private static final int LAWN_COLS = 9;
 
     public void initClock() {
         clock.reset();
@@ -34,6 +36,21 @@ public class GameSession {
         plants.removeIf(p -> !p.isAlive());
         zombies.removeIf(z -> !z.isAlive());
         items.removeIf(i -> !i.isAlive());
+    }
+
+    public void spawnZombie(Zombie zombie) {
+        zombies.add(zombie);
+        clock.addEntity(zombie);
+    }
+
+    public void onZombieReachedEnd() {
+        gameOver = true;
+        // TODO: show game over screen here
+        System.out.println("[GAME OVER] A zombie reached the house!");
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
     }
 
     public int getSunCount() {
@@ -148,6 +165,10 @@ public class GameSession {
 
     public List<Plant> getPlants() {
         return plants;
+    }
+
+    public double getElapsedSeconds() {
+        return clock.getElapsedSeconds();
     }
 
     public void setPlants(List<Plant> plants) {

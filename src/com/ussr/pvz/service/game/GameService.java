@@ -3,6 +3,7 @@ package com.ussr.pvz.service.game;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.dto.CheatAddCurrencyRequest;
 import com.ussr.pvz.model.dto.CheatAddSunsRequest;
 import com.ussr.pvz.model.dto.CheatSpawnZombieRequest;
@@ -10,6 +11,9 @@ import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
+import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 
 public class GameService {
 
@@ -182,15 +186,28 @@ public class GameService {
     }
 
     public String cheatSpawnZombie(CheatSpawnZombieRequest request) {
-        int x, y;
+        int row;
         try {
-            x = Integer.parseInt(request.x());
-            y = Integer.parseInt(request.y());
+            row = Integer.parseInt(request.y());
         } catch (NumberFormatException e) {
             return "invalid location";
         }
-        // TODO: handle after zombies are implemented.
-        return "zombie " + request.type() + " spawned at (" + x + ", " + y + ")";
+
+        GameSession session = App.getGameSession();
+        if (session == null) return "no active game session";
+
+        Lawn lawn = session.getLawn();
+        if (row < 0 || row >= lawn.getRows()) {
+            return "row out of bounds (0-" + (lawn.getRows() - 1) + ")";
+        }
+
+        try {
+            Zombie zombie = ZombieFactory.create(request.type(), row, lawn.getCols());
+            session.spawnZombie(zombie);
+            return request.type() + " spawned in row " + row;
+        } catch (IllegalArgumentException e) {
+            return "unknown zombie type: " + request.type();
+        }
     }
 
     public String cheatAddCurrency(CheatAddCurrencyRequest request) {

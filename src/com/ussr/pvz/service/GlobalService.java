@@ -63,18 +63,26 @@ public class GlobalService {
     }
 
     public String advanceTime(AdvanceTimeRequest request) {
-        //TODO: some mechanism should added to account or App or both
-        int count = 0;
+        int count;
         try {
             count = Integer.parseInt(request.count());
         } catch (NumberFormatException e) {
             return "invalid count";
         }
-        if (App.getAccount() != null) {
-            for (int i = 0; i < count; i++) {
-                App.getGameSession().tick();
+
+        if (count <= 0) return "count must be positive";
+
+        if (App.getGameSession() == null) return "no active game session";
+
+        for (int i = 0; i < count; i++) {
+            App.getGameSession().tick();
+            if (App.getGameSession().isGameOver()) {
+                return "advanced " + (i + 1) + " tick(s) — game over! a zombie reached the house.";
             }
         }
-        return "";
+
+        return "advanced " + count + " tick(s) | elapsed: "
+                + String.format("%.1f", App.getGameSession().getElapsedSeconds()) + "s"
+                + " | zombies: " + App.getGameSession().getZombies().size();
     }
 }

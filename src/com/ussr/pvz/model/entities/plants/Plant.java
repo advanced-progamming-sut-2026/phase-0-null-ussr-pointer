@@ -81,6 +81,17 @@ public class Plant extends GameEntity {
         }
     }
 
+    public void takeDamage(int damage) {
+        if (!isAlive) return;
+        int newHp = getHp() - damage;
+        if (newHp <= 0) {
+            setHp(0);
+            isAlive = false;
+        } else {
+            setHp(newHp);
+        }
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

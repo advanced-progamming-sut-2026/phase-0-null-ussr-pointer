@@ -19,9 +19,15 @@ public abstract class GameEntity implements Tickable {
         this.position = target;
     }
 
+    public Vec2 getSpeed() {
+        return this.speed;
+    }
+
+    public void setSpeed(Vec2 speed) {
+        this.speed = speed;
+    }
+
     public boolean isAlive() {
         return this.isAlive;
     }
-
 }
-
