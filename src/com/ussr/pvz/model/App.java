@@ -4,6 +4,7 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
 import com.ussr.pvz.service.SaveService;
 
@@ -16,6 +17,7 @@ public class App {
     private static GameSession gameSession;
     //todo check this shop manager and see if it shouldn't be here
     private static ShopManager shopManager;
+    private static LevelManager levelManager = new LevelManager();
     private static List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
@@ -31,6 +33,10 @@ public class App {
                 SaveService.saveAccounts(states);
             }
         }));
+    }
+
+    public static LevelManager getLevelManager() {
+        return levelManager;
     }
 
     public static List<Account> getAccounts() {

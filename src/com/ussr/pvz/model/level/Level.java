@@ -74,6 +74,30 @@ public class Level {
         this.behavior = levelBehavior;
     }
 
+    public void setDeliveryStrategy(DeliveryStrategy deliveryStrategy) {
+        this.deliveryStrategy = deliveryStrategy;
+    }
+
+    public DeliveryStrategy getDeliveryStrategy() {
+        return deliveryStrategy;
+    }
+
+    public void setAllowedZombies(List<String> allowedZombies) {
+        this.allowedZombies = allowedZombies;
+    }
+
+    public List<String> getAllowedZombies() {
+        return allowedZombies;
+    }
+
+    public void setWaves(List<Wave> waves) {
+        this.waves = waves;
+    }
+
+    public List<Wave> getWaves() {
+        return waves;
+    }
+
     public String getId() {
         return id;
     }

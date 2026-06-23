@@ -41,6 +41,7 @@ public class AppView {
         leaderBoardMenu = new LeaderBoardMenu();
         choosePlantMenu = new ChoosePlantMenu();
         App.initShop();
+        App.getLevelManager().loadFromJson();
     }
 
     public void run(Scanner scanner) {
