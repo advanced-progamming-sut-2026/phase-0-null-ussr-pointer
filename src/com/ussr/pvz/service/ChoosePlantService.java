@@ -134,6 +134,7 @@ public class ChoosePlantService {
         session.addSun(INITIAL_SUN);
 
         App.setGameSession(session);
+        session.initClock();
         App.setMenuState(MenuState.GAME);
 
         selectedPlants.clear();

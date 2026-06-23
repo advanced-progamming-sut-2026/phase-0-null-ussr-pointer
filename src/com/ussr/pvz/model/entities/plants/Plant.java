@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
@@ -61,8 +62,22 @@ public class Plant extends GameEntity {
 
     @Override
     public void tick() {
-        if (actStrategy != null) {
-            // Logic using internalTimer and actionIntervalStat goes here
+        if (!isAlive) return;
+
+        if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
+        if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
+
+        if (actStrategy == null) return;
+
+        internalTimer += GameClock.SECONDS_PER_TICK;
+
+        double interval = actionIntervalStat != null
+                ? actionIntervalStat.getValue()
+                : actionInterval;
+
+        if (internalTimer >= interval) {
+            internalTimer = 0.0;
+            actStrategy.act(this, com.ussr.pvz.model.App.getGameSession());
         }
     }
 

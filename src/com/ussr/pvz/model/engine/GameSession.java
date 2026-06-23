@@ -10,7 +10,7 @@ import com.ussr.pvz.model.state.ResourceState;
 import java.util.List;
 
 public class GameSession {
-    private GameClock clock;
+    private GameClock clock = new GameClock();
     private Level level;
     private ResourceState resourceState;
     private List<Zombie> zombies;
@@ -21,10 +21,19 @@ public class GameSession {
     private boolean wavesStarted;
     private Lawn lawn;
 
+    public void initClock() {
+        clock.reset();
+        plants.forEach(clock::addEntity);
+        zombies.forEach(clock::addEntity);
+        items.forEach(clock::addEntity);
+    }
+
+
     public void tick() {
-        plants.forEach(Plant::tick);
-        zombies.forEach(Zombie::tick);
-        items.forEach(GroundItem::tick);
+        clock.tick();
+        plants.removeIf(p -> !p.isAlive());
+        zombies.removeIf(z -> !z.isAlive());
+        items.removeIf(i -> !i.isAlive());
     }
 
     public int getSunCount() {
