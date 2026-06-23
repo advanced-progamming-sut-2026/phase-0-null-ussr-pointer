@@ -8,6 +8,7 @@ import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class RegisterService {
@@ -53,7 +54,10 @@ public class RegisterService {
                 0,     // score
                 AdventureProgress.initializePlantsLvl(),
                 new ArrayList<>(),
-                List.of(NewsItem.initialNews())
+                List.of(NewsItem.initialNews()),
+                null,  // greenhouse
+                0,     // plantFoodCount
+                new HashMap<>()   //seedPackets
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");

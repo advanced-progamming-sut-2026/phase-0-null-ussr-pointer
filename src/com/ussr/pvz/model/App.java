@@ -1,6 +1,7 @@
 package com.ussr.pvz.model;
 
 import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.shop.ShopManager;
@@ -19,6 +20,18 @@ public class App {
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
                             (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
+
+    public static void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            List<Account> accounts = getAccounts();
+            if (accounts != null && !accounts.isEmpty()) {
+                List<AccountState> states = accounts.stream()
+                        .map(Account::toState)
+                        .toList();
+                SaveService.saveAccounts(states);
+            }
+        }));
+    }
 
     public static List<Account> getAccounts() {
         return accounts;

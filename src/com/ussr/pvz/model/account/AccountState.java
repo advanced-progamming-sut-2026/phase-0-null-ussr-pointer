@@ -20,7 +20,10 @@ public record AccountState(
         int score,
         Map<String, Integer> plantLvl,
         List<String> seenZombies,
-        List<NewsItem> personalNews
+        List<NewsItem> personalNews,
+        Map<String , Object> greenhouse,
+        int plantFoodCount,
+        Map<String, Integer> seedPackets
 ) {
     public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
         return new AccountState(
@@ -38,7 +41,11 @@ public record AccountState(
                 this.score,
                 this.plantLvl,
                 this.seenZombies,
-                this.personalNews
+                this.personalNews,
+                this.greenhouse,
+                this.plantFoodCount,
+                this.seedPackets
+
         );
     }
 }

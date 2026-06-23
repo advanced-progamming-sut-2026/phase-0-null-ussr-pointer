@@ -19,7 +19,6 @@ public class Account {
     private Collection collection;
     private Greenhouse greenhouse;
     private int difficultyLvl;
-    //todo add the properties property so we can save things that get bought in shop
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();
@@ -28,13 +27,13 @@ public class Account {
         this.gender = state.gender();
         this.securityQuestion = state.securityQuestion();
         this.securityAnswer = state.securityAnswer();
-        this.difficultyLvl = 3;
+        this.difficultyLvl = state.difficultyLvl();
 
         adventureProgress = new AdventureProgress(state.currentLvl(), state.coin(), state.gem(), state.plantLvl());
         scoreRecord = new ScoreRecord(state.score());
         personalNews = new ArrayList<>(state.personalNews());
         this.collection = collection;
-        this.greenhouse = new Greenhouse();
+        this.greenhouse = state.greenhouse() != null ? Greenhouse.fromMap(state.greenhouse()) : new Greenhouse();
     }
 
     public AccountState toState() {
@@ -53,7 +52,10 @@ public class Account {
                 scoreRecord.getScore(),
                 adventureProgress.getPlantLvls(),
                 adventureProgress.getSeenZombies(),
-                personalNews
+                personalNews,
+                this.greenhouse != null ? this.greenhouse.toMap() : null,
+                adventureProgress.getPlantFoodCount(),
+                adventureProgress.getSeedPackets()
         );
     }
 

@@ -5,10 +5,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Greenhouse {
 
@@ -96,11 +93,52 @@ public class Greenhouse {
     }
 
     public Map<String, Object> toMap() {
-        return null;
+        Map<String, Object> map = new HashMap<>();
+        map.put("unlockedPots", unlockedPots);
+
+        List<Map<String, Object>> potsList = new ArrayList<>();
+        for (Map.Entry<Location, Pot> entry : pots.entrySet()) {
+            Pot pot = entry.getValue();
+            Map<String, Object> potMap = new HashMap<>();
+            potMap.put("x", pot.getX());
+            potMap.put("y", pot.getY());
+            potMap.put("unlocked", pot.isUnlocked());
+            potMap.put("occupied", pot.isOccupied());
+            if (pot.getPlant() != null) {
+                potMap.put("plant", pot.getPlant().toMap());
+            }
+            potsList.add(potMap);
+        }
+        map.put("pots", potsList);
+        return map;
     }
 
+    @SuppressWarnings("unchecked")
     public static Greenhouse fromMap(Map<String, Object> map) {
-        return null;
+        if (map == null) return new Greenhouse();
+
+        Greenhouse gh = new Greenhouse();
+        gh.unlockedPots = ((Number) map.get("unlockedPots")).intValue();
+
+        List<Map<String, Object>> potsList = (List<Map<String, Object>>) map.get("pots");
+        if (potsList != null) {
+            for (Map<String, Object> potMap : potsList) {
+                int x = ((Number) potMap.get("x")).intValue();
+                int y = ((Number) potMap.get("y")).intValue();
+                boolean unlocked = (boolean) potMap.get("unlocked");
+                boolean occupied = (boolean) potMap.get("occupied");
+
+                Pot pot = gh.pots.get(new Location(x, y));
+                pot.setUnlocked(unlocked);
+                pot.setOccupied(occupied);
+
+                if (potMap.containsKey("plant")) {
+                    pot.setPlant(SproutPlant.fromMap((Map<String, Object>) potMap.get("plant")));
+                }
+            }
+        }
+        return gh;
+
     }
 
     private SproutPlant randomPlant(Collection collection) {
@@ -130,6 +168,12 @@ public class Greenhouse {
 
         public int getY() {
             return y;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location l)) return false;
+            return x == l.x && y == l.y;
         }
     }
 }

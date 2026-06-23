@@ -15,14 +15,18 @@ public class AdventureProgress {
     private int coin;
     private int gem;
     private int currentLvl;
+    private int plantFoodCount;
     private final Map<String, Integer> plantLvls;
     private final List<String> seenZombies;
+    private final Map<String , Integer> seedPackets;
 
     public AdventureProgress(int currentLvl, int coin, int gem, Map<String, Integer> plantLvls) {
         this.currentLvl = currentLvl;
         this.coin = coin;
         this.gem = gem;
+        this.plantFoodCount = 0;
         this.plantLvls = plantLvls;
+        this.seedPackets = new HashMap<>();
         this.seenZombies = new ArrayList<>();
     }
 
@@ -56,6 +60,31 @@ public class AdventureProgress {
 
     public void setCurrentLvl(int level) {
         this.currentLvl = level;
+    }
+
+    public int getPlantFoodCount() { return plantFoodCount; }
+
+    public void addPlantFood(int amount) {
+        plantFoodCount = Math.min(plantFoodCount + amount, 3);
+    }
+
+    public boolean spendPlantFood() {
+        if (plantFoodCount <= 0) return false;
+        plantFoodCount--;
+        return true;
+    }
+
+    public Map<String, Integer> getSeedPackets() { return seedPackets; }
+
+    public void addSeedPackets(String plantName, int amount) {
+        seedPackets.merge(plantName, amount, Integer::sum);
+    }
+
+    public boolean spendSeedPacket(String plantName) {
+        int current = seedPackets.getOrDefault(plantName, 0);
+        if (current <= 0) return false;
+        seedPackets.put(plantName, current - 1);
+        return true;
     }
 
     public static Map<String, Integer> initializePlantsLvl() {
