@@ -1,10 +1,10 @@
 package com.ussr.pvz.model.greenhouse;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 public class Greenhouse {
@@ -18,9 +18,10 @@ public class Greenhouse {
     public static final int MARIGOLD_GROW_HOURS = 2;
     public static final int PLANT_GROW_HOURS = 8;
     public static final int MARIGOLD_COIN_REWARD = 500;
-    private final HashMap<Location, Pot> pots;
 
-    private SproutPlant[][] grid;
+    private static final Random RAND = new Random();
+
+    private final HashMap<Location, Pot> pots;
     private int unlockedPots;
 
     public Greenhouse() {
@@ -34,16 +35,35 @@ public class Greenhouse {
     }
 
     public void unlockPot(int x, int y) {
-        pots.get(new Location(x, y)).setUnlocked(true);
-        unlockedPots++;
+        Pot pot = pots.get(new Location(x, y));
+        if (pot != null && !pot.isUnlocked()) {
+            pot.setUnlocked(true);
+            unlockedPots++;
+        }
+    }
+
+    public void unlockPot() {
+        for (int j = 0; j < MAX_ROWS; j++) {
+            for (int i = 0; i < MAX_COLS; i++) {
+                Location loc = new Location(i, j);
+                Pot pot = pots.get(loc);
+                if (pot != null && !pot.isUnlocked()) {
+                    pot.setUnlocked(true);
+                    unlockedPots++;
+                    return;
+                }
+            }
+        }
     }
 
     public boolean isPotUnlocked(int x, int y) {
-        return pots.get(new Location(x, y)).isUnlocked();
+        Pot pot = pots.get(new Location(x, y));
+        return pot != null && pot.isUnlocked();
     }
 
     public boolean isPotOccupied(int x, int y) {
-        return pots.get(new Location(x, y)).isOccupied();
+        Pot pot = pots.get(new Location(x, y));
+        return pot != null && pot.isOccupied();
     }
 
     public int getUnlockedPots() {
@@ -51,45 +71,62 @@ public class Greenhouse {
     }
 
     public void plant(int x, int y, Collection collection) {
-        Random rand = new SecureRandom();
-        rand.setSeed(System.currentTimeMillis());
-        SproutPlant plant = null;
-        if (rand.nextInt() % 2 == 0) {
-            plant = randomPlant(collection);
-        } else {
-            plant = new SproutPlant(null, true, PlantState.GROWING, "",System.currentTimeMillis(), 2 * HOUR);
+        Pot targetPot = pots.get(new Location(x, y));
+        if (targetPot == null || !targetPot.isUnlocked() || targetPot.isOccupied()) {
+            return;
         }
 
-        pots.get(new Location(x, y)).setPlant(plant);
+        SproutPlant plant;
+        if (RAND.nextInt(2) == 0) {
+            plant = randomPlant(collection);
+        } else {
+            plant = new SproutPlant(null, true, PlantState.GROWING, "", System.currentTimeMillis(), 2 * HOUR);
+        }
+
+        targetPot.setPlant(plant);
+        targetPot.setOccupied(true);
     }
 
     public SproutPlant collect(int x, int y) {
-        SproutPlant result = pots.get(new Location(x, y)).getPlant();
-        if(result.isReady()) {
-            pots.get(new Location(x, y)).setOccupied(false);
-            return result;
+        Pot pot = pots.get(new Location(x, y));
+        if (pot == null) {
+            throw new IllegalArgumentException("Invalid location");
         }
-        else
+
+        SproutPlant result = pot.getPlant();
+        if (result == null) {
+            throw new IllegalStateException("No plant present");
+        }
+
+        if (result.isReady()) {
+            pot.setPlant(null);
+            pot.setOccupied(false);
+            return result;
+        } else {
             throw new IllegalStateException("SproutPlant not ready");
+        }
     }
 
     public int speedUp(int x, int y) {
-        if(pots.get(new Location(x, y)).getPlant().isReady()) {
+        Pot pot = pots.get(new Location(x, y));
+        if (pot == null || pot.getPlant() == null) {
+            throw new IllegalStateException("No plant present");
+        }
+        if (pot.getPlant().isReady()) {
             throw new IllegalStateException("SproutPlant is ready");
         }
-
-        return pots.get(new Location(x,y)).getPlant().getRemainingHoursCeil();
+        return pot.getPlant().getRemainingHoursCeil();
     }
 
     public void grow(int x, int y) {
-        if(pots.get(new Location(x, y)).getPlant().isReady()) {
+        Pot pot = pots.get(new Location(x, y));
+        if (pot == null || pot.getPlant() == null) {
+            throw new IllegalStateException("No plant present");
+        }
+        if (pot.getPlant().isReady()) {
             throw new IllegalStateException("SproutPlant is ready");
         }
-
-        pots.get(new Location(x, y)).getPlant().setState(PlantState.READY);
-    }
-
-    public void printGrid() {
+        pot.getPlant().setState(PlantState.READY);
     }
 
     public Map<String, Object> toMap() {
@@ -129,52 +166,61 @@ public class Greenhouse {
                 boolean occupied = (boolean) potMap.get("occupied");
 
                 Pot pot = gh.pots.get(new Location(x, y));
-                pot.setUnlocked(unlocked);
-                pot.setOccupied(occupied);
-
-                if (potMap.containsKey("plant")) {
-                    pot.setPlant(SproutPlant.fromMap((Map<String, Object>) potMap.get("plant")));
+                if (pot != null) {
+                    pot.setUnlocked(unlocked);
+                    pot.setOccupied(occupied);
+                    if (potMap.containsKey("plant")) {
+                        pot.setPlant(SproutPlant.fromMap((Map<String, Object>) potMap.get("plant")));
+                    }
                 }
             }
         }
         return gh;
-
     }
 
     private SproutPlant randomPlant(Collection collection) {
-        SecureRandom random = new SecureRandom();
-        int min = 0;
-        int max = collection.getUnlockedPlants().size();
-        int randomInt = random.nextInt(max - min + 1) + min;
-        Plant typePlant = collection.getUnlockedPlants().get(randomInt);
+        List<Plant> unlocked = collection.getUnlockedPlants();
+        if (unlocked == null || unlocked.isEmpty()) {
+            return new SproutPlant(null, true, PlantState.GROWING, "", System.currentTimeMillis(), 2 * HOUR);
+        }
+
+        int max = unlocked.size();
+        int initialIdx = RAND.nextInt(max);
+        int currentIdx = initialIdx;
+        Plant typePlant = unlocked.get(currentIdx);
+
         while (typePlant.getPlantFoodType().equals(PlantFoodType.NONE)) {
-            typePlant = collection.getUnlockedPlants().get(randomInt++);
+            currentIdx = (currentIdx + 1) % max;
+            typePlant = unlocked.get(currentIdx);
+            if (currentIdx == initialIdx) {
+                break;
+            }
         }
         return new SproutPlant(null, false, PlantState.GROWING, typePlant.getName(), System.currentTimeMillis(), 8 * HOUR);
     }
 
     private static class Location {
-        int x;
-        int y;
+        private final int x;
+        private final int y;
 
         private Location(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
-        public int getX() {
-            return x;
-        }
+        public int getX() { return x; }
+        public int getY() { return y; }
 
-        public int getY() {
-            return y;
-        }
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof Location l)) return false;
             return x == l.x && y == l.y;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
     }
 }
-

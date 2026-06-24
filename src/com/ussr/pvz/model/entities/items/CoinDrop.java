@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.items;
 
+import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 
 public class CoinDrop extends GroundItem {
@@ -16,7 +17,7 @@ public class CoinDrop extends GroundItem {
     private final CoinTier tier;
 
     @Override
-    public void applyRewards(GameSession session) {
+    public void applyRewards(GameSession session, Account account) {
 
     }
 }

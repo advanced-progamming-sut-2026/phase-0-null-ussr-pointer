@@ -17,6 +17,7 @@ public class App {
     private static GameSession gameSession;
     //todo check this shop manager and see if it shouldn't be here
     private static ShopManager shopManager;
+    private static StringBuilder pendingMessage = new StringBuilder();
     private static LevelManager levelManager = new LevelManager();
     private static List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
