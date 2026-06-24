@@ -4,14 +4,18 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.items.PlantFoodDrop;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
 import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
+import java.util.Random;
 
 public class Zombie extends GameEntity {
+    private static final Random RAND = new Random();
+
     private final String name;
 
     private MoveBehavior moveBehavior;
@@ -24,10 +28,13 @@ public class Zombie extends GameEntity {
     private double eatDps;
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
+    private final boolean isGlowing;
 
     public Zombie(String name, Armor armor) {
         this.name = name;
         this.armor = armor;
+        // 5% chance to spawn as a glowing variant carrying Plant Food
+        this.isGlowing = RAND.nextInt(100) < 5;
     }
 
     @Override
@@ -77,6 +84,10 @@ public class Zombie extends GameEntity {
                 hp = 0;
                 isAlive = false;
                 state = ZombieActivity.DEAD;
+
+                if (isGlowing) {
+                    PlantFoodDrop plantFoodDrop = new PlantFoodDrop(1);
+                }
             }
         }
     }
@@ -158,5 +169,9 @@ public class Zombie extends GameEntity {
                 armor != null && !armor.isDestroyed()
                         ? " | armor: " + armor.getArmorHp() + "/" + armor.getMaxArmorHp()
                         : "");
+    }
+
+    public boolean isGlowing() {
+        return isGlowing;
     }
 }

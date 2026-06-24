@@ -48,8 +48,7 @@ public class GreenHouseController {
     }
 
     private String handleShowGreenhouse() {
-        // TODO: call greenHouseService.showGreenhouse() and return its message
-        return "";
+       return greenHouseService.showGreenHouse();
     }
 
     private String handlePlantPot(Matcher matcher) {
@@ -73,8 +72,11 @@ public class GreenHouseController {
 
     private String handleGrow(Matcher matcher) {
         GreenhousePotRequest request = new GreenhousePotRequest(matcher.group("x"), matcher.group("y"));
-        // TODO: call greenHouseService.grow(request) and return its message
-        return "";
+        try {
+            return greenHouseService.grow(request);
+        }catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     private String handleEnterShop() {

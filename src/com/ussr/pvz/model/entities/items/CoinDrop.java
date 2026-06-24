@@ -5,6 +5,7 @@ import com.ussr.pvz.model.engine.GameSession;
 
 public class CoinDrop extends GroundItem {
     public CoinDrop(CoinTier tier) {
+        super();
         this.tier = tier;
     }
 
@@ -18,6 +19,8 @@ public class CoinDrop extends GroundItem {
 
     @Override
     public void applyRewards(GameSession session, Account account) {
-
+        //todo apply reward
+        this.isAlive = false;
+        this.setCollected(true);
     }
 }

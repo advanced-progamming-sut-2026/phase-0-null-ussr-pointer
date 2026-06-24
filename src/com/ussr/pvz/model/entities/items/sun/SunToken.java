@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.entities.items.sun;
 
-import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
@@ -24,6 +23,7 @@ public class SunToken extends GroundItem {
     public SunToken(int maxRows, int maxCols) {
         //todo make some event or something that we can triggre when sun produced to print it and
         //todo later use it for graphic
+        super();
         int roll = RAND.nextInt(100);
         SunDropType selectedType = SunDropType.REGULAR;
         int cumulativeProbability = 0;
@@ -58,6 +58,7 @@ public class SunToken extends GroundItem {
             session.addSun(dropType.getValue());
         }
         this.isAlive = false;
+        this.setCollected(true);
     }
 
     @Override

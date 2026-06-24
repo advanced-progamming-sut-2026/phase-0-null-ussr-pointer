@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.greenhouse;
 
-import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
@@ -29,7 +28,7 @@ public class Greenhouse {
         for (int i = 0; i < MAX_COLS; i++) {
             for (int j = 0; j < MAX_ROWS; j++) {
                 Location l = new Location(i, j);
-                pots.put(l, new Pot(l.getX(), l.getY()));
+                pots.put(l, new Pot(l.x(), l.y()));
             }
         }
     }
@@ -199,28 +198,13 @@ public class Greenhouse {
         return new SproutPlant(null, false, PlantState.GROWING, typePlant.getName(), System.currentTimeMillis(), 8 * HOUR);
     }
 
-    private static class Location {
-        private final int x;
-        private final int y;
-
-        private Location(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() { return x; }
-        public int getY() { return y; }
+    private record Location(int x, int y) {
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Location l)) return false;
-            return x == l.x && y == l.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof Location(int x1, int y1))) return false;
+                return x == x1 && y == y1;
+            }
     }
 }

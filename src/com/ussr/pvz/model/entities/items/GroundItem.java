@@ -10,9 +10,18 @@ public abstract class GroundItem extends GameEntity {
     private double collectRadius;
     private boolean collected;
     private ItemType itemType;
+    protected Location location;
+    //todo implement the constructor , supers in children , change in usages (critical)
+
+//    protected GroundItem(ItemType itemType, double lifetime, double collectRadius) {
+//        this.itemType = itemType;
+//        this.collected = false;
+//        this.collectRadius = collectRadius;
+//        this.lifetime = lifetime;
+//    }
 
     public void collect() {
-        applyRewards(App.getGameSession(),App.getAccount());
+        applyRewards(App.getGameSession(), App.getAccount());
     }
 
     public boolean isExpired() {
@@ -25,4 +34,37 @@ public abstract class GroundItem extends GameEntity {
     public void tick() {
     }
 
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    public double getLifetime() {
+        return lifetime;
+    }
+
+    public double getCollectRadius() {
+        return collectRadius;
+    }
+
+    public boolean isCollected() {
+        return collected;
+    }
+
+    public void setCollected(boolean collected) {
+        this.collected = collected;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public record Location(int x, int y) {
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location(int x1, int y1))) return false;
+            return x == x1 && y == y1;
+        }
+    }
 }

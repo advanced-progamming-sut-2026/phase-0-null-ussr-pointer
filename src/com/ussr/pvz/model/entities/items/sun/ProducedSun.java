@@ -10,6 +10,7 @@ public class ProducedSun extends GroundItem {
     private final int value;
 
     public ProducedSun(int x, int y, int value) {
+        super();
         this.x = x;
         this.y = y;
         this.value = value;
@@ -19,6 +20,7 @@ public class ProducedSun extends GroundItem {
     public void applyRewards(GameSession session, Account account) {
         session.addSun(value);
         this.isAlive = false;
+        this.setCollected(true);
     }
 
     public int getValue() {

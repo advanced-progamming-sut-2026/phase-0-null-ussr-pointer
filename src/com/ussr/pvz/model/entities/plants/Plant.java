@@ -6,6 +6,7 @@ import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
+import com.ussr.pvz.model.greenhouse.Greenhouse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Plant extends GameEntity {
     private int recharge;
     private double actionInterval;
     private int cost;
+    private Location location;
     private final ArrayList<Tag> tags = new ArrayList<>();
     private int damage;
     private PlantType type;
@@ -50,7 +52,8 @@ public class Plant extends GameEntity {
         this.recharge = blueprint.recharge;
         this.tags.addAll(blueprint.tags);
         this.rawUpgrades.addAll(blueprint.rawUpgrades);
-
+        //todo needs check
+        this.location = blueprint.location;
         // Strategy attachments
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodEffect = blueprint.plantFoodEffect;
@@ -99,6 +102,14 @@ public class Plant extends GameEntity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     public String getName() {
@@ -205,5 +216,15 @@ public class Plant extends GameEntity {
 
     public void setPlantFoodType(PlantFoodType plantFoodType) {
         this.plantFoodType = plantFoodType;
+    }
+
+    public record Location(int x, int y) {
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Plant.Location(int x1, int y1))) return false;
+            return x == x1 && y == y1;
+        }
     }
 }

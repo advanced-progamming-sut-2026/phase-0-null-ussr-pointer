@@ -190,4 +190,8 @@ public class GameSession {
     public void setLevel(Level level) {
         this.level = level;
     }
+
+    public List<GroundItem> getItems(){
+        return items;
+    }
 }
