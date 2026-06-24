@@ -6,6 +6,6 @@ import com.ussr.pvz.model.entities.plants.Plant;
 public class WallNutStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
-        //wall nut does no shit
+        //todo implement this shit
     }
 }

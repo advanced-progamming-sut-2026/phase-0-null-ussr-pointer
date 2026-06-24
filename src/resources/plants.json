@@ -79,8 +79,20 @@
     "category": "SUN_PRODUCER",
     "tags": [
       "SHROOM",
-      "WARM_UP",
+      "WRAMP-UP",
       "NIGHT"
+    ],
+    "wramp-up": [
+      {
+        "stage": 2,
+        "time": 24,
+        "abilityValue": 50
+      },
+      {
+        "stage": 3,
+        "time": 72,
+        "abilityValue": 75
+      }
     ],
     "cost": 25,
     "baseHp": 300,
@@ -1550,7 +1562,7 @@
     "category": "MELEE",
     "tags": [
       "AOE",
-      "WARM_UP"
+      "WRAMP-UP"
     ],
     "cost": 175,
     "baseHp": 300,
@@ -1561,6 +1573,18 @@
     "abilityValue": 9.0,
     "plantFoodType": "LOCAL_AOE_ATTACK",
     "plantFoodValue": 25.0,
+    "wramp-up": [
+      {
+        "stage": 2,
+        "time": 24,
+        "damage": 15
+      },
+      {
+        "stage": 3,
+        "time": 72,
+        "damage": 45
+      }
+    ],
     "upgrades": [
       {
         "level": 2,

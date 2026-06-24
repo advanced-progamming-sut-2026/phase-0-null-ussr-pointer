@@ -3,7 +3,7 @@ package com.ussr.pvz.model.entities.plants;
 public enum Tag {
     DAY("Day"),
     SHROOM("Shroom"),
-    WARM_UP("wramp-up"), // matches json value
+    WRAMP_UP("wramp-up"),
     NIGHT("night"),
     PEA("Pea"),
     ICE("Ice"),

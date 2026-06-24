@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Plant extends GameEntity {
+    //todo implement the warm up tiers
+    //todo implement the acts based on tier if it is warm up
+    //todo it is better to implement it in another class
     private int id;
     private String name;
     private int level = 1;
@@ -33,6 +36,7 @@ public class Plant extends GameEntity {
     private PlantFoodEffect plantFoodEffect;
     private PlantFoodType plantFoodType;
     private double internalTimer = 0.0;
+    private double abilityValue;
 
     // Kept to track applied upgrades
     private final List<String> rawUpgrades = new ArrayList<>();
@@ -61,6 +65,7 @@ public class Plant extends GameEntity {
         // Initialize wrapper stats
         this.hpStat = new ModifiableStat(this.hp);
         this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
+        this.abilityValue = blueprint.abilityValue;
     }
 
     @Override
@@ -217,7 +222,9 @@ public class Plant extends GameEntity {
     public void setPlantFoodType(PlantFoodType plantFoodType) {
         this.plantFoodType = plantFoodType;
     }
-
+    public double getAbilityValue() {
+        return abilityValue;
+    }
     public record Location(int x, int y) {
 
         @Override

@@ -9,9 +9,8 @@ public enum PlantType {
     MODIFIER("Modifier"),
     SHOOTER("Shooter"),
     STRIKE_THROUGH("Strike-through"),
-    SUN_PRODUCER("Sun Producer"),
-    MINT("Mint");
-
+    SUN_PRODUCER("Sun Producer");
+    //mint deleted cause mint is for each
     private final String name;
 
     //constructor

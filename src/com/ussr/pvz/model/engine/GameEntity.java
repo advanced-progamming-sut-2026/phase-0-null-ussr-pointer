@@ -30,4 +30,8 @@ public abstract class GameEntity implements Tickable {
     public boolean isAlive() {
         return this.isAlive;
     }
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
 }
