@@ -22,6 +22,7 @@ public class Plant extends GameEntity {
     private int hp;
     private int recharge;
     private double actionInterval;
+    private double timeLeft;
     private int cost;
     private Location location;
     private final ArrayList<Tag> tags = new ArrayList<>();
@@ -233,5 +234,13 @@ public class Plant extends GameEntity {
             if (!(o instanceof Plant.Location(int x1, int y1))) return false;
             return x == x1 && y == y1;
         }
+    }
+
+    public double getTimeLeft() {
+        return this.timeLeft;
+    }
+
+    public void setTimeLeft(double time) {
+        this.timeLeft = time;
     }
 }

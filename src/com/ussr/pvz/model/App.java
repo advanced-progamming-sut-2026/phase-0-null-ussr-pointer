@@ -1,5 +1,7 @@
 package com.ussr.pvz.model;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
@@ -8,13 +10,19 @@ import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
 import com.ussr.pvz.service.SaveService;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class App {
     private static MenuState menuState = MenuState.REGISTER;
     private static Account account;
     private static GameSession gameSession;
+    private static List<Map<String, Object>> cachedPlantsData = null;
     //todo check this shop manager and see if it shouldn't be here
     private static ShopManager shopManager;
     private static StringBuilder pendingMessage = new StringBuilder();
@@ -23,6 +31,10 @@ public class App {
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
                             (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
+
+    static {
+        loadPlantsDataToMemory();
+    }
 
     public static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -34,6 +46,31 @@ public class App {
                 SaveService.saveAccounts(states);
             }
         }));
+    }
+
+    public static void loadPlantsDataToMemory() {
+        if (cachedPlantsData != null) return;
+
+        Gson gson = new Gson();
+        File allPlantsFile = new File("src/resources/plants.json");
+
+        if (!allPlantsFile.exists()) {
+            System.err.println("Critical Error: plants.json not found during App boot!");
+            cachedPlantsData = new ArrayList<>();
+            return;
+        }
+
+        try (FileReader reader = new FileReader(allPlantsFile)) {
+            Type complexListType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+            cachedPlantsData = gson.fromJson(reader, complexListType);
+
+            if (cachedPlantsData == null) {
+                cachedPlantsData = new ArrayList<>();
+            }
+        } catch (IOException e) {
+            System.err.println("Error caching plants.json to memory: " + e.getMessage());
+            cachedPlantsData = new ArrayList<>();
+        }
     }
 
     public static LevelManager getLevelManager() {
@@ -82,5 +119,9 @@ public class App {
 
     public static void initShop(){
         App.shopManager = new ShopManager();
+    }
+
+    public static List<Map<String, Object>> getCachedPlantsData() {
+        return cachedPlantsData;
     }
 }

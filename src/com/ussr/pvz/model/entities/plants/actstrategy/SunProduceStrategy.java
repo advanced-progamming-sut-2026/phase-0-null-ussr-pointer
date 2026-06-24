@@ -19,13 +19,17 @@ public class SunProduceStrategy implements ActStrategy {
                         && item.getLocation().y() == y);
 
         if (!sunAlreadyExists) {
-            if (user.getTags().contains(Tag.WARM_UP)) {
+            if (user.getTags().contains(Tag.WRAMP_UP)) {
                 //todo implement shroom stage mechanics (Sun-warmup growth tier checks)
+                //TODO change the json file and add the growth time to the file
                 ProducedSun sun = new ProducedSun(x, y, (int) user.getAbilityValue());
                 session.getItems().add(sun);
             } else {
-                ProducedSun sun = new ProducedSun(x, y, (int) user.getAbilityValue());
-                session.getItems().add(sun);
+                if(user.getTimeLeft() <= 0) {
+                    ProducedSun sun = new ProducedSun(x, y, (int) user.getAbilityValue());
+                    session.getItems().add(sun);
+                    user.setTimeLeft(user.getActionInterval());
+                }
             }
         }
     }
