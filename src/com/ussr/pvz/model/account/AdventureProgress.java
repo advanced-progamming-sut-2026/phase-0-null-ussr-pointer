@@ -51,18 +51,18 @@ public class AdventureProgress {
                         Plant plantInstance = new Plant();
                         plantInstance.setName(plantName);
                         plantInstance.setLevel(currentLevel);
-                        setDefaults(plantInstance , plantData);
+                        setDefaults(plantInstance, plantData);
                         Object upgradesObj = plantData.get("upgrades");
                         if (upgradesObj instanceof List) {
                             @SuppressWarnings("unchecked")
                             List<Map<String, Object>> upgradesList = (List<Map<String, Object>>) upgradesObj;
-                            upgradesList.sort(Comparator.comparingInt(u -> ((Double) u.get("level")).intValue()));
+                            upgradesList.sort(Comparator.comparingInt(u -> ((Number) u.get("level")).intValue()));
                             for (Map<String, Object> upgrade : upgradesList) {
-                                int upgradeLevel = ((Double) upgrade.get("level")).intValue();
+                                int upgradeLevel = ((Number) upgrade.get("level")).intValue();
                                 if (upgradeLevel <= currentLevel) {
                                     String type = (String) upgrade.get("type");
-                                    double value = (Double) upgrade.get("value");
-                                    applyBuffi(type , plantInstance , value);
+                                    double value = ((Number) upgrade.get("value")).doubleValue();
+                                    applyBuffi(type, plantInstance, value);
                                 }
                             }
                         }
@@ -93,19 +93,26 @@ public class AdventureProgress {
         }
     }
 
-    private void setDefaults(Plant plantInstance , Map<String , Object> plantData) {
+    private void setDefaults(Plant plantInstance, Map<String, Object> plantData) {
         if (plantData.get("id") != null)
-            plantInstance.setId(((Double) plantData.get("id")).intValue());
+            plantInstance.setId(((Number) plantData.get("id")).intValue());
         if (plantData.get("hp") != null)
-            plantInstance.setHp(((Double) plantData.get("hp")).intValue());
+            plantInstance.setHp(((Number) plantData.get("hp")).intValue());
         if (plantData.get("cost") != null)
-            plantInstance.setCost(((Double) plantData.get("cost")).intValue());
+            plantInstance.setCost(((Number) plantData.get("cost")).intValue());
         if (plantData.get("damage") != null)
-            plantInstance.setDamage(((Double) plantData.get("damage")).intValue());
+            plantInstance.setDamage(((Number) plantData.get("damage")).intValue());
         if (plantData.get("actionInterval") != null)
-            plantInstance.setActionInterval(((Double) plantData.get("actionInterval")));
+            plantInstance.setActionInterval(((Number) plantData.get("actionInterval")).doubleValue());
         if (plantData.get("recharge") != null)
-            plantInstance.setRecharge(((Double) plantData.get("recharge")).intValue());
+            plantInstance.setRecharge(((Number) plantData.get("recharge")).intValue());
+        if (plantData.get("abilityValue") != null)
+            plantInstance.setAbilityValue(((Number) plantData.get("abilityValue")).doubleValue());
+        if (plantData.get("wramp-up") != null) {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> wrampUpList = (List<Map<String, Object>>) plantData.get("wramp-up");
+            plantInstance.setWrampUp(wrampUpList);
+        }
     }
 
     public void upgradePlant(String plantName) {
@@ -181,13 +188,7 @@ public class AdventureProgress {
         Map<String, Integer> defaultPlantLevels = new HashMap<>();
         Gson gson = new Gson();
 
-        File allPlantsFile = new File("src/resources/plants.json");
         File defaultUnlockedFile = new File("default_unlocked_plants.json");
-
-        if (!allPlantsFile.exists()) {
-            System.err.println("Critical Error: plants.json not found!");
-            return defaultPlantLevels;
-        }
 
         List<String> starterPlantNames = new ArrayList<>();
         if (defaultUnlockedFile.exists()) {
@@ -203,25 +204,24 @@ public class AdventureProgress {
                 System.err.println("Error reading default_unlocked_plants.json: " + e.getMessage());
             }
         }
-        try (FileReader reader = new FileReader(allPlantsFile)) {
-            Type complexListType = new TypeToken<List<Map<String, Object>>>() {}.getType();
-            List<Map<String, Object>> complexPlantsList = gson.fromJson(reader, complexListType);
 
-            if (complexPlantsList != null) {
-                for (Map<String, Object> plantData : complexPlantsList) {
-                    Object nameObj = plantData.get("name");
-                    if (nameObj != null) {
-                        String plantName = nameObj.toString().trim().toUpperCase();
-                        if (starterPlantNames.contains(plantName)) {
-                            defaultPlantLevels.put(plantName, 1);
-                        } else {
-                            defaultPlantLevels.put(plantName, 0);
-                        }
+        if (App.getCachedPlantsData() == null) {
+            App.loadPlantsDataToMemory();
+        }
+
+        List<Map<String, Object>> complexPlantsList = App.getCachedPlantsData();
+        if (complexPlantsList != null) {
+            for (Map<String, Object> plantData : complexPlantsList) {
+                Object nameObj = plantData.get("name");
+                if (nameObj != null) {
+                    String plantName = nameObj.toString().trim().toUpperCase();
+                    if (starterPlantNames.contains(plantName)) {
+                        defaultPlantLevels.put(plantName, 1);
+                    } else {
+                        defaultPlantLevels.put(plantName, 0);
                     }
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error reading plants.json: " + e.getMessage());
         }
         return defaultPlantLevels;
     }

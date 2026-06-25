@@ -1,9 +1,11 @@
 package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.PlantFoodDrop;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
@@ -13,7 +15,7 @@ import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import java.util.Random;
 
-public class Zombie extends GameEntity {
+public class Zombie extends GroundItem {
     private static final Random RAND = new Random();
 
     private final String name;
@@ -90,6 +92,11 @@ public class Zombie extends GameEntity {
                 }
             }
         }
+    }
+
+    @Override
+    public void applyRewards(GameSession session, Account account) {
+
     }
 
     public String getName() {

@@ -2,6 +2,14 @@ package com.ussr.pvz.model.entities.plants.actstrategy;
 
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.hit.FireHit;
+import com.ussr.pvz.model.entities.projectiles.hit.IceHit;
+import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
+import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
+import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.rmi.server.ServerNotActiveException;
 
@@ -9,72 +17,30 @@ public class ShootStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-        if(user.getTimeLeft() <= 0) {
-            switch (user.getName()) {
-                case "Peashooter":
-                    peaShooter();
-                    break;
-                case "Repeater":
-                    repeater();
-                    break;
-                case "Threepeater":
-                    threepeater();
-                    break;
-                case "Snow Pea":
-                    snowPea();
-                    break;
-                case "Rotobaga":
-                    rotobaga();
-                case "Pea Pod":
-                    peaPod();
-                    break;
-                case "Split Pea":
-                    splitPea();
-                    break;
-                case "Citron":
-                    citron();
-                    break;
-                case "Bowling Bulb":
-                    bowlingBulb();
-                    break;
-                case "Fire Peashooter":
-                    firePeashooter();
-                    break;
-                case "Starfruit":
-                    starfruit();
-                    break;
-                case "Goo Peashooter":
-                    gooPeashooter();
-                    break;
-                case "Mega Gatling Pea":
-                    megaGatlingPea();
-                    break;
-                case "Sea-shroom":
-                    seaShroom();
-                    break;
-                case "Puff-shroom":
-                    puffShroom();
-                    break;
+        //todo change the json file for shooters to has a vec2 for each projectile they shoot
+        if(user.getIntervalTimer() <= 0) {
+            if(user.getTags().contains(Tag.FIRE)){
+                for(Vec2 vec : user.getShootingVectors()) {
+                    session.getItems().add(new Projectile(user.getPosition() , vec , user.getDamage() , new StraightMove() , new FireHit(1)));
+                }
             }
-            user.setTimeLeft(user.getActionInterval());
+            else if(user.getTags().contains(Tag.ICE)) {
+                for(Vec2 vec : user.getShootingVectors()) {
+                    session.getItems().add(new Projectile(user.getPosition() , vec , user.getDamage() , new StraightMove() , new IceHit(1)));
+                }
+            }
+            else if(user.getName().equalsIgnoreCase("bowling bulb")) {
+                for(Vec2 vec : user.getShootingVectors()) {
+                    session.getItems().add(new Projectile(user.getPosition() , vec , user.getDamage() , new BounceMove() , new NormalHit(1)));
+                }
+            }
+            else {
+                for(Vec2 vec : user.getShootingVectors()) {
+                    session.getItems().add(new Projectile(user.getPosition() , vec , user.getDamage() , new StraightMove() , new NormalHit(1)));
+                }
+            }
+
         }
+        user.setInternalTimer(user.getActionInterval());
     }
-
-    private void peaShooter() {
-
-    }
-    private void repeater() {}
-    private void threepeater() {}
-    private void snowPea() {}
-    private void rotobaga() {}
-    private void peaPod() {}
-    private void splitPea() {}
-    private void citron() {}
-    private void bowlingBulb() {}
-    private void firePeashooter() {}
-    private void starfruit() {}
-    private void gooPeashooter() {}
-    private void megaGatlingPea() {}
-    private void seaShroom() {}
-    private void puffShroom() {}
 }

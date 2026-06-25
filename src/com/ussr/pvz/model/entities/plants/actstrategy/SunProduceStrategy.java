@@ -19,17 +19,14 @@ public class SunProduceStrategy implements ActStrategy {
                         && item.getLocation().y() == y);
 
         if (!sunAlreadyExists) {
-            if (user.getTags().contains(Tag.WRAMP_UP)) {
+            if(user.getIntervalTimer() <= 0) {
+                int sunValue = (int)user.getAbilityValue();
                 //todo implement shroom stage mechanics (Sun-warmup growth tier checks)
                 //TODO change the json file and add the growth time to the file
-                ProducedSun sun = new ProducedSun(x, y, (int) user.getAbilityValue());
+                //todo call the upgrade method for all plants in game loop
+                ProducedSun sun = new ProducedSun(x, y, sunValue);
                 session.getItems().add(sun);
-            } else {
-                if(user.getTimeLeft() <= 0) {
-                    ProducedSun sun = new ProducedSun(x, y, (int) user.getAbilityValue());
-                    session.getItems().add(sun);
-                    user.setTimeLeft(user.getActionInterval());
-                }
+                user.setInternalTimer(user.getActionInterval());
             }
         }
     }

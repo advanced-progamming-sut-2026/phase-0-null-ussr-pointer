@@ -7,9 +7,11 @@ import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.greenhouse.Greenhouse;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Plant extends GameEntity {
     //todo implement the warm up tiers
@@ -22,7 +24,6 @@ public class Plant extends GameEntity {
     private int hp;
     private int recharge;
     private double actionInterval;
-    private double timeLeft;
     private int cost;
     private Location location;
     private final ArrayList<Tag> tags = new ArrayList<>();
@@ -39,8 +40,14 @@ public class Plant extends GameEntity {
     private double internalTimer = 0.0;
     private double abilityValue;
 
+    private List<Map<String, Object>> wrampUp;
+    private int currentStage = 1;
+    private double ageInSeconds = 0.0;
+
     // Kept to track applied upgrades
     private final List<String> rawUpgrades = new ArrayList<>();
+    //avoid hardcode
+    private List<Vec2> shootingVectors = new ArrayList<>();
 
     public Plant() {
     }
@@ -84,8 +91,8 @@ public class Plant extends GameEntity {
                 ? actionIntervalStat.getValue()
                 : actionInterval;
 
-        if (internalTimer >= interval) {
-            internalTimer = 0.0;
+        if (internalTimer <= 0) {
+            internalTimer = (actionIntervalStat != null ? actionIntervalStat.getValue() : actionInterval);
             actStrategy.act(this, com.ussr.pvz.model.App.getGameSession());
         }
     }
@@ -98,6 +105,19 @@ public class Plant extends GameEntity {
             isAlive = false;
         } else {
             setHp(newHp);
+        }
+    }
+
+    public void updateGrowth(double deltaTimeSeconds) {
+        if (this.wrampUp == null || this.wrampUp.isEmpty()) return;
+        this.ageInSeconds += deltaTimeSeconds;
+        for (Map<String, Object> stageData : wrampUp) {
+            int stage = ((Double) stageData.get("stage")).intValue();
+            double targetTime = ((Double) stageData.get("time"));
+            if (this.ageInSeconds >= targetTime && stage > this.currentStage) {
+                this.currentStage = stage;
+                //System.out.println(this.getName() + " reached stage " + this.currentStage + "!");
+            }
         }
     }
 
@@ -224,8 +244,21 @@ public class Plant extends GameEntity {
         this.plantFoodType = plantFoodType;
     }
     public double getAbilityValue() {
-        return abilityValue;
+        if (wrampUp != null && !wrampUp.isEmpty()) {
+            for (Map<String, Object> stageData : wrampUp) {
+                int stage = ((Double) stageData.get("stage")).intValue();
+                if (stage == this.currentStage) {
+                    return ((Double) stageData.get("abilityValue"));
+                }
+            }
+        }
+        return this.abilityValue;
     }
+
+    public List<Map<String, Object>> getWrampUp() { return wrampUp; }
+
+    public void setWrampUp(List<Map<String, Object>> wrampUp) { this.wrampUp = wrampUp; }
+
     public record Location(int x, int y) {
 
         @Override
@@ -236,11 +269,21 @@ public class Plant extends GameEntity {
         }
     }
 
-    public double getTimeLeft() {
-        return this.timeLeft;
+    public double getIntervalTimer() { return internalTimer; }
+
+    public void setInternalTimer(double timer) { this.internalTimer = timer; }
+
+    public void setAbilityValue(double value) { this.abilityValue = value; }
+
+    public List<Vec2> getShootingVectors() {
+        return shootingVectors;
     }
 
-    public void setTimeLeft(double time) {
-        this.timeLeft = time;
+    public void setShootingVectors(List<Vec2> shootingVectors) {
+        this.shootingVectors = shootingVectors;
+    }
+
+    public void addShootingVectors(Vec2 vec2) {
+        shootingVectors.add(vec2);
     }
 }

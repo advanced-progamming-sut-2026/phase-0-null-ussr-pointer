@@ -33,7 +33,9 @@ public enum Tag {
     HYPNO("Hypno"),
     CLONE("Clone"),
     BESTER("Bester"),
-    SUN("Sun");
+    SUN("Sun"),
+    AOE("Area damage"),
+    MOVE_ZOMBIES("Move Zombies");
 
     private final String name;
 

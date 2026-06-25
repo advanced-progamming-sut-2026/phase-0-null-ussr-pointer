@@ -1,6 +1,8 @@
 package com.ussr.pvz.model;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
@@ -50,8 +52,10 @@ public class App {
 
     public static void loadPlantsDataToMemory() {
         if (cachedPlantsData != null) return;
+        Gson gson = new GsonBuilder()
+                .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+                .create();
 
-        Gson gson = new Gson();
         File allPlantsFile = new File("src/resources/plants.json");
 
         if (!allPlantsFile.exists()) {
