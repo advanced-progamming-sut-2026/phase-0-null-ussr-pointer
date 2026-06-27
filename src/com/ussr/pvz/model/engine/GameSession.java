@@ -1,12 +1,15 @@
 package com.ussr.pvz.model.engine;
 
 import com.ussr.pvz.model.board.Lawn;
+import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.state.ResourceState;
+import com.ussr.pvz.model.util.Vec2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameSession {
@@ -22,20 +25,85 @@ public class GameSession {
     private Lawn lawn;
     private boolean gameOver = false;
     private static final int LAWN_COLS = 9;
+    private List<LawnMower> lawnMowers = new ArrayList<>();
 
     public void initClock() {
         clock.reset();
         plants.forEach(clock::addEntity);
         zombies.forEach(clock::addEntity);
         items.forEach(clock::addEntity);
+        initLawnMowers();
     }
 
+    private void initLawnMowers() {
+        if (lawn == null) return;
+        lawnMowers.clear();
+
+        int rows = lawn.getRows();
+        for (int r = 0; r < rows; r++) {
+            // Position them just to the left of the grid column 0 (e.g., x = -0.5)
+            LawnMower mower = new LawnMower(r, new Vec2(-0.5, r));
+            lawnMowers.add(mower);
+            clock.addEntity(mower); // Ensure the clock ticks them!
+        }
+    }
 
     public void tick() {
         clock.tick();
         plants.removeIf(p -> !p.isAlive());
         zombies.removeIf(z -> !z.isAlive());
         items.removeIf(i -> !i.isAlive());
+        lawnMowers.removeIf(m -> !m.isAlive());
+        cleanupDeadGridStructures();
+        checkZombieBreaches();
+    }
+
+    private void cleanupDeadGridStructures() {
+        if (lawn == null) return;
+
+        int rows = lawn.getRows();
+        int cols = lawn.getCols();
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                var cell = lawn.getCell(r, c);
+                if (cell != null && cell.getInteractableStructure() != null) {
+                    var structure = cell.getInteractableStructure();
+
+                    if (!structure.isAlive()) {
+                        structure.onDestroy(this);
+                        cell.setStructure(null);
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkZombieBreaches() {
+        for (Zombie zombie : zombies) {
+            if (!zombie.isAlive()) continue;
+
+            if (zombie.getPosition().x() < 0.0) {
+                int row = (int) zombie.getPosition().y();
+                LawnMower mower = getMowerForLane(row);
+
+                if (mower != null && !mower.isActivated()) {
+                    //todo remove the sout
+                    System.out.println("[LAWNMOWER] Triggered on row " + row);
+                    mower.activate();
+                } else if (mower == null) {
+                    onZombieReachedEnd();
+                    break;
+                }
+            }
+        }
+    }
+
+    private LawnMower getMowerForLane(int lane) {
+        return lawnMowers.stream()
+                .filter(m -> m.getLane() == lane)
+                .findFirst()
+                .orElse(null);
     }
 
     public void spawnZombie(Zombie zombie) {
@@ -110,6 +178,8 @@ public class GameSession {
                     sb.append(".");
                 } else if (cell.getPlant() != null) {
                     sb.append("P");
+                } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave) {
+                    sb.append("G"); // NEW: Render 'G' for Grave tiles
                 } else {
                     sb.append(".");
                 }
@@ -137,9 +207,13 @@ public class GameSession {
         if (cell == null) return "invalid tile (" + row + ", " + col + ")";
         StringBuilder sb = new StringBuilder();
         sb.append("tile (").append(row).append(", ").append(col).append("): ");
+
         if (cell.getPlant() != null) {
             sb.append("plant=").append(cell.getPlant().getName())
                     .append(" hp=").append(cell.getPlant().getHp());
+        } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave) {
+            var grave = (com.ussr.pvz.model.board.structures.Grave) cell.getInteractableStructure();
+            sb.append("structure=Grave hp=").append(grave.getHp()); // NEW: Show grave HP status
         } else {
             sb.append("empty");
         }
@@ -191,7 +265,7 @@ public class GameSession {
         this.level = level;
     }
 
-    public List<GroundItem> getItems(){
+    public List<GroundItem> getItems() {
         return items;
     }
 }
