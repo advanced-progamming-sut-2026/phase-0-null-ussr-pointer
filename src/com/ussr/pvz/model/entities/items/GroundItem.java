@@ -6,19 +6,18 @@ import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 
 public abstract class GroundItem extends GameEntity {
-    private double lifetime;
-    private double collectRadius;
+    private final double lifetime;
+    private final double collectRadius;
     private boolean collected;
-    private ItemType itemType;
+    private final ItemType itemType;
     protected Location location;
-    //todo implement the constructor , supers in children , change in usages (critical)
 
-//    protected GroundItem(ItemType itemType, double lifetime, double collectRadius) {
-//        this.itemType = itemType;
-//        this.collected = false;
-//        this.collectRadius = collectRadius;
-//        this.lifetime = lifetime;
-//    }
+    protected GroundItem(ItemType itemType, double lifetime, double collectRadius) {
+        this.itemType = itemType;
+        this.collected = false;
+        this.collectRadius = collectRadius;
+        this.lifetime = lifetime;
+    }
 
     public void collect() {
         applyRewards(App.getGameSession(), App.getAccount());

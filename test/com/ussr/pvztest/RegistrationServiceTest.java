@@ -6,6 +6,7 @@ import com.ussr.pvz.model.account.*;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.service.RegisterService;
+import com.ussr.pvz.view.mainmenu.GreenHouse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,7 +116,12 @@ class RegisterServiceTest {
                         0,
                         0,
                         AdventureProgress.initializePlantsLvl(),
-                        List.of(NewsItem.initialNews())
+                        List.of("",""),
+                        List.of(NewsItem.initialNews()),
+                        //todo make a green house from test here
+                        Map.of("",1),
+                        0,
+                        Map.of("",2)
                 ),
                 null
         );

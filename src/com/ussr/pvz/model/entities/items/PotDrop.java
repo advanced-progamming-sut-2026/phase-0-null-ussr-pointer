@@ -6,7 +6,7 @@ import com.ussr.pvz.model.engine.GameSession;
 public class PotDrop extends GroundItem {
 
     public PotDrop() {
-        super();
+        super(ItemType.POT,40f,20f);
     }
 
     @Override

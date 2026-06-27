@@ -5,7 +5,7 @@ import com.ussr.pvz.model.engine.GameSession;
 
 public class CoinDrop extends GroundItem {
     public CoinDrop(CoinTier tier) {
-        super();
+        super(ItemType.COIN,40f,20f);
         this.tier = tier;
     }
 

@@ -7,6 +7,7 @@ public class PlantFoodDrop extends GroundItem {
     private final int amount;
 
     public PlantFoodDrop(int amount) {
+        super(ItemType.COIN,40f,20f);
         this.amount = amount;
     }
 

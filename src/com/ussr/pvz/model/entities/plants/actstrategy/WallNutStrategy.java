@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
+import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -15,10 +16,10 @@ public class WallNutStrategy implements ActStrategy {
         if (user.getIntervalTimer() <= 0) {
             if (user.getTags().contains(Tag.MOVE_ZOMBIES)) {
                 if (user.getName().equalsIgnoreCase("garlic")) {
-                    for (GroundItem item : session.getItems()) {
-                        if (item instanceof Zombie) {
-                            if(item.getPosition().distanceTo(user.getPosition()) < 5d) {
-                                handleMoveZombie((Zombie) item);
+                    for (Zombie zombie : session.getZombies()) {
+                        if (zombie != null) {
+                            if(zombie.getPosition().distanceTo(user.getPosition()) < 5d) {
+                                handleMoveZombie(zombie);
                                 break;
                             }
                         }

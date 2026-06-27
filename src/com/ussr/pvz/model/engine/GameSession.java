@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.state.ResourceState;
@@ -26,12 +27,14 @@ public class GameSession {
     private boolean gameOver = false;
     private static final int LAWN_COLS = 9;
     private List<LawnMower> lawnMowers = new ArrayList<>();
+    private final List<Projectile> projectiles = new ArrayList<>();
 
     public void initClock() {
         clock.reset();
         plants.forEach(clock::addEntity);
         zombies.forEach(clock::addEntity);
         items.forEach(clock::addEntity);
+        projectiles.forEach(clock::addEntity);
         initLawnMowers();
     }
 
@@ -53,9 +56,14 @@ public class GameSession {
         plants.removeIf(p -> !p.isAlive());
         zombies.removeIf(z -> !z.isAlive());
         items.removeIf(i -> !i.isAlive());
+        projectiles.removeIf(p -> !p.isAlive());
         lawnMowers.removeIf(m -> !m.isAlive());
         cleanupDeadGridStructures();
         checkZombieBreaches();
+    }
+
+    public List<Projectile> getProjectiles() {
+        return projectiles;
     }
 
     private void cleanupDeadGridStructures() {

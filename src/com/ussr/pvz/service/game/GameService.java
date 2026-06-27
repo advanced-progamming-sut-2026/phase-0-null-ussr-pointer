@@ -12,6 +12,8 @@ import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.items.GroundItem;
+import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 
@@ -61,8 +63,19 @@ public class GameService {
         } catch (NumberFormatException e) {
             return "invalid location";
         }
-        // TODO: handle sun collection here once it's implemented
-        return "sun collected at (" + x + ", " + y + ")";
+
+        var matchingSun = App.getGameSession().getItems().stream()
+                .filter(item -> item.getItemType() == ItemType.SUN)
+                .filter(item -> !item.isCollected())
+                .filter(item -> item.getLocation().equals(new GroundItem.Location(x, y)))
+                .findFirst();
+
+        if (matchingSun.isPresent()) {
+            matchingSun.get().collect();
+            return "sun collected at (" + x + ", " + y + ")";
+        }
+
+        return "no sun found at (" + x + ", " + y + ")";
     }
 
     public String showSunAmount() {

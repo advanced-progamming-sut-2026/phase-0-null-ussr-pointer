@@ -7,6 +7,7 @@ public class DiamondDrop extends GroundItem {
     private final int amount;
 
     public DiamondDrop(int amount) {
+        super(ItemType.DIAMOND,40f,20f);
         this.amount = amount;
     }
 

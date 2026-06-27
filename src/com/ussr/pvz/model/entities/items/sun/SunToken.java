@@ -3,13 +3,14 @@ package com.ussr.pvz.model.entities.items.sun;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
+import com.ussr.pvz.model.entities.items.ItemType;
 
 import java.util.Random;
 
 public class SunToken extends GroundItem {
     private static final Random RAND = new Random();
     private static final double SECONDS_TO_FALL = 5.0;
-    private static final int TOTAL_FALL_TICKS = (int) (SECONDS_TO_FALL / 0.1); // 50 ticks
+    private static final int TOTAL_FALL_TICKS = (int) (SECONDS_TO_FALL / 0.1);
 
     private final SunDropType dropType;
     private boolean falling;
@@ -21,9 +22,9 @@ public class SunToken extends GroundItem {
     private int elapsedTicks = 0;
 
     public SunToken(int maxRows, int maxCols) {
-        //todo make some event or something that we can triggre when sun produced to print it and
+        //todo make some event or something that we can trigger when sun produced to print it and
         //todo later use it for graphic
-        super();
+        super(ItemType.SUN,40f,20f);
         int roll = RAND.nextInt(100);
         SunDropType selectedType = SunDropType.REGULAR;
         int cumulativeProbability = 0;

@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.items.sun;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
+import com.ussr.pvz.model.entities.items.ItemType;
 
 public class ProducedSun extends GroundItem {
     private final int x;
@@ -10,7 +11,7 @@ public class ProducedSun extends GroundItem {
     private final int value;
 
     public ProducedSun(int x, int y, int value) {
-        super();
+        super(ItemType.SUN,40f,20f);
         this.x = x;
         this.y = y;
         this.value = value;

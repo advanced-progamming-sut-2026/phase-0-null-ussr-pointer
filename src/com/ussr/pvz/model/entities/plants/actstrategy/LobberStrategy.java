@@ -18,11 +18,11 @@ public class LobberStrategy implements ActStrategy {
             if(user.getTags().contains(Tag.AOE))
                 areaLength = 3;
             if(user.getTags().contains(Tag.FIRE))
-                session.getItems().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage(), new ArcMove() , new FireHit(areaLength)));
+                session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage(), new ArcMove() , new FireHit(areaLength)));
             else if (user.getTags().contains(Tag.ICE))
-                session.getItems().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage(), new ArcMove() , new IceHit(areaLength)));
+                session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage(), new ArcMove() , new IceHit(areaLength)));
             else
-                session.getItems().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage() , new ArcMove() , new NormalHit(areaLength)));
+                session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage() , new ArcMove() , new NormalHit(areaLength)));
         }
 
     }

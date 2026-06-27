@@ -15,7 +15,7 @@ import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import java.util.Random;
 
-public class Zombie extends GroundItem {
+public class Zombie extends GameEntity {
     private static final Random RAND = new Random();
 
     private final String name;
@@ -94,10 +94,6 @@ public class Zombie extends GroundItem {
         }
     }
 
-    @Override
-    public void applyRewards(GameSession session, Account account) {
-
-    }
 
     public String getName() {
         return name;

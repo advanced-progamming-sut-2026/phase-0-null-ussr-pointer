@@ -11,7 +11,7 @@ public class StrikeStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
         if(user.getIntervalTimer() <= 0) {
-            session.getItems().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage() , new StraightMove() , new PierceHit((int)user.getAbilityValue())));
+            session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage() , new StraightMove() , new PierceHit((int)user.getAbilityValue())));
             user.setInternalTimer(user.getActionInterval());
         }
     }

@@ -8,7 +8,7 @@ import com.ussr.pvz.model.entities.projectiles.hit.HitEffectStrategy;
 import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy;
 import com.ussr.pvz.model.util.Vec2;
 
-public class Projectile extends GroundItem {
+public class Projectile extends GameEntity {
     private Vec2 direction;
     private Vec2 position;
     private int damage;
@@ -24,8 +24,9 @@ public class Projectile extends GroundItem {
         this.hitEffectStrategy = hitEffectStrategy;
     }
 
+
     @Override
-    public void applyRewards(GameSession session, Account account) {
+    public void tick() {
 
     }
 }
