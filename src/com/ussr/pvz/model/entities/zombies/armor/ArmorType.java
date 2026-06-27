@@ -4,7 +4,8 @@ public enum ArmorType {
     CONE("cone", 370),
     BUCKET("bucket", 1100),
     HELMET("helmet", 1600),
-    BRICK("brick", 2200);
+    BRICK("brick", 2200),
+    NEWSPAPER("newspaper", 800);
 
     private final String name;
     private final int armorHp;

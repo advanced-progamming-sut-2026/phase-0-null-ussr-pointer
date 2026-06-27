@@ -8,14 +8,14 @@ public class Armor {
     private static final double LAYER_1_THRESHOLD = 0.666;
     private static final double LAYER_2_THRESHOLD = 0.333;
 
-    public Armor(ArmorType armorType) {
+    public Armor(ArmorType armorType, int startingHp) {
         this.armorType = armorType;
-        this.maxArmorHp = armorType.getArmorHp();
-        this.armorHp = this.maxArmorHp;
+        this.maxArmorHp = startingHp;
+        this.armorHp = startingHp;
     }
 
     public int takeDamage(int damage) {
-        if (isDestroyed()) return damage; // already gone, all damage passes through
+        if (isDestroyed()) return damage;
         armorHp -= damage;
         if (armorHp <= 0) {
             int leftover = -armorHp;

@@ -24,6 +24,5 @@ public class LobberStrategy implements ActStrategy {
             else
                 session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(1 , 0) , user.getDamage() , new ArcMove() , new NormalHit(areaLength)));
         }
-
     }
 }

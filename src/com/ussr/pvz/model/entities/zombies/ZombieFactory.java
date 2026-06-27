@@ -2,6 +2,8 @@ package com.ussr.pvz.model.entities.zombies;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ussr.pvz.model.board.structures.PushableStructure;
+import com.ussr.pvz.model.board.structures.PushableType;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
@@ -42,8 +44,7 @@ public class ZombieFactory {
             return;
         }
         try (FileReader reader = new FileReader(file)) {
-            Type listType = new TypeToken<List<Map<String, Object>>>() {
-            }.getType();
+            Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
             List<Map<String, Object>> entries = new Gson().fromJson(reader, listType);
             if (entries == null) return;
 
@@ -68,8 +69,7 @@ public class ZombieFactory {
             return;
         }
         try (FileReader reader = new FileReader(file)) {
-            Type listType = new TypeToken<List<Map<String, Object>>>() {
-            }.getType();
+            Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
             List<Map<String, Object>> entries = new Gson().fromJson(reader, listType);
             if (entries == null) return;
 
@@ -110,11 +110,22 @@ public class ZombieFactory {
         Armor armor = null;
         List<String> armorProps = (List<String>) data.get("ZombieArmorProps");
         if (armorProps != null && !armorProps.isEmpty()) {
-            String rtid = armorProps.get(0);
-            String armorAlias = parseRtidAlias(rtid);
-            ArmorType type = resolveArmorType(armorAlias);
-            if (type != null) {
-                armor = new Armor(type);
+            int accumulatedArmorHp = 0;
+            ArmorType primaryType = null;
+
+            for (String rtid : armorProps) {
+                String armorAlias = parseRtidAlias(rtid);
+                ArmorType resolvedType = resolveArmorType(armorAlias);
+
+                if (resolvedType != null) {
+                    primaryType = resolvedType;
+                    int hpValue = armorBaseHp.getOrDefault(armorAlias, resolvedType.getArmorHp());
+                    accumulatedArmorHp += hpValue;
+                }
+            }
+
+            if (primaryType != null && accumulatedArmorHp > 0) {
+                armor = new Armor(primaryType, accumulatedArmorHp);
             }
         }
 
@@ -123,13 +134,26 @@ public class ZombieFactory {
         zombie.setEatDps(eatDps);
         zombie.setSize(size);
 
-        zombie.setPosition(Vec2.of(cols, row));
+        // --- CONVERT TO VEC2 VECTOR POSITION IMMEDIATELY ---
+        Vec2 continuousSpawnPos = Vec2.of(cols, row);
 
+        zombie.setPosition(continuousSpawnPos);
         zombie.setSpeed(Vec2.of(-speed, 0));
 
         zombie.setMoveBehavior(new NormalWalk());
         zombie.setAttackBehavior(new ChompAttack());
         zombie.setDefenseBehavior(new NormalDefense());
+        //todo implement the set pushed structure
+        if ("ZombieArcade".equals(alias)) {
+            PushableStructure cabinet = new PushableStructure(PushableType.ARCADE_CABINET, continuousSpawnPos);
+            //zombie.setPushedStructure(cabinet);
+        } else if ("ZombieIceAgeTroglobite".equals(alias)) {
+            PushableStructure iceBlock = new PushableStructure(PushableType.ICE_BLOCK, continuousSpawnPos);
+            //zombie.setPushedStructure(iceBlock);
+        } else if ("ZombieBarrelRoller".equals(alias) || "ZombieBarrel".equals(alias)) {
+            PushableStructure barrel = new PushableStructure(PushableType.BARREL, continuousSpawnPos);
+            //zombie.setPushedStructure(barrel);
+        }
 
         return zombie;
     }
@@ -146,9 +170,8 @@ public class ZombieFactory {
             case "ConeDefault" -> ArmorType.CONE;
             case "BucketDefault" -> ArmorType.BUCKET;
             case "BrickDefault" -> ArmorType.BRICK;
-            case "CrownDefault" -> ArmorType.HELMET;
-            case "ShoulderArmorDefault" -> ArmorType.HELMET;
-            case "NewspaperDefault" -> null;
+            case "CrownDefault", "ShoulderArmorDefault" -> ArmorType.HELMET;
+            case "NewspaperDefault" -> ArmorType.NEWSPAPER;
             default -> null;
         };
     }

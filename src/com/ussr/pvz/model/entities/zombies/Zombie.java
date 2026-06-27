@@ -1,11 +1,9 @@
 package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.PlantFoodDrop;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
@@ -13,11 +11,13 @@ import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
 import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
+import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
+import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
+
 import java.util.Random;
 
 public class Zombie extends GameEntity {
     private static final Random RAND = new Random();
-
     private final String name;
 
     private MoveBehavior moveBehavior;
@@ -32,48 +32,57 @@ public class Zombie extends GameEntity {
     private ZombieActivity state = ZombieActivity.WALKING;
     private final boolean isGlowing;
 
+    // --- Core tactical vulnerability property ---
+    private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;
+
     public Zombie(String name, Armor armor) {
         this.name = name;
         this.armor = armor;
-        // 5% chance to spawn as a glowing variant carrying Plant Food
         this.isGlowing = RAND.nextInt(100) < 5;
     }
 
     @Override
     public void tick() {
         if (!isAlive) return;
-
         GameSession session = App.getGameSession();
         if (session == null) return;
 
         Plant target = getTargetPlant(session);
-
         if (target != null && target.isAlive()) {
             state = ZombieActivity.EATING;
-            if (attackBehavior != null) {
-                attackBehavior.attack(this, session);
-            }
+            if (attackBehavior != null) attackBehavior.attack(this, session);
         } else {
             state = ZombieActivity.WALKING;
-            if (moveBehavior != null) {
-                moveBehavior.move(this, session);
-            }
+            if (moveBehavior != null) moveBehavior.move(this, session);
         }
     }
 
-    public Plant getTargetPlant(GameSession session) {
-        int col = (int) getPosition().x();
-        int row = (int) getPosition().y();
-        Cell cell = session.getLawn().getCell(row, col);
-        if (cell == null) return null;
-        Plant plant = cell.getPlant();
-        if (plant != null && plant.isAlive()) return plant;
-        return null;
+    // --- Overloaded: Fallback for generic damage sources (e.g., spikes, explosions) ---
+    public void takeDamage(int damage) {
+        // Generic damage hits submerged targets normally, but is blocked by total invulnerability
+        if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
+        applyDamageCalculations(damage);
     }
 
-    public void takeDamage(int damage) {
+    // --- Advanced context damage check: Handles Lobber rules dynamically ---
+    public void takeDamage(int damage, Object moveStrategy) {
         if (!isAlive) return;
 
+        // 1. Total invulnerability protection check
+        if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
+
+        // 2. Submerged protection rule validation
+        if (this.vulnerabilityState == Vulnerability.SUBMERGED) {
+            // ONLY accept damage if the damage source explicitly tracks through ArcMove (overhead lobbers)
+            if (!(moveStrategy instanceof ArcMove)) {
+                return; // Straight line shots (Peas, Repeaters, etc.) cleanly splash past harmlessly
+            }
+        }
+
+        applyDamageCalculations(damage);
+    }
+
+    private void applyDamageCalculations(int damage) {
         int remaining = damage;
 
         if (armor != null && !armor.isDestroyed()) {
@@ -89,11 +98,34 @@ public class Zombie extends GameEntity {
 
                 if (isGlowing) {
                     PlantFoodDrop plantFoodDrop = new PlantFoodDrop(1);
+                    plantFoodDrop.setPosition(this.getPosition());
+                    GameSession session = App.getGameSession();
+                    if (session != null) {
+                        session.getItems().add(plantFoodDrop);
+                    }
                 }
             }
         }
     }
 
+    public Vulnerability getVulnerabilityState() {
+        return vulnerabilityState;
+    }
+
+    public void setVulnerabilityState(Vulnerability state) {
+        this.vulnerabilityState = state;
+    }
+
+    public Plant getTargetPlant(GameSession session) {
+        if (getPosition() == null) return null;
+        int col = (int) getPosition().x();
+        int row = (int) getPosition().y();
+        Cell cell = session.getLawn().getCell(row, col);
+        if (cell == null) return null;
+        Plant plant = cell.getPlant();
+        if (plant != null && plant.isAlive()) return plant;
+        return null;
+    }
 
     public String getName() {
         return name;
@@ -163,18 +195,11 @@ public class Zombie extends GameEntity {
         this.effectStatus = effectStatus;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s | hp: %d | state: %s | pos: (%.1f, %.1f)%s",
-                name, hp, state,
-                getPosition() != null ? getPosition().x() : 0,
-                getPosition() != null ? getPosition().y() : 0,
-                armor != null && !armor.isDestroyed()
-                        ? " | armor: " + armor.getArmorHp() + "/" + armor.getMaxArmorHp()
-                        : "");
-    }
-
     public boolean isGlowing() {
         return isGlowing;
+    }
+
+    public String getAlias() {
+        return name;
     }
 }
