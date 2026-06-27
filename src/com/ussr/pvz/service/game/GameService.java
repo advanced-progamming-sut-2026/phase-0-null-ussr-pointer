@@ -11,11 +11,15 @@ import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
+import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+
+import java.util.Optional;
 
 public class GameService {
 
@@ -123,8 +127,14 @@ public class GameService {
         } catch (NumberFormatException e) {
             return "invalid location";
         }
-        // TODO: handle the pluck here when plant service is implemented
-        return "plant plucked at (" + x + ", " + y + ")";
+
+        boolean success = App.getGameSession().removePlantAt(x, y);
+
+        if (success) {
+            return String.format("plant plucked at (%d, %d)", x, y);
+        }
+
+        return "no plant found at that location";
     }
 
     public String plantPlant(PlantPlantRequest request) {

@@ -2,11 +2,12 @@ package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.LeaderBoardCommand;
 import com.ussr.pvz.model.dto.LeaderBoardSortRequest;
+import com.ussr.pvz.service.LeaderBoardService;
 
 import java.util.regex.Matcher;
 
 public class LeaderBoardController {
-
+    private LeaderBoardService leaderBoardService;
     public LeaderBoardController() {
     }
 

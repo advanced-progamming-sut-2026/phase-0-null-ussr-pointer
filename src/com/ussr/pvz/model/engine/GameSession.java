@@ -12,6 +12,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GameSession {
     private GameClock clock = new GameClock();
@@ -275,5 +276,30 @@ public class GameSession {
 
     public List<GroundItem> getItems() {
         return items;
+    }
+
+    public boolean removePlantAt(int x, int y) {
+        Plant.Location targetLoc = new Plant.Location(x, y);
+
+        Optional<Plant> plantOpt = plants.stream()
+                .filter(p -> p.isAlive() && targetLoc.equals(p.getLocation()))
+                .findFirst();
+
+        if (plantOpt.isEmpty()) {
+            return false;
+        }
+
+        Plant plant = plantOpt.get();
+        plant.setAlive(false);
+        plants.remove(plant);
+
+        if (lawn != null) {
+            var cell = lawn.getCell(y, x);
+            if (cell != null && cell.getPlant() == plant) {
+                cell.setPlant(null);
+            }
+        }
+
+        return true;
     }
 }
