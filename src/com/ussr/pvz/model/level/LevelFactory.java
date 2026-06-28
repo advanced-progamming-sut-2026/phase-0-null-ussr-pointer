@@ -2,7 +2,9 @@ package com.ussr.pvz.model.level;
 
 import com.ussr.pvz.model.level.behavior.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -25,16 +27,47 @@ public class LevelFactory {
         level.setTimeLimitSeconds(data.timeLimitSeconds);
         level.setDeadlineColumn(data.deadlineColumn);
         level.setAllowedPlantsLost(data.allowedPlantsLost);
-        level.setLockedPlants(data.lockedPlants);
-        /// the following should be implemented some other place first
-        //level.setDeliveryStrategy(StrategyFactory.create(data.deliveryStrategy));
-        //level.setAllowedZombies(buildZombies(data.allowedZombies));
-        //level.setWaves(buildWaves(data.waves));
+        level.setLockedPlants(data.lockedPlants != null ? data.lockedPlants : new ArrayList<>());
+        level.setSeedPlants(data.seedPlants != null ? data.seedPlants : new ArrayList<>());
 
         if (data.behavior != null && !data.behavior.isBlank()) {
-            level.setBehavior(BEHAVIOR_REGISTRY.get(data.behavior).get());
+            Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior);
+            if (supplier != null) {
+                level.setBehavior(supplier.get());
+            } else {
+                System.err.println("[LevelFactory] Unknown behavior: " + data.behavior);
+            }
         }
 
+        if (data.allowedZombies != null) {
+            List<String> zombieIds = new ArrayList<>();
+            for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
+                if (entry.id != null) zombieIds.add(entry.id);
+            }
+            level.setAllowedZombies(zombieIds);
+        }
+
+        if (data.waves != null) {
+            List<Wave> waves = new ArrayList<>();
+            for (JsonContainer.JsonWaveData waveData : data.waves) {
+                Wave wave = new Wave();
+                wave.setWaveNumber(waveData.waveNumber);
+
+                if (waveData.spawnData != null) {
+                    List<SpawnData> spawns = new ArrayList<>();
+                    for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
+                        SpawnData spawn = new SpawnData();
+                        spawn.setZombieId(spawnEntry.zombieId);
+                        spawn.setLane(spawnEntry.lane);
+                        spawn.setDelaySeconds(spawnEntry.delaySeconds);
+                        spawns.add(spawn);
+                    }
+                    wave.setSpawnData(spawns);
+                }
+                waves.add(wave);
+            }
+            level.setWaves(waves);
+        }
         return level;
     }
 }
