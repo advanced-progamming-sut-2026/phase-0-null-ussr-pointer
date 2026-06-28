@@ -18,6 +18,7 @@ import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.level.Level;
 
 import java.util.Optional;
 
@@ -257,11 +258,16 @@ public class GameService {
     }
 
     public String startZombieWaves() {
-        if (App.getGameSession() == null) {
-            return "no active game session";
-        }
-        // TODO: handle after zombies and waves are implemented.
-        App.getGameSession().startWaves();
-        return "zombie waves started";
+        GameSession session = App.getGameSession();
+        if (session == null) return "no active game session";
+        if (session.isWavesStarted()) return "waves already started";
+
+        session.startWaves();
+
+        Level level = session.getLevel();
+        int totalWaves = (level != null && level.getWaves() != null) ? level.getWaves().size() : 0;
+        return totalWaves > 0
+                ? "zombie waves started (" + totalWaves + " waves loaded)"
+                : "zombie waves started (no wave data — add waves to your level JSON)";
     }
 }

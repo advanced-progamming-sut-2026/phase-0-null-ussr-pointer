@@ -29,13 +29,13 @@ public class Grave extends InteractableStructure {
 
     @Override
     public void onDestroy(GameSession session) {
-        //todo remove the sout
-        System.out.println("[GRAVE] A tombstone has been completely destroyed!");
+        int row = (int) this.getPosition().y();
+        int col = (int) this.getPosition().x();
+        session.notifyGraveDestroyed(row, col);
     }
 
     @Override
     public void tick() {
-
     }
 
     public int getHp() {

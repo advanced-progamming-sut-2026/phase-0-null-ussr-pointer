@@ -15,31 +15,28 @@ public class PushableStructure extends InteractableStructure {
         this.setAlive(true);
     }
 
-
     @Override
     public void takeDamage(int damage) {
         if (!this.isAlive()) return;
         this.hp -= damage;
         if (this.hp <= 0) {
             this.setAlive(false);
-            // Note: GameSession.cleanupDeadGridStructures() automatically calls onDestroy()
         }
     }
 
     @Override
     public void onDestroy(GameSession session) {
-        // Derive grid row and col from continuous vector positions
         int row = (int) this.getPosition().y();
         int col = (int) this.getPosition().x();
 
+        session.notifyStructureDestroyed(type.name(), row, col);
+
         if (this.type == PushableType.BARREL) {
-            // Barrels break open to release multiple Imps!
             var imp1 = ZombieFactory.create(type.getSpawnAlias(), row, col);
             var imp2 = ZombieFactory.create(type.getSpawnAlias(), row, col);
             session.spawnZombie(imp1);
             session.spawnZombie(imp2);
         } else {
-            // Ice Blocks and Arcade Cabinets release a single occupant
             var spawnedZombie = ZombieFactory.create(type.getSpawnAlias(), row, col);
             session.spawnZombie(spawnedZombie);
         }
