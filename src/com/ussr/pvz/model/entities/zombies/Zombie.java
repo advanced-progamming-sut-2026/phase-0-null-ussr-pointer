@@ -31,6 +31,8 @@ public class Zombie extends GameEntity {
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
     private final boolean isGlowing;
+    public enum Status{NORMAL , FREEZE , FIRED , POISONED}
+    private Status status = Status.NORMAL;
 
     // --- Core tactical vulnerability property ---
     private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;
@@ -201,5 +203,13 @@ public class Zombie extends GameEntity {
 
     public String getAlias() {
         return name;
+    }
+
+    public Status getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

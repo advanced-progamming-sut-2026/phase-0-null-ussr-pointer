@@ -31,7 +31,6 @@ public class HomingStrategy implements ActStrategy {
         user.setInternalTimer(user.getActionInterval());
     }
 
-
     private Projectile buildProjectile(Plant user, Zombie target, boolean isMagic) {
         Vec2 velocity = new Vec2(20, 0);
 

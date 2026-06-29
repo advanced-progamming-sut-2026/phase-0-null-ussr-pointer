@@ -19,6 +19,7 @@ public class ShootStrategy implements ActStrategy {
         if (user.getIntervalTimer() > 0) return;
 
         List<Vec2> vectors = user.getShootingVectors();
+
         if (vectors == null || vectors.isEmpty()) return;
 
         boolean anyTarget = vectors.stream()

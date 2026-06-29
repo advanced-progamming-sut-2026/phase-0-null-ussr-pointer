@@ -34,8 +34,8 @@ public class WallNutStrategy implements ActStrategy {
 
 
     private void divertZombie(Zombie zombie) {
-        Vec2 pos = zombie.getPosition();
-        int currentRow = (int) pos.y();
+        Vec2 zomPos = zombie.getPosition();
+        int currentRow = (int) zomPos.y();
 
         int dy;
         if (currentRow <= TOP_ROW) {
@@ -45,7 +45,6 @@ public class WallNutStrategy implements ActStrategy {
         } else {
             dy = RANDOM.nextBoolean() ? 1 : -1;
         }
-
-        zombie.setPosition(new Vec2(pos.x(), pos.y() + dy));
+        zombie.setPosition(new Vec2(zomPos.x(), zomPos.y() + dy));
     }
 }
