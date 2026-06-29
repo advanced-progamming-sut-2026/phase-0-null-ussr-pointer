@@ -8,29 +8,48 @@ import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
+
 public class StrikeStrategy implements ActStrategy {
+
     @Override
     public void act(Plant user, GameSession session) {
-        if(user.getIntervalTimer() <= 0) {
-            Zombie target = straightDetect(user , session);
-            if(target != null) {
-                /*todo : in json file we set the ability value for strike trough plants the number of zombies their projectile pierce
-                (-1 for infinite pierce)*/
-                int pierceNumber = (int)user.getAbilityValue();
-                session.getProjectiles().add(new Projectile(user.getPosition() , new Vec2(0 , 20) , target , user.getDamage() , new StraightMove() , new PierceHit(pierceNumber)));
-            }
-        }
+        if (user.getIntervalTimer() > 0) return;
+
+        user.setInternalTimer(user.getActionInterval());
+
+        Zombie target = findNearestInLane(user, session);
+        if (target == null) return;
+
+        int pierceCount = (int) user.getAbilityValue();
+        session.getProjectiles().add(new Projectile(
+                user.getPosition(),
+                new Vec2(20, 0), target,
+                user.getDamage(),
+                new StraightMove(),
+                new PierceHit(pierceCount)
+        ));
     }
 
-    private Zombie straightDetect(Plant user , GameSession session) {
+
+    private Zombie findNearestInLane(Plant user, GameSession session) {
+        double plantRow = user.getPosition().y();
+        double plantCol = user.getPosition().x();
+
+        Zombie nearest = null;
+        double minDist = Double.MAX_VALUE;
+
         for (Zombie zombie : session.getZombies()) {
-            if(zombie != null) {
-                Vec2 itemPos = zombie.getPosition();
-                Vec2 userPos = user.getPosition();
-                if (itemPos.x() == userPos.x() && itemPos.y() > userPos.y())
-                    return zombie;
+            if (zombie == null || !zombie.isAlive()) continue;
+            Vec2 zp = zombie.getPosition();
+
+            if (Math.abs(zp.y() - plantRow) < 0.5 && zp.x() > plantCol) {
+                double dist = zp.x() - plantCol;
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = zombie;
+                }
             }
         }
-        return null;
+        return nearest;
     }
 }

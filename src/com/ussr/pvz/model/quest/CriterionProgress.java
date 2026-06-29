@@ -39,7 +39,7 @@ public class CriterionProgress {
     public Map<String, Object> getParams() { return params; }
 
     public String getString(String key) {
-        return (String) params.get(null);
+        return (String) params.get(key);
     }
 
     public int getInt(String key, int def) {

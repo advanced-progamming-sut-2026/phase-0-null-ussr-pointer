@@ -1,8 +1,6 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
-import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -10,37 +8,44 @@ import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Random;
 
+
 public class WallNutStrategy implements ActStrategy {
+
+    private static final Random RANDOM = new Random();
+    private static final double DIVERT_RADIUS = 5.0;
+    private static final int TOP_ROW = 0;
+    private static final int BOTTOM_ROW = 4;
+
     @Override
     public void act(Plant user, GameSession session) {
-        if (user.getIntervalTimer() <= 0) {
-            if (user.getTags().contains(Tag.MOVE_ZOMBIES)) {
-                if (user.getName().equalsIgnoreCase("garlic")) {
-                    for (Zombie zombie : session.getZombies()) {
-                        if (zombie != null) {
-                            if(zombie.getPosition().distanceTo(user.getPosition()) < 5d) {
-                                handleMoveZombie(zombie);
-                                break;
-                            }
-                        }
-                    }
-                }
+        if (!user.getTags().contains(Tag.MOVE_ZOMBIES)) return;
+        if (user.getIntervalTimer() > 0) return;
+
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie == null || !zombie.isAlive()) continue;
+            if (zombie.getPosition().distanceTo(user.getPosition()) < DIVERT_RADIUS) {
+                divertZombie(zombie);
+                break;
             }
-            user.setInternalTimer(user.getActionInterval());
         }
+
+        user.setInternalTimer(user.getActionInterval());
     }
 
-    private void handleMoveZombie(Zombie zombie) {
-        Vec2 position = zombie.getPosition();
-        if(position.x() == 1)
-            zombie.setPosition(new Vec2(position.x() + 1 , position.y()));
-        else if (position.x() == 5)
-            zombie.setPosition(new Vec2(position.x() - 1 , position.y()));
-        else {
-            Random random = new Random();
-            int randomValue = random.nextBoolean() ? 1 : -1;
-            zombie.setPosition(new Vec2(position.x() + randomValue , position.y()));
+
+    private void divertZombie(Zombie zombie) {
+        Vec2 pos = zombie.getPosition();
+        int currentRow = (int) pos.y();
+
+        int dy;
+        if (currentRow <= TOP_ROW) {
+            dy = 1;
+        } else if (currentRow >= BOTTOM_ROW) {
+            dy = -1;
+        } else {
+            dy = RANDOM.nextBoolean() ? 1 : -1;
         }
 
+        zombie.setPosition(new Vec2(pos.x(), pos.y() + dy));
     }
 }
