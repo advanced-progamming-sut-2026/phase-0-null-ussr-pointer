@@ -61,4 +61,12 @@ public class Projectile extends GameEntity {
         // Simple 1D collision check based on X coordinate proximity
         return Math.abs(this.position.x() - target.getPosition().x()) <= 0.5;
     }
+
+    public void setHitEffectStrategy(HitEffectStrategy strategy) {
+        this.hitEffectStrategy = strategy;
+    }
+
+    public HitEffectStrategy getHitEffectStrategy() {
+        return this.hitEffectStrategy;
+    }
 }

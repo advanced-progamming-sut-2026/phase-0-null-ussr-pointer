@@ -4,8 +4,11 @@ import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.ModifyStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
+import com.ussr.pvz.model.entities.zombies.Faction;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.greenhouse.Greenhouse;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -20,7 +23,6 @@ public class Plant extends GameEntity {
     private int id;
     private String name;
     private int level = 1;
-    private boolean isCat = false;
     private int hp;
     private int recharge;
     private double actionInterval;
@@ -44,6 +46,16 @@ public class Plant extends GameEntity {
     private int currentStage = 1;
     private double ageInSeconds = 0.0;
 
+    //for now incapacitated is for all cat/sheep/sctopus but we can change it in the future
+    public enum PlantState {
+        ACTIVE,
+        INCAPACITATED,
+        PREPPING,
+        DYING
+    }
+
+    private PlantState state;
+
     // Kept to track applied upgrades
     private final List<String> rawUpgrades = new ArrayList<>();
     //avoid hardcode
@@ -64,6 +76,7 @@ public class Plant extends GameEntity {
         this.recharge = blueprint.recharge;
         this.tags.addAll(blueprint.tags);
         this.rawUpgrades.addAll(blueprint.rawUpgrades);
+        this.state = PlantState.ACTIVE;
         //todo needs check
         this.location = blueprint.location;
         // Strategy attachments
@@ -78,7 +91,7 @@ public class Plant extends GameEntity {
 
     @Override
     public void tick() {
-        if (!isAlive || isCat) return;
+        if (!isAlive || state == PlantState.INCAPACITATED) return;
 
         if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
@@ -97,12 +110,14 @@ public class Plant extends GameEntity {
         }
     }
 
-    public void takeDamage(int damage) {
+    public void takeDamage(int damage , Zombie dealer) {
         if (!isAlive) return;
         int newHp = getHp() - damage;
         if (newHp <= 0) {
             setHp(0);
             isAlive = false;
+            if(this.actStrategy instanceof ModifyStrategy && this.getTags().contains(Tag.MAGIC))
+                dealer.setFaction(Faction.PLANTS);
         } else {
             setHp(newHp);
         }
@@ -287,11 +302,11 @@ public class Plant extends GameEntity {
         shootingVectors.add(vec2);
     }
 
-    public boolean isCat() {
-        return isCat;
+    public void setState(PlantState state) {
+        this.state = state;
     }
 
-    public void setCat(boolean isCat) {
-        this.isCat = isCat;
+    public PlantState getState() {
+        return this.state;
     }
 }

@@ -234,4 +234,8 @@ public class Zombie extends GameEntity implements Damageable {
     public void setArmor(Armor armor) {
         this.armor = armor;
     }
+
+    public void setFaction(Faction faction) {
+        this.faction = faction;
+    }
 }
