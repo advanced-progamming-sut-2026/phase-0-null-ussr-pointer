@@ -2,21 +2,22 @@ package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.PlantFoodDrop;
-import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
 import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
+import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 
 import java.util.Random;
 
-public class Zombie extends GameEntity {
+public class Zombie extends GameEntity implements Damageable {
     //todo if iced bullet hit prospector the move strategy should change from prospector to normal
     private static final Random RAND = new Random();
     private final String name;
@@ -38,6 +39,8 @@ public class Zombie extends GameEntity {
 
     private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;
 
+    private Faction faction = Faction.ZOMBIES;
+
     public Zombie(String name, Armor armor) {
         this.name = name;
         this.armor = armor;
@@ -50,7 +53,7 @@ public class Zombie extends GameEntity {
         GameSession session = App.getGameSession();
         if (session == null) return;
 
-        Plant target = getTargetPlant(session);
+        Damageable target = acquireTarget(session);
         if (target != null && target.isAlive()) {
             state = ZombieActivity.EATING;
             if (attackBehavior != null) attackBehavior.attack(this, session);
@@ -60,7 +63,36 @@ public class Zombie extends GameEntity {
         }
     }
 
+    public Damageable acquireTarget(GameSession session) {
+        return faction.findTarget(this, session);
+    }
+
+    public void hypnotize() {
+        if (faction == Faction.PLANTS || !isAlive) return;
+        this.faction = Faction.PLANTS;
+        if (getSpeed() != null) {
+            setSpeed(getSpeed().scale(-1));
+        }
+        this.moveBehavior = new HypnotizedMoveBehavior(this.moveBehavior);
+    }
+
+    public Faction getFaction() {
+        return faction;
+    }
+
+    public boolean isHypnotized() {
+        return faction == Faction.PLANTS;
+    }
+
+    public Cell getCurrentCell(GameSession session) {
+        if (getPosition() == null || session.getLawn() == null) return null;
+        int col = (int) getPosition().x();
+        int row = (int) getPosition().y();
+        return session.getLawn().getCell(row, col);
+    }
+
     // --- Overloaded: Fallback for generic damage sources (e.g., spikes, explosions) ---
+    @Override
     public void takeDamage(int damage) {
         // Generic damage hits submerged targets normally, but is blocked by total invulnerability
         if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
@@ -113,17 +145,6 @@ public class Zombie extends GameEntity {
 
     public void setVulnerabilityState(Vulnerability state) {
         this.vulnerabilityState = state;
-    }
-
-    public Plant getTargetPlant(GameSession session) {
-        if (getPosition() == null) return null;
-        int col = (int) getPosition().x();
-        int row = (int) getPosition().y();
-        Cell cell = session.getLawn().getCell(row, col);
-        if (cell == null) return null;
-        Plant plant = cell.getPlant();
-        if (plant != null && plant.isAlive() && !plant.isCat()) return plant;
-        return null;
     }
 
     public String getName() {
