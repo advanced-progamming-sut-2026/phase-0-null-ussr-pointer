@@ -24,8 +24,9 @@ public class Zombie extends GameEntity {
     private MoveBehavior moveBehavior;
     private EffectStatus effectStatus;
     private DefenseBehavior defenseBehavior;
+    //todo the zombie may have several attack behavior(eat and throw the bullets) or we should take care of them in effects as we did for laser
     private AttackBehavior attackBehavior;
-    private final Armor armor;
+    private Armor armor;
 
     private int hp;
     private double eatDps;
@@ -35,7 +36,6 @@ public class Zombie extends GameEntity {
     public enum Status{NORMAL , FREEZE , FIRED , POISONED}
     private Status status = Status.NORMAL;
 
-    // --- Core tactical vulnerability property ---
     private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;
 
     public Zombie(String name, Armor armor) {
@@ -208,5 +208,9 @@ public class Zombie extends GameEntity {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setArmor(Armor armor) {
+        this.armor = armor;
     }
 }
