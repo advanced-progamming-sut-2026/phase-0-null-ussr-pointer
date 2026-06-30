@@ -6,7 +6,6 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 public class ProspectorMove implements MoveBehavior {
-
     private enum ProspectorPhase {
         WALKING_LEFT,
         AIRBORNE_LAUNCH,

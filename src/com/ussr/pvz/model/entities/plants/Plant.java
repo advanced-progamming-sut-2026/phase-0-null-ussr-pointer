@@ -20,7 +20,7 @@ public class Plant extends GameEntity {
     private int id;
     private String name;
     private int level = 1;
-
+    private boolean isCat = false;
     private int hp;
     private int recharge;
     private double actionInterval;
@@ -78,7 +78,7 @@ public class Plant extends GameEntity {
 
     @Override
     public void tick() {
-        if (!isAlive) return;
+        if (!isAlive || isCat) return;
 
         if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
@@ -285,5 +285,13 @@ public class Plant extends GameEntity {
 
     public void addShootingVectors(Vec2 vec2) {
         shootingVectors.add(vec2);
+    }
+
+    public boolean isCat() {
+        return isCat;
+    }
+
+    public void setCat(boolean isCat) {
+        this.isCat = isCat;
     }
 }

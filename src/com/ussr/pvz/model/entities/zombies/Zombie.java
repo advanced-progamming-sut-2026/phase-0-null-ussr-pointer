@@ -17,6 +17,7 @@ import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import java.util.Random;
 
 public class Zombie extends GameEntity {
+    //todo if iced bullet hit prospector the move strategy should change from prospector to normal
     private static final Random RAND = new Random();
     private final String name;
 
@@ -66,18 +67,14 @@ public class Zombie extends GameEntity {
         applyDamageCalculations(damage);
     }
 
-    // --- Advanced context damage check: Handles Lobber rules dynamically ---
     public void takeDamage(int damage, Object moveStrategy) {
         if (!isAlive) return;
 
-        // 1. Total invulnerability protection check
         if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
 
-        // 2. Submerged protection rule validation
         if (this.vulnerabilityState == Vulnerability.SUBMERGED) {
-            // ONLY accept damage if the damage source explicitly tracks through ArcMove (overhead lobbers)
             if (!(moveStrategy instanceof ArcMove)) {
-                return; // Straight line shots (Peas, Repeaters, etc.) cleanly splash past harmlessly
+                return;
             }
         }
 
@@ -125,7 +122,7 @@ public class Zombie extends GameEntity {
         Cell cell = session.getLawn().getCell(row, col);
         if (cell == null) return null;
         Plant plant = cell.getPlant();
-        if (plant != null && plant.isAlive()) return plant;
+        if (plant != null && plant.isAlive() && !plant.isCat()) return plant;
         return null;
     }
 

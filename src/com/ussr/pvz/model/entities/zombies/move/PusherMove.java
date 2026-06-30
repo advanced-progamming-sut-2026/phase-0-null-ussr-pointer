@@ -25,19 +25,7 @@ public class PusherMove implements MoveBehavior {
 
         Row row = session.getLawn().getRow(currentRow);
         if (row != null) {
-            List<CellStructureMapping> itemsToPush = new ArrayList<>();
-
-            for (Cell cell : row.getCells()) {
-                var structure = cell.getInteractableStructure();
-                if (structure instanceof PushableStructure && structure.isAlive()) {
-                    PushableStructure ps = (PushableStructure) structure;
-                    double structX = ps.getPosition().x();
-
-                    if (structX < pos.x() && (pos.x() - structX) <= PUSH_RANGE) {
-                        itemsToPush.add(new CellStructureMapping(cell, ps));
-                    }
-                }
-            }
+            List<CellStructureMapping> itemsToPush = getCellStructureMappings(row, pos);
 
             for (CellStructureMapping mapping : itemsToPush) {
                 Cell oldCell = mapping.cell;
@@ -69,6 +57,22 @@ public class PusherMove implements MoveBehavior {
         if (zombie.getPosition().x() < 0) {
             session.onZombieReachedEnd();
         }
+    }
+
+    private static List<CellStructureMapping> getCellStructureMappings(Row row, Vec2 pos) {
+        List<CellStructureMapping> itemsToPush = new ArrayList<>();
+
+        for (Cell cell : row.getCells()) {
+            var structure = cell.getInteractableStructure();
+            if (structure instanceof PushableStructure ps && structure.isAlive()) {
+                double structX = ps.getPosition().x();
+
+                if (structX < pos.x() && (pos.x() - structX) <= PUSH_RANGE) {
+                    itemsToPush.add(new CellStructureMapping(cell, ps));
+                }
+            }
+        }
+        return itemsToPush;
     }
 
     private record CellStructureMapping(Cell cell, PushableStructure structure) {
