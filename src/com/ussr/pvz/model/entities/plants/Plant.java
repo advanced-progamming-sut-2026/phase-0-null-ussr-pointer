@@ -10,7 +10,6 @@ import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.greenhouse.Greenhouse;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
@@ -18,9 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Plant extends GameEntity implements Damageable {
-    //todo implement the warm up tiers
-    //todo implement the acts based on tier if it is warm up
-    //todo it is better to implement it in another class
     private int id;
     private String name;
     private int level = 1;
@@ -43,9 +39,7 @@ public class Plant extends GameEntity implements Damageable {
     private double internalTimer = 0.0;
     private double abilityValue;
 
-    private List<Map<String, Object>> wrampUp;
-    private int currentStage = 1;
-    private double ageInSeconds = 0.0;
+    private GrowthTracker growthTracker;
 
     //for now incapacitated is for all cat/sheep/sctopus but we can change it in the future
     public enum PlantState {
@@ -83,6 +77,7 @@ public class Plant extends GameEntity implements Damageable {
         // Strategy attachments
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodEffect = blueprint.plantFoodEffect;
+        this.growthTracker = blueprint.growthTracker;
 
         // Initialize wrapper stats
         this.hpStat = new ModifiableStat(this.hp);
@@ -96,6 +91,7 @@ public class Plant extends GameEntity implements Damageable {
 
         if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
+        if (growthTracker != null) growthTracker.update(GameClock.SECONDS_PER_TICK);
 
         if (actStrategy == null) return;
 
@@ -130,16 +126,7 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void updateGrowth(double deltaTimeSeconds) {
-        if (this.wrampUp == null || this.wrampUp.isEmpty()) return;
-        this.ageInSeconds += deltaTimeSeconds;
-        for (Map<String, Object> stageData : wrampUp) {
-            int stage = ((Double) stageData.get("stage")).intValue();
-            double targetTime = ((Double) stageData.get("time"));
-            if (this.ageInSeconds >= targetTime && stage > this.currentStage) {
-                this.currentStage = stage;
-                //System.out.println(this.getName() + " reached stage " + this.currentStage + "!");
-            }
-        }
+        if (growthTracker != null) growthTracker.update(deltaTimeSeconds);
     }
 
     // Getters and Setters
@@ -210,7 +197,11 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public int getDamage() {
-        return damage;
+        if (growthTracker != null) {
+            Double staged = growthTracker.getStageValue("damage");
+            if (staged != null) return staged.intValue();
+        }
+        return this.damage;
     }
 
     public void setDamage(int damage) {
@@ -265,20 +256,24 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodType = plantFoodType;
     }
     public double getAbilityValue() {
-        if (wrampUp != null && !wrampUp.isEmpty()) {
-            for (Map<String, Object> stageData : wrampUp) {
-                int stage = ((Double) stageData.get("stage")).intValue();
-                if (stage == this.currentStage) {
-                    return ((Double) stageData.get("abilityValue"));
-                }
-            }
+        if (growthTracker != null) {
+            Double staged = growthTracker.getStageValue("abilityValue");
+            if (staged != null) return staged;
         }
         return this.abilityValue;
     }
 
-    public List<Map<String, Object>> getWrampUp() { return wrampUp; }
+    public List<Map<String, Object>> getWrampUp() {
+        return growthTracker != null ? growthTracker.getRawStages() : null;
+    }
 
-    public void setWrampUp(List<Map<String, Object>> wrampUp) { this.wrampUp = wrampUp; }
+    public void setWrampUp(List<Map<String, Object>> wrampUp) {
+        this.growthTracker = (wrampUp != null && !wrampUp.isEmpty()) ? new GrowthTracker(wrampUp) : null;
+    }
+
+    public int getCurrentStage() {
+        return growthTracker != null ? growthTracker.getCurrentStage() : 1;
+    }
 
     public record Location(int x, int y) {
 

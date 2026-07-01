@@ -65,6 +65,7 @@ public class PlantFactory {
         plant.setAbilityValue(runtimeAbility);
         plant.setLevel(level);
         plant.setPlantFoodType(config.plantFoodType);
+        plant.setWrampUp(config.wrampUp);
 
         plant.setShootingVectors(buildShootingVectors(config));
         plant.setActStrategy(buildActStrategy(config));

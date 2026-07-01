@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.entities.plants;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 
@@ -37,6 +38,8 @@ public class PlantJsonParser {
         public double abilityValue;
         public PlantFoodType plantFoodType;
         public double plantFoodValue;
+        @SerializedName("wramp-up")
+        public List<Map<String, Object>> wrampUp;
 
         public List<UpgradeConfig> upgrades;
     }
