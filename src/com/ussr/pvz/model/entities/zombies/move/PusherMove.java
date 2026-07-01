@@ -42,7 +42,7 @@ public class PusherMove implements MoveBehavior {
                     if (newCell != null) {
                         Plant targetPlant = newCell.getPlant();
                         if (targetPlant != null && targetPlant.isAlive()) {
-                            targetPlant.takeDamage(targetPlant.getHp());
+                            targetPlant.takeDamage(targetPlant.getHp(),zombie);
                         }
 
                         newCell.setStructure(targetStructure);

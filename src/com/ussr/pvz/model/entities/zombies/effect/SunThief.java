@@ -131,7 +131,7 @@ public class SunThief implements EffectStatus {
             if (targetCol >= 0) {
                 Cell cell = session.getLawn().getCell(zRow, targetCol);
                 if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
-                    cell.getPlant().takeDamage(laserDamage);
+                    cell.getPlant().takeDamage(laserDamage,zombie);
                 }
             }
         }

@@ -51,7 +51,7 @@ public class FireEffect implements EffectStatus {
 
             double distance = zColDouble - pCol;
             if (distance >= 0 && distance <= reach) {
-                targetPlant.takeDamage(targetPlant.getHp());
+                targetPlant.takeDamage(targetPlant.getHp(),zombie);
             }
         }
     }

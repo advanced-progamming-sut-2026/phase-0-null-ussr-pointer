@@ -26,7 +26,7 @@ public class WizardEffect implements EffectStatus {
             if (!deathHandled) {
                 for (Plant cursedPlant : cursedPlants) {
                     if (cursedPlant.isAlive()) {
-                        cursedPlant.setCat(false);
+                        cursedPlant.setState(Plant.PlantState.INCAPACITATED);
                     }
                 }
                 cursedPlants.clear();
@@ -47,7 +47,7 @@ public class WizardEffect implements EffectStatus {
     private void transformRandomPlant(GameSession session) {
         List<Plant> validPlants = new ArrayList<>();
         for (Plant p : session.getPlants()) {
-            if (p.isAlive() && !p.isCat()) {
+            if (p.isAlive() && !p.getState().equals(Plant.PlantState.INCAPACITATED)) {
                 validPlants.add(p);
             }
         }
@@ -67,14 +67,14 @@ public class WizardEffect implements EffectStatus {
         if (checkCol >= 0 && checkCol < session.getLawn().getCols()) {
             Cell cell = session.getLawn().getCell(zRow, checkCol);
 
-            if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive() && !cell.getPlant().isCat()) {
+            if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive() && !cell.getPlant().getState().equals(Plant.PlantState.INCAPACITATED)) {
                 applyCurse(cell.getPlant());
             }
         }
     }
 
     private void applyCurse(Plant target) {
-        target.setCat(true);
+        target.setState(Plant.PlantState.INCAPACITATED);
         cursedPlants.add(target);
     }
 }

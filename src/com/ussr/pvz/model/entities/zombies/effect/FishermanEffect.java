@@ -49,7 +49,7 @@ public class FishermanEffect implements EffectStatus {
                 int targetX = currentX + 1;
 
                 if (targetX >= zCol) {
-                    hookedPlant.takeDamage(hookedPlant.getHp());
+                    hookedPlant.takeDamage(hookedPlant.getHp(),zombie);
                     return true;
                 }
 

@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Plant extends GameEntity {
+public class Plant extends GameEntity implements Damageable {
     //todo implement the warm up tiers
     //todo implement the acts based on tier if it is warm up
     //todo it is better to implement it in another class
@@ -121,6 +122,10 @@ public class Plant extends GameEntity {
         } else {
             setHp(newHp);
         }
+    }
+
+    public void takeDamage(int damage){
+        //todo do some here 
     }
 
     public void updateGrowth(double deltaTimeSeconds) {
