@@ -25,7 +25,10 @@ public class ZombieSideTargetFinder implements TargetFinder {
         Cell cell = self.getCurrentCell(session);
         if (cell == null) return null;
         InteractableStructure structure = cell.getInteractableStructure();
-        return (structure != null && structure.isAlive()) ? structure : null;
+        if (structure instanceof Damageable damageable && structure.isAlive()) {
+            return damageable;
+        }
+        return null;
     }
 
     private Zombie nearestEnemyAhead(Zombie self, GameSession session) {

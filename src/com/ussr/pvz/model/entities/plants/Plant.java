@@ -111,21 +111,22 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
-    public void takeDamage(int damage , Zombie dealer) {
+    @Override
+    public void takeDamage(int damage) {
+        takeDamage(damage, null);
+    }
+
+    public void takeDamage(int damage, Zombie dealer) {
         if (!isAlive) return;
         int newHp = getHp() - damage;
         if (newHp <= 0) {
             setHp(0);
             isAlive = false;
-            if(this.actStrategy instanceof ModifyStrategy && this.getTags().contains(Tag.MAGIC))
+            if (dealer != null && this.actStrategy instanceof ModifyStrategy && this.getTags().contains(Tag.MAGIC))
                 dealer.setFaction(Faction.PLANTS);
         } else {
             setHp(newHp);
         }
-    }
-
-    public void takeDamage(int damage){
-        //todo do some here 
     }
 
     public void updateGrowth(double deltaTimeSeconds) {

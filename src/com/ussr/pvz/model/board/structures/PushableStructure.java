@@ -1,10 +1,11 @@
 package com.ussr.pvz.model.board.structures;
 
+import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.util.Vec2;
 
-public class PushableStructure extends InteractableStructure {
+public class PushableStructure extends InteractableStructure implements Damageable {
     private final PushableType type;
     private int hp;
 
