@@ -2,13 +2,17 @@ package com.ussr.pvz.model.entities.zombies;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.board.structures.PushableType;
+import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
-import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
-import com.ussr.pvz.model.entities.zombies.defense.NormalDefense;
-import com.ussr.pvz.model.entities.zombies.move.NormalWalk;
+import com.ussr.pvz.model.entities.zombies.factory.AttackBehaviorRegistry;
+import com.ussr.pvz.model.entities.zombies.factory.DefenseBehaviorRegistry;
+import com.ussr.pvz.model.entities.zombies.factory.EffectStatusRegistry;
+import com.ussr.pvz.model.entities.zombies.factory.MoveBehaviorRegistry;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.io.File;
@@ -88,7 +92,7 @@ public class ZombieFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static Zombie create(String alias, int row, int cols) {
+    public static Zombie create(String alias, int row, int col) {
         init();
 
         Map<String, Object> data = blueprints.get(alias);
@@ -96,6 +100,24 @@ public class ZombieFactory {
             throw new IllegalArgumentException("Unknown zombie alias: " + alias);
         }
 
+        Zombie zombie = buildBaseZombie(alias, data, row, col);
+
+        Object moveSpec = data.getOrDefault("move", "NormalWalk");
+        Object attackSpec = data.getOrDefault("attack", "ChompAttack");
+        Object defenseSpec = data.getOrDefault("defense", "NormalDefense");
+        Object effectSpec = data.get("effect"); // optional - most zombies have none
+
+        zombie.setMoveBehavior(MoveBehaviorRegistry.create(moveSpec));
+        zombie.setAttackBehavior(AttackBehaviorRegistry.create(attackSpec, data));
+        zombie.setDefenseBehavior(DefenseBehaviorRegistry.create(defenseSpec));
+        zombie.setEffectStatus(EffectStatusRegistry.createOrNull(effectSpec));
+
+        attachPushedStructureIfNeeded(zombie);
+
+        return zombie;
+    }
+
+    private static Zombie buildBaseZombie(String alias, Map<String, Object> data, int row, int col) {
         int hp = ((Number) data.get("Hitpoints")).intValue();
         double speed = ((Number) data.get("Speed")).doubleValue();
         double eatDps = ((Number) data.get("EatDPS")).doubleValue();
@@ -107,55 +129,71 @@ public class ZombieFactory {
             default -> ZombieSize.DEFAULT;
         };
 
-        Armor armor = null;
-        List<String> armorProps = (List<String>) data.get("ZombieArmorProps");
-        if (armorProps != null && !armorProps.isEmpty()) {
-            int accumulatedArmorHp = 0;
-            ArmorType primaryType = null;
-
-            for (String rtid : armorProps) {
-                String armorAlias = parseRtidAlias(rtid);
-                ArmorType resolvedType = resolveArmorType(armorAlias);
-
-                if (resolvedType != null) {
-                    primaryType = resolvedType;
-                    int hpValue = armorBaseHp.getOrDefault(armorAlias, resolvedType.getArmorHp());
-                    accumulatedArmorHp += hpValue;
-                }
-            }
-
-            if (primaryType != null && accumulatedArmorHp > 0) {
-                armor = new Armor(primaryType, accumulatedArmorHp);
-            }
-        }
+        Armor armor = resolveArmor(data);
 
         Zombie zombie = new Zombie(alias, armor);
         zombie.setHp(hp);
         zombie.setEatDps(eatDps);
         zombie.setSize(size);
 
-        // --- CONVERT TO VEC2 VECTOR POSITION IMMEDIATELY ---
-        Vec2 continuousSpawnPos = Vec2.of(cols, row);
-
-        zombie.setPosition(continuousSpawnPos);
+        Vec2 spawnPos = Vec2.of(col, row);
+        zombie.setPosition(spawnPos);
         zombie.setSpeed(Vec2.of(-speed, 0));
 
-        zombie.setMoveBehavior(new NormalWalk());
-        zombie.setAttackBehavior(new ChompAttack());
-        zombie.setDefenseBehavior(new NormalDefense());
-        //todo implement the set pushed structure
-        if ("ZombieArcade".equals(alias)) {
-            PushableStructure cabinet = new PushableStructure(PushableType.ARCADE_CABINET, continuousSpawnPos);
-            //zombie.setPushedStructure(cabinet);
-        } else if ("ZombieIceAgeTroglobite".equals(alias)) {
-            PushableStructure iceBlock = new PushableStructure(PushableType.ICE_BLOCK, continuousSpawnPos);
-            //zombie.setPushedStructure(iceBlock);
-        } else if ("ZombieBarrelRoller".equals(alias) || "ZombieBarrel".equals(alias)) {
-            PushableStructure barrel = new PushableStructure(PushableType.BARREL, continuousSpawnPos);
-            //zombie.setPushedStructure(barrel);
+        return zombie;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Armor resolveArmor(Map<String, Object> data) {
+        List<String> armorProps = (List<String>) data.get("ZombieArmorProps");
+        if (armorProps == null || armorProps.isEmpty()) return null;
+
+        int accumulatedArmorHp = 0;
+        ArmorType primaryType = null;
+
+        for (String rtid : armorProps) {
+            String armorAlias = parseRtidAlias(rtid);
+            ArmorType resolvedType = resolveArmorType(armorAlias);
+
+            if (resolvedType != null) {
+                primaryType = resolvedType;
+                int hpValue = armorBaseHp.getOrDefault(armorAlias, resolvedType.getArmorHp());
+                accumulatedArmorHp += hpValue;
+            }
         }
 
-        return zombie;
+        if (primaryType == null || accumulatedArmorHp <= 0) return null;
+        return new Armor(primaryType, accumulatedArmorHp);
+    }
+
+    private static void attachPushedStructureIfNeeded(Zombie zombie) {
+        PushableType type = switch (zombie.getAlias()) {
+            case "ZombieArcade" -> PushableType.ARCADE_CABINET;
+            case "ZombieIceAgeTroglobite" -> PushableType.ICE_BLOCK;
+            case "ZombieBarrelRoller", "ZombieBarrel" -> PushableType.BARREL;
+            default -> null;
+        };
+
+        if (type == null) return;
+
+        PushableStructure structure = new PushableStructure(type, zombie.getPosition());
+        zombie.setPushedStructure(structure);
+        placeOnLawnIfPossible(zombie, structure);
+    }
+
+    private static void placeOnLawnIfPossible(Zombie zombie, PushableStructure structure) {
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLawn() == null) return;
+
+        int row = (int) zombie.getPosition().y();
+        int lastCol = session.getLawn().getCols() - 1;
+        Cell cell = session.getLawn().getCell(row, lastCol);
+
+        if (cell != null && cell.getInteractableStructure() == null) {
+            cell.setStructure(structure);
+        }
+
+        session.registerStructure(structure);
     }
 
     private static String parseRtidAlias(String rtid) {

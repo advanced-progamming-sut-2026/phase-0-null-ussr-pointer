@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
@@ -29,6 +30,7 @@ public class Zombie extends GameEntity implements Damageable {
     //todo the zombie may have several attack behavior(eat and throw the bullets) or we should take care of them in effects as we did for laser
     private AttackBehavior attackBehavior;
     private Armor armor;
+    private PushableStructure pushedStructure;
 
     private int hp;
     private double eatDps;
@@ -59,6 +61,8 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive) return;
         GameSession session = App.getGameSession();
         if (session == null) return;
+
+        if (effectStatus != null) effectStatus.effect(this, session);
 
         Damageable target = acquireTarget(session);
         if (target != null && target.isAlive()) {
@@ -241,5 +245,13 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setFaction(Faction faction) {
         this.faction = faction;
+    }
+
+    public PushableStructure getPushedStructure() {
+        return pushedStructure;
+    }
+
+    public void setPushedStructure(PushableStructure pushedStructure) {
+        this.pushedStructure = pushedStructure;
     }
 }

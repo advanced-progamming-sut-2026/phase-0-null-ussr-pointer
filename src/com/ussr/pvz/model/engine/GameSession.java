@@ -10,6 +10,7 @@ import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
@@ -112,6 +113,11 @@ public class GameSession {
     public void addZombieProjectile(com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile zp) {
         zombieProjectiles.add(zp);
         clock.addEntity(zp);
+    }
+
+    public void registerStructure(InteractableStructure structure) {
+        if (structure == null) return;
+        clock.addEntity(structure);
     }
 
     private void checkZombieBreaches() {

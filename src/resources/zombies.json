@@ -137,7 +137,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "ArmorDefense"
     }
   },
   {
@@ -209,7 +210,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "ArmorDefense"
     }
   },
   {
@@ -281,7 +283,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "ArmorDefense"
     }
   },
   {
@@ -354,7 +357,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "ArmorDefense"
     }
   },
   {
@@ -491,7 +495,11 @@
           "Type": "speed",
           "Value": "speed3"
         }
-      ]
+      ],
+      "attack": {
+        "type": "SmashAttack",
+        "windupDuration": 2.0
+      }
     }
   },
   {
@@ -635,7 +643,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "effect": "SunThief"
     }
   },
   {
@@ -712,7 +721,8 @@
           "Type": "speed",
           "Value": "speed3"
         }
-      ]
+      ],
+      "effect": "FireEffect"
     }
   },
   {
@@ -787,7 +797,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "effect": "TombRaiserEffect"
     }
   },
   {
@@ -898,7 +909,8 @@
           "Type": "speed",
           "Value": "speed4"
         }
-      ]
+      ],
+      "move": "JumpMove"
     }
   },
   {
@@ -974,7 +986,8 @@
           "Type": "speed",
           "Value": "speed0"
         }
-      ]
+      ],
+      "effect": "IceAgeHunterEffect"
     }
   },
   {
@@ -1049,7 +1062,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "move": "PusherMove"
     }
   },
   {
@@ -1134,7 +1148,8 @@
           "Type": "toughness",
           "Value": "toughness5"
         }
-      ]
+      ],
+      "effect": "FishermanEffect"
     }
   },
   {
@@ -1206,7 +1221,8 @@
           "Type": "speed",
           "Value": "speed0"
         }
-      ]
+      ],
+      "effect": "OctopusThrowEffect"
     }
   },
   {
@@ -1405,7 +1421,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "move": "SnorkelMove"
     }
   },
   {
@@ -1587,7 +1604,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "JesterDefense"
     }
   },
   {
@@ -1659,7 +1677,8 @@
           "Type": "speed",
           "Value": "speed0"
         }
-      ]
+      ],
+      "effect": "WizardEffect"
     }
   },
   {
@@ -1750,7 +1769,8 @@
           "Type": "toughness",
           "Value": "toughness5"
         }
-      ]
+      ],
+      "effect": "KingBuffEffect"
     }
   },
   {
@@ -1825,7 +1845,8 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "defense": "ImmuneDefense"
     }
   },
   {
@@ -1902,7 +1923,12 @@
           "Type": "speed",
           "Value": "speed5"
         }
-      ]
+      ],
+      "attack": {
+        "type": "SmashAttack",
+        "isOneTime": true,
+        "speedScaleAfter": 0.5
+      }
     }
   },
   {
@@ -2088,7 +2114,12 @@
           "Type": "speed",
           "Value": "speed2"
         }
-      ]
+      ],
+      "effect": {
+        "type": "SunThief",
+        "isBankThief": true,
+        "laserDamage": 4001
+      }
     }
   },
   {
@@ -2161,7 +2192,8 @@
           "Type": "speed",
           "Value": "speed1"
         }
-      ]
+      ],
+      "move": "ProspectorMove"
     }
   },
   {
@@ -2253,7 +2285,8 @@
           "Type": "speed",
           "Value": "speed0"
         }
-      ]
+      ],
+      "attack": "CrushAttack"
     }
   },
   {
@@ -2327,7 +2360,9 @@
           "Type": "speed",
           "Value": "speed3"
         }
-      ]
+      ],
+      "defense": "ArmorDefense",
+      "move": "SprintMove"
     }
   },
   {
@@ -2400,7 +2435,8 @@
           "Type": "speed",
           "Value": "speed3"
         }
-      ]
+      ],
+      "move": "PusherMove"
     }
   }
 ]
