@@ -29,6 +29,7 @@ public class Plant extends GameEntity implements Damageable {
     private int damage;
     private PlantType type;
     private Plant bottom = null;
+    private int stackNumber = 1;
 
     private ModifiableStat hpStat;
     private ModifiableStat actionIntervalStat;
@@ -40,6 +41,10 @@ public class Plant extends GameEntity implements Damageable {
     private double abilityValue;
     private int chillLevel = 0;
     private GrowthTracker growthTracker;
+
+    private double plantFoodTimer = 0.0;
+
+    private PlantArmor armor;
 
     //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
     //note: this approach was a bit wrong for octopus and frozen cause they should take damage and get destroyed
@@ -96,6 +101,15 @@ public class Plant extends GameEntity implements Damageable {
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
         if (growthTracker != null) growthTracker.update(GameClock.SECONDS_PER_TICK);
 
+        if (plantFoodTimer > 0) {
+            plantFoodTimer -= GameClock.SECONDS_PER_TICK;
+
+            if (plantFoodEffect != null) {
+                plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(), GameClock.SECONDS_PER_TICK);
+            }
+            return;
+        }
+
         if (actStrategy == null) return;
 
         internalTimer += GameClock.SECONDS_PER_TICK;
@@ -117,14 +131,27 @@ public class Plant extends GameEntity implements Damageable {
 
     public void takeDamage(int damage, Zombie dealer) {
         if (!isAlive) return;
-        int newHp = getHp() - damage;
-        if (newHp <= 0) {
-            setHp(0);
-            isAlive = false;
-            if (dealer != null && this.actStrategy instanceof ModifyStrategy && this.getTags().contains(Tag.MAGIC))
-                dealer.setFaction(Faction.PLANTS);
-        } else {
-            setHp(newHp);
+
+        int remainingDamage = damage;
+
+        if (this.armor != null && !this.armor.isDestroyed()) {
+            remainingDamage = this.armor.absorbDamage(remainingDamage, this);
+            this.armor.handleReflection(dealer, this);
+
+            if (this.armor.isDestroyed()) {
+                this.armor = null;
+            }
+        }
+
+
+        if (remainingDamage > 0) {
+            int newHp = getHp() - remainingDamage;
+            if (newHp <= 0) {
+                setHp(0);
+                isAlive = false;
+            } else {
+                setHp(newHp);
+            }
         }
     }
 
@@ -249,6 +276,7 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setBottom(Plant bottom) {
         this.bottom = bottom;
+        this.stackNumber++;
     }
 
     public PlantFoodType getPlantFoodType() {
@@ -273,6 +301,12 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setWrampUp(List<Map<String, Object>> wrampUp) {
         this.growthTracker = (wrampUp != null && !wrampUp.isEmpty()) ? new GrowthTracker(wrampUp) : null;
+    }
+
+    public void instantlyMature() {
+        if (this.growthTracker != null) {
+            this.growthTracker.skipToMaxStage();
+        }
     }
 
     public int getCurrentStage() {
@@ -328,4 +362,14 @@ public class Plant extends GameEntity implements Damageable {
     public void setChillLevel(int chillLevel) {
         this.chillLevel = chillLevel;
     }
+
+    public double getPlantFoodTimer() { return plantFoodTimer; }
+
+    public void setPlantFoodTimer(double duration) { this.plantFoodTimer = duration; }
+
+    public int getStackNumber() { return this.stackNumber; }
+
+    public void setArmor(PlantArmor armor) { this.armor = armor; }
+
+    public PlantArmor getArmor() { return this.armor; }
 }

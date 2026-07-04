@@ -28,6 +28,28 @@ public class GrowthTracker {
         }
     }
 
+    public void skipToMaxStage() {
+        if (!hasStages()) return;
+
+        int maxStage = currentStage;
+        double maxTime = ageInSeconds;
+
+        for (Map<String, Object> stageData : stages) {
+            int stage = ((Double) stageData.get("stage")).intValue();
+            double targetTime = (Double) stageData.get("time");
+
+            if (stage > maxStage) {
+                maxStage = stage;
+            }
+            if (targetTime > maxTime) {
+                maxTime = targetTime;
+            }
+        }
+
+        this.currentStage = maxStage;
+        this.ageInSeconds = maxTime;
+    }
+
     public int getCurrentStage() {
         return currentStage;
     }

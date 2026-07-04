@@ -35,7 +35,8 @@ public enum Tag {
     BESTER("Bester"),
     SUN("Sun"),
     AOE("Area damage"),
-    MOVE_ZOMBIES("Move Zombies");
+    MOVE_ZOMBIES("Move Zombies"),
+    BUTTER("butter");
 
     private final String name;
 
