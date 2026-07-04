@@ -11,6 +11,8 @@ import com.ussr.pvz.model.util.Vec2;
 
 
 public class LobberStrategy implements ActStrategy {
+    private static final double GRAVITY = 15.0;
+    private static final double HORIZONTAL_SPEED = 4.0;
 
     @Override
     public void act(Plant user, GameSession session) {
@@ -20,13 +22,19 @@ public class LobberStrategy implements ActStrategy {
 
         Zombie target = findNearestInLane(user, session);
         if (target == null) return;
+        Vec2 startPos = user.getPosition();
+        Vec2 targetPos = target.getPosition();
+        double distanceX = targetPos.x() - startPos.x();
+        double timeOfFlight = distanceX / HORIZONTAL_SPEED;
+        double initialVelocityY = -0.5 * GRAVITY * timeOfFlight;
 
+        Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
         HitEffectStrategy hitEffect = buildHitEffect(user);
         session.getProjectiles().add(new Projectile(
                 user.getPosition(),
-                new Vec2(20, 0), target,
+                initialVelocity, target,
                 user.getDamage(),
-                new ArcMove(),
+                new ArcMove(GRAVITY),
                 hitEffect
         ));
     }

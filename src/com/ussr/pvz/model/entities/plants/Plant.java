@@ -38,10 +38,13 @@ public class Plant extends GameEntity implements Damageable {
     private PlantFoodType plantFoodType;
     private double internalTimer = 0.0;
     private double abilityValue;
-
+    private int chillLevel = 0;
     private GrowthTracker growthTracker;
 
-    //for now incapacitated is for all cat/sheep/sctopus but we can change it in the future
+    //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
+    //note: this approach was a bit wrong for octopus and frozen cause they should take damage and get destroyed
+    // by other plants, so I added two classes that wrap the plants and take damage and then take this back but
+    // for the can it is still the good way
     public enum PlantState {
         ACTIVE,
         INCAPACITATED,
@@ -255,6 +258,7 @@ public class Plant extends GameEntity implements Damageable {
     public void setPlantFoodType(PlantFoodType plantFoodType) {
         this.plantFoodType = plantFoodType;
     }
+
     public double getAbilityValue() {
         if (growthTracker != null) {
             Double staged = growthTracker.getStageValue("abilityValue");
@@ -285,11 +289,17 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
-    public double getIntervalTimer() { return internalTimer; }
+    public double getIntervalTimer() {
+        return internalTimer;
+    }
 
-    public void setInternalTimer(double timer) { this.internalTimer = timer; }
+    public void setInternalTimer(double timer) {
+        this.internalTimer = timer;
+    }
 
-    public void setAbilityValue(double value) { this.abilityValue = value; }
+    public void setAbilityValue(double value) {
+        this.abilityValue = value;
+    }
 
     public List<Vec2> getShootingVectors() {
         return shootingVectors;
@@ -309,5 +319,13 @@ public class Plant extends GameEntity implements Damageable {
 
     public PlantState getState() {
         return this.state;
+    }
+
+    public int getChillLevel() {
+        return chillLevel;
+    }
+
+    public void setChillLevel(int chillLevel) {
+        this.chillLevel = chillLevel;
     }
 }

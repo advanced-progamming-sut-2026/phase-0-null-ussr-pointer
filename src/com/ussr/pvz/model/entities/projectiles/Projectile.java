@@ -8,8 +8,6 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 public class Projectile extends GameEntity {
-    private Vec2 velocity;
-    private Vec2 position;
     private int damage;
     private Zombie target;
     private boolean isStunning;
@@ -18,8 +16,8 @@ public class Projectile extends GameEntity {
     private HitEffectStrategy hitEffectStrategy;
 
     public Projectile(Vec2 position, Vec2 velocity, Zombie zombie, int damage, MoveStrategy moveStrategy, HitEffectStrategy hitEffectStrategy) {
-        this.position = position;
-        this.velocity = velocity;
+        this.setPosition(position);
+        this.setSpeed(velocity);
         this.target = zombie;
         this.damage = damage;
         this.moveStrategy = moveStrategy;
@@ -42,16 +40,11 @@ public class Projectile extends GameEntity {
         boolean hasHitTarget = checkCollision(target);
 
         if (hasHitTarget) {
-            if (moveStrategy != null && moveStrategy instanceof ArcMove) {
-                target.takeDamage(damage, moveStrategy);
-            } else {
-                target.takeDamage(damage);
-            }
+            target.takeDamage(damage, this);
 
             if (hitEffectStrategy != null) {
                 hitEffectStrategy.apply(target);
             }
-
             this.isAlive = false;
         }
     }
@@ -59,7 +52,7 @@ public class Projectile extends GameEntity {
     private boolean checkCollision(Zombie target) {
         if (target == null || !target.isAlive()) return false;
         // Simple 1D collision check based on X coordinate proximity
-        return Math.abs(this.position.x() - target.getPosition().x()) <= 0.5;
+        return Math.abs(this.getPosition().x() - target.getPosition().x()) <= 0.5;
     }
 
     public void setHitEffectStrategy(HitEffectStrategy strategy) {
@@ -68,5 +61,9 @@ public class Projectile extends GameEntity {
 
     public HitEffectStrategy getHitEffectStrategy() {
         return this.hitEffectStrategy;
+    }
+
+    public Object getMoveStrategy() {
+        return moveStrategy;
     }
 }

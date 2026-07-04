@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.util.Vec2;
@@ -29,19 +30,14 @@ public class SnowballProjectile extends ZombieProjectile {
         if (targetCell != null && targetCell.getPlant() != null && targetCell.getPlant().isAlive()) {
             Plant targetPlant = targetCell.getPlant();
 
-            /*
-             * TODO: IMPLEMENTING THE CHILL/FREEZE LOGIC
-             * * 1. Add `private int chillLevel = 0;` to Plant.java
-             * 2. When hit by a snowball, increment `chillLevel`.
-             * 3. If `chillLevel == 1`, slow down the plant's action interval (e.g., multiply actionInterval by 1.5).
-             * 4. If `chillLevel >= 2`, the plant becomes an ICE BLOCK.
-             * - Add `private boolean isFrozen = false;` to Plant.java.
-             * - Update Plant.tick(): `if (!isAlive || isCat || isFrozen) return;`
-             * - Create an IceBlock structure (like Grave/Octopus) to absorb damage, OR handle it internally inside takeDamage().
-             * 5. If the plant gets hit by a fire projectile (like FirePea), reset chillLevel to 0 and isFrozen to false!
-             */
+            if (targetPlant.getState() != Plant.PlantState.INCAPACITATED) {
+                targetPlant.setChillLevel(targetPlant.getChillLevel() + 1);
 
-            // System.out.println("Snowball hit " + targetPlant.getName());
+                // If it hits 3 stacks, freeze it completely
+                if (targetPlant.getChillLevel() >= 3) {
+                    targetCell.setStructure(new IceBlock(targetPlant, 500));
+                }
+            }
         }
     }
 }

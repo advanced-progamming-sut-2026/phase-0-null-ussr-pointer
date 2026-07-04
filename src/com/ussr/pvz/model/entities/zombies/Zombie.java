@@ -6,6 +6,7 @@ import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.PlantFoodDrop;
+import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
 import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
@@ -34,6 +35,12 @@ public class Zombie extends GameEntity implements Damageable {
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
     private final boolean isGlowing;
+
+    @Override
+    public void takeDamage(int damage) {
+
+    }
+
     public enum Status{NORMAL , FREEZE , FIRED , POISONED}
     private Status status = Status.NORMAL;
 
@@ -91,26 +98,23 @@ public class Zombie extends GameEntity implements Damageable {
         return session.getLawn().getCell(row, col);
     }
 
-    // --- Overloaded: Fallback for generic damage sources (e.g., spikes, explosions) ---
-    @Override
-    public void takeDamage(int damage) {
-        // Generic damage hits submerged targets normally, but is blocked by total invulnerability
-        if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
-        applyDamageCalculations(damage);
-    }
-
-    public void takeDamage(int damage, Object moveStrategy) {
-        if (!isAlive) return;
-
-        if (this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
+    public void takeDamage(int damage, Object damageSource) {
+        if (!isAlive || this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
 
         if (this.vulnerabilityState == Vulnerability.SUBMERGED) {
-            if (!(moveStrategy instanceof ArcMove)) {
+            if (damageSource instanceof Projectile p && !(p.getMoveStrategy() instanceof ArcMove)) {
                 return;
             }
         }
 
-        applyDamageCalculations(damage);
+        int actualDamage = damage;
+        if (this.defenseBehavior != null) {
+            actualDamage = this.defenseBehavior.handleDamage(this, damage, damageSource, App.getGameSession());
+        }
+
+        if (actualDamage > 0) {
+            applyDamageCalculations(actualDamage);
+        }
     }
 
     private void applyDamageCalculations(int damage) {
