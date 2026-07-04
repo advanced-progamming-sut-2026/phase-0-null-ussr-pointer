@@ -164,7 +164,7 @@ public class PlantFactory {
         if (type == null || type == PlantFoodType.NONE) return null;
         return switch (type) {
             case SPAWN_SUN_ITEMS -> new SpawnSun();
-            case PROJECTILE_BURST -> new ProjectileBurs();
+            case PROJECTILE_BURST -> new TimedProjectileBurst();
             case SPAWN_CLONES -> new SpawnClones();
             case LOCAL_AOE_ATTACK -> new LocalAttack();
             case GRANT_PERMANENT_ARMOR -> new GrantArmor();
