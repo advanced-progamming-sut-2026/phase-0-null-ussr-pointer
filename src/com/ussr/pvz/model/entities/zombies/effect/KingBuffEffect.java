@@ -8,7 +8,6 @@ import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 
 public class KingBuffEffect implements EffectStatus {
-
     private final double delayBetweenKnighting;
     private double timer;
 
@@ -22,10 +21,8 @@ public class KingBuffEffect implements EffectStatus {
         if (!king.isAlive()) return;
 
         timer += GameClock.SECONDS_PER_TICK;
-
         if (timer >= delayBetweenKnighting) {
-            boolean buffApplied = applyBuff(king, session);
-            if (buffApplied) {
+            if (applyBuff(king, session)) {
                 timer = 0;
             }
         }
@@ -38,17 +35,14 @@ public class KingBuffEffect implements EffectStatus {
         return session.getZombies().stream()
                 .filter(GameEntity::isAlive)
                 .filter(zombie -> zombie != king)
+                .filter(zombie -> zombie.getFaction() == king.getFaction())
                 .filter(zombie -> !zombie.getName().contains("King"))
                 .filter(zombie -> (int) zombie.getPosition().y() == kingRow)
                 .filter(zombie -> Math.abs(zombie.getPosition().x() - kingCol) <= 4.0)
                 .filter(zombie -> zombie.getArmor() == null || zombie.getArmor().isDestroyed())
                 .findFirst()
                 .map(targetZombie -> {
-                    // TODO: Replace with your actual Armor parsing logic
-                    ArmorType helmetType = ArmorType.HELMET;
-                    int armorHp = helmetType.getArmorHp();
-                    Armor newHelmet = new Armor(helmetType, armorHp);
-
+                    Armor newHelmet = new Armor(ArmorType.HELMET, ArmorType.HELMET.getArmorHp());
                     targetZombie.setArmor(newHelmet);
                     return true;
                 }).orElse(false);

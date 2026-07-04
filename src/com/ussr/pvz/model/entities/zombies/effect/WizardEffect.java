@@ -1,8 +1,10 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
+import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.board.Cell;
 
@@ -13,7 +15,7 @@ public class WizardEffect implements EffectStatus {
     private final double transformInterval;
     private double timer = 0.0;
 
-    private final List<Plant> cursedPlants = new ArrayList<>();
+    private final List<Damageable> cursedEntities = new ArrayList<>();
     private boolean deathHandled = false;
 
     public WizardEffect(double transformInterval) {
@@ -21,15 +23,19 @@ public class WizardEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
-        if (!zombie.isAlive()) {
+    public void effect(Zombie wizard, GameSession session) {
+        if (!wizard.isAlive()) {
             if (!deathHandled) {
-                for (Plant cursedPlant : cursedPlants) {
-                    if (cursedPlant.isAlive()) {
-                        cursedPlant.setState(Plant.PlantState.INCAPACITATED);
+                for (Damageable cursed : cursedEntities) {
+                    if (cursed.isAlive()) {
+                        if (cursed instanceof Plant p) {
+                            p.setState(Plant.PlantState.ACTIVE);
+                        } else if (cursed instanceof Zombie z) {
+                            z.setStatus(Zombie.Status.NORMAL);
+                        }
                     }
                 }
-                cursedPlants.clear();
+                cursedEntities.clear();
                 deathHandled = true;
             }
             return;
@@ -38,43 +44,48 @@ public class WizardEffect implements EffectStatus {
         timer += GameClock.SECONDS_PER_TICK;
         if (timer >= transformInterval) {
             timer = 0;
-            transformRandomPlant(session);
+            transformRandomTarget(wizard, session);
         }
 
-        handleCollisionTransformation(zombie, session);
+        handleCollisionTransformation(wizard, session);
     }
 
-    private void transformRandomPlant(GameSession session) {
-        List<Plant> validPlants = new ArrayList<>();
-        for (Plant p : session.getPlants()) {
-            if (p.isAlive() && !p.getState().equals(Plant.PlantState.INCAPACITATED)) {
-                validPlants.add(p);
+    private void transformRandomTarget(Zombie wizard, GameSession session) {
+        List<Damageable> validTargets = new ArrayList<>();
+
+        if (wizard.getFaction() == Faction.ZOMBIES) {
+            for (Plant p : session.getPlants()) {
+                if (p.isAlive() && !p.getState().equals(Plant.PlantState.INCAPACITATED)) {
+                    validTargets.add(p);
+                }
+            }
+        } else {
+            for (Zombie z : session.getZombies()) {
+                if (z.isAlive() && z != wizard && z.getStatus() != Zombie.Status.FREEZE) {
+                    validTargets.add(z);
+                }
             }
         }
 
-        if (!validPlants.isEmpty()) {
-            int randomIndex = (int) (Math.random() * validPlants.size());
-            Plant target = validPlants.get(randomIndex);
+        if (!validTargets.isEmpty()) {
+            int randomIndex = (int) (Math.random() * validTargets.size());
+            applyCurse(validTargets.get(randomIndex));
+        }
+    }
+
+    private void handleCollisionTransformation(Zombie wizard, GameSession session) {
+        Damageable target = wizard.acquireTarget(session);
+        if (target != null && target.isAlive()) {
             applyCurse(target);
         }
     }
 
-    private void handleCollisionTransformation(Zombie zombie, GameSession session) {
-        int zRow = (int) zombie.getPosition().y();
-        double zCol = zombie.getPosition().x();
-        int checkCol = (int) Math.floor(zCol);
-
-        if (checkCol >= 0 && checkCol < session.getLawn().getCols()) {
-            Cell cell = session.getLawn().getCell(zRow, checkCol);
-
-            if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive() && !cell.getPlant().getState().equals(Plant.PlantState.INCAPACITATED)) {
-                applyCurse(cell.getPlant());
-            }
+    private void applyCurse(Damageable target) {
+        if (target instanceof Plant p) {
+            p.setState(Plant.PlantState.INCAPACITATED);
+        } else if (target instanceof Zombie z) {
+            z.setStatus(Zombie.Status.FREEZE);
         }
-    }
-
-    private void applyCurse(Plant target) {
-        target.setState(Plant.PlantState.INCAPACITATED);
-        cursedPlants.add(target);
+        cursedEntities.add(target);
     }
 }

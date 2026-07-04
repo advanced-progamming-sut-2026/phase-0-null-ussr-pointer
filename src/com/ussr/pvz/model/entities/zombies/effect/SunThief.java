@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.entities.items.GroundItem;
@@ -10,9 +11,7 @@ import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 
 public class SunThief implements EffectStatus {
-    //todo
-    // --- Configuration (Fed from JSON parsing) ---
-    private final boolean isBankThief; // false for Ra, true for Turquoise/Crystal Skull
+    private final boolean isBankThief;
     private final int maxSunsToSteal;
     private final double dropRatioOnDeath;
     private final double chargingTime;
@@ -20,7 +19,6 @@ public class SunThief implements EffectStatus {
 
     private int stolenSuns = 0;
     private boolean deathHandled = false;
-
     private double stateTimer = 0;
     private double oneSecondAccumulator = 0;
     private boolean isStealing = false;
@@ -39,10 +37,17 @@ public class SunThief implements EffectStatus {
         if (!zombie.isAlive()) {
             if (!deathHandled) {
                 int returnAmount = (int) (stolenSuns * dropRatioOnDeath);
-                if (returnAmount > 0) {
-                    session.addSun(returnAmount);
-                }
+                if (returnAmount > 0) session.addSun(returnAmount);
                 deathHandled = true;
+            }
+            return;
+        }
+
+        // A hypnotized thief shouldn't steal the player's sun!
+        if (zombie.getFaction() == Faction.PLANTS) {
+            if (isBankThief && !laserFired) {
+                fireLaserAtZombies(zombie, session);
+                laserFired = true;
             }
             return;
         }
@@ -62,7 +67,6 @@ public class SunThief implements EffectStatus {
 
             if (item.isAlive() && item.getItemType() == ItemType.SUN) {
                 int sunValue = 0;
-
                 if (item instanceof ProducedSun producedSun) {
                     sunValue = producedSun.getValue();
                 } else if (item instanceof SunToken sunToken) {
@@ -82,9 +86,7 @@ public class SunThief implements EffectStatus {
         if (laserFired) return;
 
         if (!isStealing) {
-            if (canSeePlant(zombie, session)) {
-                isStealing = true;
-            }
+            if (canSeePlant(zombie, session)) isStealing = true;
         } else {
             stateTimer += GameClock.SECONDS_PER_TICK;
             oneSecondAccumulator += GameClock.SECONDS_PER_TICK;
@@ -109,14 +111,11 @@ public class SunThief implements EffectStatus {
     private boolean canSeePlant(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
-
         for (int i = 1; i <= 4; i++) {
             int targetCol = zCol - i;
             if (targetCol >= 0) {
                 Cell cell = session.getLawn().getCell(zRow, targetCol);
-                if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
-                    return true;
-                }
+                if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) return true;
             }
         }
         return false;
@@ -125,15 +124,25 @@ public class SunThief implements EffectStatus {
     private void fireLaser(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
-
         for (int i = 1; i <= 4; i++) {
             int targetCol = zCol - i;
             if (targetCol >= 0) {
                 Cell cell = session.getLawn().getCell(zRow, targetCol);
                 if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
-                    cell.getPlant().takeDamage(laserDamage,zombie);
+                    cell.getPlant().takeDamage(laserDamage, zombie);
                 }
             }
         }
+    }
+
+    private void fireLaserAtZombies(Zombie zombie, GameSession session) {
+        int zCol = (int) zombie.getPosition().x();
+        int zRow = (int) zombie.getPosition().y();
+        session.getZombies().stream()
+                .filter(z -> z.isAlive() && z.getFaction() == Faction.ZOMBIES && (int) z.getPosition().y() == zRow)
+                .forEach(z -> {
+                    double dist = z.getPosition().x() - zCol;
+                    if (dist > 0 && dist <= 4.0) z.takeDamage(laserDamage);
+                });
     }
 }

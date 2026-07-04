@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.entities.zombies.projectiles.BoneProjectile;
@@ -24,10 +25,10 @@ public class TombRaiserEffect implements EffectStatus {
 
     @Override
     public void effect(Zombie zombie, GameSession session) {
-        if (!zombie.isAlive()) return;
+        // Hypnotized tomb raisers shouldn't block the player's plants!
+        if (!zombie.isAlive() || zombie.getFaction() == Faction.PLANTS) return;
 
         timer += GameClock.SECONDS_PER_TICK;
-
         if (timer >= cooldown) {
             timer = 0;
             throwBones(zombie, session);
@@ -38,8 +39,8 @@ public class TombRaiserEffect implements EffectStatus {
         List<Cell> emptyCells = new ArrayList<>();
         int rows = session.getLawn().getRows();
         int cols = session.getLawn().getCols();
-
         int zCol = (int) zombie.getPosition().x();
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 if (c <= zCol) {
@@ -52,20 +53,14 @@ public class TombRaiserEffect implements EffectStatus {
         }
 
         if (emptyCells.isEmpty()) return;
-
         Collections.shuffle(emptyCells);
 
         int thrown = 0;
         for (Cell targetCell : emptyCells) {
             if (thrown >= numTombsToSpawn) break;
-
             Vec2 startPos = zombie.getPosition();
             Vec2 targetPos = Vec2.of(targetCell.getCol(), targetCell.getRow());
-
-            BoneProjectile bone = new BoneProjectile(startPos, targetPos, 1.5);
-
-            session.addZombieProjectile(bone);
-
+            session.addZombieProjectile(new BoneProjectile(startPos, targetPos, 1.5));
             thrown++;
         }
     }

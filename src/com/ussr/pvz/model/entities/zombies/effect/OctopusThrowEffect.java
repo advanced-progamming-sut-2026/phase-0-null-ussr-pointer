@@ -4,12 +4,12 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.projectiles.OctopusProjectile;
 import com.ussr.pvz.model.util.Vec2;
 
 public class OctopusThrowEffect implements EffectStatus {
-
     private final double throwCooldown;
     private double timer;
 
@@ -23,10 +23,8 @@ public class OctopusThrowEffect implements EffectStatus {
         if (!zombie.isAlive()) return;
 
         timer += GameClock.SECONDS_PER_TICK;
-
         if (timer >= throwCooldown) {
-            boolean thrown = throwOctopus(zombie, session);
-            if (thrown) {
+            if (throwOctopus(zombie, session)) {
                 timer = 0;
             }
         }
@@ -36,24 +34,24 @@ public class OctopusThrowEffect implements EffectStatus {
         int zRow = (int) zombie.getPosition().y();
         double zCol = zombie.getPosition().x();
         int cols = session.getLawn().getCols();
+        Vec2 startPos = zombie.getPosition();
 
-        for (int c = (int) zCol; c >= 0; c--) {
-            if (c >= cols) continue;
-
-            Cell cell = session.getLawn().getCell(zRow, c);
-            if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
-                Plant targetPlant = cell.getPlant();
-
-                // TODO: You will need to check if the plant ALREADY has an octopus on it so he doesn't double-throw.
-                // e.g., if (!targetPlant.isOctopused())
-
-                Vec2 startPos = zombie.getPosition();
-                Vec2 targetPos = Vec2.of(targetPlant.getLocation().x(), targetPlant.getLocation().y());
-
-                OctopusProjectile octopus = new OctopusProjectile(startPos, targetPos, 1.5);
-                session.addZombieProjectile(octopus);
-
-                return true;
+        if (zombie.getFaction() == Faction.ZOMBIES) {
+            for (int c = (int) zCol; c >= 0; c--) {
+                if (c >= cols) continue;
+                Cell cell = session.getLawn().getCell(zRow, c);
+                if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
+                    Vec2 targetPos = Vec2.of(cell.getPlant().getLocation().x(), cell.getPlant().getLocation().y());
+                    session.addZombieProjectile(new OctopusProjectile(startPos, targetPos, 1.5));
+                    return true;
+                }
+            }
+        } else {
+            for (Zombie target : session.getZombies()) {
+                if (target.isAlive() && target.getFaction() == Faction.ZOMBIES && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
+                    session.addZombieProjectile(new OctopusProjectile(startPos, target.getPosition(), 1.5));
+                    return true;
+                }
             }
         }
         return false;
