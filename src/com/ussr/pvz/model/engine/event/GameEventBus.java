@@ -6,22 +6,15 @@ import java.util.function.Consumer;
 
 public class GameEventBus {
 
-    private static class Entry<T extends GameEvent> {
-        final Class<T> type;
-        final Consumer<T> handler;
-
-        Entry(Class<T> type, Consumer<T> handler) {
-            this.type = type;
-            this.handler = handler;
-        }
+    private record Entry<T extends GameEvent>(Class<T> type, Consumer<T> handler) {
 
         @SuppressWarnings("unchecked")
-        void tryHandle(GameEvent event) {
-            if (type.isInstance(event)) {
-                handler.accept((T) event);
+            void tryHandle(GameEvent event) {
+                if (type.isInstance(event)) {
+                    handler.accept((T) event);
+                }
             }
         }
-    }
 
     private final List<Entry<?>> entries = new ArrayList<>();
 

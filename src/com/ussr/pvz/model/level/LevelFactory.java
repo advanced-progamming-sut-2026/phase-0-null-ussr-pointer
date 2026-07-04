@@ -48,26 +48,31 @@ public class LevelFactory {
         }
 
         if (data.waves != null) {
-            List<Wave> waves = new ArrayList<>();
-            for (JsonContainer.JsonWaveData waveData : data.waves) {
-                Wave wave = new Wave();
-                wave.setWaveNumber(waveData.waveNumber);
-
-                if (waveData.spawnData != null) {
-                    List<SpawnData> spawns = new ArrayList<>();
-                    for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
-                        SpawnData spawn = new SpawnData();
-                        spawn.setZombieId(spawnEntry.zombieId);
-                        spawn.setLane(spawnEntry.lane);
-                        spawn.setDelaySeconds(spawnEntry.delaySeconds);
-                        spawns.add(spawn);
-                    }
-                    wave.setSpawnData(spawns);
-                }
-                waves.add(wave);
-            }
+            List<Wave> waves = getWaves(data);
             level.setWaves(waves);
         }
         return level;
+    }
+
+    private static List<Wave> getWaves(JsonContainer.JsonLevelData data) {
+        List<Wave> waves = new ArrayList<>();
+        for (JsonContainer.JsonWaveData waveData : data.waves) {
+            Wave wave = new Wave();
+            wave.setWaveNumber(waveData.waveNumber);
+
+            if (waveData.spawnData != null) {
+                List<SpawnData> spawns = new ArrayList<>();
+                for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
+                    SpawnData spawn = new SpawnData();
+                    spawn.setZombieId(spawnEntry.zombieId);
+                    spawn.setLane(spawnEntry.lane);
+                    spawn.setDelaySeconds(spawnEntry.delaySeconds);
+                    spawns.add(spawn);
+                }
+                wave.setSpawnData(spawns);
+            }
+            waves.add(wave);
+        }
+        return waves;
     }
 }

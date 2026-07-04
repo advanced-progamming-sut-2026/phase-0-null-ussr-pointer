@@ -33,7 +33,7 @@ public class OctopusProjectile extends ZombieProjectile {
 
         if (targetCell != null && targetCell.getPlant() != null && targetCell.getPlant().isAlive()) {
             Plant targetPlant = targetCell.getPlant();
-
+            targetPlant.setState(Plant.PlantState.INCAPACITATED);
             /*
              * TODO: IMPLEMENTING THE OCTOPUS BINDING LOGIC
              * * The Persian docs explicitly state:
