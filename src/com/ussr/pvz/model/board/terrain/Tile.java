@@ -1,9 +1,15 @@
 package com.ussr.pvz.model.board.terrain;
 
-public abstract class Tile {
-    private TileType type;
+public class Tile {
+    private final TileType type;
 
-    abstract public boolean allowsPlant();
+    public Tile(TileType type) {
+        this.type = type;
+    }
+
+    public boolean allowsPlant() {
+        return this.type.isAllowPlant();
+    }
 
     public TileType getType() {
         return this.type;

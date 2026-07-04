@@ -10,12 +10,12 @@ public class Account {
     private String nickname;
     private String password;
     private String email;
-    private Gender gender;
-    private SecurityQuestion securityQuestion;
-    private String securityAnswer;
-    private AdventureProgress adventureProgress;
-    private ScoreRecord scoreRecord;
-    private List<NewsItem> personalNews;
+    private final Gender gender;
+    private final SecurityQuestion securityQuestion;
+    private final String securityAnswer;
+    private final AdventureProgress adventureProgress;
+    private final ScoreRecord scoreRecord;
+    private final List<NewsItem> personalNews;
     private Collection collection;
     private Greenhouse greenhouse;
     private int difficultyLvl;

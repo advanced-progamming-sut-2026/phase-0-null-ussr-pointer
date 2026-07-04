@@ -178,7 +178,7 @@ public class Greenhouse {
     }
 
     private SproutPlant randomPlant(Collection collection) {
-        List<Plant> unlocked = collection.getUnlockedPlants();
+        List<Plant> unlocked = collection.unlockedPlants();
         if (unlocked == null || unlocked.isEmpty()) {
             return new SproutPlant(null, true, PlantState.GROWING, "", System.currentTimeMillis(), 2 * HOUR);
         }

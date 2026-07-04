@@ -63,5 +63,11 @@ public class CliGameEventListener {
 
         bus.subscribe(GameEvent.GameWon.class,
                 e -> System.out.println("[YOU WIN] All zombies defeated!"));
+
+        bus.subscribe(GameEvent.SunStartedFalling.class,
+                e -> System.out.println("New " + e.type() + " sun is dropping at position (" + e.x() + "," + e.y() + ")"));
+
+        bus.subscribe(GameEvent.SunGrounded.class,
+                e -> System.out.println("Sun reached the ground at position (" + e.x() + "," + e.y() + ")"));
     }
 }

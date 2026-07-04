@@ -22,10 +22,20 @@ public sealed interface GameEvent permits
         GameEvent.GameOver,
         GameEvent.GameWon,
         GameEvent.StructureDestroyed,
+        GameEvent.SunStartedFalling,
+        GameEvent.SunGrounded,
         GameEvent.GraveDestroyed {
 
 
     record ZombieSpawned(String alias, int lane, int col) implements GameEvent {
+    }
+
+    record SunStartedFalling(String type,int x , int y) implements GameEvent {
+
+    }
+
+    record SunGrounded(int x , int y) implements GameEvent {
+
     }
 
 

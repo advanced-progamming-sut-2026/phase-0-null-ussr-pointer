@@ -1,9 +1,9 @@
 package com.ussr.pvz.model.account;
 
 public class NewsItem {
-    private String title;
-    private String content;
-    private int date;
+    private final String title;
+    private final String content;
+    private final int date;
     private boolean isRead;
 
     public NewsItem(String title, String content, int date) {

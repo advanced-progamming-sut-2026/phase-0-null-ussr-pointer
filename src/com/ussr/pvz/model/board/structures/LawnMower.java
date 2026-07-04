@@ -57,8 +57,9 @@ public class LawnMower extends InteractableStructure {
 
             if (zombieLane == this.lane && zombie.isAlive()) {
                 if (zombie.getPosition().x() <= mowerX) {
-                    //todo handle the boss zombie later
-                    zombie.takeDamage(zombie.getHp() + 1000);
+                    if (!zombie.getName().toLowerCase().contains("boss")) {
+                        zombie.takeDamage(zombie.getHp() + 1000);
+                    }
                 }
             }
         });

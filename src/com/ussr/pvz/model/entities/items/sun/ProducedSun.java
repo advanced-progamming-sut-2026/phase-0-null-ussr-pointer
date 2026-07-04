@@ -1,7 +1,9 @@
 package com.ussr.pvz.model.entities.items.sun;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 
@@ -11,10 +13,11 @@ public class ProducedSun extends GroundItem {
     private final int value;
 
     public ProducedSun(int x, int y, int value) {
-        super(ItemType.SUN,40f,20f);
+        super(ItemType.SUN, 40f, 20f);
         this.x = x;
         this.y = y;
         this.value = value;
+        App.getGameSession().getEventBus().publish(new GameEvent.SunProduced(value, x, y));
     }
 
     @Override
@@ -22,6 +25,7 @@ public class ProducedSun extends GroundItem {
         session.addSun(value);
         this.isAlive = false;
         this.setCollected(true);
+        App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(value, App.getGameSession().getSunCount()));
     }
 
     public int getValue() {

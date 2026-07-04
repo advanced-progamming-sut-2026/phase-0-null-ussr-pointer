@@ -14,7 +14,7 @@ public class PlantSideTargetFinder implements TargetFinder {
         if (cell == null) return null;
 
         Plant plant = cell.getPlant();
-        if (plant != null && plant.isAlive() && !plant.getState().equals(Plant.PlantState.INCAPACITATED)) return (Damageable) plant;
+        if (plant != null && plant.isAlive() && !plant.getState().equals(Plant.PlantState.INCAPACITATED)) return plant;
 
         return null;
     }

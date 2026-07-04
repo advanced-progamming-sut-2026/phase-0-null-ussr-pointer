@@ -6,7 +6,8 @@ import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.Row;
-import com.ussr.pvz.model.board.terrain.NormalTile;
+import com.ussr.pvz.model.board.terrain.Tile;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -149,7 +150,7 @@ public class ChoosePlantService {
                 Cell cell = new Cell();
                 cell.setRow(r);
                 cell.setCol(c);
-                cell.setTile(new NormalTile());
+                cell.setTile(new Tile(TileType.Normal));
                 row.addCell(cell);
             }
             lawn.addRow(row);
