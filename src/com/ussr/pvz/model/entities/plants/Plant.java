@@ -46,6 +46,11 @@ public class Plant extends GameEntity implements Damageable {
 
     private PlantArmor armor;
 
+    public int getMaxHp() {
+        //todo change this
+        return hp;
+    }
+
     //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
     //note: this approach was a bit wrong for octopus and frozen cause they should take damage and get destroyed
     // by other plants, so I added two classes that wrap the plants and take damage and then take this back but

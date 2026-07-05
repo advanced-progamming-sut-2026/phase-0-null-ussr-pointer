@@ -13,4 +13,9 @@ public class LocalAttack implements PlantFoodEffect {
     public void applyStatusModifiers(Plant user) {
 
     }
+
+    @Override
+    public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
+
+    }
 }
