@@ -1,15 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.factory;
 
-import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
-import com.ussr.pvz.model.entities.zombies.effect.FireEffect;
-import com.ussr.pvz.model.entities.zombies.effect.FishermanEffect;
-import com.ussr.pvz.model.entities.zombies.effect.IceAgeHunterEffect;
-import com.ussr.pvz.model.entities.zombies.effect.KingBuffEffect;
-import com.ussr.pvz.model.entities.zombies.effect.OctopusThrowEffect;
-import com.ussr.pvz.model.entities.zombies.effect.SpinEffect;
-import com.ussr.pvz.model.entities.zombies.effect.SunThief;
-import com.ussr.pvz.model.entities.zombies.effect.TombRaiserEffect;
-import com.ussr.pvz.model.entities.zombies.effect.WizardEffect;
+import com.ussr.pvz.model.entities.zombies.effect.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +47,10 @@ public final class EffectStatusRegistry {
 
         register("KingBuffEffect", params -> new KingBuffEffect(
                 BehaviorSpec.getDouble(params, "delayBetweenKnighting", 2.5)
+        ));
+
+        register("PianistEffect", params -> new PianistEffect(
+                BehaviorSpec.getDouble(params, "danceInterval", 2.5)
         ));
     }
 
