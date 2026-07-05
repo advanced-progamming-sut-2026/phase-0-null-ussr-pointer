@@ -4,12 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class QuestManager {
@@ -18,9 +16,12 @@ public class QuestManager {
     private final Gson gson = new Gson();
 
     public void loadFromJson() throws FileNotFoundException {
-        try (Reader reader = new InputStreamReader(
-                Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("src/resources/quests.json")))) {
+        java.io.File file = new java.io.File("src/resources/quests.json");
+        if (!file.exists()) {
+            throw new FileNotFoundException("quests.json not found!");
+        }
 
+        try (java.io.FileReader reader = new java.io.FileReader(file)) {
             Type questListType = new TypeToken<ArrayList<ConfigurableQuest>>() {}.getType();
             List<ConfigurableQuest> loadedQuests = gson.fromJson(reader, questListType);
 
@@ -29,8 +30,26 @@ public class QuestManager {
                 allQuests.addAll(loadedQuests);
             }
         } catch (Exception e) {
-            throw new FileNotFoundException(e.getMessage());
+            throw new FileNotFoundException("Error parsing quests: " + e.getMessage());
         }
+    }
+
+    public void restoreState(List<String> completedIds, Map<String, List<Integer>> progressMap) {
+        for (ConfigurableQuest q : allQuests) {
+            boolean isCompleted = completedIds != null && completedIds.contains(q.getId());
+            List<Integer> progress = progressMap != null ? progressMap.get(q.getId()) : null;
+            q.restoreProgress(isCompleted, progress);
+        }
+    }
+
+    // CHANGED: Added export logic for AccountState serialization
+    public Map<String, List<Integer>> exportProgressMap() {
+        return allQuests.stream()
+                .filter(q -> !q.isCompleted() && !q.isExpired())
+                .collect(Collectors.toMap(
+                        ConfigurableQuest::getId,
+                        q -> q.getCriteria().stream().map(CriterionProgress::getCurrent).collect(Collectors.toList())
+                ));
     }
 
     public void onGameEvent(String eventType, int amount, QuestContext ctx) {

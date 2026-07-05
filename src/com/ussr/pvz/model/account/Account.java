@@ -1,6 +1,8 @@
 package com.ussr.pvz.model.account;
 
 import com.ussr.pvz.model.greenhouse.Greenhouse;
+import com.ussr.pvz.model.quest.ConfigurableQuest;
+import com.ussr.pvz.model.quest.QuestManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class Account {
     private Greenhouse greenhouse;
     private int difficultyLvl;
     private SavedBoosts savedBoosts;
-
+    private QuestManager questManager;
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();
@@ -52,9 +54,20 @@ public class Account {
                 this.savedBoosts.addBoost(boost);
             }
         }
+
+        this.questManager = new QuestManager();
+        try {
+            this.questManager.loadFromJson();
+            this.questManager.restoreState(state.completedQuests(), state.activeQuestProgress());
+        } catch (Exception e) {
+            System.err.println("Failed to load quests: " + e.getMessage());
+        }
     }
 
     public AccountState toState() {
+        List<String> completedIds = this.questManager.getCompleted().stream()
+                .map(ConfigurableQuest::getId)
+                .toList();
         return new AccountState(
                 this.name,
                 this.nickname,
@@ -77,7 +90,9 @@ public class Account {
                 this.greenhouse != null ? this.greenhouse.toMap() : null,
                 this.savedBoosts.getBoosts(),
                 adventureProgress.getPlantFoodCount(),
-                adventureProgress.getSeedPackets()
+                adventureProgress.getSeedPackets(),
+                completedIds,
+                this.questManager.exportProgressMap()
         );
     }
 
@@ -167,5 +182,9 @@ public class Account {
 
     public void setSavedBoosts(SavedBoosts savedBoosts) {
         this.savedBoosts = savedBoosts;
+    }
+
+    public QuestManager getQuestManager() {
+        return questManager;
     }
 }

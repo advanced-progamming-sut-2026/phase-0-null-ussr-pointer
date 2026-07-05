@@ -81,7 +81,14 @@ public class ConfigurableQuest implements Quest {
             criteria.forEach(CriterionProgress::reset);
         }
     }
-
+    public void restoreProgress(boolean isCompleted, List<Integer> criteriaProgress) {
+        this.completed = isCompleted;
+        if (criteriaProgress != null && criteriaProgress.size() == this.criteria.size()) {
+            for (int i = 0; i < criteriaProgress.size(); i++) {
+                this.criteria.get(i).set(criteriaProgress.get(i));
+            }
+        }
+    }
     @Override
     public boolean isExpired() {
         if (expiresAfterSeconds == null) {

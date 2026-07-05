@@ -39,7 +39,7 @@ public sealed interface GameEvent permits
     }
 
 
-    record ZombieDied(String alias, double x, double y) implements GameEvent {
+    record ZombieDied(String alias, double x, double y, String killerPlantName) implements GameEvent {
     }
 
 

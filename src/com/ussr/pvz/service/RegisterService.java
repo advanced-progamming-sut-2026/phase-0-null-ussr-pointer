@@ -61,7 +61,9 @@ public class RegisterService {
                 null,  // greenhouse
                 null,  // saved boosts
                 0,     // plantFoodCount
-                new HashMap<>()   //seedPackets
+                new HashMap<>(),   //seedPackets
+                new ArrayList<>(),
+                new HashMap<>()
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");

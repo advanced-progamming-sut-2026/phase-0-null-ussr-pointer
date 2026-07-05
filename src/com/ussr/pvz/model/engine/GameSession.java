@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.engine;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.event.GameEvent;
@@ -12,6 +13,7 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -198,12 +200,17 @@ public class GameSession {
         ));
     }
 
-    public void notifyZombieDied(Zombie zombie) {
+    public void notifyZombieDied(Zombie zombie, String killerPlantName) {
         eventBus.publish(new GameEvent.ZombieDied(
                 zombie.getAlias(),
                 zombie.getPosition().x(),
-                zombie.getPosition().y()
+                zombie.getPosition().y(),
+                killerPlantName
         ));
+    }
+
+    public void notifyZombieDied(Zombie zombie) {
+        notifyZombieDied(zombie, "Unknown");
     }
 
     public void notifyGraveDestroyed(int row, int col) {
@@ -253,7 +260,10 @@ public class GameSession {
 
     public void startWaves() {
         ZombieFactory.init();
-
+        if (App.getAccount() != null) {
+            QuestEventTracker tracker = new QuestEventTracker(App.getAccount().getQuestManager());
+            tracker.subscribeTo(this);
+        }
         if (level == null || level.getWaves() == null) {
             wavesStarted = true;
             return;
