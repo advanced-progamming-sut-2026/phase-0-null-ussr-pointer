@@ -43,7 +43,7 @@ public class GreenHouseService {
         validatePotNotOccupied(x, y);
 
         App.getAccount().getGreenhouse().plant(x, y, App.getAccount().getCollection());
-        return "Plant planted in " + x + " " + y + "successfully";
+        return "Plant planted in " + x + " " + y + " successfully";
     }
 
     public String collect(GreenhousePotRequest request) {
@@ -54,20 +54,25 @@ public class GreenHouseService {
         validatePotUnlocked(x, y);
         validatePotOccupied(x, y);
 
-        SproutPlant result = null;
+        SproutPlant result;
         try {
             result = App.getAccount().getGreenhouse().collect(x, y);
         } catch (Exception e) {
             return e.getMessage();
         }
 
-        if (result.isReady()) {
+        if (result.isMarigold()) {
             App.getAccount().getAdventureProgress().addCoin(500);
-
-            return "The plant collected successfully and 500 coin added to your wallet";
+            return "The plant collected successfully and 500 coins added to your wallet";
         } else {
-            //todo implement the a reserved boost for that plant and change the return message
-            return "The plant collected successfully and a boost is there for you";
+            String plantName = result.getType();
+            boolean boostAdded = App.getAccount().getSavedBoosts().addBoost(plantName);
+
+            if (boostAdded) {
+                return "The plant collected successfully and a boost for " + plantName + " has been added.";
+            } else {
+                return "The plant collected successfully, but you already have a saved boost for " + plantName + ". Pot emptied.";
+            }
         }
     }
 
@@ -82,9 +87,10 @@ public class GreenHouseService {
         try {
             int cost = App.getAccount().getGreenhouse().speedUp(x, y);
             int currentGem = App.getAccount().getAdventureProgress().getGem();
-            if (cost > currentGem ) {
-                throw new IllegalStateException("You don't have enough money");
-            }else{
+
+            if (cost > currentGem) {
+                throw new IllegalStateException("You don't have enough gems");
+            } else {
                 App.getAccount().getGreenhouse().grow(x, y);
                 App.getAccount().getAdventureProgress().addGem(-cost);
                 return "The plant grew successfully and is ready to collect";
@@ -105,8 +111,8 @@ public class GreenHouseService {
 
         if (potsList != null) {
             for (java.util.Map<String, Object> potMap : potsList) {
-                int x = ((Number) potMap.get("x")).intValue(); // Column coordinate
-                int y = ((Number) potMap.get("y")).intValue(); // Row coordinate
+                int x = ((Number) potMap.get("x")).intValue();
+                int y = ((Number) potMap.get("y")).intValue();
                 if (y >= 0 && y < maxRows && x >= 0 && x < maxCols) {
                     grid[y][x] = potMap;
                 }
@@ -135,13 +141,14 @@ public class GreenHouseService {
                         if ("READY".equals(stateStr)) {
                             sb.append("[READY]");
                         } else {
-                            String name = (String) plant.get("name");
-                            if (name == null || name.isEmpty()) {
+                            String name = (String) plant.get("type");
+                            if (name == null || name.isEmpty() || (boolean) plant.get("isMarigold")) {
                                 name = "Marigold";
                             }
 
-                            long targetTime = ((Number) plant.get("growTargetTime")).longValue();
-                            long remainingMillis = targetTime - System.currentTimeMillis();
+                            long plantedAt = ((Number) plant.get("plantedAtMillis")).longValue();
+                            long duration = ((Number) plant.get("growthDurationMillis")).longValue();
+                            long remainingMillis = (plantedAt + duration) - System.currentTimeMillis();
                             long remainingHours = Math.max(0, (remainingMillis + (60 * 60 * 1000) - 1) / (60 * 60 * 1000));
 
                             sb.append(String.format("[%s: %dh remaining]", name, remainingHours));

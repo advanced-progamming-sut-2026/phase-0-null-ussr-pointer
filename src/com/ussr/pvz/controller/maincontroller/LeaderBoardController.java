@@ -7,8 +7,10 @@ import com.ussr.pvz.service.LeaderBoardService;
 import java.util.regex.Matcher;
 
 public class LeaderBoardController {
-    private LeaderBoardService leaderBoardService;
+    private final LeaderBoardService leaderBoardService;
+
     public LeaderBoardController() {
+        this.leaderBoardService = new LeaderBoardService();
     }
 
     public String handleCommand(String command) {
@@ -21,12 +23,11 @@ public class LeaderBoardController {
                 };
             }
         }
-        return "";
+        return "Invalid Leaderboard command.";
     }
 
     private String handleShow() {
-        // TODO: call leaderBoardService.show() and return its message
-        return "";
+        return leaderBoardService.show();
     }
 
     private String handleSort(Matcher matcher) {
@@ -34,7 +35,6 @@ public class LeaderBoardController {
                 matcher.group("column"),
                 matcher.group("order")
         );
-        // TODO: call leaderBoardService.sort(request) and return its message
-        return "";
+        return leaderBoardService.sort(request);
     }
 }

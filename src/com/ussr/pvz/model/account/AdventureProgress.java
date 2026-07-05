@@ -14,15 +14,21 @@ import java.util.*;
 public class AdventureProgress {
     private int coin;
     private int gem;
+    private int currentChapter;
     private int currentLvl;
+    private int minigamesWon;
+    private int questsCompleted;
     private int plantFoodCount;
     private final Map<String, Integer> plantLvls;
     private final List<String> seenZombies;
-    private final Map<String , Integer> seedPackets;
+    private final Map<String, Integer> seedPackets;
     private final List<Plant> accountPlants;
 
-    public AdventureProgress(int currentLvl, int coin, int gem, Map<String, Integer> plantLvls) {
+    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> plantLvls) {
+        this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
+        this.minigamesWon = minigamesWon;
+        this.questsCompleted = questsCompleted;
         this.coin = coin;
         this.gem = gem;
         this.plantFoodCount = 0;
@@ -73,7 +79,7 @@ public class AdventureProgress {
         }
     }
 
-    private void applyBuffi(String type , Plant plantInstance , double value) {
+    private void applyBuffi(String type, Plant plantInstance, double value) {
         switch (type.toUpperCase()) {
             case "HP":
                 plantInstance.setHp(plantInstance.getHp() + (int) value);
@@ -123,20 +129,68 @@ public class AdventureProgress {
         }
     }
 
-    public List<String> getSeenZombies() { return this.seenZombies; }
+    public List<String> getSeenZombies() {
+        return this.seenZombies;
+    }
 
-    public void addSeenZombies(String newSeen) { seenZombies.add(newSeen); }
+    public void addSeenZombies(String newSeen) {
+        seenZombies.add(newSeen);
+    }
+
+    public int getCurrentChapter() {
+        return currentChapter;
+    }
+
+    public void setCurrentChapter(int chapter) {
+        this.currentChapter = chapter;
+    }
 
     public int getCurrentLvl() {
         return this.currentLvl;
+    }
+
+    public void setCurrentLvl(int level) {
+        this.currentLvl = level;
+    }
+
+    public int getMinigamesWon() {
+        return minigamesWon;
+    }
+
+    public void incrementMinigamesWon() {
+        this.minigamesWon++;
+    }
+
+    public void setMinigamesWon(int count) {
+        this.minigamesWon = count;
+    }
+
+    public int getQuestsCompleted() {
+        return questsCompleted;
+    }
+
+    public void incrementQuestsCompleted() {
+        this.questsCompleted++;
+    }
+
+    public void setQuestsCompleted(int count) {
+        this.questsCompleted = count;
     }
 
     public int getCoin() {
         return this.coin;
     }
 
+    public void addCoin(int amount) {
+        this.coin += amount;
+    }
+
     public int getGem() {
         return this.gem;
+    }
+
+    public void addGem(int amount) {
+        this.gem += amount;
     }
 
     public Map<String, Integer> getPlantLvls() {
@@ -147,19 +201,9 @@ public class AdventureProgress {
         return this.accountPlants;
     }
 
-    public void addCoin(int amount) {
-        this.coin += amount;
+    public int getPlantFoodCount() {
+        return plantFoodCount;
     }
-
-    public void addGem(int amount) {
-        this.gem += amount;
-    }
-
-    public void setCurrentLvl(int level) {
-        this.currentLvl = level;
-    }
-
-    public int getPlantFoodCount() { return plantFoodCount; }
 
     public void addPlantFood(int amount) {
         plantFoodCount = Math.min(plantFoodCount + amount, 3);
@@ -171,7 +215,9 @@ public class AdventureProgress {
         return true;
     }
 
-    public Map<String, Integer> getSeedPackets() { return seedPackets; }
+    public Map<String, Integer> getSeedPackets() {
+        return seedPackets;
+    }
 
     public void addSeedPackets(String plantName, int amount) {
         seedPackets.merge(plantName, amount, Integer::sum);
@@ -193,7 +239,8 @@ public class AdventureProgress {
         List<String> starterPlantNames = new ArrayList<>();
         if (defaultUnlockedFile.exists()) {
             try (FileReader reader = new FileReader(defaultUnlockedFile)) {
-                Type simpleListType = new TypeToken<List<String>>() {}.getType();
+                Type simpleListType = new TypeToken<List<String>>() {
+                }.getType();
                 List<String> loadedStarters = gson.fromJson(reader, simpleListType);
                 if (loadedStarters != null) {
                     starterPlantNames = loadedStarters.stream()

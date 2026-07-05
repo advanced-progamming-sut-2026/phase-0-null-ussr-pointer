@@ -19,6 +19,8 @@ public class Account {
     private Collection collection;
     private Greenhouse greenhouse;
     private int difficultyLvl;
+    private SavedBoosts savedBoosts;
+
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();
@@ -29,11 +31,27 @@ public class Account {
         this.securityAnswer = state.securityAnswer();
         this.difficultyLvl = state.difficultyLvl();
 
-        adventureProgress = new AdventureProgress(state.currentLvl(), state.coin(), state.gem(), state.plantLvl());
-        scoreRecord = new ScoreRecord(state.score());
-        personalNews = new ArrayList<>(state.personalNews());
+        this.adventureProgress = new AdventureProgress(
+                state.currentChapter(),
+                state.currentLvl(),
+                state.minigamesWon(),
+                state.questsCompleted(),
+                state.coin(),
+                state.gem(),
+                state.plantLvl()
+        );
+
+        this.scoreRecord = new ScoreRecord(state.score());
+        this.personalNews = new ArrayList<>(state.personalNews());
         this.collection = collection;
         this.greenhouse = state.greenhouse() != null ? Greenhouse.fromMap(state.greenhouse()) : new Greenhouse();
+
+        this.savedBoosts = new SavedBoosts();
+        if (state.savedBoosts() != null) {
+            for (String boost : state.savedBoosts()) {
+                this.savedBoosts.addBoost(boost);
+            }
+        }
     }
 
     public AccountState toState() {
@@ -46,7 +64,10 @@ public class Account {
                 this.difficultyLvl,
                 this.securityQuestion,
                 this.securityAnswer,
+                adventureProgress.getCurrentChapter(),
                 adventureProgress.getCurrentLvl(),
+                adventureProgress.getMinigamesWon(),
+                adventureProgress.getQuestsCompleted(),
                 adventureProgress.getCoin(),
                 adventureProgress.getGem(),
                 scoreRecord.getScore(),
@@ -54,6 +75,7 @@ public class Account {
                 adventureProgress.getSeenZombies(),
                 personalNews,
                 this.greenhouse != null ? this.greenhouse.toMap() : null,
+                this.savedBoosts.getBoosts(),
                 adventureProgress.getPlantFoodCount(),
                 adventureProgress.getSeedPackets()
         );
@@ -79,7 +101,9 @@ public class Account {
         return gender;
     }
 
-    public int getDifficultyLvl() { return difficultyLvl; }
+    public int getDifficultyLvl() {
+        return difficultyLvl;
+    }
 
     public SecurityQuestion getSecurityQuestion() {
         return securityQuestion;
@@ -105,6 +129,10 @@ public class Account {
         return adventureProgress;
     }
 
+    public ScoreRecord getScoreRecord() {
+        return scoreRecord;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -121,7 +149,9 @@ public class Account {
         this.email = email;
     }
 
-    public void setDifficultyLvl(int difficultyLvl) { this.difficultyLvl = difficultyLvl; }
+    public void setDifficultyLvl(int difficultyLvl) {
+        this.difficultyLvl = difficultyLvl;
+    }
 
     public void setCollection(Collection collection) {
         this.collection = collection;
@@ -129,5 +159,13 @@ public class Account {
 
     public void setGreenhouse(Greenhouse greenhouse) {
         this.greenhouse = greenhouse;
+    }
+
+    public SavedBoosts getSavedBoosts() {
+        return savedBoosts;
+    }
+
+    public void setSavedBoosts(SavedBoosts savedBoosts) {
+        this.savedBoosts = savedBoosts;
     }
 }
