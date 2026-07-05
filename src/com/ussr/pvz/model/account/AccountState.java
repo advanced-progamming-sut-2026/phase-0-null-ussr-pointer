@@ -14,7 +14,10 @@ public record AccountState(
         int difficultyLvl,
         SecurityQuestion securityQuestion,
         String securityAnswer,
+        int currentChapter,
         int currentLvl,
+        int minigamesWon,
+        int questsCompleted,
         int coin,
         int gem,
         int score,
@@ -22,6 +25,7 @@ public record AccountState(
         List<String> seenZombies,
         List<NewsItem> personalNews,
         Map<String , Object> greenhouse,
+        List<String> savedBoosts,
         int plantFoodCount,
         Map<String, Integer> seedPackets
 ) {
@@ -35,7 +39,10 @@ public record AccountState(
                 this.difficultyLvl,
                 question,
                 answer,
+                this.currentChapter,
                 this.currentLvl,
+                this.minigamesWon,
+                this.questsCompleted,
                 this.coin,
                 this.gem,
                 this.score,
@@ -43,9 +50,9 @@ public record AccountState(
                 this.seenZombies,
                 this.personalNews,
                 this.greenhouse,
+                this.savedBoosts,
                 this.plantFoodCount,
                 this.seedPackets
-
         );
     }
 }

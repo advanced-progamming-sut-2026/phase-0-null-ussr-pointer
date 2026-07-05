@@ -79,7 +79,7 @@ public class Greenhouse {
         if (RAND.nextInt(2) == 0) {
             plant = randomPlant(collection);
         } else {
-            plant = new SproutPlant(null, true, PlantState.GROWING, "", System.currentTimeMillis(), 2 * HOUR);
+            plant = new SproutPlant("MARIGOLD", true, PlantState.GROWING, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
 
         targetPot.setPlant(plant);
@@ -180,7 +180,7 @@ public class Greenhouse {
     private SproutPlant randomPlant(Collection collection) {
         List<Plant> unlocked = collection.unlockedPlants();
         if (unlocked == null || unlocked.isEmpty()) {
-            return new SproutPlant(null, true, PlantState.GROWING, "", System.currentTimeMillis(), 2 * HOUR);
+            return new SproutPlant("MARIGOLD", true, PlantState.GROWING, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
 
         int max = unlocked.size();
@@ -195,7 +195,8 @@ public class Greenhouse {
                 break;
             }
         }
-        return new SproutPlant(null, false, PlantState.GROWING, typePlant.getName(), System.currentTimeMillis(), 8 * HOUR);
+
+        return new SproutPlant(typePlant.getName(), false, PlantState.GROWING, typePlant.getName(), System.currentTimeMillis(), 8 * HOUR);
     }
 
     private record Location(int x, int y) {

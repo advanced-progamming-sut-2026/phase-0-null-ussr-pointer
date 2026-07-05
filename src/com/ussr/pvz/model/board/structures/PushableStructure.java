@@ -12,6 +12,7 @@ import com.ussr.pvz.model.util.Vec2;
 public class PushableStructure extends InteractableStructure implements Damageable {
     private final PushableType type;
     private int hp;
+    private double spawnTimer = 0.0;
 
     private static final double COLLISION_RADIUS = 0.5;
 
@@ -37,6 +38,10 @@ public class PushableStructure extends InteractableStructure implements Damageab
         int col = (int) this.getPosition().x();
 
         session.notifyStructureDestroyed(type.name(), row, col);
+
+        if (type.getSpawnAlias() == null) {
+            return;
+        }
 
         if (this.type == PushableType.BARREL) {
             var imp1 = ZombieFactory.create(type.getSpawnAlias(), row, col);

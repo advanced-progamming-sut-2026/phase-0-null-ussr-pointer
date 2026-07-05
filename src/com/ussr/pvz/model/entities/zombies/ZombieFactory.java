@@ -110,7 +110,7 @@ public class ZombieFactory {
         zombie.setMoveBehavior(MoveBehaviorRegistry.create(moveSpec));
         zombie.setAttackBehavior(AttackBehaviorRegistry.create(attackSpec, data));
         zombie.setDefenseBehavior(DefenseBehaviorRegistry.create(defenseSpec));
-        zombie.setEffectStatus(EffectStatusRegistry.createOrNull(effectSpec));
+        zombie.setEffectStatus(EffectStatusRegistry.createOrNull(effectSpec, data));
 
         attachPushedStructureIfNeeded(zombie);
 
@@ -166,6 +166,12 @@ public class ZombieFactory {
         return new Armor(primaryType, accumulatedArmorHp);
     }
 
+    public static Armor createKnightArmor() {
+        int crownHp = armorBaseHp.getOrDefault("CrownDefault", ArmorType.CROWN.getArmorHp());
+        int shoulderHp = armorBaseHp.getOrDefault("ShoulderArmorDefault", ArmorType.SHOULDER_ARMOR.getArmorHp());
+        return new Armor(ArmorType.CROWN, crownHp + shoulderHp);
+    }
+
     private static void attachPushedStructureIfNeeded(Zombie zombie) {
         PushableType type = switch (zombie.getAlias()) {
             case "ZombieArcade" -> PushableType.ARCADE_CABINET;
@@ -208,7 +214,8 @@ public class ZombieFactory {
             case "ConeDefault" -> ArmorType.CONE;
             case "BucketDefault" -> ArmorType.BUCKET;
             case "BrickDefault" -> ArmorType.BRICK;
-            case "CrownDefault", "ShoulderArmorDefault" -> ArmorType.HELMET;
+            case "CrownDefault" -> ArmorType.CROWN;
+            case "ShoulderArmorDefault" -> ArmorType.SHOULDER_ARMOR;
             case "NewspaperDefault" -> ArmorType.NEWSPAPER;
             default -> null;
         };

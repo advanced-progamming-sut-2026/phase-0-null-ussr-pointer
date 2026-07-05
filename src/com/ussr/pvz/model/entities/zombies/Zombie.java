@@ -33,6 +33,7 @@ public class Zombie extends GameEntity implements Damageable {
     private PushableStructure pushedStructure;
 
     private int hp;
+    private int maxHp;
     private double eatDps;
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
@@ -165,6 +166,17 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setHp(int hp) {
         this.hp = hp;
+        if (this.maxHp <= 0) {
+            this.maxHp = hp;
+        }
+    }
+
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
     }
 
     public double getEatDps() {

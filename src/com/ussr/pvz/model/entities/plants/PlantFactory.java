@@ -163,16 +163,18 @@ public class PlantFactory {
     private static PlantFoodEffect buildPlantFoodEffect(PlantFoodType type) {
         if (type == null || type == PlantFoodType.NONE) return null;
         return switch (type) {
-            case SPAWN_SUN_ITEMS -> new SpawnSun();
-            case PROJECTILE_BURST -> new TimedProjectileBurst();
-            case SPAWN_CLONES -> new SpawnClones();
-            case LOCAL_AOE_ATTACK -> new LocalAttack();
-            case GRANT_PERMANENT_ARMOR -> new GrantArmor();
+            case SPAWN_SUN_ITEMS -> null;//new SpawnSun();
+            case PROJECTILE_BURST -> null;//new TimedProjectileBurst();
+            case SPAWN_CLONES -> null;//new SpawnClones();
+            case LOCAL_AOE_ATTACK -> null;//new LocalAttack();
+            case GRANT_PERMANENT_ARMOR -> null;//new GrantArmor();
             case RANDOM_HYPNOTIZE -> new RandomHypnotize();
-            case KNOCKBACK_BLAST -> new KnockBackBlast();
-            case PULL_UNDERWATER -> new PullUnderWater();
-            case MAP_WIDE_FREEZE -> new MapWideFreeze();
+            case KNOCKBACK_BLAST -> null;//new KnockBackBlast();
+            case PULL_UNDERWATER ->null ;//new PullUnderWater();
+            case MAP_WIDE_FREEZE -> null;//new MapWideFreeze();
             case NONE -> null;
+            case INSTANT_KILL -> null;
+            case LOBBER_BARRAGE -> null;
         };
     }
 }

@@ -50,5 +50,4 @@ public class LocalAttack implements PlantFoodEffect {
         }
 
     }
->>>>>>> Stashed changes
 }

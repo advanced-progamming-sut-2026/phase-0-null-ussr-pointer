@@ -4,8 +4,8 @@ import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
-import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 
 public class KingBuffEffect implements EffectStatus {
     private final double delayBetweenKnighting;
@@ -31,7 +31,6 @@ public class KingBuffEffect implements EffectStatus {
     private boolean applyBuff(Zombie king, GameSession session) {
         int kingRow = (int) king.getPosition().y();
         double kingCol = king.getPosition().x();
-
         return session.getZombies().stream()
                 .filter(GameEntity::isAlive)
                 .filter(zombie -> zombie != king)
@@ -42,8 +41,8 @@ public class KingBuffEffect implements EffectStatus {
                 .filter(zombie -> zombie.getArmor() == null || zombie.getArmor().isDestroyed())
                 .findFirst()
                 .map(targetZombie -> {
-                    Armor newHelmet = new Armor(ArmorType.HELMET, ArmorType.HELMET.getArmorHp());
-                    targetZombie.setArmor(newHelmet);
+                    Armor knightArmor = ZombieFactory.createKnightArmor();
+                    targetZombie.setArmor(knightArmor);
                     return true;
                 }).orElse(false);
     }

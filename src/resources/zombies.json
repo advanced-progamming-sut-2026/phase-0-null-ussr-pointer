@@ -496,6 +496,7 @@
           "Value": "speed3"
         }
       ],
+      "effect": "GargantuarImpThrowEffect",
       "attack": {
         "type": "SmashAttack",
         "windupDuration": 2.0
@@ -1605,7 +1606,8 @@
           "Value": "speed2"
         }
       ],
-      "defense": "JesterDefense"
+      "defense": "JesterDefense",
+      "effect": "SpinEffect"
     }
   },
   {
@@ -1770,7 +1772,8 @@
           "Value": "toughness5"
         }
       ],
-      "effect": "KingBuffEffect"
+      "effect": "KingBuffEffect",
+      "move": "StationaryMove"
     }
   },
   {

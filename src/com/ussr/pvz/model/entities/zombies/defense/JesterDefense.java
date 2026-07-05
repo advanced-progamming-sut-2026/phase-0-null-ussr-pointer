@@ -6,10 +6,12 @@ import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.effect.SpinEffect;
 import com.ussr.pvz.model.util.Vec2;
 
 public class JesterDefense implements DefenseBehavior {
     private static final double MIRROR_SPEED = 20.0;
+    private static final double SPIN_DURATION_ON_DEFLECT = 1.0;
 
     @Override
     public int handleDamage(Zombie zombie, int rawDamage, Object damageSource, GameSession session) {
@@ -19,11 +21,18 @@ public class JesterDefense implements DefenseBehavior {
                     projectile.getMoveStrategy() instanceof ArcMove) {
 
                 mirrorBack(zombie, projectile, session);
+                triggerSpin(zombie);
 
                 return 0; // Takes no damage from juggled objects
             }
         }
         return rawDamage;
+    }
+
+    private void triggerSpin(Zombie zombie) {
+        if (zombie.getEffectStatus() instanceof SpinEffect spinEffect) {
+            spinEffect.startSpin(SPIN_DURATION_ON_DEFLECT);
+        }
     }
 
     private void mirrorBack(Zombie zombie, Projectile incoming, GameSession session) {
@@ -42,7 +51,7 @@ public class JesterDefense implements DefenseBehavior {
                 velocity,
                 incoming.getDamage(),
                 new StraightMove(),
-                null
+                incoming.getHitEffectStrategy()
         ));
     }
 

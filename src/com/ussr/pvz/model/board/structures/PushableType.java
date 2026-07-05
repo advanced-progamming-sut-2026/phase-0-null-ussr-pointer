@@ -2,7 +2,7 @@ package com.ussr.pvz.model.board.structures;
 
 public enum PushableType {
     ICE_BLOCK(500, "ZombieImp"),
-    ARCADE_CABINET(800, "ZombieArcade"),
+    ARCADE_CABINET(1100, null),
     BARREL(500, "ZombieImp"); // Barrel added, spawns Imps upon breaking
 
     private final int baseHp;
