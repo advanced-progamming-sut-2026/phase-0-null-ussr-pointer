@@ -7,13 +7,21 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class SprintMove implements MoveBehavior {
     private final double baseSprintMultiplier;
+    private final double enrageMultiplier;
+    private final boolean enragesOnArmorLoss;
 
     public SprintMove() {
-        this.baseSprintMultiplier = 1.0;
+        this(1.0, 1.0, false);
     }
 
     public SprintMove(double baseSprintMultiplier) {
+        this(baseSprintMultiplier, 1.0, false);
+    }
+
+    public SprintMove(double baseSprintMultiplier, double enrageMultiplier, boolean enragesOnArmorLoss) {
         this.baseSprintMultiplier = baseSprintMultiplier;
+        this.enrageMultiplier = enrageMultiplier;
+        this.enragesOnArmorLoss = enragesOnArmorLoss;
     }
 
     @Override
@@ -21,26 +29,18 @@ public class SprintMove implements MoveBehavior {
         Vec2 pos = zombie.getPosition();
         if (pos == null) return;
 
-        double activeSpeedX = getActiveSpeedX(zombie);
-        double deltaX = activeSpeedX * GameClock.SECONDS_PER_TICK;
-        double targetX = pos.x() + deltaX;
-
-        zombie.setPosition(Vec2.of(targetX, pos.y()));
+        double deltaX = getActiveSpeedX(zombie) * GameClock.SECONDS_PER_TICK;
+        zombie.setPosition(Vec2.of(pos.x() + deltaX, pos.y()));
 
         if (zombie.getPosition().x() < 0) {
             session.onZombieReachedEnd();
         }
     }
 
-    private double getActiveSpeedX(Zombie zombie) {
-        double currentMultiplier = this.baseSprintMultiplier;
-
-        if ("ZombieNewspaper".equals(zombie.getAlias())) {
-            if (zombie.getArmor() == null || zombie.getArmor().getArmorHp() <= 0) {
-                currentMultiplier = 4.0;
-            }
+    protected double getActiveSpeedX(Zombie zombie) {
+        if (enragesOnArmorLoss && (zombie.getArmor() == null || zombie.getArmor().isDestroyed())) {
+            return zombie.getSpeed().x() * enrageMultiplier;
         }
-
-        return zombie.getSpeed().x() * currentMultiplier;
+        return zombie.getSpeed().x() * baseSprintMultiplier;
     }
 }

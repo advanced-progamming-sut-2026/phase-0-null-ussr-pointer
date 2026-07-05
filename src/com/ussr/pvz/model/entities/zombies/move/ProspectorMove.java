@@ -18,8 +18,21 @@ public class ProspectorMove implements MoveBehavior {
     private double timeToTravel = 1.5;
     private double airborneSpeedX = 0.0;
 
+    private boolean dynamiteExtinguished = false;
+
+    public void extinguishDynamite() {
+        if (currentPhase == ProspectorPhase.WALKING_LEFT) {
+            dynamiteExtinguished = true;
+        }
+    }
+
     @Override
     public void move(Zombie zombie, GameSession session) {
+        if (dynamiteExtinguished) {
+            new NormalWalk().move(zombie, session);
+            return;
+        }
+
         Vec2 pos = zombie.getPosition();
         if (pos == null) return;
 

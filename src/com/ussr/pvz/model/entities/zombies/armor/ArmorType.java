@@ -5,7 +5,9 @@ public enum ArmorType {
     BUCKET("bucket", 1100),
     HELMET("helmet", 1600),
     BRICK("brick", 2200),
-    NEWSPAPER("newspaper", 800);
+    NEWSPAPER("newspaper", 800),
+    CROWN("crown", 1600),
+    SHOULDER_ARMOR("shoulderArmor", 1600);
 
     private final String name;
     private final int armorHp;
