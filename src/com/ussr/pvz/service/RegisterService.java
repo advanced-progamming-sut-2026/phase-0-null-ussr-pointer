@@ -48,7 +48,10 @@ public class RegisterService {
                 3,         // default difficulty level
                 null,  // securityQuestion — not picked yet
                 null,  // securityAnswer — not picked yet
+                1,     // starting chapter
                 1,     // starting level
+                0,     // minigames won
+                0,     // completed quests
                 0,     // coin
                 0,     // gem
                 0,     // score
@@ -56,6 +59,7 @@ public class RegisterService {
                 new ArrayList<>(),
                 List.of(NewsItem.initialNews()),
                 null,  // greenhouse
+                null,  // saved boosts
                 0,     // plantFoodCount
                 new HashMap<>()   //seedPackets
         );
