@@ -22,7 +22,7 @@ public class KnockBackBlast implements PlantFoodEffect {
 
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
-        
+
         Vec2 userPos = user.getPosition();
         Vec2 vel = new Vec2(20 , 0);
         MoveStrategy moveStrategy = new StraightMove();
