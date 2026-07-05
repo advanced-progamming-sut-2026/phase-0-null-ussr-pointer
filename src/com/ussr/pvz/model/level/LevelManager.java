@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.level;
 
-import com.ussr.pvz.model.level.delivery.CardDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.RegularDeliveryStrategy;
@@ -114,7 +113,6 @@ public class LevelManager {
         if (raw == null) return new RegularDeliveryStrategy();
         return switch (raw.toLowerCase()) {
             case "conveyor" -> new ConveyorDeliveryStrategy();
-            case "card" -> new CardDeliveryStrategy();
             default -> new RegularDeliveryStrategy();
         };
     }

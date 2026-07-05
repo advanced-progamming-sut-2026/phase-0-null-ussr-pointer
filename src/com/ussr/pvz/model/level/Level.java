@@ -133,5 +133,9 @@ public class Level {
     public void setSeedPlants(List<String> seedPlants) {
         this.seedPlants = seedPlants;
     }
+
+    public Object getBehavior() {
+        return this.behavior;
+    }
 }
 
