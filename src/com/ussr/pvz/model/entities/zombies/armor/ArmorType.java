@@ -11,11 +11,13 @@ public enum ArmorType {
 
     private final String name;
     private final int armorHp;
+    private final boolean isMetal;
 
     //constructor
-    ArmorType(String name, int armorHp) {
+    ArmorType(String name, int armorHp , boolean isMetal) {
         this.name = name;
         this.armorHp = armorHp;
+        this.isMetal = isMetal;
     }
 
     //getter
@@ -26,6 +28,8 @@ public enum ArmorType {
     public int getArmorHp() {
         return this.armorHp;
     }
+
+    public boolean isMetal() { return this.isMetal; }
 
     //helper
     public static ArmorType getByName(String name) {

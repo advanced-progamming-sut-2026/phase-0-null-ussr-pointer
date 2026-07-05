@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.board;
 
+import com.ussr.pvz.model.board.terrain.Tile;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,11 @@ public class Lawn {
         Row row = getRow(r);
         if (row == null) return null;
         return row.getCell(c);
+    }
+
+    public Tile getTile(int row , int col) {
+        if(row < 1 || row > 5 || col < 1 || col > 9) return  null;
+        return rows.get(row-1).getCell(col - 1).getTile();
     }
 
     public int getRows() { return numRows; }

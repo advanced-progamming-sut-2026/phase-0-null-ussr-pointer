@@ -30,6 +30,7 @@ public class Plant extends GameEntity implements Damageable {
     private PlantType type;
     private Plant bottom = null;
     private int stackNumber = 1;
+    private boolean isBuffed = false;
 
     private ModifiableStat hpStat;
     private ModifiableStat actionIntervalStat;
@@ -377,4 +378,8 @@ public class Plant extends GameEntity implements Damageable {
     public void setArmor(PlantArmor armor) { this.armor = armor; }
 
     public PlantArmor getArmor() { return this.armor; }
+
+    public boolean isBuffed() { return this.isBuffed; }
+
+    public void setBuffed(boolean isBuffed) { this.isBuffed = isBuffed; }
 }
