@@ -9,6 +9,7 @@ import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TimedProjectileBurst implements PlantFoodEffect {
@@ -19,6 +20,7 @@ public class TimedProjectileBurst implements PlantFoodEffect {
     private final boolean freezeLaneOnTrigger;
     private final Tag resetLifespanTag;
     private final List<Vec2> temporaryVectors;
+    private Zombie target = null;
 
     public TimedProjectileBurst(double duration, double fireRate, int giantPeaCount,
                                 double giantPeaMultiplier, boolean freezeLaneOnTrigger,
@@ -75,6 +77,7 @@ public class TimedProjectileBurst implements PlantFoodEffect {
             HitEffectStrategy hitEffect = buildHitEffect(user);
 
             for (Vec2 direction : vectors) {
+                target = findNearest(user , session);
                 Vec2 velocity = direction.normalize().scale(25.0);
 
                 boolean fireGiant = (user.getPlantFoodTimer() <= fireRate * giantPeaCount) && (giantPeaCount > 0);
@@ -84,7 +87,7 @@ public class TimedProjectileBurst implements PlantFoodEffect {
                 session.getProjectiles().add(new Projectile(
                         user.getPosition(),
                         velocity,
-                        null,
+                        target,
                         finalDamage,
                         new StraightMove(),
                         hitEffect
@@ -98,5 +101,22 @@ public class TimedProjectileBurst implements PlantFoodEffect {
         if (user.getTags().contains(Tag.ICE)) return new IceHit(1);
         if (user.getTags().contains(Tag.POISON)) return new PoisonHit(1);
         return new NormalHit(1);
+    }
+
+    private Zombie findNearest(Plant user , GameSession session) {
+        if(!user.getTags().contains(Tag.MAGIC)) return null;
+        List<Zombie> zombies = session.getZombies();
+        Zombie nearest = null;
+        double shortest = Double.MAX_VALUE;
+        Vec2 userPos = user.getPosition();
+
+        for(Zombie zomb : zombies) {
+            double length = userPos.distanceTo(zomb.getPosition());
+            if(length < shortest) {
+                shortest= length;
+                nearest = zomb;
+            }
+        }
+        return nearest;
     }
 }

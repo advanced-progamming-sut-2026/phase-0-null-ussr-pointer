@@ -43,7 +43,7 @@ public class Zombie extends GameEntity implements Damageable {
 
     }
 
-    public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER}
+    public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
     private Status status = Status.NORMAL;
 
     private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;

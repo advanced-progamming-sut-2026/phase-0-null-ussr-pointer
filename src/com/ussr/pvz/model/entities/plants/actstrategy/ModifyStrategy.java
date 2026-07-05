@@ -14,6 +14,11 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
 
 public class ModifyStrategy implements ActStrategy {
+    private  int damageMultiplier = 1;
+
+    public ModifyStrategy(int damageMultiplier) {
+        this.damageMultiplier = damageMultiplier;
+    }
     @Override
     // todo: ability values: 1 for pads(do nothing) 2 for (Torchwood) 3 for (hypnotism)
     // the hypno will handled in the zombie and plant in the future
@@ -60,5 +65,10 @@ public class ModifyStrategy implements ActStrategy {
                 projectile.setHitEffectStrategy(new PoisonHit(1));
             }
         }
+        for(Projectile projectile : targets) {
+            projectile.setDamage(projectile.getDamage() * damageMultiplier);
+        }
     }
+
+    public void setDamageMultiplier(int multiplier) { this.damageMultiplier = multiplier; }
 }
