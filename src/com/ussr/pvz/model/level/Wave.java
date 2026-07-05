@@ -15,6 +15,14 @@ public class Wave {
         this.waveNumber = n;
     }
 
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
     public List<SpawnData> getSpawnData() {
         return spawnData;
     }

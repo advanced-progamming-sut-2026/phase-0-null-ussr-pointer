@@ -1,9 +1,11 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum Tag {
     DAY("Day"),
     SHROOM("Shroom"),
-    WRAMP_UP("wramp-up"),
+    @SerializedName("WRAMP-UP") WRAMP_UP("wramp-up"),
     NIGHT("night"),
     PEA("Pea"),
     ICE("Ice"),
@@ -35,8 +37,10 @@ public enum Tag {
     BESTER("Bester"),
     SUN("Sun"),
     AOE("Area damage"),
-    MOVE_ZOMBIES("Move Zombies"),
-    BUTTER("butter");
+    @SerializedName("MOVE_ZOMBIE") MOVE_ZOMBIES("Move Zombies"),
+    BUTTER("butter"),
+    @SerializedName("EXPLOSIVE") EXPLOSIVE("Explosive"),
+    @SerializedName("TRAP") TRAP("Trap");
 
     private final String name;
 

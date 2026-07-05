@@ -40,11 +40,13 @@ public class LevelFactory {
         }
 
         if (data.allowedZombies != null) {
-            List<String> zombieIds = new ArrayList<>();
+            List<Level.AllowedZombie> allowed = new ArrayList<>();
             for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
-                if (entry.id != null) zombieIds.add(entry.id);
+                if (entry.id != null) {
+                    allowed.add(new Level.AllowedZombie(entry.id, entry.weight > 0 ? entry.weight : 1000));
+                }
             }
-            level.setAllowedZombies(zombieIds);
+            level.setAllowedZombies(allowed);
         }
 
         if (data.waves != null) {
@@ -59,6 +61,7 @@ public class LevelFactory {
         for (JsonContainer.JsonWaveData waveData : data.waves) {
             Wave wave = new Wave();
             wave.setWaveNumber(waveData.waveNumber);
+            wave.setCost(waveData.cost);
 
             if (waveData.spawnData != null) {
                 List<SpawnData> spawns = new ArrayList<>();

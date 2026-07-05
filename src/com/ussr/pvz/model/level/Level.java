@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Level {
 
+    public record AllowedZombie(String id, int weight) {}
+
     private String id;
     private int order;
     private String chapter;
@@ -21,7 +23,7 @@ public class Level {
 
     private DeliveryStrategy deliveryStrategy;
 
-    private List<String> allowedZombies;
+    private List<AllowedZombie> allowedZombies;
     private List<Wave> waves;
 
     private LevelBehavior behavior;
@@ -82,11 +84,11 @@ public class Level {
         return deliveryStrategy;
     }
 
-    public void setAllowedZombies(List<String> allowedZombies) {
+    public void setAllowedZombies(List<AllowedZombie> allowedZombies) {
         this.allowedZombies = allowedZombies;
     }
 
-    public List<String> getAllowedZombies() {
+    public List<AllowedZombie> getAllowedZombies() {
         return allowedZombies;
     }
 

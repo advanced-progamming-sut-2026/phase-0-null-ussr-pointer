@@ -258,9 +258,12 @@ public class GameSession {
             wavesStarted = true;
             return;
         }
-        waveScheduler.load(level.getWaves(), lawn != null ? lawn.getCols() : 9);
+
+        int rows = lawn != null ? lawn.getRows() : 5;
+        int cols = lawn != null ? lawn.getCols() : 9;
+
+        waveScheduler.load(level, rows, cols);
         wavesStarted = true;
-        // TODO: implement after zombies are handled
     }
 
     public boolean isWavesStarted() {

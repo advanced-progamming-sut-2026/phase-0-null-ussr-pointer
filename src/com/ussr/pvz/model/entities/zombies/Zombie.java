@@ -51,10 +51,14 @@ public class Zombie extends GameEntity implements Damageable {
 
     private Faction faction = Faction.ZOMBIES;
 
-    public Zombie(String name, Armor armor) {
+    public Zombie(String name, Armor armor, boolean canSpawnPlantFood) {
         this.name = name;
         this.armor = armor;
-        this.isGlowing = RAND.nextInt(100) < 5;
+        this.isGlowing = canSpawnPlantFood && RAND.nextInt(100) < 5;
+    }
+
+    public Zombie(String name, Armor armor) {
+        this(name, armor, true);
     }
 
     @Override

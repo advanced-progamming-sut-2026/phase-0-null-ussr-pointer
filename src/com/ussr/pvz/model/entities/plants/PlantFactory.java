@@ -51,6 +51,9 @@ public class PlantFactory {
                         case BUFF_DAMAGE -> runtimeDamage += (int) upgrade.value;
                         case BUFF_RECHARGE -> runtimeRecharge += upgrade.value;
                         case SPECIAL_MECHANIC -> {
+                            if (upgrade.specialTag != null && !upgrade.specialTag.isEmpty()) {
+                                plant.getRawUpgrades().add(upgrade.specialTag);
+                            }
                         }
                     }
                 }
@@ -69,7 +72,7 @@ public class PlantFactory {
 
         plant.setShootingVectors(buildShootingVectors(config));
         plant.setActStrategy(buildActStrategy(config));
-        plant.setPlantFoodEffect(buildPlantFoodEffect(config.plantFoodType));
+        plant.setPlantFoodEffect(buildPlantFoodEffect(config));
 
         return plant;
     }
@@ -84,11 +87,9 @@ public class PlantFactory {
         List<Vec2> v = new ArrayList<>();
 
         switch (name) {
-
-            case "Peashooter", "Snow Pea", "Fire Peashooter",
-                 "Goo Peashooter", "Sea-shroom", "Puff-shroom",
-                 "Cactus", "Citron", "Bowling Bulb" -> v.add(Vec2.of(1, 0));
-
+            case "Peashooter", "Snow Pea", "Fire Peashooter", "Goo Peashooter", "Sea-shroom",
+                 "Puff-shroom", "Cactus", "Citron", "Bowling Bulb", "Cabbage-pult", "Kernel-pult",
+                 "Melon-pult", "Winter Melon", "Pepper-pult" -> v.add(Vec2.of(1, 0));
             case "Repeater" -> {
                 v.add(Vec2.of(1, 0));
                 v.add(Vec2.of(1, 0));
@@ -144,7 +145,7 @@ public class PlantFactory {
             case INSTANT_EXPLOSIVE -> new ExplodeStrategy();
             case MELEE_ATTACK -> new MeleeStrategy();
             case PASSIVE_SHIELD -> new WallNutStrategy();
-            case MODIFIER_UTILITY -> new ModifyStrategy();
+            case MODIFIER_UTILITY -> new ModifyStrategy(1);
             case MINT_FAMILY_BOOST -> new MintStrategy();
         };
     }
@@ -159,22 +160,30 @@ public class PlantFactory {
         };
     }
 
+    private static PlantFoodEffect buildPlantFoodEffect(PlantConfig config) {
+        if (config.plantFoodType == null || config.plantFoodType == PlantFoodType.NONE) return null;
 
-    private static PlantFoodEffect buildPlantFoodEffect(PlantFoodType type) {
-        if (type == null || type == PlantFoodType.NONE) return null;
-        return switch (type) {
-            case SPAWN_SUN_ITEMS -> null;//new SpawnSun();
-            case PROJECTILE_BURST -> null;//new TimedProjectileBurst();
-            case SPAWN_CLONES -> null;//new SpawnClones();
-            case LOCAL_AOE_ATTACK -> null;//new LocalAttack();
-            case GRANT_PERMANENT_ARMOR -> null;//new GrantArmor();
-            case RANDOM_HYPNOTIZE -> new RandomHypnotize();
-            case KNOCKBACK_BLAST -> null;//new KnockBackBlast();
-            case PULL_UNDERWATER ->null ;//new PullUnderWater();
-            case MAP_WIDE_FREEZE -> null;//new MapWideFreeze();
+        int pfValue = (int) config.plantFoodValue;
+
+        return switch (config.plantFoodType) {
+            case SPAWN_SUN_ITEMS -> new SpawnSun(pfValue, false);
+            case PROJECTILE_BURST -> {
+                if (config.category == PlantType.LOBBER) {
+                    yield new LobberBarrage(pfValue, 1.0, -1);
+                } else {
+                    yield new InstantMassiveBlast(pfValue / Math.max(1.0, config.damage), false);
+                }
+            }
+            case SPAWN_CLONES -> new SpawnClones(pfValue);
+            case LOCAL_AOE_ATTACK -> new LocalAttack(5.0, 0.5, pfValue);
+            case GRANT_PERMANENT_ARMOR -> new GrantArmor(pfValue, 0, false, false, false, true);
+            case RANDOM_HYPNOTIZE -> new RandomHypnotize(pfValue);
+            case KNOCKBACK_BLAST -> new KnockBackBlast(pfValue, 2.0);
+            case PULL_UNDERWATER -> new PullUnderWater(pfValue);
+            case MAP_WIDE_FREEZE -> new MapWideFreeze();
+            case INSTANT_KILL -> new InstantKill(pfValue);
+            case LOBBER_BARRAGE -> new LobberBarrage(pfValue, 1.0, -1);
             case NONE -> null;
-            case INSTANT_KILL -> null;
-            case LOBBER_BARRAGE -> null;
         };
     }
 }

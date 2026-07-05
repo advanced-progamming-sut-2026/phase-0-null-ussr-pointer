@@ -5,10 +5,8 @@ import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
-import com.ussr.pvz.model.entities.plants.actstrategy.ModifyStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
-import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -47,10 +45,6 @@ public class Plant extends GameEntity implements Damageable {
 
     private PlantArmor armor;
 
-    public int getMaxHp() {
-        //todo change this
-        return hp;
-    }
 
     //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
     //note: this approach was a bit wrong for octopus and frozen cause they should take damage and get destroyed
@@ -86,17 +80,20 @@ public class Plant extends GameEntity implements Damageable {
         this.tags.addAll(blueprint.tags);
         this.rawUpgrades.addAll(blueprint.rawUpgrades);
         this.state = PlantState.ACTIVE;
-        //todo needs check
         this.location = blueprint.location;
         // Strategy attachments
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodEffect = blueprint.plantFoodEffect;
-        this.growthTracker = blueprint.growthTracker;
+
+        this.setWrampUp(blueprint.getWrampUp());
 
         // Initialize wrapper stats
         this.hpStat = new ModifiableStat(this.hp);
         this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
         this.abilityValue = blueprint.abilityValue;
+
+        this.plantFoodType = blueprint.plantFoodType;
+        this.shootingVectors = new ArrayList<>(blueprint.shootingVectors);
     }
 
     @Override
@@ -205,6 +202,10 @@ public class Plant extends GameEntity implements Damageable {
     public void setHp(int hp) {
         this.hp = hp;
         if (hpStat != null) hpStat.setBaseValue(hp);
+    }
+
+    public int getMaxHp() {
+        return hp;
     }
 
     public int getRecharge() {

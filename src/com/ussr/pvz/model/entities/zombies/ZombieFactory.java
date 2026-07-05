@@ -91,6 +91,13 @@ public class ZombieFactory {
         }
     }
 
+    public static int getZombieCost(String alias) {
+        init();
+        Map<String, Object> data = blueprints.get(alias);
+        if (data == null) return Integer.MAX_VALUE; // Prevent buying unknown zombies
+        return ((Number) data.getOrDefault("WavePointCost", 100)).intValue();
+    }
+
     @SuppressWarnings("unchecked")
     public static Zombie create(String alias, int row, int col) {
         init();
@@ -105,7 +112,7 @@ public class ZombieFactory {
         Object moveSpec = data.getOrDefault("move", "NormalWalk");
         Object attackSpec = data.getOrDefault("attack", "ChompAttack");
         Object defenseSpec = data.getOrDefault("defense", "NormalDefense");
-        Object effectSpec = data.get("effect"); // optional - most zombies have none
+        Object effectSpec = data.get("effect");
 
         zombie.setMoveBehavior(MoveBehaviorRegistry.create(moveSpec));
         zombie.setAttackBehavior(AttackBehaviorRegistry.create(attackSpec, data));
@@ -129,9 +136,12 @@ public class ZombieFactory {
             default -> ZombieSize.DEFAULT;
         };
 
+        boolean canSpawnPlantFood = data.containsKey("CanSpawnPlantFood") ? (Boolean) data.get("CanSpawnPlantFood") : true;
+
         Armor armor = resolveArmor(data);
 
-        Zombie zombie = new Zombie(alias, armor);
+        Zombie zombie = new Zombie(alias, armor, canSpawnPlantFood);
+        zombie.setMaxHp(hp);
         zombie.setHp(hp);
         zombie.setEatDps(eatDps);
         zombie.setSize(size);
@@ -140,7 +150,33 @@ public class ZombieFactory {
         zombie.setPosition(spawnPos);
         zombie.setSpeed(Vec2.of(-speed, 0));
 
+        applyDifficultyScaling(zombie, data);
+
         return zombie;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void applyDifficultyScaling(Zombie zombie, Map<String, Object> data) {
+        if (App.getAccount() == null) return;
+        int diff = App.getAccount().getDifficultyLvl();
+
+        List<Map<String, Object>> scaledProps = (List<Map<String, Object>>) data.get("ScaledProps");
+        if (scaledProps != null) {
+            for (Map<String, Object> prop : scaledProps) {
+                if ("standard".equals(prop.get("Formula"))) {
+                    double arg1 = ((Number) prop.get("Arg1")).doubleValue();
+                    double arg2 = ((Number) prop.get("Arg2")).doubleValue();
+                    double scale = arg1 + ((diff - 1) * arg2);
+
+                    if ("Hitpoints".equals(prop.get("Key"))) {
+                        zombie.setMaxHp((int)(zombie.getMaxHp() * scale));
+                        zombie.setHp(zombie.getMaxHp());
+                    } else if ("EatDPS".equals(prop.get("Key"))) {
+                        zombie.setEatDps(zombie.getEatDps() * scale);
+                    }
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

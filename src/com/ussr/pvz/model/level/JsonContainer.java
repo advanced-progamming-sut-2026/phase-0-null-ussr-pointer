@@ -41,6 +41,7 @@ public class JsonContainer {
 
     public static class JsonWaveData {
         public int waveNumber;
+        public int cost;
         public List<JsonSpawnData> spawnData;
     }
 
