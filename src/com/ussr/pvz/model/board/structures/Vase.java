@@ -2,13 +2,18 @@ package com.ussr.pvz.model.board.structures;
 
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.items.ItemType;
+import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+
+import java.util.Random;
 
 public class Vase extends InteractableStructure implements Damageable {
     private int hp = 200; //temp
     private VaseType type;
-    private Plant containedPlant;
+    private SeedPackDrop seedPackDrop;
     private Zombie containedZombie;
 
     @Override
@@ -25,20 +30,21 @@ public class Vase extends InteractableStructure implements Damageable {
     @Override
     public void onDestroy(GameSession session) {
         switch (type) {
-            case PLANT ->
-                session.getItems().add()
-                break;
-            case NORMAL ->
-                break;
-            case GARGANTAUR ->
-                break;
-            case null, default ->
-                break;
+            case PLANT -> session.getItems().add(seedPackDrop);
+            case NORMAL -> {
+                Random rand = new Random();
+                rand.setSeed(System.currentTimeMillis());
+                if (rand.nextInt() % 2 == 0) {
+                    session.getItems().add(seedPackDrop);
+                } else {
+                    session.getZombies().add(containedZombie);
+                }
+            }
+            case GARGANTAUR -> {
+                session.getZombies().add(containedZombie);
+            }
         }
-    }
-
-    @Override
-    public void tick() {
+        this.isAlive = false;
     }
 
     public int getHp() {
@@ -53,12 +59,12 @@ public class Vase extends InteractableStructure implements Damageable {
         this.type = type;
     }
 
-    public Plant getContainedPlant() {
-        return containedPlant;
+    public SeedPackDrop getContainedPlant() {
+        return seedPackDrop;
     }
 
-    public void setContainedPlant(Plant containedPlant) {
-        this.containedPlant = containedPlant;
+    public void setSeedPackDrop(SeedPackDrop containedPlant) {
+        this.seedPackDrop = containedPlant;
     }
 
     public Zombie getContainedZombie() {
