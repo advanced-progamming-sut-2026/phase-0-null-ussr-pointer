@@ -24,6 +24,17 @@ public class Vase extends InteractableStructure implements Damageable {
 
     @Override
     public void onDestroy(GameSession session) {
+        switch (type) {
+            case PLANT ->
+                session.getItems().add()
+                break;
+            case NORMAL ->
+                break;
+            case GARGANTAUR ->
+                break;
+            case null, default ->
+                break;
+        }
     }
 
     @Override

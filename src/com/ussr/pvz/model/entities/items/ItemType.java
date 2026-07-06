@@ -5,5 +5,6 @@ public enum ItemType {
     COIN,
     DIAMOND,
     PLANT_FOOD,
+    SEED_PACK,
     POT;
 }

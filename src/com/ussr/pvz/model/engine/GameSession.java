@@ -13,6 +13,8 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
+import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
@@ -85,6 +87,10 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
+        if(level.isFailed()){
+            gameOver = true;
+        }
+
         if (wavesStarted && waveScheduler.isDone() && zombies.isEmpty() && !gameOver) {
             eventBus.publish(new GameEvent.WavesCompleted());
             eventBus.publish(new GameEvent.GameWon());
@@ -134,7 +140,7 @@ public class GameSession {
                     mower.activate();
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
-                } else if (mower == null) {
+                } else {
                     onZombieReachedEnd();
                     break;
                 }
@@ -175,12 +181,17 @@ public class GameSession {
                 damageDealt,
                 plant.getHp()
         ));
+
         if (!plant.isAlive()) {
             eventBus.publish(new GameEvent.PlantDied(
                     plant.getName(),
                     plant.getLocation().y(),
                     plant.getLocation().x()
             ));
+
+            if(level.getBehavior() instanceof LoveYourPlantsBehavior){
+                ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
+            }
         }
     }
 
@@ -207,6 +218,10 @@ public class GameSession {
                 zombie.getPosition().y(),
                 killerPlantName
         ));
+
+        if (level.getBehavior() instanceof TimedWarBehavior) {
+            ((TimedWarBehavior) level.getBehavior()).triggerZombieDied();
+        }
     }
 
     public void notifyZombieDied(Zombie zombie) {
@@ -227,6 +242,9 @@ public class GameSession {
 
     public void addSun(int amount) {
         sunCount += amount;
+        if (level.getBehavior() instanceof TimedWarBehavior) {
+            ((TimedWarBehavior) level.getBehavior()).triggerSunCollected(amount);
+        }
     }
 
     public boolean spendSun(int amount) {
@@ -330,8 +348,7 @@ public class GameSession {
         if (cell.getPlant() != null) {
             sb.append("plant=").append(cell.getPlant().getName())
                     .append(" hp=").append(cell.getPlant().getHp());
-        } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave) {
-            var grave = (com.ussr.pvz.model.board.structures.Grave) cell.getInteractableStructure();
+        } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
             sb.append("structure=Grave hp=").append(grave.getHp());
         } else {
             sb.append("empty");
