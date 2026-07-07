@@ -14,7 +14,7 @@ public class LevelFactory {
 
     static {
         BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
-        BEHAVIOR_REGISTRY.put("SaveOurSeedsBehavior", SaveOurSeedsBehavior::new);
+        //BEHAVIOR_REGISTRY.put("SaveOurSeedsBehavior", SaveOurSeedsBehavior::new);
         BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
         BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
     }
