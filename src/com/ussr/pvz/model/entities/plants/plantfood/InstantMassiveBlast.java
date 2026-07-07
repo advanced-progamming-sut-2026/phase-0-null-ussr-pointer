@@ -70,7 +70,7 @@ public class InstantMassiveBlast implements PlantFoodEffect{
 
     private MoveStrategy handleMoveStrategy(Plant user) {
         if(user.getTags().contains(Tag.BOUNCE))
-            return new BounceMove(9.8 , 1);
+            return new BounceMove();
         return new StraightMove();
     }
 }
