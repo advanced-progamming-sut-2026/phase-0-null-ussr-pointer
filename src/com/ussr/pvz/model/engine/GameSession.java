@@ -95,6 +95,12 @@ public class GameSession {
             eventBus.publish(new GameEvent.WavesCompleted());
             eventBus.publish(new GameEvent.GameWon());
         }
+
+        if (level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior izBehavior) {
+            if (izBehavior.isWon() && !gameOver) {
+                eventBus.publish(new GameEvent.GameWon());
+            }
+        }
     }
 
 
@@ -129,6 +135,9 @@ public class GameSession {
     }
 
     private void checkZombieBreaches() {
+        // Add a check to bypass standard breach rules for i,Zombie
+        boolean isIZombie = level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior;
+
         for (Zombie zombie : zombies) {
             if (!zombie.isAlive()) continue;
 
@@ -140,9 +149,13 @@ public class GameSession {
                     mower.activate();
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
-                } else {
+                } else if (!isIZombie) {
+                    // ONLY trigger game over if it's NOT i,Zombie
                     onZombieReachedEnd();
                     break;
+                } else {
+                    // In i,Zombie, a zombie walking off the left edge just despawns cleanly
+                    zombie.setAlive(false);
                 }
             }
         }

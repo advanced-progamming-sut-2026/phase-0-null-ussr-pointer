@@ -34,15 +34,14 @@ public class Vase extends InteractableStructure implements Damageable {
             case NORMAL -> {
                 Random rand = new Random();
                 rand.setSeed(System.currentTimeMillis());
-                if (rand.nextInt() % 2 == 0) {
+                int random = rand.nextInt();
+                if (random % 3 == 0) {
                     session.getItems().add(seedPackDrop);
-                } else {
+                } else if (random % 3 == 1) {
                     session.getZombies().add(containedZombie);
                 }
             }
-            case GARGANTAUR -> {
-                session.getZombies().add(containedZombie);
-            }
+            case GARGANTAUR -> session.getZombies().add(containedZombie);
         }
         this.isAlive = false;
     }

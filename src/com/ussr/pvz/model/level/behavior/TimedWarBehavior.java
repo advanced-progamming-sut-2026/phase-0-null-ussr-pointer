@@ -3,68 +3,43 @@ package com.ussr.pvz.model.level.behavior;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.level.Level;
 
-import java.util.Random;
-
 public class TimedWarBehavior implements LevelBehavior {
-    //todo it should set as behavior if the limitation time of the level is bigger than -1 in the level factory
-    //todo the is fail should check every tick
-    public enum LimitationType {
-        Zombie(5),
-        sun(500);
 
-        private final int value;
+    public enum LimitationType { ZOMBIE, SUN }
 
-        LimitationType(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
-    private LimitationType limitationType;
+    private final LimitationType limitationType;
+    private final int targetValue;
     private int counter = 0;
+
+    public TimedWarBehavior(LimitationType limitationType, int targetValue) {
+        this.limitationType = limitationType;
+        this.targetValue = targetValue;
+    }
 
     @Override
     public void onStart(Level level) {
-        Random rand = new Random();
-        rand.setSeed(System.currentTimeMillis());
-        int chance = rand.nextInt();
-        if (chance % 2 == 0) {
-            limitationType = LimitationType.Zombie;
-        } else {
-            limitationType = LimitationType.sun;
-        }
+        // Initialization if needed
     }
 
     @Override
-    public void onWaveComplete(Level level, int waveNumber) {
-
-    }
+    public void onWaveComplete(Level level, int waveNumber) {}
 
     @Override
-    public void onComplete(Level level) {
-
-    }
+    public void onComplete(Level level) {}
 
     @Override
     public boolean isFailed(Level level) {
         if (App.getGameSession().getElapsedSeconds() > level.getTimeLimitSeconds()) {
-            return limitationType.value > counter;
+            return counter < targetValue;
         }
         return false;
     }
 
-    public LimitationType getLimitationType() {
-        return limitationType;
-    }
-
     public void triggerSunCollected(int amount) {
-        counter += amount;
+        if (limitationType == LimitationType.SUN) counter += amount;
     }
 
     public void triggerZombieDied() {
-        counter++;
+        if (limitationType == LimitationType.ZOMBIE) counter++;
     }
 }

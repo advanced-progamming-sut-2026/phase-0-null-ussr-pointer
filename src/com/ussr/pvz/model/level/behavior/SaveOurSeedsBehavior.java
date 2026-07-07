@@ -13,15 +13,12 @@ import java.util.List;
 public class SaveOurSeedsBehavior implements LevelBehavior {
 
     private final List<Plant> endangeredPlants = new ArrayList<>();
-    private final List<TargetSeed> seedsToSpawn = new ArrayList<>();
+    private final List<TargetSeed> seedsToSpawn;
 
     private boolean missionFailed = false;
 
-    public SaveOurSeedsBehavior() {
-        // You can populate this list dynamically from your JSON level loader later.
-        // For now, we are adding a couple of hardcoded examples per your request.
-        seedsToSpawn.add(new TargetSeed("SUNFLOWER", 2, 4));
-        seedsToSpawn.add(new TargetSeed("SUNFLOWER", 3, 4));
+    public SaveOurSeedsBehavior(List<TargetSeed> seedsToSpawn) {
+        this.seedsToSpawn = seedsToSpawn != null ? seedsToSpawn : new ArrayList<>();
     }
 
     public void addTargetSeed(String plantName, int row, int col) {
@@ -38,7 +35,7 @@ public class SaveOurSeedsBehavior implements LevelBehavior {
         for (TargetSeed target : seedsToSpawn) {
             Plant specialPlant = new Plant();
             specialPlant.setName(target.plantName());
-            specialPlant.setHp(300);
+            specialPlant.setHp(300); // Or fetch from PlantFactory
             specialPlant.setAlive(true);
             specialPlant.setLocation(new Plant.Location(target.col(), target.row()));
 
