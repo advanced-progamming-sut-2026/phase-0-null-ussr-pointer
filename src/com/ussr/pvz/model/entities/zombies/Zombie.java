@@ -44,6 +44,10 @@ public class Zombie extends GameEntity implements Damageable {
 
     }
 
+    public void takeDamage(int damage , boolean isPoisonous) {
+        //todo : it is for poison hit (just affect zombie's HP
+    }
+
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
     private Status status = Status.NORMAL;
 
