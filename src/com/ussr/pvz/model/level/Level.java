@@ -2,18 +2,17 @@ package com.ussr.pvz.model.level;
 
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
+import com.ussr.pvz.model.level.environment.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
 
-    public record AllowedZombie(String id, int weight) {}
-
     private String id;
     private int order;
     private String chapter;
-
+    private Environment environment;
     private boolean sunFalling = true;
     private int timeLimitSeconds = 0;
     private int deadlineColumn = -1;
@@ -138,6 +137,17 @@ public class Level {
 
     public Object getBehavior() {
         return this.behavior;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
+
+    public record AllowedZombie(String id, int weight) {
     }
 }
 

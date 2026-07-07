@@ -13,6 +13,7 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
 import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
 import com.ussr.pvz.model.quest.QuestEventTracker;
@@ -74,6 +75,11 @@ public class GameSession {
 
     public void tick() {
         clock.tick();
+
+        if (level != null && level.getEnvironment() != null) {
+            level.getEnvironment().tick(this, GameClock.SECONDS_PER_TICK);
+        }
+
         if (wavesStarted) {
             waveScheduler.tick(this, clock.getElapsedSeconds());
         }
@@ -87,7 +93,7 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
-        if(level.isFailed()){
+        if (level.isFailed()) {
             gameOver = true;
         }
 
@@ -202,7 +208,7 @@ public class GameSession {
                     plant.getLocation().x()
             ));
 
-            if(level.getBehavior() instanceof LoveYourPlantsBehavior){
+            if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
                 ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
             }
         }
@@ -458,5 +464,17 @@ public class GameSession {
 
     public double getElapsedSeconds() {
         return clock.getElapsedSeconds();
+    }
+
+    public void notifyPlantDied(Plant plant) {
+        eventBus.publish(new GameEvent.PlantDied(
+                plant.getName(),
+                plant.getLocation().y(),
+                plant.getLocation().x()
+        ));
+
+        if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
+            ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
+        }
     }
 }
