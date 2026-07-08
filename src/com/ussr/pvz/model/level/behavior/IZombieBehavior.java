@@ -5,8 +5,12 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.engine.event.GameEvent;
-import com.ussr.pvz.model.entities.items.sun.ProducedSun;
+import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieSize;
+import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
+import com.ussr.pvz.model.entities.zombies.defense.NormalDefense;
+import com.ussr.pvz.model.entities.zombies.effect.SunProducerZombieEffect;
+import com.ussr.pvz.model.entities.zombies.move.StationaryMove;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -14,17 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IZombieBehavior implements LevelBehavior {
-    //todo this is not complete at all
     private final int redLineColumn;
     private final int startingSun;
     private final List<Brain> brains = new ArrayList<>();
-
-    // In a real scenario, this would be populated by your JSON LevelFactory
     private final List<PrePlacedPlant> plantLayout;
 
     public IZombieBehavior(int redLineColumn, int startingSun, List<PrePlacedPlant> plantLayout) {
         this.redLineColumn = redLineColumn;
-        this.startingSun = startingSun;
+        // Enforce the 150 starting sun requirement
+        this.startingSun = startingSun > 0 ? startingSun : 150;
         this.plantLayout = plantLayout != null ? plantLayout : new ArrayList<>();
     }
 
@@ -35,11 +37,12 @@ public class IZombieBehavior implements LevelBehavior {
 
         level.setSunFalling(false);
 
-        // Give starting sun
+        // Give exactly starting sun (150)
         int currentSun = session.getSunCount();
         session.addSun(startingSun - currentSun);
 
         int rows = session.getLawn().getRows();
+        int cols = session.getLawn().getCols();
 
         // 1. Place Brains at column 0 for every row
         for (int r = 0; r < rows; r++) {
@@ -55,21 +58,33 @@ public class IZombieBehavior implements LevelBehavior {
 
         // 2. Pre-place cardboard plants
         for (PrePlacedPlant pp : plantLayout) {
-            // TODO: Use PlantFactory when ready
-            // Plant plant = PlantFactory.createPlant(pp.plantName, 1);
-            // plant.setLocation(new Plant.Location(pp.col, pp.row));
-            // session.getLawn().getCell(pp.row, pp.col).setPlant(plant);
-            // session.getPlants().add(plant);
+            int plantId = 1; // TODO: Replace with PlantFactory.getIdByName(pp.plantName());
+            com.ussr.pvz.model.entities.plants.Plant plant =
+                    com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(plantId, 1);
+
+            plant.setLocation(new com.ussr.pvz.model.entities.plants.Plant.Location(pp.col(), pp.row()));
+            session.getLawn().getCell(pp.row(), pp.col()).setPlant(plant);
+            session.getPlants().add(plant);
         }
 
-        // 3. Listen for Sunflower deaths to drop sun
-        session.getEventBus().subscribe(GameEvent.PlantDied.class, event -> {
-            if (event.plantName().equalsIgnoreCase("Sunflower")) {
-                // Spawn a sun worth 200 at the exact location the plant died
-                ProducedSun bigSun = new ProducedSun(event.row(), event.col(), 200);
-                session.getItems().add(bigSun);
-            }
-        });
+        // 3. Spawn the special Sun-Producing Zombies (one per row, rightmost column)
+        for (int r = 0; r < rows; r++) {
+            Zombie sunZombie = new Zombie("SunProducerZombie", null, false);
+            // Health equal to a bucket zombie (200 base + 1100 bucket = 1300)
+            sunZombie.setMaxHp(1300);
+            sunZombie.setHp(1300);
+            sunZombie.setEatDps(0);
+            sunZombie.setSize(ZombieSize.DEFAULT);
+            sunZombie.setPosition(Vec2.of(cols - 1, r));
+
+            // Stationary so it acts as a passive generator
+            sunZombie.setMoveBehavior(new StationaryMove());
+            sunZombie.setAttackBehavior(new ChompAttack());
+            sunZombie.setDefenseBehavior(new NormalDefense());
+            sunZombie.setEffectStatus(new SunProducerZombieEffect());
+
+            session.spawnZombie(sunZombie);
+        }
     }
 
     @Override
@@ -86,16 +101,16 @@ public class IZombieBehavior implements LevelBehavior {
         GameSession session = App.getGameSession();
         if (session == null) return false;
 
-        boolean outOfSun = session.getSunCount() < 50; // Cheapest zombie cost
+        // Note: 50 is used as a baseline cheapest zombie cost. You can dynamically fetch the
+        // minimum cost of the 5 available zombies for the current stage if needed.
+        boolean outOfSun = session.getSunCount() < 50;
         boolean noZombiesAlive = session.getZombies().stream().noneMatch(GameEntity::isAlive);
-        boolean brainsRemaining = brains.stream().anyMatch(Brain::isAlive);
 
-        // Fail if we can't buy zombies, have no zombies acting, and haven't eaten all brains
-        return outOfSun && noZombiesAlive && brainsRemaining;
+        // Fails if no sun to place units AND no zombies exist on the lawn
+        return outOfSun && noZombiesAlive;
     }
 
     public boolean isWon() {
-        // Win if all brains are dead
         return brains.stream().noneMatch(Brain::isAlive);
     }
 

@@ -1,9 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.factory;
 
-import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
-import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
-import com.ussr.pvz.model.entities.zombies.attack.CrushAttack;
-import com.ussr.pvz.model.entities.zombies.attack.SmashAttack;
+import com.ussr.pvz.model.entities.zombies.attack.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +25,11 @@ public final class AttackBehaviorRegistry {
             boolean isOneTime = BehaviorSpec.getBoolean(params, "isOneTime", false);
             double speedScaleAfter = BehaviorSpec.getDouble(params, "speedScaleAfter", 1.0);
             return new SmashAttack(smashDamage, windupDuration, isOneTime, speedScaleAfter);
+        });
+
+        register("KamikazeAttack", (params, data) -> {
+            int damage = BehaviorSpec.getInt(params, "damage", 1800);
+            return new KamikazeAttack(damage);
         });
     }
 

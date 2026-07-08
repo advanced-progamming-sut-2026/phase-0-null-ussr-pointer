@@ -20,18 +20,20 @@ public class ButterHit implements HitEffectStrategy{
         }
 
         projectile.setAlive(false);
-
         int damageAmount = projectile.getDamage();
 
         for (GameEntity target : entities) {
             if (target == null) continue;
 
             if (target instanceof Zombie zombie) {
-                zombie.takeDamage(damageAmount);
-
+                // Pass the projectile as the damage source
+                zombie.takeDamage(damageAmount, projectile);
                 zombie.setStatus(Zombie.Status.BUTTER);
 
-                // todo: Call your zombie immobilization/stun method here
+                // Wrap the current move behavior to stun them for a duration (e.g., 4 seconds)
+                if (!(zombie.getMoveBehavior() instanceof com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior)) {
+                    zombie.setMoveBehavior(new com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior(zombie.getMoveBehavior(), 4.0));
+                }
 
             } else if (target instanceof InteractableStructure structure) {
                 structure.takeDamage(damageAmount);

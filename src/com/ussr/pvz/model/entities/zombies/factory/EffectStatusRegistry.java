@@ -63,6 +63,13 @@ public final class EffectStatusRegistry {
                         BehaviorSpec.getDouble(data, "MinPosXThrowImp", 0.0),
                         BehaviorSpec.getString(params, "impAlias", "ZombieImp")
                 ));
+
+        register("JalapenoZombieEffect", (params, data) -> new JalapenoZombieEffect());
+
+        register("PeashooterZombieEffect", (params, data) -> new PeashooterZombieEffect(
+                BehaviorSpec.getInt(params, "damage", 20),
+                BehaviorSpec.getDouble(params, "fireRate", 1.5)
+        ));
     }
 
     private EffectStatusRegistry() {

@@ -1,9 +1,8 @@
-package com.ussr.pvz.model.minigames.projectile;
+package com.ussr.pvz.model.entities.projectiles;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 

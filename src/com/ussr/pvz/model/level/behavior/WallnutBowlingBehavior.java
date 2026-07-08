@@ -2,7 +2,7 @@ package com.ussr.pvz.model.level.behavior;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.minigames.projectile.BowlingNutProjectile;
+import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 

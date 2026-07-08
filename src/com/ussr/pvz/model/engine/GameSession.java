@@ -291,7 +291,12 @@ public class GameSession {
     }
 
     public void removeAllCooldowns() {
-        // TODO: implement after plants are handled
+        if (App.getAccount() != null && App.getAccount().getCollection() != null) {
+            // Iterate through the unlocked plants in the collection and zero out their recharge
+            for (Plant plant : App.getAccount().getCollection().unlockedPlants()) {
+                plant.setRecharge(0);
+            }
+        }
     }
 
 

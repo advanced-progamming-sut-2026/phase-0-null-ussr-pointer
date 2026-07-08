@@ -25,11 +25,9 @@ public class App {
     private static Account account;
     private static GameSession gameSession;
     private static List<Map<String, Object>> cachedPlantsData = null;
-    //todo check this shop manager and see if it shouldn't be here
     private static ShopManager shopManager;
-    private static StringBuilder pendingMessage = new StringBuilder();
-    private static LevelManager levelManager = new LevelManager();
-    private static List<Account> accounts = new ArrayList<>(
+    private static final LevelManager levelManager = new LevelManager();
+    private static final List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
                             (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
@@ -41,7 +39,7 @@ public class App {
     public static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             List<Account> accounts = getAccounts();
-            if (accounts != null && !accounts.isEmpty()) {
+            if (!accounts.isEmpty()) {
                 List<AccountState> states = accounts.stream()
                         .map(Account::toState)
                         .toList();

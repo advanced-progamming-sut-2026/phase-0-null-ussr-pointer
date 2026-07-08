@@ -24,8 +24,6 @@ public class SunToken extends GroundItem {
     private int elapsedTicks = 0;
 
     public SunToken(int maxRows, int maxCols) {
-        //todo make some event or something that we can trigger when sun produced to print it and
-        // later use it for graphic
         super(ItemType.SUN, 40f, 20f);
         int roll = RAND.nextInt(100);
         SunDropType selectedType = SunDropType.REGULAR;
@@ -57,7 +55,9 @@ public class SunToken extends GroundItem {
             App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(), App.getGameSession().getSunCount()));
         } else {
             if (falling) {
-                // TODO: Implement area damage (150) to zombies and plants in area when falling
+                explodeRadioactive(session);
+                this.isAlive = false;
+                this.setCollected(true);
                 return;
             }
             session.addSun(dropType.getValue());
@@ -65,6 +65,40 @@ public class SunToken extends GroundItem {
         }
         this.isAlive = false;
         this.setCollected(true);
+    }
+
+    private void explodeRadioactive(GameSession session) {
+        int rCenter = targetRow;
+        int cCenter = targetCol;
+
+        // Deal 150 damage to zombies in a 5x5 area (Radius of 2)
+        if (session.getZombies() != null) {
+            for (com.ussr.pvz.model.entities.zombies.Zombie zombie : session.getZombies()) {
+                if (!zombie.isAlive()) continue;
+
+                double zY = zombie.getPosition().y();
+                double zX = zombie.getPosition().x();
+
+                if (Math.abs(zY - rCenter) <= 2 && Math.abs(zX - cCenter) <= 2) {
+                    zombie.takeDamage(150);
+                }
+            }
+        }
+
+        // Deal 80 damage to plants in a 3x3 area (Radius of 1)
+        if (session.getPlants() != null) {
+            for (com.ussr.pvz.model.entities.plants.Plant plant : session.getPlants()) {
+                if (!plant.isAlive()) continue;
+
+                int pY = plant.getLocation().y();
+                int pX = plant.getLocation().x();
+
+                if (Math.abs(pY - rCenter) <= 1 && Math.abs(pX - cCenter) <= 1) {
+                    // Pass null for the dealer, or create a specific environmental damage source if needed
+                    plant.takeDamage(80, null);
+                }
+            }
+        }
     }
 
     @Override

@@ -134,6 +134,12 @@ public class MeleeStrategy implements ActStrategy {
 
     private void userAct(Plant user , ArrayList<Zombie> targets) {
         int userDamage = user.getDamage();
+
+        // If the ability is 4 (Swallow), ensure an instant kill
+        if ((int) user.getAbilityValue() == 4) {
+            userDamage = 99999;
+        }
+
         for(Zombie zombie : targets) {
             zombie.takeDamage(userDamage);
         }

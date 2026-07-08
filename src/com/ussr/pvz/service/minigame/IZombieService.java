@@ -18,22 +18,36 @@ public class IZombieService {
             return "Current level is not an i,Zombie minigame.";
         }
 
-        // Validate placement area (must be to the right of the red line)
+        // 1. Prevent spawning the special Sun-Producing Zombie
+        if (zombieAlias.equalsIgnoreCase("SunProducerZombie")) {
+            return "You cannot manually place the Sun-Producing Zombie!";
+        }
+
+        // Optional: Ensure the zombie is part of the 5 allowed zombies for this specific stage
+        /*
+        boolean isAllowed = session.getLevel().getAllowedZombies().stream()
+                .anyMatch(z -> z.id().equalsIgnoreCase(zombieAlias));
+        if (!isAllowed) {
+            return zombieAlias + " is not available in this stage.";
+        }
+        */
+
+        // 2. Validate placement area (must be to the right of the red line)
         if (x < iZombieBehavior.getRedLineColumn()) {
             return "You can only spawn zombies to the right of the red line (column " + iZombieBehavior.getRedLineColumn() + " or greater).";
         }
 
-        // Validate Cost
+        // 3. Validate Cost
         int cost = ZombieFactory.getZombieCost(zombieAlias);
         if (session.getSunCount() < cost) {
             return "Not enough sun! " + zombieAlias + " costs " + cost + " sun.";
         }
 
         try {
-            // Spawn the zombie
+            // 4. Spawn the zombie
             Zombie zombie = ZombieFactory.create(zombieAlias, y, x);
 
-            // Deduct sun and add to session
+            // 5. Deduct sun and add to session
             session.spendSun(cost);
             session.spawnZombie(zombie);
 

@@ -27,6 +27,13 @@ public enum GameCommand {
     ZOMBIES_INFO("^zombies\\s+info(?:\\s+.*)?$"),
     CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     CHEAT_ADD_CURRENCY("^menu\\s+cheat\\s+add\\s+(?<amount>\\S+)\\s+(?<currency>\\S+)(?:\\s+.*)?$"),
+    // In src/com/ussr/pvz/controller/command/maincommand/gamecommand/GameCommand.java
+
+    // Command: swap (r1, c1) with (r2, c2)
+    SWAP_PLANTS("^swap\\s+\\(\\s*(?<r1>\\S+?)\\s*,\\s*(?<c1>\\S+?)\\s*\\)\\s+with\\s+\\(\\s*(?<r2>\\S+?)\\s*,\\s*(?<c2>\\S+?)\\s*\\)(?:\\s+.*)?$"),
+
+    // Command: upgrade <plantType>
+    UPGRADE_BEGHOULED_PLANT("^upgrade\\s+(?<plantType>.+?)(?:\\s+.*)?$"),
     START_ZOMBIE_WAVES("^start\\s+zombie\\s+waves(?:\\s+.*)?$");
 
     private final String pattern;

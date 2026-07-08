@@ -20,10 +20,9 @@ public class SunProduceStrategy implements ActStrategy {
 
         if (!sunAlreadyExists) {
             if(user.getIntervalTimer() <= 0) {
-                int sunValue = (int)user.getAbilityValue();
-                //todo implement shroom stage mechanics (Sun-warmup growth tier checks)
-                //TODO change the json file and add the growth time to the file
-                //todo call the upgrade method for all plants in game loop
+                // This naturally grabs the current stage's sun value thanks to Plant.java's getter
+                int sunValue = (int) user.getAbilityValue();
+
                 ProducedSun sun = new ProducedSun(x, y, sunValue);
                 session.getItems().add(sun);
                 user.setInternalTimer(user.getActionInterval());

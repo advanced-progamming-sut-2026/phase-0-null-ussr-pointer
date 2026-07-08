@@ -40,9 +40,10 @@ public class PierceKnockBackHit implements HitEffectStrategy{
 
                 hitZombies.add(zombie);
                 zombie.takeDamage(damageAmount);
-
-                // todo : call the zombie.knockback(knockbackdistance) here
-                // todo : you can pass the knockback distance to the method too
+                double newX = zombie.getPosition().x() + knockbackDistance;
+                // Cap the knockback so they don't fall off the right edge of the grid
+                newX = Math.min(newX, 9.5);
+                zombie.setPosition(com.ussr.pvz.model.util.Vec2.of(newX, zombie.getPosition().y()));
 
             } else if (target instanceof InteractableStructure structure) {
                 structure.takeDamage(damageAmount);

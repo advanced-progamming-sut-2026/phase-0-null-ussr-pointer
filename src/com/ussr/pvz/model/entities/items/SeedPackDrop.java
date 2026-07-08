@@ -8,7 +8,6 @@ public class SeedPackDrop extends GroundItem{
     public String type;
     public SeedPackDrop(ItemType itemType, double lifetime, double collectRadius) {
         super(itemType, lifetime, collectRadius);
-        //todo randomly find one
     }
 
     @Override

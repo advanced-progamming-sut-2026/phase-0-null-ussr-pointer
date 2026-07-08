@@ -19,7 +19,12 @@ public class CoinDrop extends GroundItem {
 
     @Override
     public void applyRewards(GameSession session, Account account) {
-        //todo apply reward
+        int value = switch (tier) {
+            case BRONZE -> 10;
+            case SILVER -> 50;
+            case GOLD -> 100;
+        };
+        account.getAdventureProgress().addCoin(value);
         this.isAlive = false;
         this.setCollected(true);
     }

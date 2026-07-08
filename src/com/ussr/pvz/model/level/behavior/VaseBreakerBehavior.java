@@ -43,12 +43,23 @@ public class VaseBreakerBehavior implements LevelBehavior {
                 if (poolIndex >= vasePool.size()) break;
 
                 Vase vase = new Vase();
-                vase.setType(vasePool.get(poolIndex++));
+                VaseType assignedType = vasePool.get(poolIndex++);
+                vase.setType(assignedType);
                 vase.setPosition(Vec2.of(c, r));
                 vase.setAlive(true);
-                //todo set set the contained zombie
-                //If it's a plant vase, load it with a dummy SeedPackDrop for now
-                if (vase.getType() == VaseType.PLANT) {
+
+                // Assign the contained entity based on the VaseType
+                if (assignedType == VaseType.NORMAL) {
+                    // Standard zombie alias
+                    vase.setContainedZombie(
+                            com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Zombie", r, c)
+                    );
+                } else if (assignedType == VaseType.GARGANTAUR) {
+                    // Gargantuar alias
+                    vase.setContainedZombie(
+                            com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Gargantuar", r, c)
+                    );
+                } else if (assignedType == VaseType.PLANT) {
                     vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, -1, 1));
                 }
 
