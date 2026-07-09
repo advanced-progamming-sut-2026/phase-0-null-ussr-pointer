@@ -8,13 +8,13 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
 import com.ussr.pvz.service.SaveService;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +69,8 @@ public class App {
             if (cachedPlantsData == null) {
                 cachedPlantsData = new ArrayList<>();
             }
+            InputStream jsonStream = new FileInputStream(allPlantsFile);
+            PlantFactory.init(jsonStream);
         } catch (IOException e) {
             System.err.println("Error caching plants.json to memory: " + e.getMessage());
             cachedPlantsData = new ArrayList<>();
