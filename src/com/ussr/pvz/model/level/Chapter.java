@@ -13,23 +13,60 @@ public class Chapter {
     private final GameMode gameMode;
     private List<String> allowedPlants;
     private final List<Level> levels;
-    private final List<TileType> allowedTiles;
+    private List<TileType> allowedTiles;
 
     public Chapter(String id, String name, GameMode gameMode, List<TileType> allowedTiles) {
         this.id = id;
         this.name = name;
         this.gameMode = gameMode;
-        this.allowedTiles = allowedTiles;
+        this.allowedTiles = allowedTiles != null ? allowedTiles : new ArrayList<>();
         this.levels = new ArrayList<>();
+        this.allowedPlants = new ArrayList<>();
     }
 
     public void addLevel(Level level) {
-        levels.add(level);
+        if (level != null) {
+            levels.add(level);
+        }
     }
 
     public Optional<Level> findLevel(String id) {
+        if (id == null) return Optional.empty();
         return levels.stream().filter(l -> l.getId().equals(id)).findFirst();
     }
+
+    // === Core Setters & JSON Data Binding Bridges ===
+
+    public void setAllowedPlants(List<String> p) {
+        this.allowedPlants = p != null ? p : new ArrayList<>();
+    }
+
+    /**
+     * Bridges the gap between raw JSON data configuration strings and
+     * the internal strong-typed TileType enums used by the engine terrain system.
+     */
+
+    public void setAllowedTiles(List<String> rawTileNames) {
+        if (rawTileNames == null) {
+            this.allowedTiles = new ArrayList<>();
+            return;
+        }
+
+        List<TileType> parsedTypes = new ArrayList<>();
+        for (String name : rawTileNames) {
+            if (name == null || name.isBlank()) continue;
+            try {
+                // Safely sanitize and translate e.g., "sand_tile" into TileType.SAND_TILE
+                TileType type = TileType.valueOf(name.trim().toUpperCase());
+                parsedTypes.add(type);
+            } catch (IllegalArgumentException e) {
+                System.err.println("[Chapter Warning] Skipping invalid TileType entry configured in JSON: '" + name + "'");
+            }
+        }
+        this.allowedTiles = parsedTypes;
+    }
+
+    // === Standard Getters ===
 
     public String getId() {
         return id;
@@ -47,15 +84,11 @@ public class Chapter {
         return allowedPlants;
     }
 
-    public void setAllowedPlants(List<String> p) {
-        this.allowedPlants = p;
-    }
-
     public List<Level> getLevels() {
         return Collections.unmodifiableList(levels);
     }
 
     public List<TileType> getAllowedTiles() {
-        return allowedTiles;
+        return Collections.unmodifiableList(allowedTiles);
     }
 }
