@@ -5,6 +5,7 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.hit.HitEffectStrategy;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
@@ -86,6 +87,10 @@ public class Projectile extends GameEntity {
         GameSession session = App.getGameSession();
         if (session == null) return null;
 
+        if (target instanceof Plant) {
+            return checkPlantCollision(session);
+        }
+
         GameEntity physicalImpactTarget = null;
 
         ArrayList<InteractableStructure> interactableStructures = session.getLawn().getAllInteractable();
@@ -114,6 +119,44 @@ public class Projectile extends GameEntity {
 
         return targetFinder(interactableStructures , session);
 
+    }
+
+    private ArrayList<GameEntity> checkPlantCollision(GameSession session) {
+        if (!(target instanceof Plant targetPlant) || !targetPlant.isAlive() || targetPlant.getLocation() == null) {
+            return null;
+        }
+        if (session.getPlants() == null) return null;
+
+        Vec2 targetPos = Vec2.of(targetPlant.getLocation().x(), targetPlant.getLocation().y());
+        Vec2 pos = this.getPosition();
+        Vec2 speed = this.getSpeed();
+
+        boolean withinRadius = pos.distanceTo(targetPos) < 0.5;
+        boolean crossedX = speed != null && ((speed.x() < 0 && pos.x() <= targetPos.x())
+                || (speed.x() > 0 && pos.x() >= targetPos.x()));
+
+        if (!withinRadius && !crossedX) {
+            return null;
+        }
+
+        ArrayList<GameEntity> targets = new ArrayList<>();
+        int areaLength = hitEffectStrategy.getAreaLength();
+        double straightDist = (int) (areaLength / 2) + 0.2;
+        if (areaLength == 1) straightDist = 0.2;
+
+        for (Plant plant : session.getPlants()) {
+            if (plant == null || !plant.isAlive() || plant.getLocation() == null) continue;
+            Vec2 plantPos = Vec2.of(plant.getLocation().x(), plant.getLocation().y());
+            if (Math.abs(pos.y() - plantPos.y()) < straightDist && Math.abs(pos.x() - plantPos.x()) < straightDist) {
+                targets.add(plant);
+            }
+        }
+
+        if (targets.isEmpty()) {
+            targets.add(targetPlant);
+        }
+
+        return targets;
     }
 
     public ArrayList<GameEntity> targetFinder(ArrayList<InteractableStructure> interactableStructures, GameSession session) {
