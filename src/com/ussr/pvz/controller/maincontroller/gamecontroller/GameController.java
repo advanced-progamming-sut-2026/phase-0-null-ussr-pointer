@@ -49,9 +49,19 @@ public class GameController {
                     case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
                     case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
                     case START_ZOMBIE_WAVES -> handleStartZombieWaves();
+                    case SWAP_PLANTS -> handleSwapPlants(matcher);
+                    case UPGRADE_BEGHOULED_PLANT -> handleUpgradeBeghouledPlant(matcher);
                 };
             }
         }
+        return "";
+    }
+
+    private String handleUpgradeBeghouledPlant(Matcher matcher) {
+        return "";
+    }
+
+    private String handleSwapPlants(Matcher matcher) {
         return "";
     }
 

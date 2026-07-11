@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.board;
 
+import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.board.terrain.Tile;
 
 import java.util.ArrayList;
@@ -37,4 +38,19 @@ public class Lawn {
 
     public int getRows() { return numRows; }
     public int getCols() { return numCols; }
+
+    public ArrayList<InteractableStructure> getAllInteractable() {
+        ArrayList<InteractableStructure> allInteractable = new ArrayList<>();
+        for(Row row : rows) {
+
+            for(Cell cell : row.getCells()) {
+
+                InteractableStructure structure = cell.getInteractableStructure();
+                if(structure != null)
+                    allInteractable.add(structure);
+            }
+
+        }
+        return allInteractable;
+    }
 }

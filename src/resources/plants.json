@@ -1131,7 +1131,7 @@
     "actionInterval": 5.0,
     "recharge": 5.0,
     "abilityType": "DELAYED_EXPLOSIVE",
-    "abilityValue": 9.0,
+    "abilityValue": 2.0,
     "plantFoodType": "SPAWN_CLONES",
     "plantFoodValue": 2.0,
     "upgrades": [
@@ -1166,7 +1166,7 @@
     "actionInterval": 0.0,
     "recharge": 35.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 9.0,
+    "abilityValue": 2.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -1238,7 +1238,7 @@
     "actionInterval": 0.0,
     "recharge": 35.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 9.0,
+    "abilityValue": 2.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -1275,7 +1275,7 @@
     "actionInterval": 0.0,
     "recharge": 35.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 9.0,
+    "abilityValue": 3.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -1312,7 +1312,7 @@
     "actionInterval": 0.0,
     "recharge": 15.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 45.0,
+    "abilityValue": 4.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -1460,7 +1460,7 @@
     "actionInterval": 2.0,
     "recharge": 5.0,
     "abilityType": "MELEE_ATTACK",
-    "abilityValue": 9.0,
+    "abilityValue": 2.0,
     "plantFoodType": "LOCAL_AOE_ATTACK",
     "plantFoodValue": 9.0,
     "upgrades": [
@@ -1494,8 +1494,8 @@
     "damage": 99999,
     "actionInterval": 40.0,
     "recharge": 5.0,
-    "abilityType": "DELAYED_EXPLOSIVE",
-    "abilityValue": 1.0,
+    "abilityType": "MELEE_ATTACK",
+    "abilityValue": 4.0,
     "plantFoodType": "PULL_UNDERWATER",
     "plantFoodValue": 3.0,
     "upgrades": [
@@ -1532,7 +1532,7 @@
     "actionInterval": 2.0,
     "recharge": 5.0,
     "abilityType": "MELEE_ATTACK",
-    "abilityValue": 2.0,
+    "abilityValue": 1.0,
     "plantFoodType": "LOCAL_AOE_ATTACK",
     "plantFoodValue": 9.0,
     "upgrades": [
@@ -1570,7 +1570,7 @@
     "actionInterval": 2.0,
     "recharge": 5.0,
     "abilityType": "MELEE_ATTACK",
-    "abilityValue": 9.0,
+    "abilityValue": 2.0,
     "plantFoodType": "LOCAL_AOE_ATTACK",
     "plantFoodValue": 25.0,
     "wramp-up": [
@@ -1985,7 +1985,7 @@
     "actionInterval": 0.0,
     "recharge": 20.0,
     "abilityType": "MODIFIER_UTILITY",
-    "abilityValue": 1.0,
+    "abilityValue": 3.0,
     "plantFoodType": "RANDOM_HYPNOTIZE",
     "plantFoodValue": 1.0,
     "upgrades": [
@@ -2055,7 +2055,7 @@
     "actionInterval": 0.0,
     "recharge": 0.0,
     "abilityType": "MODIFIER_UTILITY",
-    "abilityValue": 0.0,
+    "abilityValue": 1.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -2093,7 +2093,7 @@
     "actionInterval": 0.0,
     "recharge": 50.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 45.0,
+    "abilityValue": 4.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -2131,7 +2131,7 @@
     "actionInterval": 0.0,
     "recharge": 5.0,
     "abilityType": "MODIFIER_UTILITY",
-    "abilityValue": 0.0,
+    "abilityValue": 1.0,
     "plantFoodType": "SPAWN_CLONES",
     "plantFoodValue": 4.0,
     "upgrades": [

@@ -13,6 +13,7 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
 import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
@@ -76,6 +77,11 @@ public class GameSession {
 
     public void tick() {
         clock.tick();
+
+        if (level != null && level.getEnvironment() != null) {
+            level.getEnvironment().tick(this, GameClock.SECONDS_PER_TICK);
+        }
+
         if (wavesStarted) {
             waveScheduler.tick(this, clock.getElapsedSeconds());
         }
@@ -89,13 +95,19 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
-        if(level.isFailed()){
+        if (level.isFailed()) {
             gameOver = true;
         }
 
         if (wavesStarted && waveScheduler.isDone() && zombies.isEmpty() && !gameOver) {
             eventBus.publish(new GameEvent.WavesCompleted());
             eventBus.publish(new GameEvent.GameWon());
+        }
+
+        if (level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior izBehavior) {
+            if (izBehavior.isWon() && !gameOver) {
+                eventBus.publish(new GameEvent.GameWon());
+            }
         }
     }
 
@@ -131,6 +143,9 @@ public class GameSession {
     }
 
     private void checkZombieBreaches() {
+        // Add a check to bypass standard breach rules for i,Zombie
+        boolean isIZombie = level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior;
+
         for (Zombie zombie : zombies) {
             if (!zombie.isAlive()) continue;
 
@@ -142,9 +157,13 @@ public class GameSession {
                     mower.activate();
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
-                } else {
+                } else if (!isIZombie) {
+                    // ONLY trigger game over if it's NOT i,Zombie
                     onZombieReachedEnd();
                     break;
+                } else {
+                    // In i,Zombie, a zombie walking off the left edge just despawns cleanly
+                    zombie.setAlive(false);
                 }
             }
         }
@@ -191,7 +210,7 @@ public class GameSession {
                     plant.getLocation().x()
             ));
 
-            if(level.getBehavior() instanceof LoveYourPlantsBehavior){
+            if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
                 ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
             }
         }
@@ -274,7 +293,12 @@ public class GameSession {
     }
 
     public void removeAllCooldowns() {
-        // TODO: implement after plants are handled
+        if (App.getAccount() != null && App.getAccount().getCollection() != null) {
+            // Iterate through the unlocked plants in the collection and zero out their recharge
+            for (Plant plant : App.getAccount().getCollection().unlockedPlants()) {
+                plant.setRecharge(0);
+            }
+        }
     }
 
 
@@ -458,5 +482,17 @@ public class GameSession {
 
     public double getElapsedSeconds() {
         return clock.getElapsedSeconds();
+    }
+
+    public void notifyPlantDied(Plant plant) {
+        eventBus.publish(new GameEvent.PlantDied(
+                plant.getName(),
+                plant.getLocation().y(),
+                plant.getLocation().x()
+        ));
+
+        if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
+            ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
+        }
     }
 }

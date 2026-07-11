@@ -42,6 +42,19 @@ public class PlantArmor {
     }
 
     private void executeArmorExplosion(Plant user) {
-        //todo : handle armor explosion
+        com.ussr.pvz.model.engine.GameSession session = com.ussr.pvz.model.App.getGameSession();
+        if (session == null || session.getZombies() == null) return;
+
+        com.ussr.pvz.model.util.Vec2 plantPos = user.getPosition();
+        int explosionDamage = 500; // Standard baseline explosion damage
+
+        for (com.ussr.pvz.model.entities.zombies.Zombie zombie : session.getZombies()) {
+            if (zombie.isAlive()) {
+                double distance = zombie.getPosition().distanceTo(plantPos);
+                if (distance <= 1.5) { // 1.5 tile radius
+                    zombie.takeDamage(explosionDamage);
+                }
+            }
+        }
     }
 }

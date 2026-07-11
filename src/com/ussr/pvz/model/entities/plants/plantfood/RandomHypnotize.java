@@ -34,7 +34,7 @@ public class RandomHypnotize implements PlantFoodEffect {
 
         for (Zombie target : selectedZombies) {
             target.setStatus(Zombie.Status.HYPNOTIZED);
-            //todo : call the turn around method for the zombie if it does not handle in its own class
+            target.hypnotize();
         }
     }
 

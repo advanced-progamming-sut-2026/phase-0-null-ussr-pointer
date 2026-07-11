@@ -44,6 +44,35 @@ public class Zombie extends GameEntity implements Damageable {
 
     }
 
+    public void takeDamage(int damage, boolean isPoisonous) {
+        if (!isAlive || this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
+
+        if (isPoisonous) {
+            // Poison bypasses armor and defense calculations directly
+            this.hp -= damage;
+
+            if (this.hp <= 0) {
+                this.hp = 0;
+                this.isAlive = false;
+                this.state = ZombieActivity.DEAD;
+
+                // Handle plant food drops on death
+                if (isGlowing) {
+                    com.ussr.pvz.model.entities.items.PlantFoodDrop plantFoodDrop =
+                            new com.ussr.pvz.model.entities.items.PlantFoodDrop(1);
+                    plantFoodDrop.setPosition(this.getPosition());
+                    GameSession session = App.getGameSession();
+                    if (session != null) {
+                        session.getItems().add(plantFoodDrop);
+                    }
+                }
+            }
+        } else {
+            // Route standard damage back to the main pipeline
+            takeDamage(damage, null);
+        }
+    }
+
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
     private Status status = Status.NORMAL;
 

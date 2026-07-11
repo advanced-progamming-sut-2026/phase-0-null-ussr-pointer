@@ -9,7 +9,7 @@ public class Cell {
     private int col;
     private Tile tile;
     private Plant plant;
-    private InteractableStructure interactableStructure;
+    private InteractableStructure interactableStructure = null;
 
     public int getRow() {
         return row;

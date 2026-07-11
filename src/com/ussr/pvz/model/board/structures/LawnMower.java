@@ -64,4 +64,9 @@ public class LawnMower extends InteractableStructure {
             }
         });
     }
+
+    @Override
+    public void takeDamage(int damage) {
+
+    }
 }

@@ -8,13 +8,13 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
 import com.ussr.pvz.service.SaveService;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +25,9 @@ public class App {
     private static Account account;
     private static GameSession gameSession;
     private static List<Map<String, Object>> cachedPlantsData = null;
-    //todo check this shop manager and see if it shouldn't be here
     private static ShopManager shopManager;
-    private static StringBuilder pendingMessage = new StringBuilder();
-    private static LevelManager levelManager = new LevelManager();
-    private static List<Account> accounts = new ArrayList<>(
+    private static final LevelManager levelManager = new LevelManager();
+    private static final List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
                     .map(state -> new Account
                             (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
@@ -41,7 +39,7 @@ public class App {
     public static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             List<Account> accounts = getAccounts();
-            if (accounts != null && !accounts.isEmpty()) {
+            if (!accounts.isEmpty()) {
                 List<AccountState> states = accounts.stream()
                         .map(Account::toState)
                         .toList();
@@ -71,6 +69,8 @@ public class App {
             if (cachedPlantsData == null) {
                 cachedPlantsData = new ArrayList<>();
             }
+            InputStream jsonStream = new FileInputStream(allPlantsFile);
+            PlantFactory.init(jsonStream);
         } catch (IOException e) {
             System.err.println("Error caching plants.json to memory: " + e.getMessage());
             cachedPlantsData = new ArrayList<>();

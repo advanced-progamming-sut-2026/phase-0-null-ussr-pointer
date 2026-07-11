@@ -27,7 +27,7 @@ public class ExplodeStrategy implements ActStrategy{
                 break;
             case 4 :
                 targets = wholePitchDetect(user , session);
-                makeHole(session);
+                makeHole(user, session); // Pass 'user' here
                 break;
         }
         if(targets == null || targets.isEmpty()) return;
@@ -89,8 +89,15 @@ public class ExplodeStrategy implements ActStrategy{
         return (ArrayList<Zombie>) session.getZombies();
     }
 
-    private void makeHole(GameSession session) {
-        //todo: make a 1*1 or 3*3 hole in the pitch that we can not plant any seed in it for a while
+    private void makeHole(Plant user, GameSession session) {
+        int row = (int) user.getPosition().y();
+        int col = (int) user.getPosition().x();
+
+        com.ussr.pvz.model.board.Cell cell = session.getLawn().getCell(row, col);
+        if (cell != null) {
+            // Replaces the tile with a Crater, preventing planting.
+            cell.setTile(new com.ussr.pvz.model.board.terrain.Tile(com.ussr.pvz.model.board.terrain.TileType.Crater));
+        }
     }
 
     private void userAct(Plant user , ArrayList<Zombie> targets) {
