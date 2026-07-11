@@ -31,8 +31,8 @@ public class DeadlineBehavior implements LevelBehavior {
             if (!zombie.isAlive()) continue;
 
             if (zombie.getPosition().x() < 0.0) {
-                int row = (int) zombie.getPosition().y();
-                return row > level.getDeadlineColumn();
+                int col = (int) zombie.getPosition().y();
+                return col < level.getDeadlineColumn();
             }
         }
 
