@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.projectiles.hit;
 
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.GameEntity;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -29,6 +30,8 @@ public class NormalHit implements HitEffectStrategy {
 
             if (target instanceof Zombie zombie) {
                 zombie.takeDamage(damageAmount);
+            } else if (target instanceof Plant plant) {
+                plant.takeDamage(damageAmount);
             } else if (target instanceof InteractableStructure structure) {
                 structure.takeDamage(damageAmount);
             }

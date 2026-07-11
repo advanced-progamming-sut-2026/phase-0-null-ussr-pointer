@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.projectiles.hit;
 
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.GameEntity;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
@@ -45,6 +46,8 @@ public class PierceKnockBackHit implements HitEffectStrategy{
                 newX = Math.min(newX, 9.5);
                 zombie.setPosition(com.ussr.pvz.model.util.Vec2.of(newX, zombie.getPosition().y()));
 
+            } else if (target instanceof Plant plant) {
+                plant.takeDamage(damageAmount);
             } else if (target instanceof InteractableStructure structure) {
                 structure.takeDamage(damageAmount);
             }

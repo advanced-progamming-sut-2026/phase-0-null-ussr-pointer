@@ -1,6 +1,11 @@
 package com.ussr.pvz.model.entities.projectiles.hit;
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.GameEntity;
+import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -9,6 +14,9 @@ import com.ussr.pvz.model.entities.zombies.move.ProspectorMove;
 import java.util.ArrayList;
 
 public class IceHit implements HitEffectStrategy {
+    private static final int PLANT_FREEZE_STACKS = 3;
+    private static final int ICE_BLOCK_HP = 500;
+
     private int areaLength;
 
     public IceHit(int areaLength) {
@@ -42,9 +50,32 @@ public class IceHit implements HitEffectStrategy {
 
                 zombie.setStatus(Zombie.Status.FREEZE);
 
+            } else if (target instanceof Plant plant) {
+                plant.takeDamage(damageAmount);
+                applyChill(plant);
+
             } else if (target instanceof InteractableStructure structure) {
                 structure.takeDamage(damageAmount);
             }
+        }
+    }
+
+    private void applyChill(Plant plant) {
+        if (!plant.isAlive() || plant.getState() == Plant.PlantState.INCAPACITATED) return;
+
+        int newLevel = plant.getChillLevel() + 1;
+        plant.setChillLevel(newLevel);
+
+        if (newLevel >= PLANT_FREEZE_STACKS) {
+            GameSession session = App.getGameSession();
+            if (session == null || session.getLawn() == null || plant.getLocation() == null) return;
+
+            Cell cell = session.getLawn().getCell(plant.getLocation().y(), plant.getLocation().x());
+            if (cell == null) return;
+
+            IceBlock iceBlock = new IceBlock(plant, ICE_BLOCK_HP);
+            cell.setStructure(iceBlock);
+            session.registerStructure(iceBlock);
         }
     }
 
