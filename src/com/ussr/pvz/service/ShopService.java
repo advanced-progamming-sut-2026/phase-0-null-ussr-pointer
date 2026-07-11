@@ -13,6 +13,7 @@ public class ShopService {
     }
 
     public String shopList() {
+        rotateDailyOffersIfNeeded();
         StringBuffer sb = new StringBuffer();
         //todo organize this so it would be beautiful
         sb.append("id    |name       |cost         |description     |discount\n");
@@ -23,13 +24,29 @@ public class ShopService {
     }
 
     public String shopDaily() {
+        rotateDailyOffersIfNeeded();
         StringBuilder sb = new StringBuilder();
         App.getShopManager().getShopItems().forEach(item -> {
             if (item.getType().equals(ShopItemType.DAILY_OFFER)) {
                 sb.append(makeItem(item));
+                if (item.getFeaturedPlant() != null) {
+                    sb.append("  featuring: ").append(item.getFeaturedPlant())
+                            .append(item.isExpired() ? " (already claimed today)\n" : "\n");
+                }
             }
         });
         return sb.toString();
+    }
+
+    private void rotateDailyOffersIfNeeded() {
+        AdventureProgress adv = App.getAccount() != null ? App.getAccount().getAdventureProgress() : null;
+        if (adv == null) return;
+
+        App.getShopManager().getShopItems().forEach(item -> {
+            if (item.isDailyRotationDue()) {
+                item.rotateDaily(randomUnlockedPlant(adv));
+            }
+        });
     }
 
     private StringBuilder makeItem(ShopItem item) {
@@ -43,6 +60,8 @@ public class ShopService {
     }
 
     public String buy(ShopBuyRequest request) {
+        rotateDailyOffersIfNeeded();
+
         int count = 0;
         try {
             count = Integer.parseInt(request.count());
@@ -62,6 +81,9 @@ public class ShopService {
         }
         if (item.isExpired()) return "this offer has expired";
 
+        if (item.isDailyOffer() && count > 1) {
+            return "the daily offer can only be bought once per rotation";
+        }
 
         if (item.requiresPlantType()) {
             if (request.plantType().isEmpty()) {
@@ -90,12 +112,13 @@ public class ShopService {
             default -> { return "unknown currency type"; }
         }
 
-        //todo cancel the shop and return the fund if the limit is exceeded
-        //todo if the type is chosen plant type the logic should implemented
-        //todo if the type is daily the randomness logic should implemented
-        //todo add exceptions and throw them as above
+        String result = applyItem(item, count, request.plantType());
 
-        return applyItem(item, count, request.plantType());
+        if (item.isDailyOffer()) {
+            item.setExpired(true);
+        }
+
+        return result;
     }
     private int discountedCost(ShopItem item) {
         if (item.getDiscountPercent() == null || item.getDiscountPercent() == 0f)
@@ -151,10 +174,11 @@ public class ShopService {
                 yield "converted to " + coinsGained + " coins";
             }
             case DAILY_OFFER -> {
-                String randomPlant = randomUnlockedPlant(adv);
-                if (randomPlant == null) yield "no unlocked plants to give seeds for";
+                String plant = item.getFeaturedPlant();
+                if (plant == null) plant = randomUnlockedPlant(adv);
+                if (plant == null) yield "no unlocked plants to give seeds for";
                 int seeds = count * item.getQuantityPerPurchase();
-                yield seeds + " seed packets added for " + randomPlant + " (daily offer)";
+                yield seeds + " seed packets added for " + plant + " (daily offer)";
             }
         };
     }
