@@ -1,0 +1,98 @@
+{
+  "chapters": [
+    {
+      "id": "egypt-1",
+      "name": "Ancient Egypt",
+      "gameMode": "ADVENTURE",
+      "allowedPlants": [
+        "Sunflower",
+        "Peashooter",
+        "Wall-nut",
+        "Snow Pea",
+        "Cherry Bomb"
+      ],
+      "levels": [
+        {
+          "id": "egypt-1-1",
+          "order": 1,
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "deliveryStrategy": "regular",
+          "lockedPlants": [],
+          "allowedZombies": [
+            { "id": "ZombieDefault", "weight": 10 },
+            { "id": "ZombieArmor1",  "weight": 5 }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "spawnData": [
+                { "zombieId": "ZombieDefault", "lane": 0, "delaySeconds": 0.0 },
+                { "zombieId": "ZombieDefault", "lane": 2, "delaySeconds": 2.0 },
+                { "zombieId": "ZombieDefault", "lane": 4, "delaySeconds": 4.0 }
+              ]
+            },
+            {
+              "waveNumber": 2,
+              "spawnData": [
+                { "zombieId": "ZombieArmor1", "lane": 1, "delaySeconds": 0.0 },
+                { "zombieId": "ZombieDefault", "lane": 3, "delaySeconds": 1.5 },
+                { "zombieId": "ZombieArmor1", "lane": 0, "delaySeconds": 3.0 },
+                { "zombieId": "ZombieDefault", "lane": 2, "delaySeconds": 5.0 }
+              ]
+            },
+            {
+              "waveNumber": 3,
+              "spawnData": [
+                { "zombieId": "ZombieArmor2",   "lane": 2, "delaySeconds": 0.0 },
+                { "zombieId": "ZombieNewspaper", "lane": 0, "delaySeconds": 2.0 },
+                { "zombieId": "ZombieNewspaper", "lane": 4, "delaySeconds": 2.0 },
+                { "zombieId": "ZombieArmor1",    "lane": 1, "delaySeconds": 4.0 },
+                { "zombieId": "ZombieGargantuar","lane": 2, "delaySeconds": 8.0 }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "egypt-1-2",
+          "order": 2,
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "deliveryStrategy": "regular",
+          "lockedPlants": [],
+          "allowedZombies": [
+            { "id": "ZombieDefault",  "weight": 8 },
+            { "id": "ZombieArmor1",   "weight": 5 },
+            { "id": "ZombieArmor2",   "weight": 3 },
+            { "id": "ZombieRa",       "weight": 4 },
+            { "id": "ZombieTombRaiser","weight": 2 }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "spawnData": [
+                { "zombieId": "ZombieDefault", "lane": 1, "delaySeconds": 0.0 },
+                { "zombieId": "ZombieRa",      "lane": 3, "delaySeconds": 1.0 },
+                { "zombieId": "ZombieDefault", "lane": 0, "delaySeconds": 3.0 }
+              ]
+            },
+            {
+              "waveNumber": 2,
+              "spawnData": [
+                { "zombieId": "ZombieTombRaiser", "lane": 2, "delaySeconds": 0.0 },
+                { "zombieId": "ZombieArmor1",     "lane": 0, "delaySeconds": 2.0 },
+                { "zombieId": "ZombieArmor1",     "lane": 4, "delaySeconds": 2.0 },
+                { "zombieId": "ZombieRa",         "lane": 1, "delaySeconds": 4.0 },
+                { "zombieId": "ZombieArmor2",     "lane": 3, "delaySeconds": 6.0 }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
