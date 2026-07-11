@@ -84,7 +84,7 @@ public sealed interface GameEvent permits
     record ProjectileHit(String zombieAlias, int damageDealt) implements GameEvent {
     }
 
-    record WaveStarted(int waveNumber) implements GameEvent {
+    record WaveStarted(int waveNumber, boolean isFinalWave) implements GameEvent {
     }
 
     record WavesCompleted() implements GameEvent {

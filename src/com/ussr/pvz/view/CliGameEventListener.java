@@ -51,8 +51,13 @@ public class CliGameEventListener {
                 e -> System.out.println("[STRUCTURE] " + e.structureType()
                         + " at (" + e.row() + ", " + e.col() + ") destroyed"));
 
-        bus.subscribe(GameEvent.WaveStarted.class,
-                e -> System.out.println("[WAVE] Wave " + e.waveNumber() + " started!"));
+        bus.subscribe(GameEvent.WaveStarted.class, e -> {
+            if (e.isFinalWave()) {
+                System.out.println("The final wave has come.");
+            } else {
+                System.out.println("Wave " + e.waveNumber() + " started.");
+            }
+        });
 
         bus.subscribe(GameEvent.WavesCompleted.class,
                 e -> System.out.println("[WAVES] All waves cleared!"));

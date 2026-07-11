@@ -13,8 +13,14 @@ import java.util.Random;
 
 public class WaveScheduler {
 
+    private static final String EGYPT_CHAPTER_ID = "egypt-1"; // match your levels.json id
+    private static final int SANDSTORM_MIN_OFFSET = 1;
+    private static final int SANDSTORM_MAX_OFFSET = 4;
+
     private final List<ScheduledSpawn> pending = new ArrayList<>();
     private int nextIndex = 0;
+    private int lastAnnouncedWave = 0;
+    private int finalWaveNumber = 0;
     private static final Random RAND = new Random();
 
     public static class ScheduledSpawn {
@@ -22,46 +28,67 @@ public class WaveScheduler {
         public final String zombieId;
         public final int lane;
         public final int spawnCol;
+        public final int waveNumber;
 
-        public ScheduledSpawn(double triggerSeconds, String zombieId, int lane, int spawnCol) {
+        public ScheduledSpawn(double triggerSeconds, String zombieId, int lane, int spawnCol, int waveNumber) {
             this.triggerSeconds = triggerSeconds;
             this.zombieId = zombieId;
             this.lane = lane;
             this.spawnCol = spawnCol;
+            this.waveNumber = waveNumber;
         }
     }
 
     public void load(Level level, int lawnRows, int lawnCols) {
         pending.clear();
         nextIndex = 0;
+        lastAnnouncedWave = 0;
+        finalWaveNumber = 0;
 
         if (level == null || level.getWaves() == null) return;
 
         final double WAVE_GAP_SECONDS = 25.0;
+        boolean isEgypt = EGYPT_CHAPTER_ID.equals(level.getChapterId());
+
+        finalWaveNumber = level.getWaves().stream()
+                .mapToInt(Wave::getWaveNumber)
+                .max()
+                .orElse(0);
 
         for (Wave wave : level.getWaves()) {
             double waveOffset = (wave.getWaveNumber() - 1) * WAVE_GAP_SECONDS;
+            boolean isFinalWave = wave.getWaveNumber() == finalWaveNumber;
+            boolean applySandstorm = isEgypt && isFinalWave; // Part D
 
             if (wave.getSpawnData() != null) {
                 for (SpawnData spawn : wave.getSpawnData()) {
+                    int col = applySandstorm ? sandstormColumn(lawnCols) : lawnCols;
                     pending.add(new ScheduledSpawn(
                             waveOffset + spawn.getDelaySeconds(),
                             spawn.getZombieId(),
                             spawn.getLane(),
-                            lawnCols
+                            col,
+                            wave.getWaveNumber()
                     ));
                 }
             }
 
             if (wave.getCost() > 0 && level.getAllowedZombies() != null) {
-                generateDynamicSpawns(wave.getCost(), waveOffset, level.getAllowedZombies(), lawnRows, lawnCols);
+                generateDynamicSpawns(wave.getCost(), waveOffset, level.getAllowedZombies(),
+                        lawnRows, lawnCols, wave.getWaveNumber(), applySandstorm);
             }
         }
 
         pending.sort(Comparator.comparingDouble(s -> s.triggerSeconds));
     }
 
-    private void generateDynamicSpawns(int budget, double waveOffset, List<Level.AllowedZombie> allowed, int maxRows, int spawnCol) {
+    private int sandstormColumn(int normalCol) {
+        int offset = SANDSTORM_MIN_OFFSET + RAND.nextInt(SANDSTORM_MAX_OFFSET - SANDSTORM_MIN_OFFSET + 1);
+        return Math.max(0, normalCol - offset);
+    }
+
+    private void generateDynamicSpawns(int budget, double waveOffset, List<Level.AllowedZombie> allowed,
+                                       int maxRows, int spawnCol, int waveNumber, boolean applySandstorm) {
         int remainingCost = budget;
 
         while (remainingCost > 0) {
@@ -92,12 +119,14 @@ public class WaveScheduler {
 
             int lane = RAND.nextInt(maxRows);
             double randomDelay = RAND.nextDouble() * 15.0;
+            int col = applySandstorm ? sandstormColumn(spawnCol) : spawnCol;
 
             pending.add(new ScheduledSpawn(
                     waveOffset + randomDelay,
                     selectedZombieId,
                     lane,
-                    spawnCol
+                    col,
+                    waveNumber
             ));
         }
     }
@@ -106,6 +135,11 @@ public class WaveScheduler {
         while (nextIndex < pending.size()) {
             ScheduledSpawn next = pending.get(nextIndex);
             if (elapsedSeconds < next.triggerSeconds) break;
+
+            if (next.waveNumber > lastAnnouncedWave) {
+                lastAnnouncedWave = next.waveNumber;
+                session.triggerWaveStart(lastAnnouncedWave, lastAnnouncedWave == finalWaveNumber);
+            }
 
             try {
                 Zombie zombie = ZombieFactory.create(next.zombieId, next.lane, next.spawnCol);

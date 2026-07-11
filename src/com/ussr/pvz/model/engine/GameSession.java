@@ -15,6 +15,8 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
 import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
+import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
+import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
@@ -388,6 +390,17 @@ public class GameSession {
         }
 
         return true;
+    }
+
+    public void triggerWaveStart(int waveNumber, boolean isFinalWave) {
+        eventBus.publish(new GameEvent.WaveStarted(waveNumber, isFinalWave));
+
+        if (level != null) {
+            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapterId());
+            if (effect != null) {
+                effect.onWaveStart(this, level, waveNumber, isFinalWave);
+            }
+        }
     }
 
 

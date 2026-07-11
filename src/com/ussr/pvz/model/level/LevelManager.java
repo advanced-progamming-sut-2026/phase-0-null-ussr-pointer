@@ -39,6 +39,7 @@ public class LevelManager {
                 for (JsonContainer.JsonLevelData levelData : chapterData.levels) {
                     Level level = LevelFactory.create(levelData);
                     level.setDeliveryStrategy(buildDeliveryStrategy(levelData.deliveryStrategy));
+                    level.setChapterId(chapterData.id);
                     chapter.addLevel(level);
                 }
             }

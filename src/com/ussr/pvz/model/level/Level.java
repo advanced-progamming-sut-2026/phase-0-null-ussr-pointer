@@ -12,7 +12,7 @@ public class Level {
 
     private String id;
     private int order;
-    private String chapter;
+    private String chapterId;
 
     private boolean sunFalling = true;
     private int timeLimitSeconds = 0;
@@ -88,6 +88,10 @@ public class Level {
         this.allowedZombies = allowedZombies;
     }
 
+    public void setChapterId(String chapterId) {
+        this.chapterId = chapterId;
+    }
+
     public List<AllowedZombie> getAllowedZombies() {
         return allowedZombies;
     }
@@ -139,5 +143,10 @@ public class Level {
     public Object getBehavior() {
         return this.behavior;
     }
+
+    public String getChapterId() {
+        return chapterId;
+    }
+
 }
 

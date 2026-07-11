@@ -1,10 +1,10 @@
 package com.ussr.pvz.model.entities.plants.plantfood;
 
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.actstrategy.ModifyStrategy;
-import com.ussr.pvz.model.util.Vec2;
 
 public class ModifierEffect implements PlantFoodEffect{
     private final boolean isCloner;
@@ -20,8 +20,8 @@ public class ModifierEffect implements PlantFoodEffect{
         if (this.isCloner) {
             for (int row = 0; row < session.getLawn().getRows(); row++) {
                 for (int col = 0; col < session.getLawn().getCols(); col++) {
-
-                    if (session.getLawn().getTile(row, col).getType() == TileType.Water) {
+                    Cell cell = session.getLawn().getCell(row, col);
+                    if (cell != null && cell.getTile() != null && cell.getTile().getType() == TileType.Water) {
 
                         boolean isTileOccupied = false;
                         if (session.getPlants() != null) {

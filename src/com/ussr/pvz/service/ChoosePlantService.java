@@ -3,15 +3,10 @@ package com.ussr.pvz.service;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.AdventureProgress;
-import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
-import com.ussr.pvz.model.board.Row;
-import com.ussr.pvz.model.board.terrain.Tile;
-import com.ussr.pvz.model.board.terrain.TileType;
+import com.ussr.pvz.model.level.TerrainFactory;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.plants.Plant;
-import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 
@@ -143,18 +138,8 @@ public class ChoosePlantService {
     }
 
     private Lawn buildLawn(int rows, int cols) {
-        Lawn lawn = new Lawn(rows, cols);
-        for (int r = 0; r < rows; r++) {
-            Row row = new Row(r);
-            for (int c = 0; c < cols; c++) {
-                Cell cell = new Cell();
-                cell.setRow(r);
-                cell.setCol(c);
-                cell.setTile(new Tile(TileType.Normal));
-                row.addCell(cell);
-            }
-            lawn.addRow(row);
-        }
-        return lawn;
+        Chapter chapter = App.getLevelManager().getCurrentChapter();
+        String chapterId = chapter != null ? chapter.getId() : null;
+        return TerrainFactory.build(chapterId, rows, cols);
     }
 }

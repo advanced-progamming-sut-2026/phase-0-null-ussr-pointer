@@ -4,17 +4,26 @@ import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
 
 public class Grave extends InteractableStructure implements Damageable {
+
+    public enum Content { NONE, SUN, PLANT_FOOD }
+
     private final String zombieId; // Used if a zombie spawns from this grave later
+    private final Content content;
     private int hp;
 
-    public Grave(String zombieId) {
+    public Grave(String zombieId, Content content) {
         this.zombieId = zombieId;
+        this.content = content != null ? content : Content.NONE;
         this.hp = 700; // Requirement from assignment sheet
         this.setAlive(true);
     }
 
+    public Grave(String zombieId) {
+        this(zombieId, Content.NONE);
+    }
+
     public Grave() {
-        this(null);
+        this(null, Content.NONE);
     }
 
     @Override
@@ -33,6 +42,18 @@ public class Grave extends InteractableStructure implements Damageable {
         int row = (int) this.getPosition().y();
         int col = (int) this.getPosition().x();
         session.notifyGraveDestroyed(row, col);
+
+        switch (content) {
+            case SUN -> {
+                session.addSun(50);
+                System.out.println("The tombstone crumbled and released 50 sun!");
+            }
+            case PLANT_FOOD -> {
+                session.addPlantFood();
+                System.out.println("The tombstone crumbled and released a plant food!");
+            }
+            case NONE -> {}
+        }
     }
 
     @Override
@@ -45,5 +66,9 @@ public class Grave extends InteractableStructure implements Damageable {
 
     public String getZombieId() {
         return zombieId;
+    }
+
+    public Content getContent() {
+        return content;
     }
 }
