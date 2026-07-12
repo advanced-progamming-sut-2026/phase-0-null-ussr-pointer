@@ -5,7 +5,6 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
-import com.ussr.pvz.model.level.behavior.LevelBehavior;
 
 public class IZombieService {
 

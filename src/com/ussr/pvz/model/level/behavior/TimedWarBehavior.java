@@ -1,9 +1,11 @@
 package com.ussr.pvz.model.level.behavior;
 
-import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 
-public class TimedWarBehavior implements LevelBehavior {
+public class TimedWarBehavior extends LevelBehavior {
 
     public enum LimitationType { ZOMBIE, SUN }
 
@@ -14,32 +16,51 @@ public class TimedWarBehavior implements LevelBehavior {
     public TimedWarBehavior(LimitationType limitationType, int targetValue) {
         this.limitationType = limitationType;
         this.targetValue = targetValue;
+        this.autoWinOnWavesClear = false;
     }
 
     @Override
-    public void onStart(Level level) {
-        // Initialization if needed
-    }
+    public void tick(GameSession session, double deltaTime) {
+        super.tick(session, deltaTime);
 
-    @Override
-    public void onWaveComplete(Level level, int waveNumber) {}
+        if (levelCompleted || session.isGameOver()) return;
 
-    @Override
-    public void onComplete(Level level) {}
+        Level level = session.getLevel();
+        if (level == null) return;
 
-    @Override
-    public boolean isFailed(Level level) {
-        if (App.getGameSession().getElapsedSeconds() > level.getTimeLimitSeconds()) {
-            return counter < targetValue;
+        // Evaluate objectives once the time limit expires
+        if (session.getElapsedSeconds() > level.getTimeLimitSeconds()) {
+            if (counter >= targetValue) {
+                onComplete(level);
+            } else {
+                session.getEventBus().publish(new GameEvent.GameOver());
+            }
         }
-        return false;
     }
 
-    public void triggerSunCollected(int amount) {
-        if (limitationType == LimitationType.SUN) counter += amount;
+    @Override
+    public void onZombieDied(GameSession session, Zombie zombie) {
+        if (limitationType == LimitationType.ZOMBIE) {
+            counter++;
+        }
     }
 
-    public void triggerZombieDied() {
-        if (limitationType == LimitationType.ZOMBIE) counter++;
+    @Override
+    public void onSunCollected(GameSession session, int amount) {
+        if (limitationType == LimitationType.SUN) {
+            counter += amount;
+        }
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public int getTargetValue() {
+        return targetValue;
+    }
+
+    public LimitationType getLimitationType() {
+        return limitationType;
     }
 }

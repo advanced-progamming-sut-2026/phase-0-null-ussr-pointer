@@ -1,14 +1,78 @@
 package com.ussr.pvz.model.level.behavior;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.ai.ZombieAIManager;
 
-public interface LevelBehavior {
-    void onStart(Level level);
+public abstract class LevelBehavior {
 
-    void onWaveComplete(Level level, int waveNumber);
+    protected ZombieAIManager aiManager;
+    protected boolean autoWinOnWavesClear = true;
+    protected boolean levelCompleted = false;
 
-    void onComplete(Level level);
+    public void onStart(Level level) {
+        this.aiManager = new ZombieAIManager(App.getAccount().getDifficultyLvl());
+    }
 
-    boolean isFailed(Level level);
+    public void onWaveComplete(Level level, int waveNumber) {
+        GameSession session = App.getGameSession();
+        if (session != null && level.getWaves() != null) {
+            boolean isFinalWave = (waveNumber == level.getWaves().size());
+            session.triggerWaveStart(waveNumber, isFinalWave);
+        }
+    }
+
+    public void onComplete(Level level) {
+        this.levelCompleted = true;
+        level.onComplete();
+
+        GameSession session = App.getGameSession();
+        if (session != null) {
+            session.getEventBus().publish(new GameEvent.WavesCompleted());
+            session.getEventBus().publish(new GameEvent.GameWon());
+        }
+    }
+
+    public boolean isFailed(Level level) {
+        return false;
+    }
+
+    public void tick(GameSession session, double deltaTime) {
+        if (levelCompleted) return;
+
+        if (aiManager != null) {
+            aiManager.tick(session, deltaTime);
+        }
+
+        checkLevelCompletion(session);
+    }
+
+    protected void checkLevelCompletion(GameSession session) {
+        if (!autoWinOnWavesClear || aiManager == null) return;
+
+        Level level = session.getLevel();
+        if (level == null || level.getWaves() == null) return;
+
+        if (aiManager.areAllWavesDone(level.getWaves()) && session.getZombies().isEmpty()) {
+            onComplete(level);
+        }
+    }
+
+    public void onZombieBreach(GameSession session, Zombie breachedZombie) {
+        session.onZombieReachedEnd();
+    }
+
+    public void onPlantDied(GameSession session, Plant plant) {}
+
+    public void onZombieDied(GameSession session, Zombie zombie) {}
+
+    public void onSunCollected(GameSession session, int amount) {}
+
+    public ZombieAIManager getAiManager() {
+        return aiManager;
+    }
 }

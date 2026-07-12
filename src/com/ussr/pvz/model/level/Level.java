@@ -17,13 +17,13 @@ public class Level {
     private int timeLimitSeconds = 0;
     private int deadlineColumn = -1;
     private int allowedPlantsLost = -1;
-    private List<String> lockedPlants = new ArrayList<>();
-    private List<String> seedPlants = new ArrayList<>();
+    private final List<String> lockedPlants = new ArrayList<>();
+    private final List<String> seedPlants = new ArrayList<>();
+    private List<AllowedZombie> allowedZombies = new ArrayList<>();
+    private List<Wave> waves = new ArrayList<>();
 
     private DeliveryStrategy deliveryStrategy;
 
-    private List<AllowedZombie> allowedZombies;
-    private List<Wave> waves = new ArrayList<>();
 
     private LevelBehavior behavior;
 
@@ -106,7 +106,10 @@ public class Level {
     }
 
     public void setLockedPlants(List<String> lockedPlants) {
-        this.lockedPlants = lockedPlants;
+        this.lockedPlants.clear();
+        if (lockedPlants != null) {
+            this.lockedPlants.addAll(lockedPlants);
+        }
     }
 
     public List<String> getSeedPlants() {
@@ -114,7 +117,10 @@ public class Level {
     }
 
     public void setSeedPlants(List<String> seedPlants) {
-        this.seedPlants = seedPlants;
+        this.seedPlants.clear();
+        if (seedPlants != null) {
+            this.seedPlants.addAll(seedPlants);
+        }
     }
 
     public DeliveryStrategy getDeliveryStrategy() {
@@ -130,7 +136,7 @@ public class Level {
     }
 
     public void setAllowedZombies(List<AllowedZombie> allowedZombies) {
-        this.allowedZombies = allowedZombies;
+        this.allowedZombies = allowedZombies != null ? allowedZombies : new ArrayList<>();
     }
 
     public List<Wave> getWaves() {
@@ -138,7 +144,7 @@ public class Level {
     }
 
     public void setWaves(List<Wave> waves) {
-        this.waves = waves;
+        this.waves = waves != null ? waves : new ArrayList<>();
     }
 
     public LevelBehavior getBehavior() {
@@ -157,7 +163,7 @@ public class Level {
         this.environment = environment;
     }
 
-    // === Core Core-Data Records ===
+    // === Core Inner Records ===
 
     public record AllowedZombie(String id, int weight) {}
 

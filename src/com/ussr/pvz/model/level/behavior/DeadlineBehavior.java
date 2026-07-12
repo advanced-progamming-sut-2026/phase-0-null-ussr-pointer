@@ -1,41 +1,26 @@
 package com.ussr.pvz.model.level.behavior;
 
-import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.board.structures.LawnMower;
+import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 
-import java.util.List;
-
-public class DeadlineBehavior implements LevelBehavior {
-    @Override
-    public void onStart(Level level) {
-        //nada
-    }
+public class DeadlineBehavior extends LevelBehavior {
 
     @Override
-    public void onWaveComplete(Level level, int waveNumber) {
-        //nada
-    }
+    public void tick(GameSession session, double deltaTime) {
+        super.tick(session, deltaTime);
 
-    @Override
-    public void onComplete(Level level) {
-        //nada
-    }
+        if (levelCompleted || session.isGameOver()) return;
 
-    @Override
-    public boolean isFailed(Level level) {
-        List<Zombie> zombies = App.getGameSession().getZombies();
-        for (Zombie zombie : zombies) {
-            if (!zombie.isAlive()) continue;
+        Level level = session.getLevel();
+        if (level == null) return;
 
-            if (zombie.getPosition().x() < 0.0) {
-                int col = (int) zombie.getPosition().y();
-                return col < level.getDeadlineColumn();
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie.isAlive() && zombie.getPosition().x() < level.getDeadlineColumn()) {
+                session.getEventBus().publish(new GameEvent.GameOver());
+                break;
             }
         }
-
-        return false;
     }
 }

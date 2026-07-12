@@ -3,13 +3,15 @@ package com.ussr.pvz.model.level;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.RegularDeliveryStrategy;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LevelManager {
     private final List<Chapter> chapters = new ArrayList<>();
+    private final Map<String, JsonContainer.JsonLevelData> levelConfigs = new HashMap<>();
     private Chapter currentChapter;
     private Level currentLevel;
 
@@ -30,28 +32,26 @@ public class LevelManager {
         }
 
         chapters.clear();
+        levelConfigs.clear();
 
         for (JsonContainer.JsonChapterData chapterData : world.chapters) {
             GameMode mode = parseGameMode(chapterData.gameMode);
-
-            // Instantiating Chapter safely
             Chapter chapter = new Chapter(chapterData.id, chapterData.name, mode, new ArrayList<>());
 
             if (chapterData.allowedPlants != null) {
                 chapter.setAllowedPlants(chapterData.allowedPlants);
             }
 
-            // Bind world-specific tile layouts (Ancient Egypt sand, BWB water, Frostbite ice)
             if (chapterData.allowedTiles != null) {
                 chapter.setAllowedTiles(chapterData.allowedTiles);
             }
 
             if (chapterData.levels != null) {
                 for (JsonContainer.JsonLevelData levelData : chapterData.levels) {
+                    levelConfigs.put(levelData.id, levelData);
                     Level level = LevelFactory.create(levelData);
                     level.setChapter(chapter.getId());
                     level.setDeliveryStrategy(buildDeliveryStrategy(levelData.deliveryStrategy));
-                    level.setChapterId(chapterData.id);
                     chapter.addLevel(level);
                 }
             }
@@ -85,13 +85,10 @@ public class LevelManager {
         currentLevel = currentChapter.findLevel(id)
                 .orElseThrow(() -> new IllegalArgumentException("Level '" + id + "' not found in chapter: " + currentChapter.getId()));
 
+        refreshLevelState(currentLevel);
         currentLevel.onStart();
     }
 
-    /**
-     * Advances the campaign framework state machine seamlessly.
-     * Prevents hard crashes by transitioning across chapter borders automatically.
-     */
     public void nextLevel() {
         if (currentChapter == null || currentLevel == null) {
             throw new IllegalStateException("Cannot advance level; active session state is missing.");
@@ -111,14 +108,13 @@ public class LevelManager {
             throw new IllegalStateException("System error: current level tracking broken out of its parent chapter collection.");
         }
 
-        // 1. If there's another level left in the current world, advance normally
         if (currentIndex + 1 < levels.size()) {
             currentLevel = levels.get(currentIndex + 1);
+            refreshLevelState(currentLevel);
             currentLevel.onStart();
             return;
         }
 
-        // 2. Out of levels! Attempt to safely cascade into the next chapter
         int currentChapterIndex = chapters.indexOf(currentChapter);
         if (currentChapterIndex >= 0 && currentChapterIndex + 1 < chapters.size()) {
             currentChapter = chapters.get(currentChapterIndex + 1);
@@ -128,11 +124,20 @@ public class LevelManager {
             }
 
             currentLevel = currentChapter.getLevels().getFirst();
+            refreshLevelState(currentLevel);
             currentLevel.onStart();
             System.out.println("[LevelManager] Chapter completed! Advancing to: " + currentChapter.getName());
         } else {
-            // 3. Campaign completed fully! End-of-game victory boundary
             System.out.println("[LevelManager] Final campaign chapter fully cleared! Triggering Game Cleared Engine UI Event.");
+        }
+    }
+
+    private void refreshLevelState(Level level) {
+        if (level == null) return;
+        JsonContainer.JsonLevelData data = levelConfigs.get(level.getId());
+        if (data != null) {
+            Level freshLevel = LevelFactory.create(data);
+            level.setBehavior(freshLevel.getBehavior());
         }
     }
 
@@ -142,10 +147,8 @@ public class LevelManager {
         List<Level> levels = currentChapter.getLevels();
         int currentIndex = levels.indexOf(currentLevel);
 
-        // True if there is another level in this chapter
         if (currentIndex >= 0 && currentIndex + 1 < levels.size()) return true;
 
-        // True if we are at the end of this chapter, but there is an entire next world loaded
         int currentChapterIndex = chapters.indexOf(currentChapter);
         return currentChapterIndex >= 0 && currentChapterIndex + 1 < chapters.size();
     }
@@ -155,8 +158,6 @@ public class LevelManager {
             currentLevel.onComplete();
         }
     }
-
-    // === Encapsulated Accessors ===
 
     public Chapter getCurrentChapter() { return currentChapter; }
 
@@ -171,8 +172,6 @@ public class LevelManager {
                 .findFirst()
                 .orElse(null);
     }
-
-    // === Internal Text Parsing Closures ===
 
     private GameMode parseGameMode(String raw) {
         if (raw == null || raw.isBlank()) return GameMode.ADVENTURE;

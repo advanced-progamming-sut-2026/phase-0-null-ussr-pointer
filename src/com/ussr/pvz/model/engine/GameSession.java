@@ -13,7 +13,7 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
-import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.ai.ZombieAIManager; // 1. Added modern AI import
 import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
 import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
@@ -28,14 +28,10 @@ import java.util.Optional;
 
 public class GameSession {
 
-
     private final GameEventBus eventBus = new GameEventBus();
 
-
     private GameClock clock = new GameClock();
-    private final WaveScheduler waveScheduler = new WaveScheduler();
-
-
+    private ZombieAIManager aiManager;
     private Level level;
     private ResourceState resourceState;
     private List<Zombie> zombies;
@@ -51,7 +47,6 @@ public class GameSession {
     private List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
-
 
     public void initClock() {
         clock.reset();
@@ -74,7 +69,6 @@ public class GameSession {
         }
     }
 
-
     public void tick() {
         clock.tick();
 
@@ -82,8 +76,8 @@ public class GameSession {
             level.getEnvironment().tick(this, GameClock.SECONDS_PER_TICK);
         }
 
-        if (wavesStarted) {
-            waveScheduler.tick(this, clock.getElapsedSeconds());
+        if (wavesStarted && aiManager != null) {
+            aiManager.tick(this, GameClock.SECONDS_PER_TICK);
         }
 
         plants.removeIf(p -> !p.isAlive());
@@ -99,7 +93,7 @@ public class GameSession {
             gameOver = true;
         }
 
-        if (wavesStarted && waveScheduler.isDone() && zombies.isEmpty() && !gameOver) {
+        if (wavesStarted && aiManager != null && aiManager.areAllWavesDone(level.getWaves()) && zombies.isEmpty() && !gameOver) {
             eventBus.publish(new GameEvent.WavesCompleted());
             eventBus.publish(new GameEvent.GameWon());
         }
@@ -110,7 +104,6 @@ public class GameSession {
             }
         }
     }
-
 
     private void cleanupDeadGridStructures() {
         if (lawn == null) return;
@@ -143,7 +136,6 @@ public class GameSession {
     }
 
     private void checkZombieBreaches() {
-        // Add a check to bypass standard breach rules for i,Zombie
         boolean isIZombie = level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior;
 
         for (Zombie zombie : zombies) {
@@ -158,11 +150,9 @@ public class GameSession {
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
                 } else if (!isIZombie) {
-                    // ONLY trigger game over if it's NOT i,Zombie
                     onZombieReachedEnd();
                     break;
                 } else {
-                    // In i,Zombie, a zombie walking off the left edge just despawns cleanly
                     zombie.setAlive(false);
                 }
             }
@@ -175,7 +165,6 @@ public class GameSession {
                 .findFirst()
                 .orElse(null);
     }
-
 
     public void spawnZombie(Zombie zombie) {
         zombies.add(zombie);
@@ -192,7 +181,6 @@ public class GameSession {
                 (int) zombie.getPosition().x()
         ));
     }
-
 
     public void onZombieReachedEnd() {
         gameOver = true;
@@ -290,7 +278,6 @@ public class GameSession {
         return true;
     }
 
-
     public void killAllZombies() {
         if (zombies != null) {
             zombies.forEach(z -> z.isAlive = false);
@@ -300,13 +287,11 @@ public class GameSession {
 
     public void removeAllCooldowns() {
         if (App.getAccount() != null && App.getAccount().getCollection() != null) {
-            // Iterate through the unlocked plants in the collection and zero out their recharge
             for (Plant plant : App.getAccount().getCollection().unlockedPlants()) {
                 plant.setRecharge(0);
             }
         }
     }
-
 
     public void startWaves() {
         ZombieFactory.init();
@@ -319,10 +304,12 @@ public class GameSession {
             return;
         }
 
-        int rows = lawn != null ? lawn.getRows() : 5;
-        int cols = lawn != null ? lawn.getCols() : 9;
+        int accountDifficultyLvl = 1;
+        if (App.getAccount() != null) {
+            accountDifficultyLvl = App.getAccount().getDifficultyLvl();
+        }
+        this.aiManager = new ZombieAIManager(accountDifficultyLvl);
 
-        waveScheduler.load(level, rows, cols);
         wavesStarted = true;
     }
 
@@ -331,9 +318,8 @@ public class GameSession {
     }
 
     public boolean areWavesDone() {
-        return wavesStarted && waveScheduler.isDone() && zombies.isEmpty();
+        return wavesStarted && aiManager != null && aiManager.areAllWavesDone(level.getWaves()) && zombies.isEmpty();
     }
-
 
     public String renderMap() {
         if (lawn == null) return "map not initialized";
@@ -397,7 +383,6 @@ public class GameSession {
         return sb.toString().trim();
     }
 
-
     public boolean removePlantAt(int x, int y) {
         Plant.Location targetLoc = new Plant.Location(x, y);
 
@@ -432,7 +417,6 @@ public class GameSession {
             }
         }
     }
-
 
     public GameEventBus getEventBus() {
         return eventBus;

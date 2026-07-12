@@ -14,12 +14,17 @@ public class LevelFactory {
     private static final Map<String, Supplier<LevelBehavior>> BEHAVIOR_REGISTRY = new HashMap<>();
 
     static {
-        BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
-        BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
         BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
+        BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
+        BEHAVIOR_REGISTRY.put("DeadlineBehavior", DeadlineBehavior::new);
+        BEHAVIOR_REGISTRY.put("LoveYourPlantsBehavior", LoveYourPlantsBehavior::new);
+        BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
+        BEHAVIOR_REGISTRY.put("ZombotanyBehavior", ZombotanyBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
+        if (data == null) return null;
+
         Level level = new Level();
         level.setId(data.id);
         level.setOrder(data.order);
@@ -30,44 +35,46 @@ public class LevelFactory {
         level.setLockedPlants(data.lockedPlants != null ? data.lockedPlants : new ArrayList<>());
         level.setSeedPlants(data.seedPlants != null ? data.seedPlants : new ArrayList<>());
 
-        // Dynamic Behavior & Minigame Router
+        LevelBehavior selectedBehavior = null;
+
         if (data.behavior != null && !data.behavior.isBlank()) {
-            switch (data.behavior) {
-                case "WallnutBowlingBehavior" ->
-                        level.setBehavior(new WallnutBowlingBehavior(data.redLineColumn));
-
-                case "VaseBreakerBehavior" ->
-                        level.setBehavior(new VaseBreakerBehavior());
-
-                case "BeghouledBehavior" -> {
-                    List<String> startingPlants = data.startingPlants != null ? data.startingPlants : new ArrayList<>();
-                    level.setBehavior(new BeghouledBehavior(data.targetMatches, startingPlants));
+            String behaviorKey = data.behavior.trim();
+            switch (behaviorKey) {
+                case "TimedWarBehavior" -> {
+                    TimedWarBehavior.LimitationType type = TimedWarBehavior.LimitationType.ZOMBIE;
+                    if (data.timedWarType != null && data.timedWarType.equalsIgnoreCase("SUN")) {
+                        type = TimedWarBehavior.LimitationType.SUN;
+                    }
+                    selectedBehavior = new TimedWarBehavior(type, data.timedWarTarget);
                 }
-
-                case "IZombieBehavior" -> {
-                    List<IZombieBehavior.PrePlacedPlant> layouts = new ArrayList<>();
+                case "SaveOurSeedsBehavior" -> {
+                    List<SaveOurSeedsBehavior.TargetSeed> seeds = new ArrayList<>();
                     if (data.plantLayout != null) {
                         for (JsonContainer.JsonPrePlacedPlant p : data.plantLayout) {
-                            layouts.add(new IZombieBehavior.PrePlacedPlant(p.plantName, p.row, p.col));
+                            seeds.add(new SaveOurSeedsBehavior.TargetSeed(p.plantName, p.row, p.col));
                         }
                     }
-                    level.setBehavior(new IZombieBehavior(data.redLineColumn, data.startingSun, layouts));
+                    selectedBehavior = new SaveOurSeedsBehavior(seeds);
                 }
-
                 default -> {
-                    Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior);
+                    Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(behaviorKey);
                     if (supplier != null) {
-                        level.setBehavior(supplier.get());
+                        selectedBehavior = supplier.get();
                     } else {
-                        System.err.println("[LevelFactory] Unknown behavior: " + data.behavior);
+                        System.err.println("[LevelFactory] Unknown campaign behavior: " + data.behavior);
                     }
                 }
             }
         }
 
-        //Context-Driven Environment Builder
+        if (selectedBehavior == null && data.order == 4) {
+            selectedBehavior = new BossBehavior();
+        }
+
+        level.setBehavior(selectedBehavior);
+
         if (data.environment != null && !data.environment.isBlank()) {
-            switch (data.environment) {
+            switch (data.environment.trim()) {
                 case "AncientEgyptEnvironment" -> {
                     List<AncientEgyptEnvironment.SandstormEvent> schedule = new ArrayList<>();
                     if (data.sandstorms != null) {
@@ -99,7 +106,6 @@ public class LevelFactory {
             }
         }
 
-        //Allowed Zombies Loader
         if (data.allowedZombies != null) {
             List<Level.AllowedZombie> allowed = new ArrayList<>();
             for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
@@ -110,7 +116,6 @@ public class LevelFactory {
             level.setAllowedZombies(allowed);
         }
 
-        //Wave & Spawn Schedule Loader
         if (data.waves != null) {
             level.setWaves(getWaves(data));
         }
@@ -118,18 +123,15 @@ public class LevelFactory {
         return level;
     }
 
-    /**
-     * Maps incoming wave timeline metadata directly into immutable Java Record structures.
-     */
     private static List<Level.Wave> getWaves(JsonContainer.JsonLevelData data) {
         List<Level.Wave> waves = new ArrayList<>();
+        if (data.waves == null) return waves;
 
         for (JsonContainer.JsonWaveData waveData : data.waves) {
             List<Level.SpawnData> spawns = new ArrayList<>();
 
             if (waveData.spawnData != null) {
                 for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
-                    // Safe injection using the Record constructor
                     spawns.add(new Level.SpawnData(
                             spawnEntry.zombieId,
                             spawnEntry.lane,
@@ -137,8 +139,6 @@ public class LevelFactory {
                     ));
                 }
             }
-
-            // Safe instantiation of the Level.Wave record container
             waves.add(new Level.Wave(waveData.waveNumber, waveData.cost, spawns));
         }
 

@@ -3,8 +3,6 @@ package com.ussr.pvz.model.engine;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
-import com.ussr.pvz.model.level.SpawnData;
-import com.ussr.pvz.model.level.Wave;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +11,7 @@ import java.util.Random;
 
 public class WaveScheduler {
 
-    private static final String EGYPT_CHAPTER_ID = "egypt-1"; // match your levels.json id
+    private static final String EGYPT_CHAPTER_ID = "egypt-1";
     private static final int SANDSTORM_MIN_OFFSET = 1;
     private static final int SANDSTORM_MAX_OFFSET = 4;
 
@@ -48,34 +46,34 @@ public class WaveScheduler {
         if (level == null || level.getWaves() == null) return;
 
         final double WAVE_GAP_SECONDS = 25.0;
-        boolean isEgypt = EGYPT_CHAPTER_ID.equals(level.getChapterId());
+        boolean isEgypt = EGYPT_CHAPTER_ID.equals(level.getChapter());
 
         finalWaveNumber = level.getWaves().stream()
-                .mapToInt(Wave::getWaveNumber)
+                .mapToInt(Level.Wave::waveNumber)
                 .max()
                 .orElse(0);
 
-        for (Wave wave : level.getWaves()) {
-            double waveOffset = (wave.getWaveNumber() - 1) * WAVE_GAP_SECONDS;
-            boolean isFinalWave = wave.getWaveNumber() == finalWaveNumber;
-            boolean applySandstorm = isEgypt && isFinalWave; // Part D
+        for (Level.Wave wave : level.getWaves()) {
+            double waveOffset = (wave.waveNumber() - 1) * WAVE_GAP_SECONDS;
+            boolean isFinalWave = wave.waveNumber() == finalWaveNumber;
+            boolean applySandstorm = isEgypt && isFinalWave;
 
-            if (wave.getSpawnData() != null) {
-                for (SpawnData spawn : wave.getSpawnData()) {
+            if (wave.spawnData() != null) {
+                for (Level.SpawnData spawn : wave.spawnData()) {
                     int col = applySandstorm ? sandstormColumn(lawnCols) : lawnCols;
                     pending.add(new ScheduledSpawn(
-                            waveOffset + spawn.getDelaySeconds(),
-                            spawn.getZombieId(),
-                            spawn.getLane(),
+                            waveOffset + spawn.delaySeconds(),
+                            spawn.zombieId(),
+                            spawn.lane(),
                             col,
-                            wave.getWaveNumber()
+                            wave.waveNumber()
                     ));
                 }
             }
 
-            if (wave.getCost() > 0 && level.getAllowedZombies() != null) {
-                generateDynamicSpawns(wave.getCost(), waveOffset, level.getAllowedZombies(),
-                        lawnRows, lawnCols, wave.getWaveNumber(), applySandstorm);
+            if (wave.cost() > 0 && level.getAllowedZombies() != null) {
+                generateDynamicSpawns(wave.cost(), waveOffset, level.getAllowedZombies(),
+                        lawnRows, lawnCols, wave.waveNumber(), applySandstorm);
             }
         }
 

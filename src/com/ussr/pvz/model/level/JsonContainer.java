@@ -22,7 +22,6 @@ public class JsonContainer {
         public int order;
         public String deliveryStrategy;
 
-        // --- flags (replace subclasses) ---
         public boolean sunFalling = true;
         public int timeLimitSeconds = 0;
         public int deadlineColumn = -1;
@@ -32,25 +31,29 @@ public class JsonContainer {
         public List<String> seedPlants;
         public String behavior;
 
+        // === Timed War Parameters ===
+        public String timedWarType;
+        public int timedWarTarget;
+
         public List<JsonZombieEntry> allowedZombies;
         public List<JsonWaveData> waves;
 
-        // === 🇪🇬 Ancient Egypt Parameters ===
+        // === Ancient Egypt Parameters ===
         public List<JsonSandstormEvent> sandstorms;
 
-        // === 🏖️ Big Wave Beach Parameters ===
+        // === Big Wave Beach Parameters ===
         public int startingTideColumn = 9;
         public List<JsonTideEvent> tides;
 
-        // === 🏰 Dark Ages Parameters ===
+        // === Dark Ages Parameters ===
         public String necromancyZombieAlias;
         public int zombiesPerNecromancyWave = 0;
 
-        // === ❄️ Frostbite Caves Parameters ===
+        // === Frostbite Caves Parameters ===
         public double windIntervalSeconds = 0.0;
         public int freezeStacksPerWind = 0;
 
-        // === 🕹️ Minigame Strategy Parameters ===
+        // === Minigame Strategy Parameters ===
         public int redLineColumn = 2;
         public int startingSun = 150;
         public int targetMatches = 20;
@@ -74,8 +77,6 @@ public class JsonContainer {
         public int lane;
         public float delaySeconds;
     }
-
-    // === 🛠️ Sub-DTO Helpers for Strategy Data Binding ===
 
     public static class JsonSandstormEvent {
         public double triggerTimeSeconds;
