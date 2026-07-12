@@ -26,6 +26,14 @@ public class ProspectorMove implements MoveBehavior {
         }
     }
 
+    public void litDynamite() {
+        if (currentPhase == ProspectorPhase.WALKING_LEFT) {
+            if (dynamiteExtinguished) {
+                dynamiteExtinguished = false;
+            }
+        }
+    }
+
     @Override
     public void move(Zombie zombie, GameSession session) {
         if (dynamiteExtinguished) {
