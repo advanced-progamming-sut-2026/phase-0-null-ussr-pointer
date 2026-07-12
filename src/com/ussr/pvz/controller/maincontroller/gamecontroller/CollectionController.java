@@ -60,13 +60,11 @@ public class CollectionController {
 
     private String handleUpgradePlant(Matcher matcher) {
         PlantTypeRequest request = new PlantTypeRequest(matcher.group("plantName"));
-        // TODO: call collectionService.upgradePlant(request) and return its message
-        return "";
+        return collectionService.upgradePlant(request);
     }
 
     private String handlePurchasePlant(Matcher matcher) {
         PlantTypeRequest request = new PlantTypeRequest(matcher.group("plantName"));
-        // TODO: call collectionService.purchasePlant(request) and return its message
-        return "";
+        return collectionService.purchasePlant(request);
     }
 }

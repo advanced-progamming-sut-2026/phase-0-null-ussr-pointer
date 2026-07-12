@@ -256,4 +256,9 @@ public class ZombieFactory {
             default -> null;
         };
     }
+
+    public static java.util.Set<String> getAllZombieAliases() {
+        init();
+        return blueprints.keySet();
+    }
 }

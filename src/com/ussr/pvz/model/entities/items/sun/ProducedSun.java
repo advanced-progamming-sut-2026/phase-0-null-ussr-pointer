@@ -17,6 +17,7 @@ public class ProducedSun extends GroundItem {
         this.x = x;
         this.y = y;
         this.value = value;
+        this.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
         App.getGameSession().getEventBus().publish(new GameEvent.SunProduced(value, x, y));
     }
 

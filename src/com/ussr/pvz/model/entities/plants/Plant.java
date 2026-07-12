@@ -172,14 +172,14 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void setLocation(Location location) {
-        this.location = location;
         if (location != null) {
             this.setPosition(Vec2.of(location.x(), location.y()));
         }
     }
 
     public Location getLocation() {
-        return location;
+        if (this.getPosition() == null) return null;
+        return new Location((int) this.getPosition().x(), (int) this.getPosition().y());
     }
 
     public String getName() {

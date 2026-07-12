@@ -32,7 +32,7 @@ public class GargantuarImpProjectile extends ZombieProjectile {
 
     @Override
     protected void onDestinationReached(GameSession session) {
-        int targetCol = (int) Math.round(targetPosition.x());
+        int targetCol = (int) (targetPosition.x());
 
         Cell targetCell = session.getLawn().getCell(targetRow, targetCol);
         if (targetCell == null) return;

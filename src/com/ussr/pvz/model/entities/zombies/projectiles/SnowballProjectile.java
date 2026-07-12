@@ -22,11 +22,10 @@ public class SnowballProjectile extends ZombieProjectile {
 
     @Override
     protected void onDestinationReached(GameSession session) {
-        int targetRow = (int) Math.round(targetPosition.y());
-        int targetCol = (int) Math.round(targetPosition.x());
+        int targetRow = (int) targetPosition.y();
+        int targetCol = (int) targetPosition.x();
 
         Cell targetCell = session.getLawn().getCell(targetRow, targetCol);
-
         if (targetCell != null && targetCell.getPlant() != null && targetCell.getPlant().isAlive()) {
             Plant targetPlant = targetCell.getPlant();
 

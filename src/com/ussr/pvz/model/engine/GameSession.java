@@ -180,6 +180,12 @@ public class GameSession {
     public void spawnZombie(Zombie zombie) {
         zombies.add(zombie);
         clock.addEntity(zombie);
+        if (App.getAccount() != null) {
+            List<String> seen = App.getAccount().getAdventureProgress().getSeenZombies();
+            if (!seen.contains(zombie.getAlias())) {
+                App.getAccount().getAdventureProgress().addSeenZombies(zombie.getAlias());
+            }
+        }
         eventBus.publish(new GameEvent.ZombieSpawned(
                 zombie.getAlias(),
                 (int) zombie.getPosition().y(),
@@ -420,7 +426,7 @@ public class GameSession {
         eventBus.publish(new GameEvent.WaveStarted(waveNumber, isFinalWave));
 
         if (level != null) {
-            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapterId());
+            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
             if (effect != null) {
                 effect.onWaveStart(this, level, waveNumber, isFinalWave);
             }

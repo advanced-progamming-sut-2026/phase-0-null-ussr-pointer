@@ -10,7 +10,6 @@ public abstract class GroundItem extends GameEntity {
     private final double collectRadius;
     private boolean collected;
     private final ItemType itemType;
-    protected Location location;
 
     protected GroundItem(ItemType itemType, double lifetime, double collectRadius) {
         this.itemType = itemType;
@@ -54,7 +53,8 @@ public abstract class GroundItem extends GameEntity {
     }
 
     public Location getLocation() {
-        return location;
+        if (this.getPosition() == null) return null;
+        return new Location((int) this.getPosition().x(), (int) this.getPosition().y());
     }
 
     public record Location(int x, int y) {
