@@ -7,6 +7,13 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
+// TODO(dodo-jump-probability): this whole class ignores zombies.json's Dodo-specific fields —
+//  AddRandomChanceForJumpPerGridWalked, CooldownSecondsUntilNextJumpAvailable,
+//  InitialSetRandomChanceForJump, LandedResetRandomChanceForJump, Min/MaxRandomGridSquaresToFlyOver
+//  — and instead jumps deterministically every time an obstacle plant is directly ahead. Needs a
+//  real probability accumulator (increases per grid square walked, resets after a jump per
+//  LandedResetRandomChanceForJump, respects the cooldown between jumps) plus honoring
+//  PlantsToFlyOver / GridItemsToFlyOver as actual whitelists instead of "any alive plant ahead".
 public class JumpMove implements MoveBehavior {
 
     @Override

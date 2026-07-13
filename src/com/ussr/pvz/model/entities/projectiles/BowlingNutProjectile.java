@@ -63,7 +63,11 @@ public class BowlingNutProjectile extends Projectile {
                 switch (nutType) {
                     case NORMAL -> {
                         zombie.takeDamage(getDamage(), this);
-                        // Bounce at a 45-degree angle
+                        // TODO(bowling-nut-angles): spec calls for a 45-degree deflection on the
+                        //  FIRST hit and 90-degree on subsequent hits (same for hitting the top/
+                        //  bottom edge). This just flips/picks a lane each time with no distinction
+                        //  between first and later hits — needs a hit counter to track which stage
+                        //  of deflection it's on.
                         bounceDirection = (bounceDirection == 0) ? (Math.random() > 0.5 ? 1 : -1) : -bounceDirection;
                     }
                     case EXPLODING -> {

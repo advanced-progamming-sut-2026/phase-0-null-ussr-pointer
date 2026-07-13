@@ -99,6 +99,10 @@ public class WaveDirector {
         }
     }
 
+    // TODO(wave-weight-selection): all three strategies below pick from `pool` with a uniform
+    //  random index, completely ignoring each AllowedZombie's/zombies.json's `Weight` field.
+    //  Should instead do a weighted random pick (e.g. build a cumulative-weight list once per
+    //  wave and binary-search it) so heavier zombies are proportionally more common.
     private void executeSimpleStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
         Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
         int cost = ZombieFactory.getZombieCost(choice.id());

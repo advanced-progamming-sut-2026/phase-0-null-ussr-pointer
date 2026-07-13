@@ -189,6 +189,12 @@ public class GameService {
 
             Plant plant = instantiatePlant(blueprint, x, y);
 
+            // TODO(greenhouse-boost-consumption): if App.getAccount().getSavedBoosts()
+            //  .useBoost(blueprint.getName()) returns true here, immediately trigger this plant's
+            //  plant-food effect (same code path as the `feed plant` command) before it's added to
+            //  the lawn. Blocked on confirming the exact plant-food-effect trigger point/method name
+            //  with the plant-food system; SavedBoosts.useBoost() currently has no call site anywhere.
+
             // FIX: Stacking Logic. If the cell wasn't empty, it must be a Lily Pad (validated below).
             if (!cell.isEmpty()) {
                 Plant existingLilyPad = cell.getPlant();

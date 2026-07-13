@@ -174,6 +174,12 @@ public class ZombieFactory {
                     } else if ("EatDPS".equals(prop.get("Key"))) {
                         zombie.setEatDps(zombie.getEatDps() * scale);
                     }
+                    // TODO(scaling-gap): Gargantuar/All-Star's "SmashDamage" and CrystalSkull's
+                    //  "LaserBeamDamage" both appear in zombies.json's ScaledProps with the
+                    //  "standard" formula (meaning they ARE meant to scale with difficulty), but
+                    //  neither key is handled above, so those two attack values never scale.
+                    //  Need to plumb the scaled value into whatever reads SmashDamage/LaserBeamDamage
+                    //  when building SmashAttack / the laser-beam effect for these zombies.
                 }
             }
         }
@@ -208,6 +214,15 @@ public class ZombieFactory {
         return new Armor(ArmorType.CROWN, crownHp + shoulderHp);
     }
 
+    // TODO(zombotany-zombie-types): none of the 4 Zombotany-minigame zombie types exist yet
+    //  (peashooter-zombie / wall-nut-zombie / jalapeno-zombie / squash-zombie — see spec + the
+    //  matching TODO in ZombotanyService.java). They'll need aliases + blueprint entries added
+    //  either to zombies.json or a parallel minigame-only data source, plus effect/attack classes
+    //  wired through the same registries used below (EffectStatusRegistry, AttackBehaviorRegistry).
+    //
+    // TODO(troglobite-ice-count): zombies.json's "NumberOfIceblocksToSpawnWith" (3) is never read
+    //  anywhere in this file or PushableStructure — Troglobite currently only ever pushes a single
+    //  generic PushableStructure(ICE_BLOCK, ...) instead of 3 separate ice blocks per spec.
     private static void attachPushedStructureIfNeeded(Zombie zombie) {
         PushableType type = switch (zombie.getAlias()) {
             case "ZombieArcade" -> PushableType.ARCADE_CABINET;

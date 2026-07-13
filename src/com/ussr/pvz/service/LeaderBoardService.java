@@ -7,6 +7,10 @@ import com.ussr.pvz.model.dto.LeaderBoardSortRequest;
 import java.util.Comparator;
 import java.util.List;
 
+// TODO(leaderboard-verification): do an end-to-end pass confirming the sortable columns exactly
+//  match spec (last chapter/level reached, minigames won, quests completed — daily vs. non-daily
+//  counted SEPARATELY per spec, highest MooPoint score) and that both ascending and descending
+//  work for every column, including tie-breaking and an empty-account-list case.
 public class LeaderBoardService {
 
     public LeaderBoardService() {
