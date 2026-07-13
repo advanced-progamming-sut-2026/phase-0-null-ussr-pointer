@@ -13,15 +13,11 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
-import com.ussr.pvz.model.level.ai.ZombieAIManager; // 1. Added modern AI import
-import com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior;
-import com.ussr.pvz.model.level.behavior.TimedWarBehavior;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +27,6 @@ public class GameSession {
     private final GameEventBus eventBus = new GameEventBus();
 
     private GameClock clock = new GameClock();
-    private ZombieAIManager aiManager;
     private Level level;
     private ResourceState resourceState;
     private List<Zombie> zombies;
@@ -76,8 +71,9 @@ public class GameSession {
             level.getEnvironment().tick(this, GameClock.SECONDS_PER_TICK);
         }
 
-        if (wavesStarted && aiManager != null) {
-            aiManager.tick(this, GameClock.SECONDS_PER_TICK);
+        // Delegate core tick progression directly to the behavior polymorphically
+        if (level != null && level.getBehavior() != null) {
+            level.getBehavior().tick(this, GameClock.SECONDS_PER_TICK);
         }
 
         plants.removeIf(p -> !p.isAlive());
@@ -89,19 +85,9 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
-        if (level.isFailed()) {
+        // Polymorphic loss condition check
+        if (level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
             gameOver = true;
-        }
-
-        if (wavesStarted && aiManager != null && aiManager.areAllWavesDone(level.getWaves()) && zombies.isEmpty() && !gameOver) {
-            eventBus.publish(new GameEvent.WavesCompleted());
-            eventBus.publish(new GameEvent.GameWon());
-        }
-
-        if (level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior izBehavior) {
-            if (izBehavior.isWon() && !gameOver) {
-                eventBus.publish(new GameEvent.GameWon());
-            }
         }
     }
 
@@ -136,7 +122,7 @@ public class GameSession {
     }
 
     private void checkZombieBreaches() {
-        boolean isIZombie = level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior;
+        if (level == null || level.getBehavior() == null) return;
 
         for (Zombie zombie : zombies) {
             if (!zombie.isAlive()) continue;
@@ -149,11 +135,10 @@ public class GameSession {
                     mower.activate();
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
-                } else if (!isIZombie) {
-                    onZombieReachedEnd();
-                    break;
                 } else {
-                    zombie.setAlive(false);
+                    // Let the behavior safely decide how to handle breaches
+                    level.getBehavior().onZombieBreach(this, zombie);
+                    if (gameOver) break;
                 }
             }
         }
@@ -204,8 +189,8 @@ public class GameSession {
                     plant.getLocation().x()
             ));
 
-            if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
-                ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
+            if (level != null && level.getBehavior() != null) {
+                level.getBehavior().onPlantDied(this, plant);
             }
         }
     }
@@ -234,8 +219,8 @@ public class GameSession {
                 killerPlantName
         ));
 
-        if (level.getBehavior() instanceof TimedWarBehavior) {
-            ((TimedWarBehavior) level.getBehavior()).triggerZombieDied();
+        if (level != null && level.getBehavior() != null) {
+            level.getBehavior().onZombieDied(this, zombie);
         }
     }
 
@@ -257,8 +242,8 @@ public class GameSession {
 
     public void addSun(int amount) {
         sunCount += amount;
-        if (level.getBehavior() instanceof TimedWarBehavior) {
-            ((TimedWarBehavior) level.getBehavior()).triggerSunCollected(amount);
+        if (level != null && level.getBehavior() != null) {
+            level.getBehavior().onSunCollected(this, amount);
         }
     }
 
@@ -299,16 +284,11 @@ public class GameSession {
             QuestEventTracker tracker = new QuestEventTracker(App.getAccount().getQuestManager());
             tracker.subscribeTo(this);
         }
-        if (level == null || level.getWaves() == null) {
-            wavesStarted = true;
-            return;
-        }
 
-        int accountDifficultyLvl = 1;
-        if (App.getAccount() != null) {
-            accountDifficultyLvl = App.getAccount().getDifficultyLvl();
+        // Let the behavior set up its own wave schedules or internal configurations polymorphically
+        if (level != null && level.getBehavior() != null) {
+            level.getBehavior().onStart(level);
         }
-        this.aiManager = new ZombieAIManager(accountDifficultyLvl);
 
         wavesStarted = true;
     }
@@ -318,7 +298,14 @@ public class GameSession {
     }
 
     public boolean areWavesDone() {
-        return wavesStarted && aiManager != null && aiManager.areAllWavesDone(level.getWaves()) && zombies.isEmpty();
+        if (!wavesStarted || level == null || level.getBehavior() == null) return false;
+
+        var ai = level.getBehavior().getAiManager();
+        if (ai == null) {
+            return zombies.isEmpty();
+        }
+
+        return ai.areAllWavesDone(level.getWaves()) && zombies.isEmpty();
     }
 
     public String renderMap() {
@@ -481,8 +468,8 @@ public class GameSession {
                 plant.getLocation().x()
         ));
 
-        if (level.getBehavior() instanceof LoveYourPlantsBehavior) {
-            ((LoveYourPlantsBehavior) level.getBehavior()).triggerPlantDied();
+        if (level != null && level.getBehavior() != null) {
+            level.getBehavior().onPlantDied(this, plant);
         }
     }
 }

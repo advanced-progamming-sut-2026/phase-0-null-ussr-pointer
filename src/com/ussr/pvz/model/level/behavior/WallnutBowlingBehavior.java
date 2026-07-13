@@ -8,6 +8,8 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class WallnutBowlingBehavior implements LevelBehavior {
 
+    //todo : handle it on you own i dont know what to do
+
     private final int redLineColumn;
 
     public WallnutBowlingBehavior(int redLineColumn) {
