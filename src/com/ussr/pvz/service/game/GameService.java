@@ -3,6 +3,7 @@ package com.ussr.pvz.service.game;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.dto.CheatAddCurrencyRequest;
 import com.ussr.pvz.model.dto.CheatAddSunsRequest;
@@ -11,11 +12,11 @@ import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
-import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
@@ -25,7 +26,18 @@ import java.util.Optional;
 public class GameService {
 
     public String menuEnterChapter(MenuEnterChapterRequest request) {
-        // TODO: validate chapter name via LevelManager here
+        String chapterId = request.chapterName();
+
+        if (App.getLevelManager().findChapter(chapterId) == null) {
+            return "chapter not found: " + chapterId;
+        }
+
+        try {
+            App.getLevelManager().startChapter(chapterId);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return "could not enter chapter '" + chapterId + "': " + e.getMessage();
+        }
+
         App.setMenuState(MenuState.CHOOSE_PLANT);
         return "entered chapter: " + request.chapterName();
     }
@@ -56,7 +68,18 @@ public class GameService {
     }
 
     public String menuSwitchWorld(MenuSwitchWorldRequest request) {
-        // TODO: validate world name via LevelManager here
+        String worldId = request.worldName();
+
+        if (App.getLevelManager().findChapter(worldId) == null) {
+            return "world not found: " + worldId;
+        }
+
+        try {
+            App.getLevelManager().startChapter(worldId);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return "could not switch to world '" + worldId + "': " + e.getMessage();
+        }
+
         return "switched to world: " + request.worldName();
     }
 
@@ -146,8 +169,63 @@ public class GameService {
         } catch (NumberFormatException e) {
             return "invalid location";
         }
-        // TODO: do other validation checks here and handle the plant process.
-        return "plant " + request.type() + " placed at (" + x + ", " + y + ")";
+
+        GameSession session = App.getGameSession();
+        if (session == null) {
+            return "no active game session";
+        }
+
+        Lawn lawn = session.getLawn();
+        if (lawn == null || y < 0 || y >= lawn.getRows() || x < 0 || x >= lawn.getCols()) {
+            return "invalid location";
+        }
+
+        Cell cell = lawn.getCell(y, x);
+        if (cell == null) {
+            return "invalid location";
+        }
+
+        if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
+            return "cannot plant on tile (" + x + ", " + y + ")";
+        }
+
+        if (!cell.isEmpty()) {
+            return "a plant is already at (" + x + ", " + y + ")";
+        }
+
+        Account account = App.getAccount();
+        if (account == null) {
+            return "no active account";
+        }
+
+        String plantKey = request.type() == null ? "" : request.type().trim().toUpperCase();
+        int unlockedLevel = account.getAdventureProgress().getPlantLvls().getOrDefault(plantKey, 0);
+        if (unlockedLevel <= 0) {
+            return "you haven't unlocked " + request.type();
+        }
+
+        Plant blueprint = account.getAdventureProgress().getAccountPlants().stream()
+                .filter(p -> p.getName() != null && p.getName().equalsIgnoreCase(plantKey))
+                .findFirst()
+                .orElse(null);
+
+        if (blueprint == null) {
+            return "unknown plant type: " + request.type();
+        }
+
+        if (!session.spendSun(blueprint.getCost())) {
+            return "not enough sun to plant " + blueprint.getName() + " (needs " + blueprint.getCost() + ")";
+        }
+
+        Plant plant = new Plant(blueprint);
+        plant.setLocation(new Plant.Location(x, y));
+        plant.setState(Plant.PlantState.ACTIVE);
+        plant.setAlive(true);
+
+        cell.setPlant(plant);
+        session.addPlant(plant);
+
+        return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
     }
 
     public String feedPlant(LocationRequest request) {
@@ -158,7 +236,42 @@ public class GameService {
         } catch (NumberFormatException e) {
             return "invalid location";
         }
-        // TODO: handle other checks when plants are implemented.
+
+        GameSession session = App.getGameSession();
+        if (session == null) {
+            return "no active game session";
+        }
+
+        Lawn lawn = session.getLawn();
+        if (lawn == null) {
+            return "map not initialized";
+        }
+
+        Cell cell = lawn.getCell(y, x);
+        if (cell == null || cell.getPlant() == null) {
+            return "no plant found at that location";
+        }
+
+        Plant plant = cell.getPlant();
+
+        if (plant.getPlantFoodType() == null
+                || plant.getPlantFoodType() == PlantFoodType.NONE
+                || plant.getPlantFoodEffect() == null) {
+            return plant.getName() + " has no plant food effect";
+        }
+
+        if (plant.getPlantFoodTimer() > 0) {
+            return plant.getName() + " is already under a plant food effect";
+        }
+
+        if (!session.spendPlantFood()) {
+            return "no plant food available";
+        }
+
+        plant.getPlantFoodEffect().triggerSuperpower(plant, session);
+        plant.getPlantFoodEffect().applyStatusModifiers(plant);
+        session.notifyPlantFoodUsed(plant);
+
         return "plant fed at (" + x + ", " + y + ")";
     }
 
@@ -174,7 +287,6 @@ public class GameService {
         if (App.getGameSession() == null) {
             return "no active game session";
         }
-        // TODO: change after zombies are implemented.
         return App.getGameSession().renderMap();
     }
 
@@ -182,7 +294,6 @@ public class GameService {
         if (App.getGameSession() == null) {
             return "no active game session";
         }
-        // TODO: handle after plants are implemented.
         return App.getGameSession().renderPlantsStatus();
     }
 
@@ -197,7 +308,6 @@ public class GameService {
         if (App.getGameSession() == null) {
             return "no active game session";
         }
-        // TODO: handle after plants and zombies are implemented.
         return App.getGameSession().renderTileStatus(x, y);
     }
 
@@ -205,7 +315,6 @@ public class GameService {
         if (App.getGameSession() == null) {
             return "no active game session";
         }
-        // TODO: handle after zombies are implemented.
         return App.getGameSession().renderZombiesInfo();
     }
 

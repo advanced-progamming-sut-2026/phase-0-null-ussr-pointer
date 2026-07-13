@@ -176,6 +176,21 @@ public class GameSession {
         eventBus.publish(new GameEvent.GameOver());
     }
 
+    public void addPlant(Plant plant) {
+        if (plant == null) return;
+        plants.add(plant);
+        clock.addEntity(plant);
+        notifyPlantPlanted(plant);
+    }
+
+    public void notifyPlantFoodUsed(Plant plant) {
+        eventBus.publish(new GameEvent.PlantFoodUsed(
+                plant.getName(),
+                plant.getLocation().y(),
+                plant.getLocation().x()
+        ));
+    }
+
     public void notifyPlantDamaged(Plant plant, int damageDealt) {
         eventBus.publish(new GameEvent.PlantDamaged(
                 plant.getName(),
