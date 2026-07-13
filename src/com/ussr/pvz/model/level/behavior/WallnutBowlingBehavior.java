@@ -6,7 +6,7 @@ import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 
-public class WallnutBowlingBehavior implements LevelBehavior {
+public class WallnutBowlingBehavior extends LevelBehavior {
 
     //todo : handle it on you own i dont know what to do
 

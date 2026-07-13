@@ -1,4 +1,5 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
+
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
@@ -6,118 +7,144 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
-public class ExplodeStrategy implements ActStrategy{
+
+public class ExplodeStrategy implements ActStrategy {
     private final double TRAP_ACTIVATION_RADIUS = 0.3;
+
     @Override
-    //todo : if an explosive plant have an activate delay set its activate for its action interval and also do it for interval timer
-    //todo : ability values : 1 for (touch) 2 for (area) 3 for (line) 4 for (whole pitch) 5 for (nearest(water of land)
     public void act(Plant user, GameSession session) {
-        if(user.getIntervalTimer() > 0) return;
+        if (user.getIntervalTimer() > 0) return;
+
+        // Arming Delay logic: If it's a delayed explosive (like Potato Mine)
+        // and hasn't matured yet, use the action interval as its arming countdown.
+        if (user.getTags().contains(Tag.DELAYED) && user.getCurrentStage() < 2) {
+            return;
+        }
+
         ArrayList<Zombie> targets = null;
-        switch ((int)user.getAbilityValue()) {
-            case 1 :
-                if(!isZombieTouch(user , session)) return;
-                targets = touchDetect(user , session);
+        switch ((int) user.getAbilityValue()) {
+            case 1:
+                if (!isZombieTouch(user, session)) return;
+                targets = touchDetect(user, session);
                 break;
-            case 2 :
-                targets = areaDetect(user , session);
+            case 2:
+                targets = areaDetect(user, session);
                 break;
-            case 3 :
-                targets = lineDetect(user , session);
+            case 3:
+                targets = lineDetect(user, session);
                 break;
-            case 4 :
-                targets = wholePitchDetect(user , session);
-                makeHole(user, session); // Pass 'user' here
+            case 4:
+                targets = wholePitchDetect(user, session);
+                makeHole(user, session);
+                break;
+            case 5: // Complete the nearest target functionality
+                targets = nearestZombieDetect(user, session);
                 break;
         }
-        if(targets == null || targets.isEmpty()) return;
-        userAct(user , targets);
+
+        if (targets == null || targets.isEmpty()) return;
+        userAct(user, targets);
+        user.setAlive(false); // Detonate and clear the plant entity
     }
 
-    private boolean isZombieTouch(Plant user , GameSession session) {
+    private boolean isZombieTouch(Plant user, GameSession session) {
         Vec2 userPos = user.getPosition();
-        for(Zombie zombie : session.getZombies()) {
-            Vec2 zomPos = zombie.getPosition();
-            if(zombie.getPosition().distanceTo(userPos) < TRAP_ACTIVATION_RADIUS)
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie.isAlive() && zombie.getPosition().distanceTo(userPos) < TRAP_ACTIVATION_RADIUS) {
                 return true;
+            }
         }
         return false;
     }
 
-    private ArrayList<Zombie> touchDetect(Plant user , GameSession session) {
+    private ArrayList<Zombie> touchDetect(Plant user, GameSession session) {
         ArrayList<Zombie> targets = new ArrayList<>();
         Vec2 userPos = user.getPosition();
         Zombie firstTouch = null;
         double shortest = Double.MAX_VALUE;
 
-        for(Zombie zombie : session.getZombies()) {
-            Vec2 zomPos = zombie.getPosition();
-            double distance = zomPos.distanceTo(userPos);
-            if(distance < shortest) {
+        for (Zombie zombie : session.getZombies()) {
+            if (!zombie.isAlive()) continue;
+            double distance = zombie.getPosition().distanceTo(userPos);
+            if (distance < shortest && distance < TRAP_ACTIVATION_RADIUS) {
                 shortest = distance;
                 firstTouch = zombie;
             }
         }
-        if(firstTouch != null) targets.add(firstTouch);
+        if (firstTouch != null) targets.add(firstTouch);
         return targets;
     }
 
-    private ArrayList<Zombie> areaDetect(Plant user , GameSession session) {
+    private ArrayList<Zombie> areaDetect(Plant user, GameSession session) {
         ArrayList<Zombie> targets = new ArrayList<>();
         Vec2 userPos = user.getPosition();
-        for(Zombie zombie : session.getZombies()) {
+        for (Zombie zombie : session.getZombies()) {
+            if (!zombie.isAlive()) continue;
             Vec2 zomPos = zombie.getPosition();
-            if(Math.abs(zomPos.y() - userPos.y()) < 1 && Math.abs(zomPos.x() - userPos.x()) < 1)
-                targets.add(zombie);
-        }
-        return targets;
-    }
-
-    private ArrayList<Zombie> lineDetect(Plant user , GameSession session) {
-        ArrayList<Zombie> targets = new ArrayList<>();
-        Vec2 userPos = user.getPosition();
-        for(Zombie zombie : session.getZombies()) {
-            Vec2 zomPos = zombie.getPosition();
-            if(Math.abs(userPos.y() - zomPos.y()) < 0.5) {
+            if (Math.abs(zomPos.y() - userPos.y()) <= 1.5 && Math.abs(zomPos.x() - userPos.x()) <= 1.5) {
                 targets.add(zombie);
             }
         }
         return targets;
     }
 
-    private ArrayList<Zombie> wholePitchDetect(Plant user , GameSession session) {
-        return (ArrayList<Zombie>) session.getZombies();
+    private ArrayList<Zombie> lineDetect(Plant user, GameSession session) {
+        ArrayList<Zombie> targets = new ArrayList<>();
+        Vec2 userPos = user.getPosition();
+        for (Zombie zombie : session.getZombies()) {
+            if (!zombie.isAlive()) continue;
+            Vec2 zomPos = zombie.getPosition();
+            if (Math.abs(userPos.y() - zomPos.y()) < 0.5) {
+                targets.add(zombie);
+            }
+        }
+        return targets;
+    }
+
+    private ArrayList<Zombie> wholePitchDetect(Plant user, GameSession session) {
+        ArrayList<Zombie> targets = new ArrayList<>();
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie.isAlive()) targets.add(zombie);
+        }
+        return targets;
+    }
+
+    private ArrayList<Zombie> nearestZombieDetect(Plant user, GameSession session) {
+        ArrayList<Zombie> targets = new ArrayList<>();
+        Zombie nearest = null;
+        double shortest = Double.MAX_VALUE;
+        Vec2 userPos = user.getPosition();
+
+        for (Zombie zombie : session.getZombies()) {
+            if (!zombie.isAlive()) continue;
+            double dist = zombie.getPosition().distanceTo(userPos);
+            if (dist < shortest) {
+                shortest = dist;
+                nearest = zombie;
+            }
+        }
+        if (nearest != null) targets.add(nearest);
+        return targets;
     }
 
     private void makeHole(Plant user, GameSession session) {
         int row = (int) user.getPosition().y();
         int col = (int) user.getPosition().x();
-
         com.ussr.pvz.model.board.Cell cell = session.getLawn().getCell(row, col);
         if (cell != null) {
-            // Replaces the tile with a Crater, preventing planting.
             cell.setTile(new com.ussr.pvz.model.board.terrain.Tile(com.ussr.pvz.model.board.terrain.TileType.Crater));
         }
     }
 
-    private void userAct(Plant user , ArrayList<Zombie> targets) {
+    private void userAct(Plant user, ArrayList<Zombie> targets) {
         int userDamage = user.getDamage();
-        if(user.getTags().contains(Tag.ICE)) {
-            for(Zombie zombie : targets) {
+        for (Zombie zombie : targets) {
+            if (user.getTags().contains(Tag.ICE)) {
                 zombie.setStatus(Zombie.Status.FREEZE);
-                zombie.takeDamage(userDamage);
-            }
-        }
-        else if(user.getTags().contains(Tag.FIRE)) {
-            for (Zombie zombie : targets) {
+            } else if (user.getTags().contains(Tag.FIRE)) {
                 zombie.setStatus(Zombie.Status.FIRED);
-                zombie.takeDamage(userDamage);
             }
-        }
-        else {
-            for (Zombie zombie : targets)
-                zombie.takeDamage(userDamage);
+            zombie.takeDamage(userDamage, null);
         }
     }
-
 }

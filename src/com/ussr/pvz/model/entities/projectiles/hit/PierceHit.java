@@ -28,24 +28,30 @@ public class PierceHit implements HitEffectStrategy {
         for (GameEntity target : entities) {
             if (target == null || !target.isAlive()) continue;
 
-            if (target instanceof Zombie zombie) {
-                if (!hitZombies.contains(zombie)) {
-                    if (hitZombies.size() < pierceNumber) {
-                        zombie.takeDamage(damageAmount);
-                        hitZombies.add(zombie);
-                    }
+            switch (target) {
+                case Zombie zombie -> {
+                    if (!hitZombies.contains(zombie)) {
+                        if (hitZombies.size() < pierceNumber) {
+                            zombie.takeDamage(damageAmount,projectile);
+                            hitZombies.add(zombie);
+                        }
 
-                    if (hitZombies.size() >= pierceNumber) {
-                        shouldDestroyProjectile = true;
+                        if (hitZombies.size() >= pierceNumber) {
+                            shouldDestroyProjectile = true;
+                        }
                     }
                 }
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-                shouldDestroyProjectile = true;
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+                case Plant plant -> {
+                    plant.takeDamage(damageAmount);
+                    shouldDestroyProjectile = true;
+                }
+                case InteractableStructure structure -> {
+                    structure.takeDamage(damageAmount);
 
-                shouldDestroyProjectile = true;
+                    shouldDestroyProjectile = true;
+                }
+                default -> {
+                }
             }
         }
 

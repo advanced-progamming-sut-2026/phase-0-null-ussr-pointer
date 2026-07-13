@@ -21,7 +21,6 @@ public class BoneProjectile extends ZombieProjectile {
 
         // Add a visual arc to the Y position (or Z if your graphics engine uses it).
         // Math.sin(progress * Math.PI) goes from 0 -> 1 -> 0, creating a perfect parabola.
-        //todo NOTE: In PvZ, Y is visually down, so we subtract to make it go "up" on screen.
         double visualY = currentY - (arcHeight * Math.sin(progress * Math.PI));
 
         this.setPosition(Vec2.of(currentX, visualY));

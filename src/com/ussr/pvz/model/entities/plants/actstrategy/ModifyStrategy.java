@@ -14,61 +14,88 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
 
 public class ModifyStrategy implements ActStrategy {
-    private  int damageMultiplier = 1;
+    private int damageMultiplier = 1;
 
     public ModifyStrategy(int damageMultiplier) {
         this.damageMultiplier = damageMultiplier;
     }
+
     @Override
-    // todo: ability values: 1 for pads(do nothing) 2 for (Torchwood) 3 for (hypnotism)
-    // the hypno will handled in the zombie and plant in the future
     public void act(Plant user, GameSession session) {
         switch ((int) user.getAbilityValue()) {
-            case 1 :
+            case 1:
                 return;
-            case 2 :
-                ArrayList<Projectile> targets = projectileThroughDetect(user , session);
-                modifyTargets(user , targets);
+            case 2:
+                ArrayList<Projectile> targets = projectileThroughDetect(user, session);
+                modifyTargets(user, targets);
+                break;
+            case 3:
+                ArrayList<Projectile> hypnoTargets = projectileThroughDetect(user, session);
+                applyHypnoModification(hypnoTargets);
                 break;
         }
     }
 
-    private ArrayList<Projectile> projectileThroughDetect(Plant user , GameSession session) {
+    private ArrayList<Projectile> projectileThroughDetect(Plant user, GameSession session) {
         Vec2 userPos = user.getPosition();
         ArrayList<Projectile> targets = new ArrayList<>();
-        for(Projectile projectile : session.getProjectiles()) {
+        for (Projectile projectile : session.getProjectiles()) {
             Vec2 projPos = projectile.getPosition();
-            if(Math.abs(userPos.distanceTo(projPos)) < 0.7)
+            if (Math.abs(userPos.distanceTo(projPos)) < 0.7)
                 targets.add(projectile);
         }
         return targets;
     }
 
-    private void modifyTargets(Plant user , ArrayList<Projectile> targets) {
-        if(user.getTags().contains(Tag.FIRE)) {
-            for(Projectile projectile : targets) {
-                if(projectile.getHitEffectStrategy() instanceof FireHit)
+    private void modifyTargets(Plant user, ArrayList<Projectile> targets) {
+        if (user.getTags().contains(Tag.FIRE)) {
+            for (Projectile projectile : targets) {
+                if (projectile.getHitEffectStrategy() instanceof FireHit)
                     continue;
                 projectile.setHitEffectStrategy(new FireHit(1));
             }
-        } else if(user.getTags().contains(Tag.ICE)) {
+        } else if (user.getTags().contains(Tag.ICE)) {
             for (Projectile projectile : targets) {
                 if (projectile.getHitEffectStrategy() instanceof IceHit)
                     continue;
                 projectile.setHitEffectStrategy(new IceHit(1));
             }
-        }
-        else if(user.getTags().contains(Tag.POISON)) {
+        } else if (user.getTags().contains(Tag.POISON)) {
             for (Projectile projectile : targets) {
                 if (projectile.getHitEffectStrategy() instanceof PoisonHit)
                     continue;
                 projectile.setHitEffectStrategy(new PoisonHit(1));
             }
         }
-        for(Projectile projectile : targets) {
+        for (Projectile projectile : targets) {
             projectile.setDamage(projectile.getDamage() * damageMultiplier);
         }
     }
 
-    public void setDamageMultiplier(int multiplier) { this.damageMultiplier = multiplier; }
+    public void setDamageMultiplier(int multiplier) {
+        this.damageMultiplier = multiplier;
+    }
+
+    private void applyHypnoModification(ArrayList<Projectile> targets) {
+        for (Projectile projectile : targets) {
+            // Intercept and rewrite the projectile hit behavior to trigger hypnosis on contact
+            projectile.setHitEffectStrategy(new com.ussr.pvz.model.entities.projectiles.hit.HitEffectStrategy() {
+                @Override
+                public void apply(ArrayList<com.ussr.pvz.model.engine.GameEntity> entities, Projectile proj) {
+                    proj.setAlive(false);
+                    for (com.ussr.pvz.model.engine.GameEntity entity : entities) {
+                        if (entity instanceof Zombie zombie && zombie.isAlive()) {
+                            zombie.setStatus(Zombie.Status.HYPNOTIZED);
+                            zombie.hypnotize();
+                        }
+                    }
+                }
+
+                @Override
+                public int getAreaLength() {
+                    return 1;
+                }
+            });
+        }
+    }
 }

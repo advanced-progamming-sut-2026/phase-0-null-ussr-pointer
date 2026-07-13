@@ -20,14 +20,12 @@ import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import java.util.Random;
 
 public class Zombie extends GameEntity implements Damageable {
-    //todo if iced bullet hit prospector the move strategy should change from prospector to normal
     private static final Random RAND = new Random();
     private final String name;
 
     private MoveBehavior moveBehavior;
     private EffectStatus effectStatus;
     private DefenseBehavior defenseBehavior;
-    //todo the zombie may have several attack behavior(eat and throw the bullets) or we should take care of them in effects as we did for laser
     private AttackBehavior attackBehavior;
     private Armor armor;
     private PushableStructure pushedStructure;

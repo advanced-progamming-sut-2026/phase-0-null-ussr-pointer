@@ -26,15 +26,17 @@ public class NormalHit implements HitEffectStrategy {
         long projectileLane = Math.round(projectile.getPosition().y());
 
         for (GameEntity target : entities) {
-            if (target == null) continue;
-
-            if (target instanceof Zombie zombie) {
-                zombie.takeDamage(damageAmount);
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+            switch (target) {
+                case null -> {
+                    continue;
+                }
+                case Zombie zombie -> zombie.takeDamage(damageAmount,projectile);
+                case Plant plant -> plant.takeDamage(damageAmount);
+                case InteractableStructure structure -> structure.takeDamage(damageAmount);
+                default -> {
+                }
             }
+
         }
     }
 

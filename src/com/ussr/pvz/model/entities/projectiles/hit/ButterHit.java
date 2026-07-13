@@ -24,24 +24,26 @@ public class ButterHit implements HitEffectStrategy{
         int damageAmount = projectile.getDamage();
 
         for (GameEntity target : entities) {
-            if (target == null) continue;
-
-            if (target instanceof Zombie zombie) {
-                // Pass the projectile as the damage source
-                zombie.takeDamage(damageAmount, projectile);
-                zombie.setStatus(Zombie.Status.BUTTER);
-
-                // Wrap the current move behavior to stun them for a duration (e.g., 4 seconds)
-                if (!(zombie.getMoveBehavior() instanceof com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior)) {
-                    zombie.setMoveBehavior(new com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior(zombie.getMoveBehavior(), 4.0));
+            switch (target) {
+                case null -> {
+                    continue;
                 }
+                case Zombie zombie -> {
+                    // Pass the projectile as the damage source
+                    zombie.takeDamage(damageAmount, projectile);
+                    zombie.setStatus(Zombie.Status.BUTTER);
 
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+                    // Wrap the current move behavior to stun them for a duration (e.g., 4 seconds)
+                    if (!(zombie.getMoveBehavior() instanceof com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior)) {
+                        zombie.setMoveBehavior(new com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior(zombie.getMoveBehavior(), 4.0));
+                    }
+                }
+                case Plant plant -> plant.takeDamage(damageAmount);
+                case InteractableStructure structure -> structure.takeDamage(damageAmount);
+                default -> {
+                }
             }
+
         }
     }
 

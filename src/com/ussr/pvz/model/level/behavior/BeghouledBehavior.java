@@ -15,7 +15,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 import java.util.*;
 
-public class BeghouledBehavior implements LevelBehavior {
+public class BeghouledBehavior extends LevelBehavior {
 
     private final int targetMatches;
     private int currentMatches = 0;

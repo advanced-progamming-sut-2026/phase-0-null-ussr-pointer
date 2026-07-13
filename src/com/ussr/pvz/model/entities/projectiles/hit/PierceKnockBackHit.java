@@ -34,22 +34,23 @@ public class PierceKnockBackHit implements HitEffectStrategy{
                 return;
             }
 
-            if (target instanceof Zombie zombie) {
-                if (hitZombies.contains(zombie)) {
-                    continue;
+            switch (target) {
+                case Zombie zombie -> {
+                    if (hitZombies.contains(zombie)) {
+                        continue;
+                    }
+
+                    hitZombies.add(zombie);
+                    zombie.takeDamage(damageAmount,projectile);
+                    double newX = zombie.getPosition().x() + knockbackDistance;
+                    // Cap the knockback so they don't fall off the right edge of the grid
+                    newX = Math.min(newX, 9.5);
+                    zombie.setPosition(com.ussr.pvz.model.util.Vec2.of(newX, zombie.getPosition().y()));
                 }
-
-                hitZombies.add(zombie);
-                zombie.takeDamage(damageAmount);
-                double newX = zombie.getPosition().x() + knockbackDistance;
-                // Cap the knockback so they don't fall off the right edge of the grid
-                newX = Math.min(newX, 9.5);
-                zombie.setPosition(com.ussr.pvz.model.util.Vec2.of(newX, zombie.getPosition().y()));
-
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+                case Plant plant -> plant.takeDamage(damageAmount);
+                case InteractableStructure structure -> structure.takeDamage(damageAmount);
+                default -> {
+                }
             }
         }
 

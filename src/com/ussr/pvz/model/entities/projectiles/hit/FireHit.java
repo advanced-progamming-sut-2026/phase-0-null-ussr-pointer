@@ -34,7 +34,7 @@ public class FireHit implements HitEffectStrategy {
 
             switch (target) {
                 case Zombie zombie -> {
-                    zombie.takeDamage(damageAmount);
+                    zombie.takeDamage(damageAmount,projectile);
 
                     if (zombie.getEffectStatus() instanceof FireEffect fireEffect) {
                         fireEffect.setLit(true);

@@ -2,7 +2,7 @@ package com.ussr.pvz.model.level.behavior;
 
 import com.ussr.pvz.model.level.Level;
 
-public class BossBehavior implements LevelBehavior {
+public class BossBehavior extends LevelBehavior {
     @Override
     public void onStart(Level level) {
 

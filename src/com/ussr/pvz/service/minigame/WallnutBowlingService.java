@@ -2,6 +2,7 @@ package com.ussr.pvz.service.minigame;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
 
 public class WallnutBowlingService {

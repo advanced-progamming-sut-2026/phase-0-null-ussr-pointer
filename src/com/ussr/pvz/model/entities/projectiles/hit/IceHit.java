@@ -37,25 +37,27 @@ public class IceHit implements HitEffectStrategy {
         for (GameEntity target : entities) {
             if (target == null || !target.isAlive()) continue;
 
-            if (target instanceof Zombie zombie) {
-                zombie.takeDamage(damageAmount);
+            switch (target) {
+                case Zombie zombie -> {
+                    zombie.takeDamage(damageAmount,projectile);
 
-                if (zombie.getEffectStatus() instanceof FireEffect fireEffect) {
-                    fireEffect.setLit(false);
+                    if (zombie.getEffectStatus() instanceof FireEffect fireEffect) {
+                        fireEffect.setLit(false);
+                    }
+
+                    if (zombie.getMoveBehavior() instanceof ProspectorMove prospectorMove) {
+                        prospectorMove.extinguishDynamite();
+                    }
+
+                    zombie.setStatus(Zombie.Status.FREEZE);
                 }
-
-                if (zombie.getMoveBehavior() instanceof ProspectorMove prospectorMove) {
-                    prospectorMove.extinguishDynamite();
+                case Plant plant -> {
+                    plant.takeDamage(damageAmount);
+                    applyChill(plant);
                 }
-
-                zombie.setStatus(Zombie.Status.FREEZE);
-
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-                applyChill(plant);
-
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+                case InteractableStructure structure -> structure.takeDamage(damageAmount);
+                default -> {
+                }
             }
         }
     }

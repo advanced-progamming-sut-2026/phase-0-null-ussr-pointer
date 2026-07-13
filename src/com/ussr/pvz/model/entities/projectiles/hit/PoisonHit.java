@@ -29,16 +29,16 @@ public class PoisonHit implements HitEffectStrategy {
         for (GameEntity target : entities) {
             if (target == null || !target.isAlive()) continue;
 
-            if (target instanceof Zombie zombie) {
-                zombie.takeDamage(damageAmount , true);
+            switch (target) {
+                case Zombie zombie -> {
+                    zombie.takeDamage(damageAmount, true);
 
-                zombie.setStatus(Zombie.Status.POISONED);
-
-            } else if (target instanceof Plant plant) {
-                plant.takeDamage(damageAmount);
-
-            } else if (target instanceof InteractableStructure structure) {
-                structure.takeDamage(damageAmount);
+                    zombie.setStatus(Zombie.Status.POISONED);
+                }
+                case Plant plant -> plant.takeDamage(damageAmount);
+                case InteractableStructure structure -> structure.takeDamage(damageAmount);
+                default -> {
+                }
             }
         }
     }

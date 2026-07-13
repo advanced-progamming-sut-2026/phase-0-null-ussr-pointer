@@ -9,8 +9,6 @@ import java.util.ArrayList;
 
 public class MeleeStrategy implements ActStrategy {
     @Override
-    //todo:add ability value 1for front and back hit 2 for area damage 3 for wave 4 for swallow
-    //todo: set a massive damage for swallow plant so that it kills the zombie with very first hit(swallow)
     public void act(Plant user, GameSession session) {
         if(user.getIntervalTimer() > 0) return;
         if(!isEnemyAround(user , session)) return;

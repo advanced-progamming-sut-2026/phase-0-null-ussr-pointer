@@ -2,7 +2,7 @@ package com.ussr.pvz.model.level.behavior;
 
 import com.ussr.pvz.model.level.Level;
 
-public class ZombotanyBehavior implements LevelBehavior {
+public class ZombotanyBehavior extends LevelBehavior {
 
     public ZombotanyBehavior() {
     }
