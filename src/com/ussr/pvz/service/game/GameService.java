@@ -21,8 +21,6 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
 
-import java.util.Optional;
-
 public class GameService {
 
     public String menuEnterChapter(MenuEnterChapterRequest request) {
@@ -70,6 +68,8 @@ public class GameService {
     public String menuSwitchWorld(MenuSwitchWorldRequest request) {
         String worldId = request.worldName();
 
+        // "worlds" map onto chapters in this codebase (there is no separate World model),
+        // so we validate/switch the same way menuEnterChapter does, via LevelManager.
         if (App.getLevelManager().findChapter(worldId) == null) {
             return "world not found: " + worldId;
         }
@@ -170,62 +170,77 @@ public class GameService {
             return "invalid location";
         }
 
+        try {
+            GameSession session = requireSession();
+            Cell cell = requirePlantableCell(session, x, y);
+            Plant blueprint = requireUnlockedPlant(request.type());
+
+            if (!session.spendSun(blueprint.getCost())) {
+                throw new IllegalStateException(
+                        "not enough sun to plant " + blueprint.getName() + " (needs " + blueprint.getCost() + ")");
+            }
+
+            Plant plant = instantiatePlant(blueprint, x, y);
+            cell.setPlant(plant);
+            session.addPlant(plant);
+
+            return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
+    }
+
+    private GameSession requireSession() {
         GameSession session = App.getGameSession();
         if (session == null) {
-            return "no active game session";
+            throw new IllegalStateException("no active game session");
         }
+        return session;
+    }
 
+    private Cell requirePlantableCell(GameSession session, int x, int y) {
         Lawn lawn = session.getLawn();
         if (lawn == null || y < 0 || y >= lawn.getRows() || x < 0 || x >= lawn.getCols()) {
-            return "invalid location";
+            throw new IllegalStateException("invalid location");
         }
 
         Cell cell = lawn.getCell(y, x);
         if (cell == null) {
-            return "invalid location";
+            throw new IllegalStateException("invalid location");
         }
-
         if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
-            return "cannot plant on tile (" + x + ", " + y + ")";
+            throw new IllegalStateException("cannot plant on tile (" + x + ", " + y + ")");
         }
-
         if (!cell.isEmpty()) {
-            return "a plant is already at (" + x + ", " + y + ")";
+            throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
         }
+        return cell;
+    }
 
+    private Plant requireUnlockedPlant(String requestedType) {
         Account account = App.getAccount();
         if (account == null) {
-            return "no active account";
+            throw new IllegalStateException("no active account");
         }
 
-        String plantKey = request.type() == null ? "" : request.type().trim().toUpperCase();
+        String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase();
         int unlockedLevel = account.getAdventureProgress().getPlantLvls().getOrDefault(plantKey, 0);
         if (unlockedLevel <= 0) {
-            return "you haven't unlocked " + request.type();
+            throw new IllegalStateException("you haven't unlocked " + requestedType);
         }
 
-        Plant blueprint = account.getAdventureProgress().getAccountPlants().stream()
+        return account.getAdventureProgress().getAccountPlants().stream()
                 .filter(p -> p.getName() != null && p.getName().equalsIgnoreCase(plantKey))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalStateException("unknown plant type: " + requestedType));
+    }
 
-        if (blueprint == null) {
-            return "unknown plant type: " + request.type();
-        }
-
-        if (!session.spendSun(blueprint.getCost())) {
-            return "not enough sun to plant " + blueprint.getName() + " (needs " + blueprint.getCost() + ")";
-        }
-
+    private Plant instantiatePlant(Plant blueprint, int x, int y) {
         Plant plant = new Plant(blueprint);
         plant.setLocation(new Plant.Location(x, y));
         plant.setState(Plant.PlantState.ACTIVE);
         plant.setAlive(true);
-
-        cell.setPlant(plant);
-        session.addPlant(plant);
-
-        return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
+        return plant;
     }
 
     public String feedPlant(LocationRequest request) {
@@ -237,42 +252,45 @@ public class GameService {
             return "invalid location";
         }
 
-        GameSession session = App.getGameSession();
-        if (session == null) {
-            return "no active game session";
-        }
+        try {
+            GameSession session = requireSession();
+            Plant plant = requireFeedablePlant(session, x, y);
 
+            if (!session.spendPlantFood()) {
+                throw new IllegalStateException("no plant food available");
+            }
+
+            plant.getPlantFoodEffect().triggerSuperpower(plant, session);
+            plant.getPlantFoodEffect().applyStatusModifiers(plant);
+            session.notifyPlantFoodUsed(plant);
+
+            return "plant fed at (" + x + ", " + y + ")";
+        } catch (IllegalStateException e) {
+            return e.getMessage();
+        }
+    }
+
+    private Plant requireFeedablePlant(GameSession session, int x, int y) {
         Lawn lawn = session.getLawn();
         if (lawn == null) {
-            return "map not initialized";
+            throw new IllegalStateException("map not initialized");
         }
 
         Cell cell = lawn.getCell(y, x);
         if (cell == null || cell.getPlant() == null) {
-            return "no plant found at that location";
+            throw new IllegalStateException("no plant found at that location");
         }
 
         Plant plant = cell.getPlant();
-
         if (plant.getPlantFoodType() == null
                 || plant.getPlantFoodType() == PlantFoodType.NONE
                 || plant.getPlantFoodEffect() == null) {
-            return plant.getName() + " has no plant food effect";
+            throw new IllegalStateException(plant.getName() + " has no plant food effect");
         }
-
         if (plant.getPlantFoodTimer() > 0) {
-            return plant.getName() + " is already under a plant food effect";
+            throw new IllegalStateException(plant.getName() + " is already under a plant food effect");
         }
-
-        if (!session.spendPlantFood()) {
-            return "no plant food available";
-        }
-
-        plant.getPlantFoodEffect().triggerSuperpower(plant, session);
-        plant.getPlantFoodEffect().applyStatusModifiers(plant);
-        session.notifyPlantFoodUsed(plant);
-
-        return "plant fed at (" + x + ", " + y + ")";
+        return plant;
     }
 
     public String cheatAddPlantFood() {

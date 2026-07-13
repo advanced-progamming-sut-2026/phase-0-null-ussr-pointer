@@ -34,7 +34,6 @@ public class IZombieBehavior extends LevelBehavior {
         this.autoWinOnWavesClear = false;
     }
 
-
     @Override
     public void onStart(Level level) {
         super.onStart(level);
@@ -51,7 +50,12 @@ public class IZombieBehavior extends LevelBehavior {
         int rows = session.getLawn().getRows();
         int cols = session.getLawn().getCols();
 
-        // 1. Place Brains at column 0 for every row instead of Lawnmowers
+        placeBrains(session, rows);
+        spawnDynamicPlants(session, rows);
+        spawnSunProducers(session, rows, cols);
+    }
+
+    private void placeBrains(GameSession session, int rows) {
         for (int r = 0; r < rows; r++) {
             Cell cell = session.getLawn().getCell(r, 0);
             if (cell != null) {
@@ -62,12 +66,11 @@ public class IZombieBehavior extends LevelBehavior {
                 session.registerStructure(brain);
             }
         }
+    }
 
-        // 2. Procedural Grid Generation: Populate tiles before the red line with dynamic plant types
+    private void spawnDynamicPlants(GameSession session, int rows) {
         for (int r = 0; r < rows; r++) {
             for (int c = 1; c < redLineColumn; c++) {
-
-                // Generates a random plant ID securely within the factory's allowed range (1 to 50 inclusive)
                 int randomPlantId = random.nextInt(50) + 1;
                 com.ussr.pvz.model.entities.plants.Plant plant =
                         com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(randomPlantId, 1);
@@ -80,9 +83,9 @@ public class IZombieBehavior extends LevelBehavior {
                 }
             }
         }
+    }
 
-        // 3. Spawn the special stationary Sun-Producing Zombie per row (rightmost edge column)
-        //todo : fix this is there is any problem there is a sun producing logic a few lines higher take a look at that too
+    private void spawnSunProducers(GameSession session, int rows, int cols) {
         for (int r = 0; r < rows; r++) {
             Zombie sunZombie = new Zombie("SunProducerZombie", null, false);
             sunZombie.setMaxHp(1300);

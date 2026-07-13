@@ -93,9 +93,7 @@ public class BeghouledBehavior extends LevelBehavior {
                 Cell cell = lawn.getCell(r, c);
                 if (cell.getTile().getType() != TileType.Crater && cell.getPlant() == null) {
                     String rootType = rootPlantTypes.get(rand.nextInt(rootPlantTypes.size()));
-                    String activeType = activePlantTypes.get(rootType);
-
-                    Plant plant = spawnPlant(activeType, r, c);
+                    Plant plant = spawnPlant(activePlantTypes.get(rootType), r, c);
                     cell.setPlant(plant);
                     session.getPlants().add(plant);
                 }
@@ -121,25 +119,11 @@ public class BeghouledBehavior extends LevelBehavior {
         Plant p1 = cell1.getPlant();
         Plant p2 = cell2.getPlant();
 
-        // Perform swap
-        cell1.setPlant(p2);
-        cell2.setPlant(p1);
-        if (p2 != null) {
-            p2.setLocation(new Plant.Location(c1, r1));
-            p2.setPosition(Vec2.of(c1, r1));
-        }
-        if (p1 != null) {
-            p1.setLocation(new Plant.Location(c2, r2));
-            p1.setPosition(Vec2.of(c2, r2));
-        }
+        swapCells(cell1, cell2, p1, p2, r1, c1, r2, c2);
 
         // A swap can only be made if it creates a match
         if (!hasMatches(lawn)) {
-            // Revert swap
-            cell1.setPlant(p1);
-            cell2.setPlant(p2);
-            if (p1 != null) { p1.setLocation(new Plant.Location(c1, r1)); p1.setPosition(Vec2.of(c1, r1)); }
-            if (p2 != null) { p2.setLocation(new Plant.Location(c2, r2)); p2.setPosition(Vec2.of(c2, r2)); }
+            swapCells(cell1, cell2, p2, p1, r1, c1, r2, c2); // Revert
             return false;
         }
 
@@ -150,10 +134,41 @@ public class BeghouledBehavior extends LevelBehavior {
         return true;
     }
 
+    private void swapCells(Cell cell1, Cell cell2, Plant p1, Plant p2, int r1, int c1, int r2, int c2) {
+        cell1.setPlant(p2);
+        cell2.setPlant(p1);
+        if (p2 != null) { p2.setLocation(new Plant.Location(c1, r1)); p2.setPosition(Vec2.of(c1, r1)); }
+        if (p1 != null) { p1.setLocation(new Plant.Location(c2, r2)); p1.setPosition(Vec2.of(c2, r2)); }
+    }
+
     private void processMatches(GameSession session, boolean isCascade) {
         Lawn lawn = session.getLawn();
         Set<Plant> matchedPlants = new HashSet<>();
-        int matchCount = 0;
+
+        int hMax = findHorizontalMatches(lawn, matchedPlants);
+        int vMax = findVerticalMatches(lawn, matchedPlants);
+        int maxGroupSize = Math.max(hMax, vMax);
+
+        if (matchedPlants.isEmpty()) return;
+
+        applyMatchRewards(session, maxGroupSize, isCascade);
+        currentMatches++;
+
+        for (Plant p : matchedPlants) {
+            p.setAlive(false);
+            session.getPlants().remove(p);
+            lawn.getCell(p.getLocation().y(), p.getLocation().x()).setPlant(null);
+        }
+
+        dropPlants(session);
+        fillBoard(session);
+
+        if (hasMatches(lawn)) {
+            processMatches(session, true);
+        }
+    }
+
+    private int findHorizontalMatches(Lawn lawn, Set<Plant> matchedPlants) {
         int maxGroupSize = 0;
 
         // Horizontal matches
@@ -163,84 +178,48 @@ public class BeghouledBehavior extends LevelBehavior {
                 if (p1 == null) continue;
 
                 int matchLength = 1;
-                while (c + matchLength < lawn.getCols()) {
-                    Plant nextP = lawn.getCell(r, c + matchLength).getPlant();
-                    if (nextP != null && nextP.getName().equals(p1.getName())) {
-                        matchLength++;
-                    } else {
-                        break;
-                    }
+                while (c + matchLength < lawn.getCols() && lawn.getCell(r, c + matchLength).getPlant() != null
+                        && lawn.getCell(r, c + matchLength).getPlant().getName().equals(p1.getName())) {
+                    matchLength++;
                 }
 
                 if (matchLength >= 3) {
-                    matchCount++;
                     maxGroupSize = Math.max(maxGroupSize, matchLength);
-                    for (int i = 0; i < matchLength; i++) {
-                        matchedPlants.add(lawn.getCell(r, c + i).getPlant());
-                    }
+                    for (int i = 0; i < matchLength; i++) matchedPlants.add(lawn.getCell(r, c + i).getPlant());
                     c += matchLength - 1;
                 }
             }
         }
+        return maxGroupSize;
+    }
 
-        // Vertical matches
+    private int findVerticalMatches(Lawn lawn, Set<Plant> matchedPlants) {
+        int maxGroupSize = 0;
         for (int c = 0; c < lawn.getCols(); c++) {
             for (int r = 0; r < lawn.getRows() - 2; r++) {
                 Plant p1 = lawn.getCell(r, c).getPlant();
                 if (p1 == null) continue;
 
                 int matchLength = 1;
-                while (r + matchLength < lawn.getRows()) {
-                    Plant nextP = lawn.getCell(r + matchLength, c).getPlant();
-                    if (nextP != null && nextP.getName().equals(p1.getName())) {
-                        matchLength++;
-                    } else {
-                        break;
-                    }
+                while (r + matchLength < lawn.getRows() && lawn.getCell(r + matchLength, c).getPlant() != null
+                        && lawn.getCell(r + matchLength, c).getPlant().getName().equals(p1.getName())) {
+                    matchLength++;
                 }
 
                 if (matchLength >= 3) {
-                    matchCount++;
                     maxGroupSize = Math.max(maxGroupSize, matchLength);
-                    for (int i = 0; i < matchLength; i++) {
-                        matchedPlants.add(lawn.getCell(r + i, c).getPlant());
-                    }
+                    for (int i = 0; i < matchLength; i++) matchedPlants.add(lawn.getCell(r + i, c).getPlant());
                     r += matchLength - 1;
                 }
             }
         }
+        return maxGroupSize;
+    }
 
-        if (matchedPlants.isEmpty()) return;
-
-        // Apply Rewards
-        int baseSun = 1;
-        if (maxGroupSize == 4) baseSun = 2;
-        if (maxGroupSize >= 5) baseSun = 3;
-
-        // Cascades give one extra sun
+    private void applyMatchRewards(GameSession session, int maxGroupSize, boolean isCascade) {
+        int baseSun = (maxGroupSize >= 5) ? 3 : (maxGroupSize == 4) ? 2 : 1;
         if (isCascade) baseSun += 1;
-
-        for (int i = 0; i < baseSun; i++) {
-            session.getItems().add(new ProducedSun(5, 2, 50));
-        }
-
-        currentMatches += matchCount;
-
-        // Remove matched plants silently (don't trigger craters)
-        for (Plant p : matchedPlants) {
-            p.setAlive(false);
-            session.getPlants().remove(p);
-            lawn.getCell(p.getLocation().y(), p.getLocation().x()).setPlant(null);
-        }
-
-        // Drop plants down
-        dropPlants(session);
-        fillBoard(session);
-
-        // Check for cascades
-        if (hasMatches(lawn)) {
-            processMatches(session, true);
-        }
+        for (int i = 0; i < baseSun; i++) session.getItems().add(new ProducedSun(5, 2, 50));
     }
 
     private void dropPlants(GameSession session) {
@@ -250,10 +229,9 @@ public class BeghouledBehavior extends LevelBehavior {
                 Cell cell = lawn.getCell(r, c);
                 if (cell.getTile().getType() == TileType.Crater || cell.getPlant() != null) continue;
 
-                // Find the nearest plant above
                 for (int aboveR = r - 1; aboveR >= 0; aboveR--) {
                     Cell aboveCell = lawn.getCell(aboveR, c);
-                    if (aboveCell.getTile().getType() == TileType.Crater) break; // Crater blocks falling
+                    if (aboveCell.getTile().getType() == TileType.Crater) break;
                     if (aboveCell.getPlant() != null) {
                         Plant fallingPlant = aboveCell.getPlant();
                         aboveCell.setPlant(null);
@@ -271,36 +249,25 @@ public class BeghouledBehavior extends LevelBehavior {
         // Horizontal
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols() - 2; c++) {
-                Plant p1 = lawn.getCell(r, c).getPlant();
-                Plant p2 = lawn.getCell(r, c + 1).getPlant();
-                Plant p3 = lawn.getCell(r, c + 2).getPlant();
-                if (p1 != null && p2 != null && p3 != null
-                        && p1.getName().equals(p2.getName()) && p2.getName().equals(p3.getName())) {
-                    return true;
-                }
+                if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r, c + 1), lawn.getCell(r, c + 2))) return true;
             }
         }
         // Vertical
         for (int c = 0; c < lawn.getCols(); c++) {
             for (int r = 0; r < lawn.getRows() - 2; r++) {
-                Plant p1 = lawn.getCell(r, c).getPlant();
-                Plant p2 = lawn.getCell(r + 1, c).getPlant();
-                Plant p3 = lawn.getCell(r + 2, c).getPlant();
-                if (p1 != null && p2 != null && p3 != null
-                        && p1.getName().equals(p2.getName()) && p2.getName().equals(p3.getName())) {
-                    return true;
-                }
+                if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r + 1, c), lawn.getCell(r + 2, c))) return true;
             }
         }
         return false;
     }
 
+    private boolean isValidMatch(Cell c1, Cell c2, Cell c3) {
+        Plant p1 = c1.getPlant(), p2 = c2.getPlant(), p3 = c3.getPlant();
+        return p1 != null && p2 != null && p3 != null && p1.getName().equals(p2.getName()) && p2.getName().equals(p3.getName());
+    }
+
     private void ensurePossibleMoves(GameSession session) {
-        // Note: A full backtracking algorithm to check for potential moves is extensive.
-        // For standard Beghouled rules: If no match is possible, the whole board resets.
-        if (!hasPossibleMoves(session.getLawn())) {
-            resetBoard(session);
-        }
+        if (!hasPossibleMoves(session.getLawn())) resetBoard(session);
     }
 
     private boolean hasPossibleMoves(Lawn lawn) {
@@ -349,7 +316,7 @@ public class BeghouledBehavior extends LevelBehavior {
             // Clear and retry if generated board is invalid
             for (int r = 0; r < lawn.getRows(); r++) {
                 for (int c = 0; c < lawn.getCols(); c++) {
-                    if (lawn.getCell(r,c).getPlant() != null) lawn.getCell(r,c).setPlant(null);
+                    if (lawn.getCell(r, c).getPlant() != null) lawn.getCell(r, c).setPlant(null);
                 }
             }
             fillBoard(session);
@@ -377,10 +344,8 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     private Plant spawnPlant(String alias, int row, int col) {
-        // ID lookup mock - replace with actual PlantFactory ID lookup if needed
-        int id = 1;
-        Plant p = PlantFactory.createPlant(id, 1);
-        p.setName(alias); // Force name for logic
+        Plant p = PlantFactory.createPlant(1, 1);
+        p.setName(alias);
         p.setLocation(new Plant.Location(col, row));
         p.setPosition(Vec2.of(col, row));
         return p;

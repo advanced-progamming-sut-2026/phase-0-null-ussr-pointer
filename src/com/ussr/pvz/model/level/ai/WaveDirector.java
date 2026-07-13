@@ -93,43 +93,45 @@ public class WaveDirector {
         int cols = session.getLawn() != null ? session.getLawn().getCols() : 9;
 
         switch (difficulty) {
-            case SIMPLE -> {
-                Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
-                int cost = ZombieFactory.getZombieCost(choice.id());
-                if (cost <= remainingBudget) {
-                    deploy(session, choice.id(), random.nextInt(rows), cols - 1, cost);
-                }
+            case SIMPLE -> executeSimpleStrategy(session, pool, rows, cols);
+            case MEDIUM -> executeMediumStrategy(session, pool, rows, cols);
+            case HARD -> executeHardStrategy(session, pool, rows, cols);
+        }
+    }
+
+    private void executeSimpleStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
+        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
+        int cost = ZombieFactory.getZombieCost(choice.id());
+        if (cost <= remainingBudget) {
+            deploy(session, choice.id(), random.nextInt(rows), cols - 1, cost);
+        }
+    }
+
+    private void executeMediumStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
+        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
+        int cost = ZombieFactory.getZombieCost(choice.id());
+        if (cost <= remainingBudget) {
+            int targetedRow = calculateSmartTargetRow(session, rows);
+            deploy(session, choice.id(), targetedRow, cols - 1, cost);
+        }
+    }
+
+    private void executeHardStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
+        if (random.nextDouble() < 0.50) {
+            int spawns = 1 + random.nextInt(3);
+            for (int i = 0; i < spawns; i++) {
+                if (remainingBudget <= 0) break;
+                executeSimpleStrategy(session, pool, rows, cols); // Re-use simple logic for random scattering
             }
-            case MEDIUM -> {
+        } else {
+            int stackSize = 2 + random.nextInt(3);
+            int targetedRow = random.nextInt(rows);
+            for (int i = 0; i < stackSize; i++) {
+                if (remainingBudget <= 0) break;
                 Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
                 int cost = ZombieFactory.getZombieCost(choice.id());
                 if (cost <= remainingBudget) {
-                    int targetedRow = calculateSmartTargetRow(session, rows);
                     deploy(session, choice.id(), targetedRow, cols - 1, cost);
-                }
-            }
-            case HARD -> {
-                if (random.nextDouble() < 0.50) {
-                    int spawns = 1 + random.nextInt(3);
-                    for (int i = 0; i < spawns; i++) {
-                        if (remainingBudget <= 0) break;
-                        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
-                        int cost = ZombieFactory.getZombieCost(choice.id());
-                        if (cost <= remainingBudget) {
-                            deploy(session, choice.id(), random.nextInt(rows), cols - 1, cost);
-                        }
-                    }
-                } else {
-                    int stackSize = 2 + random.nextInt(3);
-                    int targetedRow = random.nextInt(rows);
-                    for (int i = 0; i < stackSize; i++) {
-                        if (remainingBudget <= 0) break;
-                        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
-                        int cost = ZombieFactory.getZombieCost(choice.id());
-                        if (cost <= remainingBudget) {
-                            deploy(session, choice.id(), targetedRow, cols - 1, cost);
-                        }
-                    }
                 }
             }
         }

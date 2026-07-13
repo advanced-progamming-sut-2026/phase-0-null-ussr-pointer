@@ -62,7 +62,7 @@ public class ShopService {
     public String buy(ShopBuyRequest request) {
         rotateDailyOffersIfNeeded();
 
-        int count = 0;
+        int count;
         try {
             count = Integer.parseInt(request.count());
         } catch (NumberFormatException e) {
@@ -70,47 +70,16 @@ public class ShopService {
         }
         if (count <= 0) return "count must be greater than 0";
 
-
         ShopItem item = App.getShopManager().getShopItems().stream()
                 .filter(i -> i.getId().equals(request.itemId()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("Error: Invalid Item ID!"));
 
-        if (item == null) {
-            throw new IllegalArgumentException("Error: Invalid Item ID!");
-        }
-        if (item.isExpired()) return "this offer has expired";
+        String validationError = validatePurchaseConditions(item, count, request.plantType());
+        if (validationError != null) return validationError;
 
-        if (item.isDailyOffer() && count > 1) {
-            return "the daily offer can only be bought once per rotation";
-        }
-
-        if (item.requiresPlantType()) {
-            if (request.plantType().isEmpty()) {
-                throw new IllegalArgumentException("plant type is empty");
-            }
-            String plantType = request.plantType().trim().toUpperCase();
-            boolean plantExists = App.getAccount().getAdventureProgress()
-                    .getPlantLvls().containsKey(plantType);
-            if (!plantExists) return "plant not found: " + request.plantType();
-        }
-
-        AdventureProgress adv = App.getAccount().getAdventureProgress();
-        int totalCost = discountedCost(item) * count;
-
-        switch (item.getType().getCostType()) {
-            case "coin" -> {
-                if (adv.getCoin() < totalCost)
-                    return "insufficient coins (need " + totalCost + ", have " + adv.getCoin() + ")";
-                adv.addCoin(-totalCost);
-            }
-            case "gem" -> {
-                if (adv.getGem() < totalCost)
-                    return "insufficient gems (need " + totalCost + ", have " + adv.getGem() + ")";
-                adv.addGem(-totalCost);
-            }
-            default -> { return "unknown currency type"; }
-        }
+        String paymentError = processPayment(item, count);
+        if (paymentError != null) return paymentError;
 
         String result = applyItem(item, count, request.plantType());
 
@@ -120,6 +89,41 @@ public class ShopService {
 
         return result;
     }
+
+    private String validatePurchaseConditions(ShopItem item, int count, String plantType) {
+        if (item.isExpired()) return "this offer has expired";
+        if (item.isDailyOffer() && count > 1) {
+            return "the daily offer can only be bought once per rotation";
+        }
+        if (item.requiresPlantType()) {
+            if (plantType == null || plantType.isEmpty()) {
+                throw new IllegalArgumentException("plant type is empty");
+            }
+            String pType = plantType.trim().toUpperCase();
+            boolean plantExists = App.getAccount().getAdventureProgress().getPlantLvls().containsKey(pType);
+            if (!plantExists) return "plant not found: " + plantType;
+        }
+        return null;
+    }
+
+    private String processPayment(ShopItem item, int count) {
+        AdventureProgress adv = App.getAccount().getAdventureProgress();
+        int totalCost = discountedCost(item) * count;
+
+        switch (item.getType().getCostType()) {
+            case "coin" -> {
+                if (adv.getCoin() < totalCost) return "insufficient coins (need " + totalCost + ", have " + adv.getCoin() + ")";
+                adv.addCoin(-totalCost);
+            }
+            case "gem" -> {
+                if (adv.getGem() < totalCost) return "insufficient gems (need " + totalCost + ", have " + adv.getGem() + ")";
+                adv.addGem(-totalCost);
+            }
+            default -> { return "unknown currency type"; }
+        }
+        return null;
+    }
+
     private int discountedCost(ShopItem item) {
         if (item.getDiscountPercent() == null || item.getDiscountPercent() == 0f)
             return item.getCost();
@@ -129,58 +133,66 @@ public class ShopService {
         AdventureProgress adv = App.getAccount().getAdventureProgress();
 
         return switch (item.getType()) {
-            case POT -> {
-                int currentUnlocked = App.getAccount().getGreenhouse().getUnlockedPots();
-                int canUnlock = Math.min(count, ShopItemType.POT.getMaxStack() - currentUnlocked);
-                if (canUnlock <= 0) yield "all pots are already unlocked";
-
-                int unlocked = 0;
-                outer:
-                for (int x = 0; x < 5; x++) {
-                    for (int y = 0; y < 4; y++) {
-                        if (!App.getAccount().getGreenhouse().isPotUnlocked(x, y)) {
-                            App.getAccount().getGreenhouse().unlockPot(x, y);
-                            unlocked++;
-                            if (unlocked >= canUnlock) break outer;
-                        }
-                    }
-                }
-                yield unlocked + " pot(s) unlocked";
-            }
-            case PLANT_FOOD -> {
-                // plant food is capped at 3; enforce that
-                // stored on AdventureProgress — you may want a dedicated field later
-                // for now just report success; wire to actual storage when ready
-                yield count + " plant food added";  // TODO: add plantFoodCount field to AdventureProgress
-            }
-            case SEED_PACK_RANDOM -> {
-                // give count * 5 seed packets for a random unlocked plant
-                String randomPlant = randomUnlockedPlant(adv);
-                if (randomPlant == null) yield "no unlocked plants to give seeds for";
-                int seeds = count * item.getQuantityPerPurchase();
-                // TODO: add seed packet inventory to AdventureProgress; for now just report
-                yield seeds + " seed packets added for " + randomPlant;
-            }
-            case SEED_PACK_SELECTIVE -> {
-                String target = plantType.trim().toUpperCase();
-                int seeds = count * item.getQuantityPerPurchase();
-                // TODO: same as above — wire to seed inventory when ready
-                yield seeds + " seed packets added for " + target;
-            }
-            case CURRENCY_CONVERT -> {
-                // each purchase already cost 5 gems; give 500 coins per unit
-                int coinsGained = count * item.getQuantityPerPurchase();
-                adv.addCoin(coinsGained);
-                yield "converted to " + coinsGained + " coins";
-            }
-            case DAILY_OFFER -> {
-                String plant = item.getFeaturedPlant();
-                if (plant == null) plant = randomUnlockedPlant(adv);
-                if (plant == null) yield "no unlocked plants to give seeds for";
-                int seeds = count * item.getQuantityPerPurchase();
-                yield seeds + " seed packets added for " + plant + " (daily offer)";
-            }
+            case POT -> applyPot(count);
+            case PLANT_FOOD -> applyPlantFood(count);
+            case SEED_PACK_RANDOM -> applySeedPackRandom(item, count, adv);
+            case SEED_PACK_SELECTIVE -> applySeedPackSelective(item, count, plantType);
+            case CURRENCY_CONVERT -> applyCurrencyConvert(item, count, adv);
+            case DAILY_OFFER -> applyDailyOffer(item, count, adv);
         };
+    }
+
+    private String applyPot(int count) {
+        int currentUnlocked = App.getAccount().getGreenhouse().getUnlockedPots();
+        int canUnlock = Math.min(count, ShopItemType.POT.getMaxStack() - currentUnlocked);
+        if (canUnlock <= 0) return "all pots are already unlocked";
+
+        int unlocked = 0;
+        outer:
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 4; y++) {
+                if (!App.getAccount().getGreenhouse().isPotUnlocked(x, y)) {
+                    App.getAccount().getGreenhouse().unlockPot(x, y);
+                    unlocked++;
+                    if (unlocked >= canUnlock) break outer;
+                }
+            }
+        }
+        return unlocked + " pot(s) unlocked";
+    }
+
+    private String applyPlantFood(int count) {
+        // TODO: add plantFoodCount field to AdventureProgress
+        return count + " plant food added";
+    }
+
+    private String applySeedPackRandom(ShopItem item, int count, AdventureProgress adv) {
+        String randomPlant = randomUnlockedPlant(adv);
+        if (randomPlant == null) return "no unlocked plants to give seeds for";
+        int seeds = count * item.getQuantityPerPurchase();
+        // TODO: add seed packet inventory logic
+        return seeds + " seed packets added for " + randomPlant;
+    }
+
+    private String applySeedPackSelective(ShopItem item, int count, String plantType) {
+        String target = plantType.trim().toUpperCase();
+        int seeds = count * item.getQuantityPerPurchase();
+        // TODO: add seed packet inventory logic
+        return seeds + " seed packets added for " + target;
+    }
+
+    private String applyCurrencyConvert(ShopItem item, int count, AdventureProgress adv) {
+        int coinsGained = count * item.getQuantityPerPurchase();
+        adv.addCoin(coinsGained);
+        return "converted to " + coinsGained + " coins";
+    }
+
+    private String applyDailyOffer(ShopItem item, int count, AdventureProgress adv) {
+        String plant = item.getFeaturedPlant();
+        if (plant == null) plant = randomUnlockedPlant(adv);
+        if (plant == null) return "no unlocked plants to give seeds for";
+        int seeds = count * item.getQuantityPerPurchase();
+        return seeds + " seed packets added for " + plant + " (daily offer)";
     }
 
     private String randomUnlockedPlant(AdventureProgress adv) {

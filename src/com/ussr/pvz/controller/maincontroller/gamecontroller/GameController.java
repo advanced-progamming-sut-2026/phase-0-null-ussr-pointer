@@ -24,37 +24,50 @@ public class GameController {
         for (GameCommand cmd : GameCommand.values()) {
             Matcher matcher = cmd.getMatcher(command);
             if (matcher.matches()) {
-                return switch (cmd) {
-                    case MENU_ENTER_CHAPTER -> handleMenuEnterChapter(matcher);
-                    case MENU_GREENHOUSE -> handleMenuGreenhouse();
-                    case MENU_TRAVEL_LOG -> handleMenuTravelLog();
-                    case MENU_LEADERBOARD -> handleMenuLeaderboard();
-                    case MENU_COIN_WALLET -> handleMenuCoinWallet();
-                    case MENU_GEM_WALLET -> handleMenuGemWallet();
-                    case MENU_SWITCH_WORLD -> handleMenuSwitchWorld(matcher);
-                    case MENU_LOGOUT -> handleMenuLogout();
-                    case COLLECT_SUN -> handleCollectSun(matcher);
-                    case SHOW_SUN_AMOUNT -> handleShowSunAmount();
-                    case CHEAT_ADD_SUNS -> handleCheatAddSuns(matcher);
-                    case RELEASE_THE_NUKE -> handleReleaseTheNuke();
-                    case CHEAT_REMOVE_COOLDOWN -> handleCheatRemoveCooldown();
-                    case PLUCK_PLANT -> handlePluckPlant(matcher);
-                    case PLANT_PLANT -> handlePlantPlant(matcher);
-                    case FEED_PLANT -> handleFeedPlant(matcher);
-                    case CHEAT_ADD_PLANT_FOOD -> handleCheatAddPlantFood();
-                    case SHOW_MAP -> handleShowMap();
-                    case SHOW_PLANTS_STATUS -> handleShowPlantsStatus();
-                    case SHOW_TILE_STATUS -> handleShowTileStatus(matcher);
-                    case ZOMBIES_INFO -> handleZombiesInfo();
-                    case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
-                    case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
-                    case START_ZOMBIE_WAVES -> handleStartZombieWaves();
-                    case SWAP_PLANTS -> handleSwapPlants(matcher);
-                    case UPGRADE_BEGHOULED_PLANT -> handleUpgradeBeghouledPlant(matcher);
-                };
+                String result = routeMenuAndInformationCommands(cmd, matcher);
+                if (!result.isEmpty() || cmd == GameCommand.START_ZOMBIE_WAVES) return result;
+                return routeActionAndCheatCommands(cmd, matcher);
             }
         }
         return "";
+    }
+
+    private String routeMenuAndInformationCommands(GameCommand cmd, Matcher matcher) {
+        return switch (cmd) {
+            case MENU_ENTER_CHAPTER -> handleMenuEnterChapter(matcher);
+            case MENU_GREENHOUSE -> handleMenuGreenhouse();
+            case MENU_TRAVEL_LOG -> handleMenuTravelLog();
+            case MENU_LEADERBOARD -> handleMenuLeaderboard();
+            case MENU_COIN_WALLET -> handleMenuCoinWallet();
+            case MENU_GEM_WALLET -> handleMenuGemWallet();
+            case MENU_SWITCH_WORLD -> handleMenuSwitchWorld(matcher);
+            case MENU_LOGOUT -> handleMenuLogout();
+            case SHOW_SUN_AMOUNT -> handleShowSunAmount();
+            case SHOW_MAP -> handleShowMap();
+            case SHOW_PLANTS_STATUS -> handleShowPlantsStatus();
+            case SHOW_TILE_STATUS -> handleShowTileStatus(matcher);
+            case ZOMBIES_INFO -> handleZombiesInfo();
+            default -> "";
+        };
+    }
+
+    private String routeActionAndCheatCommands(GameCommand cmd, Matcher matcher) {
+        return switch (cmd) {
+            case COLLECT_SUN -> handleCollectSun(matcher);
+            case CHEAT_ADD_SUNS -> handleCheatAddSuns(matcher);
+            case RELEASE_THE_NUKE -> handleReleaseTheNuke();
+            case CHEAT_REMOVE_COOLDOWN -> handleCheatRemoveCooldown();
+            case PLUCK_PLANT -> handlePluckPlant(matcher);
+            case PLANT_PLANT -> handlePlantPlant(matcher);
+            case FEED_PLANT -> handleFeedPlant(matcher);
+            case CHEAT_ADD_PLANT_FOOD -> handleCheatAddPlantFood();
+            case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
+            case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
+            case START_ZOMBIE_WAVES -> handleStartZombieWaves();
+            case SWAP_PLANTS -> handleSwapPlants(matcher);
+            case UPGRADE_BEGHOULED_PLANT -> handleUpgradeBeghouledPlant(matcher);
+            default -> "";
+        };
     }
 
     private String handleUpgradeBeghouledPlant(Matcher matcher) {

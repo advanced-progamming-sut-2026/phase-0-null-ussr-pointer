@@ -7,39 +7,29 @@ import com.ussr.pvz.view.mainmenu.gamemenu.ChoosePlantMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.CollectionMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class AppView {
     private AppMenu currentMenu;
-
-    private final MainMenu mainMenu;
-    private final RegisterMenu registerMenu;
-    private final LoginMenu loginMenu;
-    private final GameMenu gameMenu;
-    private final NewsMenu newsMenu;
-    private final NetworkMenu networkMenu;
-    private final ProfileMenu profileMenu;
-    private final SettingMenu settingMenu;
-    private final CollectionMenu collectionMenu;
-    private final GreenHouse greenHouse;
-    private final TravelLogMenu travelLogMenu;
-    private final LeaderBoardMenu leaderBoardMenu;
-    private final ChoosePlantMenu choosePlantMenu;
+    private final Map<MenuState, AppMenu> menus = new EnumMap<>(MenuState.class);
 
     public AppView() {
-        mainMenu = new MainMenu();
-        registerMenu = new RegisterMenu();
-        loginMenu = new LoginMenu();
-        gameMenu = new GameMenu();
-        newsMenu = new NewsMenu();
-        networkMenu = new NetworkMenu();
-        profileMenu = new ProfileMenu();
-        settingMenu = new SettingMenu();
-        collectionMenu = new CollectionMenu();
-        greenHouse = new GreenHouse();
-        travelLogMenu = new TravelLogMenu();
-        leaderBoardMenu = new LeaderBoardMenu();
-        choosePlantMenu = new ChoosePlantMenu();
+        menus.put(MenuState.MAIN, new MainMenu());
+        menus.put(MenuState.REGISTER, new RegisterMenu());
+        menus.put(MenuState.LOGIN, new LoginMenu());
+        menus.put(MenuState.GAME, new GameMenu());
+        menus.put(MenuState.NEWS, new NewsMenu());
+        menus.put(MenuState.NETWORK, new NetworkMenu());
+        menus.put(MenuState.PROFILE, new ProfileMenu());
+        menus.put(MenuState.SETTING, new SettingMenu());
+        menus.put(MenuState.COLLECTION, new CollectionMenu());
+        menus.put(MenuState.GREENHOUSE, new GreenHouseMenu());
+        menus.put(MenuState.TRAVEL_LOG, new TravelLogMenu());
+        menus.put(MenuState.LEADERBOARD, new LeaderBoardMenu());
+        menus.put(MenuState.CHOOSE_PLANT, new ChoosePlantMenu());
+
         App.initShop();
         App.getLevelManager().loadFromJson();
     }
@@ -56,49 +46,7 @@ public class AppView {
     }
 
     public void setCurrentMenu(MenuState menuState) {
-        switch (menuState) {
-            case MAIN:
-                currentMenu = mainMenu;
-                break;
-            case REGISTER:
-                currentMenu = registerMenu;
-                break;
-            case LOGIN:
-                currentMenu = loginMenu;
-                break;
-            case GAME:
-                currentMenu = gameMenu;
-                break;
-            case NEWS:
-                currentMenu = newsMenu;
-                break;
-            case NETWORK:
-                currentMenu = networkMenu;
-                break;
-            case PROFILE:
-                currentMenu = profileMenu;
-                break;
-            case SETTING:
-                currentMenu = settingMenu;
-                break;
-            case COLLECTION:
-                currentMenu = collectionMenu;
-                break;
-            case GREENHOUSE:
-                currentMenu = greenHouse;
-                break;
-            case TRAVEL_LOG:
-                currentMenu = travelLogMenu;
-                break;
-            case LEADERBOARD:
-                currentMenu = leaderBoardMenu;
-                break;
-            case CHOOSE_PLANT:
-                currentMenu = choosePlantMenu;
-                break;
-            case null, default:
-                currentMenu = null;
-        }
+        currentMenu = menuState != null ? menus.get(menuState) : null;
     }
 
     public void exit() {

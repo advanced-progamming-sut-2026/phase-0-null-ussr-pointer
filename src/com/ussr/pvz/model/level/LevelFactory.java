@@ -26,6 +26,15 @@ public class LevelFactory {
         if (data == null) return null;
 
         Level level = new Level();
+        parseBaseAttributes(level, data);
+        level.setBehavior(parseBehavior(data));
+        parseEnvironmentConfig(level, data);
+        parseZombiesAndWaves(level, data);
+
+        return level;
+    }
+
+    private static void parseBaseAttributes(Level level, JsonContainer.JsonLevelData data) {
         level.setId(data.id);
         level.setOrder(data.order);
         level.setSunFalling(data.sunFalling);
@@ -34,48 +43,48 @@ public class LevelFactory {
         level.setAllowedPlantsLost(data.allowedPlantsLost);
         level.setLockedPlants(data.lockedPlants != null ? data.lockedPlants : new ArrayList<>());
         level.setSeedPlants(data.seedPlants != null ? data.seedPlants : new ArrayList<>());
+    }
 
-        LevelBehavior selectedBehavior = null;
+    private static LevelBehavior parseBehavior(JsonContainer.JsonLevelData data) {
+        if (data.behavior == null || data.behavior.isBlank()) {
+            return (data.order == 4) ? new BossBehavior() : null;
+        }
 
-        if (data.behavior != null && !data.behavior.isBlank()) {
-            String behaviorKey = data.behavior.trim();
-            switch (behaviorKey) {
-                case "TimedWarBehavior" -> {
-                    TimedWarBehavior.LimitationType type = TimedWarBehavior.LimitationType.ZOMBIE;
-                    if (data.timedWarType != null && data.timedWarType.equalsIgnoreCase("SUN")) {
-                        type = TimedWarBehavior.LimitationType.SUN;
-                    }
-                    selectedBehavior = new TimedWarBehavior(type, data.timedWarTarget);
+        return switch (data.behavior.trim()) {
+            case "TimedWarBehavior" -> {
+                TimedWarBehavior.LimitationType type = TimedWarBehavior.LimitationType.ZOMBIE;
+                if (data.timedWarType != null && data.timedWarType.equalsIgnoreCase("SUN")) {
+                    type = TimedWarBehavior.LimitationType.SUN;
                 }
-                case "SaveOurSeedsBehavior" -> {
-                    List<SaveOurSeedsBehavior.TargetSeed> seeds = new ArrayList<>();
-                    if (data.plantLayout != null) {
-                        for (JsonContainer.JsonPrePlacedPlant p : data.plantLayout) {
-                            seeds.add(new SaveOurSeedsBehavior.TargetSeed(p.plantName, p.row, p.col));
-                        }
-                    }
-                    selectedBehavior = new SaveOurSeedsBehavior(seeds);
-                }
-                default -> {
-                    Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(behaviorKey);
-                    if (supplier != null) {
-                        selectedBehavior = supplier.get();
-                    } else {
-                        System.err.println("[LevelFactory] Unknown campaign behavior: " + data.behavior);
-                    }
-                }
+                yield new TimedWarBehavior(type, data.timedWarTarget);
             }
-        }
+            case "SaveOurSeedsBehavior" -> {
+                List<SaveOurSeedsBehavior.TargetSeed> seeds = new ArrayList<>();
+                if (data.plantLayout != null) {
+                    for (JsonContainer.JsonPrePlacedPlant p : data.plantLayout) {
+                        seeds.add(new SaveOurSeedsBehavior.TargetSeed(p.plantName, p.row, p.col));
+                    }
+                }
+                yield new SaveOurSeedsBehavior(seeds);
+            }
+            case "WallnutBowlingBehavior" -> new WallnutBowlingBehavior(data.redLineColumn);
+            case "BeghouledBehavior" -> new BeghouledBehavior(data.targetMatches, data.startingPlants != null ? data.startingPlants : new ArrayList<>());
+            case "IZombieBehavior" -> new IZombieBehavior(data.redLineColumn, data.startingSun);
+            case "PlantWhatYouGetBehavior" -> {
+                PlantWhatYouGetBehavior behavior = new PlantWhatYouGetBehavior();
+                behavior.setStartingSun(data.startingSun);
+                yield behavior;
+            }
+            default -> {
+                Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior.trim());
+                if (supplier != null) yield supplier.get();
+                System.err.println("[LevelFactory] Unknown campaign behavior: " + data.behavior);
+                yield (data.order == 4) ? new BossBehavior() : null;
+            }
+        };
+    }
 
-        if (selectedBehavior == null && data.order == 4) {
-            selectedBehavior = new BossBehavior();
-        }
-
-        level.setBehavior(selectedBehavior);
-
-        // Chapter-effect schedule data (sandstorms, tides, necromancy, wind)
-        // is stored directly on Level and consumed by the matching
-        // ChapterEffect from ChapterEffectRegistry - see GameSession.
+    private static void parseEnvironmentConfig(Level level, JsonContainer.JsonLevelData data) {
         if (data.sandstorms != null) {
             List<Level.SandstormEvent> schedule = new ArrayList<>();
             for (JsonContainer.JsonSandstormEvent e : data.sandstorms) {
@@ -95,10 +104,11 @@ public class LevelFactory {
 
         level.setNecromancyZombieAlias(data.necromancyZombieAlias);
         level.setZombiesPerNecromancyWave(data.zombiesPerNecromancyWave);
-
         level.setWindIntervalSeconds(data.windIntervalSeconds);
         level.setFreezeStacksPerWind(data.freezeStacksPerWind);
+    }
 
+    private static void parseZombiesAndWaves(Level level, JsonContainer.JsonLevelData data) {
         if (data.allowedZombies != null) {
             List<Level.AllowedZombie> allowed = new ArrayList<>();
             for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
@@ -110,31 +120,17 @@ public class LevelFactory {
         }
 
         if (data.waves != null) {
-            level.setWaves(getWaves(data));
-        }
-
-        return level;
-    }
-
-    private static List<Level.Wave> getWaves(JsonContainer.JsonLevelData data) {
-        List<Level.Wave> waves = new ArrayList<>();
-        if (data.waves == null) return waves;
-
-        for (JsonContainer.JsonWaveData waveData : data.waves) {
-            List<Level.SpawnData> spawns = new ArrayList<>();
-
-            if (waveData.spawnData != null) {
-                for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
-                    spawns.add(new Level.SpawnData(
-                            spawnEntry.zombieId,
-                            spawnEntry.lane,
-                            spawnEntry.delaySeconds
-                    ));
+            List<Level.Wave> waves = new ArrayList<>();
+            for (JsonContainer.JsonWaveData waveData : data.waves) {
+                List<Level.SpawnData> spawns = new ArrayList<>();
+                if (waveData.spawnData != null) {
+                    for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
+                        spawns.add(new Level.SpawnData(spawnEntry.zombieId, spawnEntry.lane, spawnEntry.delaySeconds));
+                    }
                 }
+                waves.add(new Level.Wave(waveData.waveNumber, waveData.cost, spawns));
             }
-            waves.add(new Level.Wave(waveData.waveNumber, waveData.cost, spawns));
+            level.setWaves(waves);
         }
-
-        return waves;
     }
 }

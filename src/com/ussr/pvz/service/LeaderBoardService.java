@@ -39,43 +39,34 @@ public class LeaderBoardService {
     }
 
     public String sort(LeaderBoardSortRequest request) {
-        String col = request.column() != null ? request.column().toLowerCase().trim() : "score";
+        String rawCol = request.column() != null ? request.column().toLowerCase().trim() : "score";
         String ord = request.order() != null ? request.order().toLowerCase().trim() : "desc";
 
         boolean isAsc = ord.equals("asc") || ord.equals("ascending") || ord.equals("+");
 
-        Comparator<Account> comparator;
-
-        switch (col) {
-            case "progress":
-            case "level":
-            case "chapter":
-                comparator = Comparator.comparingInt((Account a) -> a.getAdventureProgress().getCurrentChapter())
-                        .thenComparingInt(a -> a.getAdventureProgress().getCurrentLvl());
-                break;
-            case "minigames":
-            case "minigame":
-                comparator = Comparator.comparingInt(a -> a.getAdventureProgress().getMinigamesWon());
-                break;
-            case "quests":
-            case "quest":
-                comparator = Comparator.comparingInt(a -> a.getAdventureProgress().getQuestsCompleted());
-                break;
-            case "score":
-            default:
-                comparator = Comparator.comparingInt(a -> a.getScoreRecord().getScore());
-                col = "score";
-                break;
-        }
+        Comparator<Account> comparator = getComparatorForColumn(rawCol);
 
         if (!isAsc) {
             comparator = comparator.reversed();
         }
 
         comparator = comparator.thenComparing(Account::getName);
-
         App.getAccounts().sort(comparator);
 
-        return "Leaderboard successfully sorted by '" + col + "' in " + (isAsc ? "ascending" : "descending") + " order.\n\n" + show();
+        return "Leaderboard successfully sorted by '" + rawCol + "' in " +
+                (isAsc ? "ascending" : "descending") + " order.\n\n" + show();
+    }
+
+    private Comparator<Account> getComparatorForColumn(String column) {
+        return switch (column) {
+            case "progress", "level", "chapter" ->
+                    Comparator.comparingInt((Account a) -> a.getAdventureProgress().getCurrentChapter())
+                            .thenComparingInt(a -> a.getAdventureProgress().getCurrentLvl());
+            case "minigames", "minigame" ->
+                    Comparator.comparingInt(a -> a.getAdventureProgress().getMinigamesWon());
+            case "quests", "quest" ->
+                    Comparator.comparingInt(a -> a.getAdventureProgress().getQuestsCompleted());
+            default -> Comparator.comparingInt(a -> a.getScoreRecord().getScore());
+        };
     }
 }

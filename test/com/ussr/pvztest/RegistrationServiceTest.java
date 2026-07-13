@@ -6,7 +6,6 @@ import com.ussr.pvz.model.account.*;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.service.RegisterService;
-import com.ussr.pvz.view.mainmenu.GreenHouse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -100,28 +98,33 @@ class RegisterServiceTest {
     @Test
     @DisplayName("❌ Should fail when username already exists")
     void register_shouldFail_whenUsernameExists() {
-        // Arrange - Add existing user
+        // Arrange - Add existing user with 24-argument AccountState
         Account existingAccount = new Account(
                 new AccountState(
-                        "existing-user",
-                        "ExistingUser",
-                        "pass",
-                        "existing@example.com",
-                        null,
-                        3,
-                        null,
-                        null,
-                        1,
-                        0,
-                        0,
-                        0,
-                        AdventureProgress.initializePlantsLvl(),
-                        List.of("",""),
-                        List.of(NewsItem.initialNews()),
-                        //todo make a green house from test here
-                        Map.of("",1),
-                        0,
-                        Map.of("",2)
+                        "existing-user",                         // 1. username
+                        "ExistingUser",                          // 2. nickname
+                        "pass",                                  // 3. password
+                        "existing@example.com",                  // 4. email
+                        null,                                    // 5. gender
+                        3,                                       // 6. difficulty
+                        null,                                    // 7. security question
+                        null,                                    // 8. security answer
+                        1,                                       // 9. current chapter
+                        1,                                       // 10. current level
+                        0,                                       // 11. minigames won
+                        0,                                       // 12. completed quests
+                        0,                                       // 13. coin
+                        0,                                       // 14. gem
+                        0,                                       // 15. score
+                        AdventureProgress.initializePlantsLvl(), // 16. plant levels
+                        new java.util.ArrayList<>(),             // 17. seen zombies
+                        List.of(NewsItem.initialNews()),         // 18. news
+                        null,                                    // 19. greenhouse state
+                        null,                                    // 20. saved boosts
+                        0,                                       // 21. plant food count
+                        new java.util.HashMap<>(),               // 22. seed packets
+                        new java.util.ArrayList<>(),             // 23. active quests
+                        new java.util.HashMap<>()                // 24. completed quests
                 ),
                 null
         );

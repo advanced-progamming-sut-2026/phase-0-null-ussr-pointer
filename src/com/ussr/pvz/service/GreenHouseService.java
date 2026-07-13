@@ -102,11 +102,13 @@ public class GreenHouseService {
 
     public String showGreenHouse() {
         java.util.Map<String, Object> data = App.getAccount().getGreenhouse().toMap();
+        @SuppressWarnings("unchecked")
         java.util.List<java.util.Map<String, Object>> potsList =
                 (java.util.List<java.util.Map<String, Object>>) data.get("pots");
 
         int maxRows = com.ussr.pvz.model.greenhouse.Greenhouse.MAX_ROWS;
         int maxCols = com.ussr.pvz.model.greenhouse.Greenhouse.MAX_COLS;
+        @SuppressWarnings("unchecked")
         java.util.Map<String, Object>[][] grid = new java.util.Map[maxRows][maxCols];
 
         if (potsList != null) {
@@ -119,52 +121,46 @@ public class GreenHouseService {
             }
         }
 
+        return formatGridToString(grid, maxRows, maxCols);
+    }
+
+    private String formatGridToString(java.util.Map<String, Object>[][] grid, int maxRows, int maxCols) {
         StringBuilder sb = new StringBuilder();
         for (int y = 0; y < maxRows; y++) {
             for (int x = 0; x < maxCols; x++) {
-                java.util.Map<String, Object> pot = grid[y][x];
-
-                if (pot == null) {
-                    sb.append("[LOCKED]");
-                } else {
-                    boolean unlocked = (boolean) pot.get("unlocked");
-                    boolean occupied = (boolean) pot.get("occupied");
-
-                    if (!unlocked) {
-                        sb.append("[LOCKED]");
-                    } else if (!occupied || !pot.containsKey("plant")) {
-                        sb.append("[EMPTY]");
-                    } else {
-                        java.util.Map<String, Object> plant = (java.util.Map<String, Object>) pot.get("plant");
-                        String stateStr = (String) plant.get("state");
-
-                        if ("READY".equals(stateStr)) {
-                            sb.append("[READY]");
-                        } else {
-                            String name = (String) plant.get("type");
-                            if (name == null || name.isEmpty() || (boolean) plant.get("isMarigold")) {
-                                name = "Marigold";
-                            }
-
-                            long plantedAt = ((Number) plant.get("plantedAtMillis")).longValue();
-                            long duration = ((Number) plant.get("growthDurationMillis")).longValue();
-                            long remainingMillis = (plantedAt + duration) - System.currentTimeMillis();
-                            long remainingHours = Math.max(0, (remainingMillis + (60 * 60 * 1000) - 1) / (60 * 60 * 1000));
-
-                            sb.append(String.format("[%s: %dh remaining]", name, remainingHours));
-                        }
-                    }
-                }
-
-                if (x < maxCols - 1) {
-                    sb.append(" | ");
-                }
+                sb.append(formatPotStatus(grid[y][x]));
+                if (x < maxCols - 1) sb.append(" | ");
             }
-            if (y < maxRows - 1) {
-                sb.append("\n");
-            }
+            if (y < maxRows - 1) sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private String formatPotStatus(java.util.Map<String, Object> pot) {
+        if (pot == null) return "[LOCKED]";
+
+        boolean unlocked = (boolean) pot.get("unlocked");
+        boolean occupied = (boolean) pot.get("occupied");
+
+        if (!unlocked) return "[LOCKED]";
+        if (!occupied || !pot.containsKey("plant")) return "[EMPTY]";
+
+        java.util.Map<String, Object> plant = (java.util.Map<String, Object>) pot.get("plant");
+        String stateStr = (String) plant.get("state");
+
+        if ("READY".equals(stateStr)) return "[READY]";
+
+        String name = (String) plant.get("type");
+        if (name == null || name.isEmpty() || (boolean) plant.get("isMarigold")) {
+            name = "Marigold";
         }
 
-        return sb.toString();
+        long plantedAt = ((Number) plant.get("plantedAtMillis")).longValue();
+        long duration = ((Number) plant.get("growthDurationMillis")).longValue();
+        long remainingMillis = Math.max(0, (plantedAt + duration) - System.currentTimeMillis());
+        long remainingHours = (remainingMillis + 3599999) / 3600000;
+
+        return String.format("[%s: %dh remaining]", name, remainingHours);
     }
 }

@@ -29,22 +29,24 @@ public class VaseBreakerBehavior extends LevelBehavior {
         if (session == null || session.getLawn() == null) return;
 
         level.setSunFalling(false);
-
         Lawn lawn = session.getLawn();
-        int rows = lawn.getRows();
-        int cols = lawn.getCols();
+        List<VaseType> vasePool = generateVasePool();
+        placeVases(session, lawn, vasePool);
+    }
 
-        // 25-vase pool distribution
-        List<VaseType> vasePool = new ArrayList<>();
-        for (int i = 0; i < 8; i++) vasePool.add(VaseType.PLANT);
-        for (int i = 0; i < 2; i++) vasePool.add(VaseType.GARGANTAUR);
-        for (int i = 0; i < 15; i++) vasePool.add(VaseType.NORMAL);
+    private List<VaseType> generateVasePool() {
+        List<VaseType> pool = new ArrayList<>();
+        for (int i = 0; i < 8; i++) pool.add(VaseType.PLANT);
+        for (int i = 0; i < 2; i++) pool.add(VaseType.GARGANTAUR);
+        for (int i = 0; i < 15; i++) pool.add(VaseType.NORMAL);
+        Collections.shuffle(pool);
+        return pool;
+    }
 
-        Collections.shuffle(vasePool);
-
+    private void placeVases(GameSession session, Lawn lawn, List<VaseType> vasePool) {
         int poolIndex = 0;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 4; c < cols; c++) {
+        for (int r = 0; r < lawn.getRows(); r++) {
+            for (int c = 4; c < lawn.getCols(); c++) {
                 if (poolIndex >= vasePool.size()) break;
 
                 Vase vase = new Vase();
@@ -53,30 +55,7 @@ public class VaseBreakerBehavior extends LevelBehavior {
                 vase.setPosition(Vec2.of(c, r));
                 vase.setAlive(true);
 
-                // Assign the internal entities inside the structural containers
-                if (assignedType == VaseType.GARGANTAUR) {
-                    // Guaranteed Gargantuar
-                    vase.setContainedZombie(
-                            com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Gargantuar", r, c)
-                    );
-                } else if (assignedType == VaseType.PLANT) {
-                    // Guaranteed Plant Seed Packet
-                    int randomPlantId = rand.nextInt(50) + 1;
-                    vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, randomPlantId, 1));
-                } else if (assignedType == VaseType.NORMAL) {
-
-                    int roll = rand.nextInt(3); // 0 = Zombie, 1 = Plant, 2 = Empty
-
-                    if (roll == 0) {
-                        vase.setContainedZombie(
-                                com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Zombie", r, c)
-                        );
-                    } else if (roll == 1) {
-                        int randomPlantId = rand.nextInt(50) + 1;
-                        vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, randomPlantId, 1));
-                    }
-                    // If roll == 2, both remain null, meaning the vase is safely empty!
-                }
+                assignVaseContents(vase, assignedType, r, c);
 
                 Cell cell = lawn.getCell(r, c);
                 if (cell != null) {
@@ -84,6 +63,21 @@ public class VaseBreakerBehavior extends LevelBehavior {
                     vases.add(vase);
                     session.registerStructure(vase);
                 }
+            }
+        }
+    }
+
+    private void assignVaseContents(Vase vase, VaseType type, int r, int c) {
+        if (type == VaseType.GARGANTAUR) {
+            vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Gargantuar", r, c));
+        } else if (type == VaseType.PLANT) {
+            vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, rand.nextInt(50) + 1, 1));
+        } else if (type == VaseType.NORMAL) {
+            int roll = rand.nextInt(3);
+            if (roll == 0) {
+                vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Zombie", r, c));
+            } else if (roll == 1) {
+                vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, rand.nextInt(50) + 1, 1));
             }
         }
     }
