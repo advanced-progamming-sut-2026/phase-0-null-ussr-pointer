@@ -11,6 +11,8 @@ import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 
 public class SunThief implements EffectStatus {
+    private static final double STEAL_DURATION_SECONDS = 5.0;
+
     private final boolean isBankThief;
     private final int maxSunsToSteal;
     private final double dropRatioOnDeath;
@@ -23,6 +25,9 @@ public class SunThief implements EffectStatus {
     private double oneSecondAccumulator = 0;
     private boolean isStealing = false;
     private boolean laserFired = false;
+
+    private GroundItem currentTarget;
+    private double targetTimer = 0;
 
     public SunThief(boolean isBankThief, int maxSunsToSteal, double dropRatioOnDeath, double chargingTime, int laserDamage) {
         this.isBankThief = isBankThief;
@@ -55,31 +60,54 @@ public class SunThief implements EffectStatus {
         if (isBankThief) {
             processBankThief(zombie, session);
         } else {
-            processGroundThief(zombie, session);
+            processGroundThief(session);
         }
     }
 
-    private void processGroundThief(Zombie zombie, GameSession session) {
+    private void processGroundThief(GameSession session) {
         if (stolenSuns >= maxSunsToSteal) return;
 
-        for (GroundItem item : session.getItems()) {
-            if (stolenSuns >= maxSunsToSteal) break;
-
-            if (item.isAlive() && item.getItemType() == ItemType.SUN) {
-                int sunValue = 0;
-                if (item instanceof ProducedSun producedSun) {
-                    sunValue = producedSun.getValue();
-                } else if (item instanceof SunToken sunToken) {
-                    if (sunToken.isFalling()) continue;
-                    sunValue = sunToken.getValue();
-                }
-
-                if (sunValue > 0) {
-                    stolenSuns = Math.min(stolenSuns + sunValue, maxSunsToSteal);
-                    item.setAlive(false);
-                }
-            }
+        if (currentTarget != null && (!currentTarget.isAlive() || currentTarget.getItemType() != ItemType.SUN)) {
+            currentTarget = null;
+            targetTimer = 0;
         }
+
+        if (currentTarget == null) {
+            currentTarget = findNextSunTarget(session);
+            targetTimer = 0;
+            if (currentTarget == null) return;
+        }
+
+        targetTimer += GameClock.SECONDS_PER_TICK;
+
+        if (targetTimer >= STEAL_DURATION_SECONDS) {
+            stealSun(currentTarget);
+            currentTarget = null;
+            targetTimer = 0;
+        }
+    }
+
+    private GroundItem findNextSunTarget(GameSession session) {
+        for (GroundItem item : session.getItems()) {
+            if (!item.isAlive() || item.getItemType() != ItemType.SUN) continue;
+            if (item instanceof SunToken sunToken && sunToken.isFalling()) continue;
+            return item;
+        }
+        return null;
+    }
+
+    private void stealSun(GroundItem item) {
+        int sunValue = 0;
+        if (item instanceof ProducedSun producedSun) {
+            sunValue = producedSun.getValue();
+        } else if (item instanceof SunToken sunToken) {
+            sunValue = sunToken.getValue();
+        }
+
+        if (sunValue > 0) {
+            stolenSuns = Math.min(stolenSuns + sunValue, maxSunsToSteal);
+        }
+        item.setAlive(false);
     }
 
     private void processBankThief(Zombie zombie, GameSession session) {

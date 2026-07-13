@@ -74,5 +74,8 @@ public class CliGameEventListener {
 
         bus.subscribe(GameEvent.SunGrounded.class,
                 e -> System.out.println("Sun reached the ground at position (" + e.x() + "," + e.y() + ")"));
+
+        bus.subscribe(GameEvent.SunExpired.class,
+                e -> System.out.println("Sun at position (" + e.x() + "," + e.y() + ") expired and disappeared"));
     }
 }

@@ -24,6 +24,7 @@ public sealed interface GameEvent permits
         GameEvent.StructureDestroyed,
         GameEvent.SunStartedFalling,
         GameEvent.SunGrounded,
+        GameEvent.SunExpired,
         GameEvent.GraveDestroyed {
 
 
@@ -35,6 +36,10 @@ public sealed interface GameEvent permits
     }
 
     record SunGrounded(int x , int y) implements GameEvent {
+
+    }
+
+    record SunExpired(int x, int y) implements GameEvent {
 
     }
 
