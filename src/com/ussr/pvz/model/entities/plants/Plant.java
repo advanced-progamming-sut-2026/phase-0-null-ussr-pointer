@@ -9,6 +9,7 @@ import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.service.game.PlantService;
 
 import java.util.ArrayList;
 import java.util.List;

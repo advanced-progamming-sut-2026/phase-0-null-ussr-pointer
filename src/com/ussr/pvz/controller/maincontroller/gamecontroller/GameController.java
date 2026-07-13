@@ -10,12 +10,22 @@ import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
 import com.ussr.pvz.service.AccountService;
 import com.ussr.pvz.service.game.GameService;
+import com.ussr.pvz.service.minigame.BeghouledService;
+import com.ussr.pvz.service.minigame.IZombieService;
+import com.ussr.pvz.service.minigame.VaseBreakerService;
+import com.ussr.pvz.service.minigame.WallnutBowlingService;
 
 import java.util.regex.Matcher;
 
 public class GameController {
     private final AccountService accountService = new AccountService();
     private final GameService gameService = new GameService();
+
+    // === MINIGAME SERVICES ===
+    private final BeghouledService beghouledService = new BeghouledService();
+    private final VaseBreakerService vaseBreakerService = new VaseBreakerService();
+    private final WallnutBowlingService bowlingService = new WallnutBowlingService();
+    private final IZombieService iZombieService = new IZombieService();
 
     public GameController() {
     }
@@ -47,6 +57,7 @@ public class GameController {
             case SHOW_PLANTS_STATUS -> handleShowPlantsStatus();
             case SHOW_TILE_STATUS -> handleShowTileStatus(matcher);
             case ZOMBIES_INFO -> handleZombiesInfo();
+            case SHOW_CONVEYOR -> handleShowConveyor();
             default -> "";
         };
     }
@@ -64,19 +75,70 @@ public class GameController {
             case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
             case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
             case START_ZOMBIE_WAVES -> handleStartZombieWaves();
+
+            // Minigame Integrations
             case SWAP_PLANTS -> handleSwapPlants(matcher);
             case UPGRADE_BEGHOULED_PLANT -> handleUpgradeBeghouledPlant(matcher);
+            case SMASH_VASE -> handleSmashVase(matcher);
+            case ROLL_WALLNUT -> handleRollWallnut(matcher);
+            case PLACE_ZOMBIE -> handlePlaceZombie(matcher);
+
             default -> "";
         };
     }
 
-    private String handleUpgradeBeghouledPlant(Matcher matcher) {
-        return "";
-    }
+    // === MINIGAME HANDLERS ===
 
     private String handleSwapPlants(Matcher matcher) {
-        return "";
+        try {
+            int r1 = Integer.parseInt(matcher.group("r1"));
+            int c1 = Integer.parseInt(matcher.group("c1"));
+            int r2 = Integer.parseInt(matcher.group("r2"));
+            int c2 = Integer.parseInt(matcher.group("c2"));
+            return beghouledService.swapPlants(r1, c1, r2, c2);
+        } catch (NumberFormatException e) {
+            return "invalid location coordinates";
+        }
     }
+
+    private String handleUpgradeBeghouledPlant(Matcher matcher) {
+        String plantType = matcher.group("plantType");
+        return beghouledService.upgradePlant(plantType);
+    }
+
+    private String handleSmashVase(Matcher matcher) {
+        try {
+            int x = Integer.parseInt(matcher.group("x"));
+            int y = Integer.parseInt(matcher.group("y"));
+            return vaseBreakerService.smashVase(x, y);
+        } catch (NumberFormatException e) {
+            return "invalid location coordinates";
+        }
+    }
+
+    private String handleRollWallnut(Matcher matcher) {
+        try {
+            String type = matcher.group("type");
+            int x = Integer.parseInt(matcher.group("x"));
+            int y = Integer.parseInt(matcher.group("y"));
+            return bowlingService.rollWallnut(type, x, y);
+        } catch (NumberFormatException e) {
+            return "invalid location coordinates";
+        }
+    }
+
+    private String handlePlaceZombie(Matcher matcher) {
+        try {
+            String type = matcher.group("type");
+            int x = Integer.parseInt(matcher.group("x"));
+            int y = Integer.parseInt(matcher.group("y"));
+            return iZombieService.placeZombie(type, x, y);
+        } catch (NumberFormatException e) {
+            return "invalid location coordinates";
+        }
+    }
+
+    // === STANDARD HANDLERS ===
 
     private String handleMenuEnterChapter(Matcher matcher) {
         MenuEnterChapterRequest request = new MenuEnterChapterRequest(matcher.group("chapterName"));
@@ -193,5 +255,9 @@ public class GameController {
 
     private String handleStartZombieWaves() {
         return gameService.startZombieWaves();
+    }
+
+    private String handleShowConveyor() {
+        return gameService.showConveyor();
     }
 }

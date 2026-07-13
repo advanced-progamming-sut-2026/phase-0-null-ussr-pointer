@@ -9,6 +9,7 @@ import com.ussr.pvz.model.dto.PlantTypeRequest;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,11 +115,19 @@ public class ChoosePlantService {
     }
 
     public String startGame() {
-        if (selectedPlants.isEmpty())
-            return "select at least one plant before starting";
-
         Level level = App.getLevelManager().getCurrentLevel();
         if (level == null) return "no level selected";
+
+        // Check if it's a standard level that requires plant selection
+        boolean requiresSelection = !(level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy)
+                && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.BeghouledBehavior)
+                && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior)
+                && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.VaseBreakerBehavior)
+                && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior);
+
+        if (requiresSelection && selectedPlants.isEmpty()) {
+            return "select at least one plant before starting";
+        }
 
         Lawn lawn = buildLawn(LAWN_ROWS, LAWN_COLS);
 
@@ -129,7 +138,15 @@ public class ChoosePlantService {
         session.setLevel(level);
         session.addSun(INITIAL_SUN);
 
+        // Bind session globally BEFORE behavior onStart
         App.setGameSession(session);
+
+        // Ensure zombies are loaded before minigames (like IZombie or Vasebreaker) attempt to spawn them
+        ZombieFactory.init();
+
+        // Now safe to initialize behavior grids (Vasebreaker, Beghouled, IZombie)
+        level.onStart();
+
         session.initClock();
         App.setMenuState(MenuState.GAME);
 

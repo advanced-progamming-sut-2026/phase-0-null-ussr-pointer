@@ -297,15 +297,9 @@ public class GameSession {
     }
 
     public void startWaves() {
-        ZombieFactory.init();
         if (App.getAccount() != null) {
             QuestEventTracker tracker = new QuestEventTracker(App.getAccount().getQuestManager());
             tracker.subscribeTo(this);
-        }
-
-        // Let the behavior set up its own wave schedules or internal configurations polymorphically
-        if (level != null && level.getBehavior() != null) {
-            level.getBehavior().onStart(level);
         }
 
         wavesStarted = true;

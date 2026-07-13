@@ -315,6 +315,22 @@ public class GameService {
         return App.getGameSession().renderPlantsStatus();
     }
 
+    public String showConveyor() {
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLevel() == null) {
+            return "no active game session";
+        }
+
+        if (session.getLevel().getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy conveyor) {
+            if (conveyor.getConveyorBelt().isEmpty()) {
+                return "conveyor is empty";
+            }
+            return "Conveyor Belt: [ " + String.join(", ", conveyor.getConveyorBelt()) + " ]";
+        }
+
+        return "this level does not use a conveyor belt";
+    }
+
     public String showTileStatus(LocationRequest request) {
         int x, y;
         try {

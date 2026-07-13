@@ -23,17 +23,19 @@ public enum GameCommand {
     CHEAT_ADD_PLANT_FOOD("^cheat\\s+add-plant-food(?:\\s+.*)?$"),
     SHOW_MAP("^show\\s+map(?:\\s+.*)?$"),
     SHOW_PLANTS_STATUS("^show\\s+plants\\s+status(?:\\s+.*)?$"),
+    SHOW_CONVEYOR("^show\\s+conveyor(?:\\s+.*)?$"),
     SHOW_TILE_STATUS("^show\\s+tile\\s+status\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     ZOMBIES_INFO("^zombies\\s+info(?:\\s+.*)?$"),
     CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     CHEAT_ADD_CURRENCY("^menu\\s+cheat\\s+add\\s+(?<amount>\\S+)\\s+(?<currency>\\S+)(?:\\s+.*)?$"),
-    // In src/com/ussr/pvz/controller/command/maincommand/gamecommand/GameCommand.java
 
-    // Command: swap (r1, c1) with (r2, c2)
+    // === Minigame Commands ===
     SWAP_PLANTS("^swap\\s+\\(\\s*(?<r1>\\S+?)\\s*,\\s*(?<c1>\\S+?)\\s*\\)\\s+with\\s+\\(\\s*(?<r2>\\S+?)\\s*,\\s*(?<c2>\\S+?)\\s*\\)(?:\\s+.*)?$"),
-
-    // Command: upgrade <plantType>
     UPGRADE_BEGHOULED_PLANT("^upgrade\\s+(?<plantType>.+?)(?:\\s+.*)?$"),
+    SMASH_VASE("^smash\\s+vase\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
+    ROLL_WALLNUT("^roll\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
+    PLACE_ZOMBIE("^place\\s+zombie\\s+-t\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
+
     START_ZOMBIE_WAVES("^start\\s+zombie\\s+waves(?:\\s+.*)?$");
 
     private final String pattern;

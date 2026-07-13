@@ -86,7 +86,6 @@ public class LevelManager {
                 .orElseThrow(() -> new IllegalArgumentException("Level '" + id + "' not found in chapter: " + currentChapter.getId()));
 
         refreshLevelState(currentLevel);
-        currentLevel.onStart();
     }
 
     public void nextLevel() {
@@ -111,7 +110,6 @@ public class LevelManager {
         if (currentIndex + 1 < levels.size()) {
             currentLevel = levels.get(currentIndex + 1);
             refreshLevelState(currentLevel);
-            currentLevel.onStart();
             return;
         }
 
@@ -125,7 +123,6 @@ public class LevelManager {
 
             currentLevel = currentChapter.getLevels().getFirst();
             refreshLevelState(currentLevel);
-            currentLevel.onStart();
             System.out.println("[LevelManager] Chapter completed! Advancing to: " + currentChapter.getName());
         } else {
             System.out.println("[LevelManager] Final campaign chapter fully cleared! Triggering Game Cleared Engine UI Event.");
