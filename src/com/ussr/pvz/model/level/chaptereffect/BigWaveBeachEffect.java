@@ -9,35 +9,38 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.level.Level;
 
-import java.util.Random;
+import java.util.List;
 
-/**
- * Rising/falling tide for Big Wave Beach levels: the number of sea columns
- * on the right side of the lawn changes every wave. Plants that cannot
- * survive in water (no WATER tag) are washed away when the tide reaches
- * them.
- *
- * NOTE: if you model lily pads as a structure rather than a Tag, add a
- * check for that structure in washAwayIfNeeded() so plants sitting on a
- * lily pad survive the tide.
- */
 public class BigWaveBeachEffect implements ChapterEffect {
 
-    private static final Random RAND = new Random();
-    private static final int MIN_SEA_COLUMNS = 3;
-    private static final int MAX_SEA_COLUMNS = 5;
+    @Override
+    public void onStart(GameSession session, Level level) {
+        applyTide(session, level, level.getStartingTideColumn());
+    }
 
     @Override
-    public void onWaveStart(GameSession session, Level level, int waveNumber, boolean isFinalWave) {
+    public void onTick(GameSession session, Level level, double deltaTime) {
+        List<Level.TideEvent> schedule = level.getTideSchedule();
+        int nextIndex = level.getNextTideIndex();
+
+        if (nextIndex >= schedule.size()) return;
+
+        Level.TideEvent nextEvent = schedule.get(nextIndex);
+        if (session.getElapsedSeconds() >= nextEvent.triggerTimeSeconds()) {
+            applyTide(session, level, nextEvent.targetColumn());
+            level.setNextTideIndex(nextIndex + 1);
+        }
+    }
+
+    private void applyTide(GameSession session, Level level, int newTideCol) {
         Lawn lawn = session.getLawn();
         if (lawn == null) return;
 
-        int cols = lawn.getCols();
-        int rows = lawn.getRows();
-        int seaColumns = MIN_SEA_COLUMNS + RAND.nextInt(MAX_SEA_COLUMNS - MIN_SEA_COLUMNS + 1);
-        int seaStart = cols - seaColumns;
+        level.setCurrentTideColumn(newTideCol);
+        System.out.println("The tide shifts: water now covers columns " + (newTideCol + 1) + " onward.");
 
-        System.out.println("The tide shifts: the sea now covers the rightmost " + seaColumns + " columns.");
+        int rows = lawn.getRows();
+        int cols = lawn.getCols();
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -45,13 +48,13 @@ public class BigWaveBeachEffect implements ChapterEffect {
                 if (cell == null || cell.getTile() == null) continue;
 
                 TileType current = cell.getTile().getType();
-                boolean shouldBeSea = c >= seaStart && current == TileType.Normal;
-                boolean shouldBeLand = c < seaStart
+                boolean shouldBeWater = c >= newTideCol && current == TileType.Normal;
+                boolean shouldBeLand = c < newTideCol
                         && (current == TileType.Water || current == TileType.ShallowCoast);
 
-                if (shouldBeSea) {
+                if (shouldBeWater) {
                     cell.setTile(new Tile(TileType.Water));
-                    washAwayIfNeeded(cell);
+                    washAwayIfNeeded(session, cell);
                 } else if (shouldBeLand) {
                     cell.setTile(new Tile(TileType.Normal));
                 }
@@ -59,13 +62,14 @@ public class BigWaveBeachEffect implements ChapterEffect {
         }
     }
 
-    private void washAwayIfNeeded(Cell cell) {
+    private void washAwayIfNeeded(GameSession session, Cell cell) {
         Plant plant = cell.getPlant();
         if (plant == null || !plant.isAlive()) return;
         if (plant.getTags().contains(Tag.WATER)) return; // water-safe plants stay put
+        if (plant.getBottom() != null) return; // planted on a lily pad / raft, stays afloat
 
-        System.out.println(plant.getName() + " at (" + cell.getCol() + ", " + cell.getRow() + ") was swept away by the tide!");
+        System.out.println(plant.getName() + " was swept away by the tide!");
         plant.setAlive(false);
-        cell.setPlant(null);
+        session.notifyPlantDied(plant);
     }
 }

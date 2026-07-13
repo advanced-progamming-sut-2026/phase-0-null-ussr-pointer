@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class LevelLoader {
-    private static final String DEFAULT_PATH = "resources/levels.json";
+    private static final String DEFAULT_PATH = "src/resources/levels.json";
     private final Gson gson = new Gson();
 
     public JsonContainer.JsonWorldData load() {

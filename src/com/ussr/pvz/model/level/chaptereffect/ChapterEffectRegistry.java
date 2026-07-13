@@ -8,9 +8,10 @@ public final class ChapterEffectRegistry {
     private static final Map<String, ChapterEffect> EFFECTS = new HashMap<>();
 
     static {
-        EFFECTS.put("frostbite-caves-1", new FrostbiteCavesEffect());
-        EFFECTS.put("big-wave-beach-1", new BigWaveBeachEffect());
-        EFFECTS.put("dark-ages-1", new DarkAgesEffect());
+        EFFECTS.put("ancient_egypt", new AncientEgyptEffect());
+        EFFECTS.put("big_wave_beach", new BigWaveBeachEffect());
+        EFFECTS.put("dark_ages", new DarkAgesEffect());
+        EFFECTS.put("frostbite_caves", new FrostbiteCavesEffect());
     }
 
     private ChapterEffectRegistry() {

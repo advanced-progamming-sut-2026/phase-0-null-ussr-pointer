@@ -1,7 +1,6 @@
 package com.ussr.pvz.model.level;
 
 import com.ussr.pvz.model.level.behavior.*;
-import com.ussr.pvz.model.level.environment.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +19,7 @@ public class LevelFactory {
         BEHAVIOR_REGISTRY.put("LoveYourPlantsBehavior", LoveYourPlantsBehavior::new);
         BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
         BEHAVIOR_REGISTRY.put("ZombotanyBehavior", ZombotanyBehavior::new);
+        BEHAVIOR_REGISTRY.put("NormalBehavior", NormalBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
@@ -73,38 +73,31 @@ public class LevelFactory {
 
         level.setBehavior(selectedBehavior);
 
-        if (data.environment != null && !data.environment.isBlank()) {
-            switch (data.environment.trim()) {
-                case "AncientEgyptEnvironment" -> {
-                    List<AncientEgyptEnvironment.SandstormEvent> schedule = new ArrayList<>();
-                    if (data.sandstorms != null) {
-                        for (JsonContainer.JsonSandstormEvent e : data.sandstorms) {
-                            schedule.add(new AncientEgyptEnvironment.SandstormEvent(e.triggerTimeSeconds, e.zombieAlias));
-                        }
-                    }
-                    level.setEnvironment(new AncientEgyptEnvironment(schedule));
-                }
-
-                case "BigWaveBeachEnvironment" -> {
-                    List<BigWaveBeachEnvironment.TideEvent> schedule = new ArrayList<>();
-                    if (data.tides != null) {
-                        for (JsonContainer.JsonTideEvent e : data.tides) {
-                            schedule.add(new BigWaveBeachEnvironment.TideEvent(e.triggerTimeSeconds, e.targetColumn));
-                        }
-                    }
-                    level.setEnvironment(new BigWaveBeachEnvironment(data.startingTideColumn, schedule));
-                }
-
-                case "DarkAgesEnvironment" ->
-                        level.setEnvironment(new DarkAgesEnvironment(data.necromancyZombieAlias, data.zombiesPerNecromancyWave));
-
-                case "FrostbiteEnvironment" ->
-                        level.setEnvironment(new FrostbiteEnvironment(data.windIntervalSeconds, data.freezeStacksPerWind));
-
-                default ->
-                        System.err.println("[LevelFactory] Unknown environment: " + data.environment);
+        // Chapter-effect schedule data (sandstorms, tides, necromancy, wind)
+        // is stored directly on Level and consumed by the matching
+        // ChapterEffect from ChapterEffectRegistry - see GameSession.
+        if (data.sandstorms != null) {
+            List<Level.SandstormEvent> schedule = new ArrayList<>();
+            for (JsonContainer.JsonSandstormEvent e : data.sandstorms) {
+                schedule.add(new Level.SandstormEvent(e.triggerTimeSeconds, e.zombieAlias));
             }
+            level.setSandstormSchedule(schedule);
         }
+
+        level.setStartingTideColumn(data.startingTideColumn);
+        if (data.tides != null) {
+            List<Level.TideEvent> schedule = new ArrayList<>();
+            for (JsonContainer.JsonTideEvent e : data.tides) {
+                schedule.add(new Level.TideEvent(e.triggerTimeSeconds, e.targetColumn));
+            }
+            level.setTideSchedule(schedule);
+        }
+
+        level.setNecromancyZombieAlias(data.necromancyZombieAlias);
+        level.setZombiesPerNecromancyWave(data.zombiesPerNecromancyWave);
+
+        level.setWindIntervalSeconds(data.windIntervalSeconds);
+        level.setFreezeStacksPerWind(data.freezeStacksPerWind);
 
         if (data.allowedZombies != null) {
             List<Level.AllowedZombie> allowed = new ArrayList<>();

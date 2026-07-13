@@ -138,6 +138,15 @@ public class LevelManager {
         if (data != null) {
             Level freshLevel = LevelFactory.create(data);
             level.setBehavior(freshLevel.getBehavior());
+
+            // Reset chapter-effect schedule progress (sandstorms, tides,
+            // wind timers) so a replayed level starts its mechanics over,
+            // rather than continuing from the previous attempt's cursor.
+            level.setSandstormSchedule(freshLevel.getSandstormSchedule());
+            level.setStartingTideColumn(freshLevel.getStartingTideColumn());
+            level.setTideSchedule(freshLevel.getTideSchedule());
+            level.setWindTimerElapsed(0.0);
+            level.setThawTimerElapsed(0.0);
         }
     }
 

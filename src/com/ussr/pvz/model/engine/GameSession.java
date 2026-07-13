@@ -67,8 +67,11 @@ public class GameSession {
     public void tick() {
         clock.tick();
 
-        if (level != null && level.getEnvironment() != null) {
-            level.getEnvironment().tick(this, GameClock.SECONDS_PER_TICK);
+        if (level != null) {
+            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
+            if (effect != null) {
+                effect.onTick(this, level, GameClock.SECONDS_PER_TICK);
+            }
         }
 
         // Delegate core tick progression directly to the behavior polymorphically
@@ -443,6 +446,12 @@ public class GameSession {
 
     public void setLevel(Level level) {
         this.level = level;
+        if (level != null) {
+            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
+            if (effect != null) {
+                effect.onStart(this, level);
+            }
+        }
     }
 
     public List<GroundItem> getItems() {
