@@ -4,8 +4,10 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.Vase;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
+import com.ussr.pvz.model.entities.plants.Plant;
 
 public class VaseBreakerService {
 
@@ -32,23 +34,34 @@ public class VaseBreakerService {
         GameSession session = App.getGameSession();
         if (session == null || session.getLawn() == null) return "Game session not active.";
 
-        Cell cell = session.getLawn().getCell(x, y);
+        Cell cell = session.getLawn().getCell(y, x);
         if (cell == null) return "Invalid planting location.";
         if (cell.getPlant() != null) return "Tile is already occupied by a plant.";
-        StringBuilder plantType = new StringBuilder();
-        session.getItems().stream().filter(i -> i.getItemType().equals(ItemType.SEED_PACK))
-                .filter(i -> i.getLocation().x() == sX && i.getLocation().y() == sY)
-                .findFirst().ifPresent(i -> {
-                    if (i instanceof SeedPackDrop) {
-                        plantType.append(((SeedPackDrop) i).getType());
-                    }
-                });
-        // TODO: Generate plant using the factory once it is fully available.
-        // Plant newPlant = PlantFactory.createPlant(seedName, 1);
-        // newPlant.setLocation(new Plant.Location(x, y));
-        // cell.setPlant(newPlant);
-        // session.getPlants().add(newPlant);
 
-        return "Successfully planted " + plantType + " at (" + x + ", " + y + ")! (TODO: Factory Implementation Pending)";
+        SeedPackDrop targetPack = null;
+
+        for (GroundItem item : session.getItems()) {
+            if (item.getItemType() == ItemType.SEED_PACK && item.getLocation().x() == sX && item.getLocation().y() == sY) {
+                targetPack = (SeedPackDrop) item;
+                break;
+            }
+        }
+
+        if (targetPack == null) return "No seed pack found at that location.";
+
+        try {
+            Plant newPlant = com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(targetPack.getPlantId(), 1);
+            newPlant.setLocation(new Plant.Location(x, y));
+            newPlant.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
+
+            cell.setPlant(newPlant);
+            session.addPlant(newPlant);
+
+            targetPack.setAlive(false); // consume the seedpack
+
+            return "Successfully planted " + newPlant.getName() + " at (" + x + ", " + y + ")!";
+        } catch (Exception e) {
+            return "Failed to plant from seed pack: " + e.getMessage();
+        }
     }
 }

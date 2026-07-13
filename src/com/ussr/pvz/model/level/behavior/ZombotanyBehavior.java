@@ -4,6 +4,12 @@ import com.ussr.pvz.model.level.Level;
 
 public class ZombotanyBehavior extends LevelBehavior {
 
+    // TODO: The Zombotany Minigame Mechanics
+    //  1. Create a custom Zombie spawn rule here or in the WaveDirector that forces
+    //  zombies to spawn with a PeashooterZombieEffect.
+    //  2. Ensure these custom zombies utilize a ShootStrategy so they fire projectiles
+    //  at the player's plants while walking left.
+
     public ZombotanyBehavior() {
     }
 

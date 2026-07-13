@@ -2,11 +2,8 @@ package com.ussr.pvz.model.board.structures;
 
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
-import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 
 import java.util.Random;
 
@@ -30,20 +27,31 @@ public class Vase extends InteractableStructure implements Damageable {
     @Override
     public void onDestroy(GameSession session) {
         switch (type) {
-            case PLANT -> session.getItems().add(seedPackDrop);
-            case NORMAL -> {
-                Random rand = new Random();
-                rand.setSeed(System.currentTimeMillis());
-                int random = rand.nextInt();
-                if (random % 3 == 0) {
-                    session.getItems().add(seedPackDrop);
-                } else if (random % 3 == 1) {
-                    session.getZombies().add(containedZombie);
+            case PLANT -> {
+                if (seedPackDrop != null) {
+                    seedPackDrop.setPosition(this.getPosition());
+                    session.addItem(seedPackDrop);
                 }
             }
-            case GARGANTAUR -> session.getZombies().add(containedZombie);
+            case NORMAL -> {
+                Random rand = new Random();
+                int random = rand.nextInt(3);
+                if (random == 0 && seedPackDrop != null) {
+                    seedPackDrop.setPosition(this.getPosition());
+                    session.addItem(seedPackDrop);
+                } else if (random == 1 && containedZombie != null) {
+                    containedZombie.setPosition(this.getPosition());
+                    session.spawnZombie(containedZombie);
+                }
+            }
+            case GARGANTAUR -> {
+                if (containedZombie != null) {
+                    containedZombie.setPosition(this.getPosition());
+                    session.spawnZombie(containedZombie);
+                }
+            }
         }
-        this.isAlive = false;
+        this.setAlive(false);
     }
 
     public int getHp() {

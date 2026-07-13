@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
 import com.ussr.pvz.model.entities.plants.PlantJsonParser.UpgradeConfig;
 import com.ussr.pvz.model.entities.plants.factory.ActStrategyRegistry;
@@ -73,6 +74,33 @@ public class PlantFactory {
         plant.setActStrategy(ActStrategyRegistry.create(config));
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(config));
 
+        // TODO: Assigning Plant Strategies
+        //  Evaluate the plant's name or tags and assign the correct ActStrategy:
+
         return plant;
+    }
+
+    // TODO: Upgrade findIdByName with fuzzy normalization (strip spaces/hyphens/underscores, lowercase).
+    public static int findIdByName(String name) {
+        if (name == null || App.getCachedPlantsData() == null) return -1;
+
+        String searchName = name.trim().toLowerCase();
+
+        for (int i = 0; i < App.getCachedPlantsData().size(); i++) {
+            var data = App.getCachedPlantsData().get(i);
+            String plantName = ((String) data.get("name")).toLowerCase();
+            if (plantName.equals(searchName)) {
+                return i + 1; // Assuming 1-based indexing for IDs
+            }
+        }
+        return -1;
+    }
+
+    public static Plant createPlantByName(String name, int level) {
+        int id = findIdByName(name);
+        if (id == -1) {
+            throw new IllegalArgumentException("Plant name not found in registry: " + name);
+        }
+        return createPlant(id, level);
     }
 }

@@ -75,6 +75,11 @@ public class LevelFactory {
                 behavior.setStartingSun(data.startingSun);
                 yield behavior;
             }
+            case "LoveYourPlantsBehavior" -> {
+                // Dynamically apply the level's specific death limit, falling back to 5 if not specified
+                int limit = data.allowedPlantsLost > 0 ? data.allowedPlantsLost : 5;
+                yield new LoveYourPlantsBehavior(limit);
+            }
             default -> {
                 Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior.trim());
                 if (supplier != null) yield supplier.get();

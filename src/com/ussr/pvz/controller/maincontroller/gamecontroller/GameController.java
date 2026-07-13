@@ -82,6 +82,7 @@ public class GameController {
             case SMASH_VASE -> handleSmashVase(matcher);
             case ROLL_WALLNUT -> handleRollWallnut(matcher);
             case PLACE_ZOMBIE -> handlePlaceZombie(matcher);
+            case PLANT_FROM_SEEDPACK -> handlePlantFromSeedpack(matcher);
 
             default -> "";
         };
@@ -255,6 +256,18 @@ public class GameController {
 
     private String handleStartZombieWaves() {
         return gameService.startZombieWaves();
+    }
+
+    private String handlePlantFromSeedpack(Matcher matcher) {
+        try {
+            int sx = Integer.parseInt(matcher.group("sx"));
+            int sy = Integer.parseInt(matcher.group("sy"));
+            int x = Integer.parseInt(matcher.group("x"));
+            int y = Integer.parseInt(matcher.group("y"));
+            return vaseBreakerService.plantFromSeedPack(sx, sy, x, y);
+        } catch (NumberFormatException e) {
+            return "invalid location coordinates";
+        }
     }
 
     private String handleShowConveyor() {

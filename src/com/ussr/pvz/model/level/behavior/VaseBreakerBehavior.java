@@ -7,8 +7,8 @@ import com.ussr.pvz.model.board.structures.Vase;
 import com.ussr.pvz.model.board.structures.VaseType;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
-import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.entities.items.ItemType;
+import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -71,13 +71,15 @@ public class VaseBreakerBehavior extends LevelBehavior {
         if (type == VaseType.GARGANTAUR) {
             vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Gargantuar", r, c));
         } else if (type == VaseType.PLANT) {
-            vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, rand.nextInt(50) + 1, 1));
+            // FIX: Uses correct parameters (type, lifetime, radius, plantId)
+            vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f, rand.nextInt(50) + 1));
         } else if (type == VaseType.NORMAL) {
             int roll = rand.nextInt(3);
             if (roll == 0) {
                 vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Zombie", r, c));
             } else if (roll == 1) {
-                vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, rand.nextInt(50) + 1, 1));
+                // FIX: Uses correct parameters
+                vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f, rand.nextInt(50) + 1));
             }
         }
     }

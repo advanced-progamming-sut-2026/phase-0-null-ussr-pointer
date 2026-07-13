@@ -16,10 +16,14 @@ import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
+import com.ussr.pvz.service.game.ZombieService;
 
 import java.util.Random;
 
 public class Zombie extends GameEntity implements Damageable {
+
+    private final ZombieService zombieService = new ZombieService();
+
     private static final Random RAND = new Random();
     private final String name;
 
@@ -93,6 +97,19 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive) return;
         GameSession session = App.getGameSession();
         if (session == null) return;
+
+        // If the zombie is NOT eating a plant, it is allowed to move
+        if (!zombieService.processEating(this, session)) {
+            if (moveBehavior != null) {
+                moveBehavior.move(this, session);
+            }
+        } else {
+            // trigger an eating animation or AttackBehavior here
+            if (attackBehavior != null) {
+                attackBehavior.attack(this, session);
+            }
+        }
+
 
         if (effectStatus != null) effectStatus.effect(this, session);
 

@@ -172,8 +172,15 @@ public class GameService {
 
         try {
             GameSession session = requireSession();
-            Cell cell = requirePlantableCell(session, x, y);
             Plant blueprint = requireUnlockedPlant(request.type());
+
+            // FIX: Pass the blueprint so the cell can validate water/lily pad rules
+            Cell cell = requirePlantableCell(session, x, y, blueprint);
+            // TODO: Seed Packet Cooldown Validation
+            //  1. Check if the blueprint plant's current 'recharge' or 'cooldown' timer is > 0.
+            //  2. If it is, throw an IllegalStateException("Plant is refreshing! Please wait.").
+            //  3. Once successfully planted, set the blueprint's cooldown timer to its max recharge value.
+            //  Note: You will also need to ensure the GameSession ticks these blueprint cooldowns down every frame!
 
             if (!session.spendSun(blueprint.getCost())) {
                 throw new IllegalStateException(
@@ -181,6 +188,13 @@ public class GameService {
             }
 
             Plant plant = instantiatePlant(blueprint, x, y);
+
+            // FIX: Stacking Logic. If the cell wasn't empty, it must be a Lily Pad (validated below).
+            if (!cell.isEmpty()) {
+                Plant existingLilyPad = cell.getPlant();
+                plant.setBottom(existingLilyPad); // Put the new plant ON top of the Lily Pad
+            }
+
             cell.setPlant(plant);
             session.addPlant(plant);
 
@@ -198,7 +212,8 @@ public class GameService {
         return session;
     }
 
-    private Cell requirePlantableCell(GameSession session, int x, int y) {
+    // FIX: Added 'blueprint' parameter to evaluate plant-specific rules
+    private Cell requirePlantableCell(GameSession session, int x, int y, Plant blueprint) {
         Lawn lawn = session.getLawn();
         if (lawn == null || y < 0 || y >= lawn.getRows() || x < 0 || x >= lawn.getCols()) {
             throw new IllegalStateException("invalid location");
@@ -208,11 +223,34 @@ public class GameService {
         if (cell == null) {
             throw new IllegalStateException("invalid location");
         }
+
+        // 1. Water Tile Logic
+        boolean isWaterTile = cell.getTile() != null && cell.getTile().getType() == com.ussr.pvz.model.board.terrain.TileType.Water;
+        boolean isAquaticPlant = blueprint.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.WATER) ||
+                blueprint.getName().equalsIgnoreCase("Lily Pad") ||
+                blueprint.getName().equalsIgnoreCase("LilyPad");
+
         if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
-            throw new IllegalStateException("cannot plant on tile (" + x + ", " + y + ")");
+            // Only allow planting if it's a water tile AND the plant is aquatic
+            if (!(isWaterTile && isAquaticPlant)) {
+                throw new IllegalStateException("cannot plant " + blueprint.getName() + " on this tile (" + x + ", " + y + ")");
+            }
+        } else if (isWaterTile && !isAquaticPlant && cell.isEmpty()) {
+            // Trying to plant a normal plant directly on empty water
+            throw new IllegalStateException(blueprint.getName() + " must be planted on a Lily Pad!");
         }
+
+        // 2. Stacking Logic
         if (!cell.isEmpty()) {
-            throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
+            Plant existingPlant = cell.getPlant();
+            boolean isLilyPad = existingPlant.getName().equalsIgnoreCase("Lily Pad") || existingPlant.getName().equalsIgnoreCase("LilyPad");
+
+            // Allow stacking IF existing plant is a Lily Pad, and the new plant is NOT another Lily Pad
+            if (isLilyPad && !isAquaticPlant) {
+                // This is allowed, do nothing here.
+            } else {
+                throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
+            }
         }
         return cell;
     }

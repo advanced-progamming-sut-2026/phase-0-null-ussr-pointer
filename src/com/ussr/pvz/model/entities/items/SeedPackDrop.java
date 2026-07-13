@@ -1,22 +1,22 @@
 package com.ussr.pvz.model.entities.items;
 
-import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.engine.GameSession;
 
-public class SeedPackDrop extends GroundItem{
-    public String type;
-    public SeedPackDrop(ItemType itemType, double lifetime, double collectRadius) {
+public class SeedPackDrop extends GroundItem {
+    private final int plantId;
+
+    public SeedPackDrop(ItemType itemType, double lifetime, double collectRadius, int plantId) {
         super(itemType, lifetime, collectRadius);
+        this.plantId = plantId;
     }
 
     @Override
     public void applyRewards(GameSession session, Account account) {
+        // Handled by VaseBreakerService directly when planted
     }
 
-    public String getType() {
-        return type;
+    public int getPlantId() {
+        return plantId;
     }
-    public void setType(String type) {}
-
 }

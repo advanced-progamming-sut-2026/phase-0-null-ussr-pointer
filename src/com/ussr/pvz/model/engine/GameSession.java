@@ -65,7 +65,16 @@ public class GameSession {
     }
 
     public void tick() {
+        // FIX: Freeze the entire simulation if the game has ended (Win or Loss)
+        if (gameOver) {
+            return;
+        }
+
         clock.tick();
+        // TODO: Sky Sun Generation
+        //  1. Check if the level allows sky sun: if (level != null && level.isSunFalling())
+        //  2. Increment skySunTimer += GameClock.SECONDS_PER_TICK;
+        //  3. If timer >= SKY_SUN_INTERVAL, spawn a new SunToken, add it to the session, and reset timer.
 
         if (level != null) {
             ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
@@ -91,6 +100,20 @@ public class GameSession {
         // Polymorphic loss condition check
         if (level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
             gameOver = true;
+        }
+
+        // Check for Win Condition
+        if (areWavesDone()) {
+            gameOver = true; // Freeze on win
+
+            // TODO: Level Progression & Saving
+            //  1. Call App.getLevelManager().nextLevel() to advance the campaign.
+            //  2. Apply level-completion rewards to App.getAccount().getAdventureProgress().
+            //  3. Convert all accounts to AccountState and call SaveService.saveAccounts() to persist progress to disk.
+
+            // TODO: Exit Game State
+            //  Force the player back to the Main Menu or a Post-Game Summary screen so they aren't trapped.
+            //  App.setMenuState(MenuState.MAIN);
         }
     }
 
@@ -229,6 +252,21 @@ public class GameSession {
         ));
     }
 
+    // TODO: Ensure all Plant ShootStrategy logic calls this instead of session.getProjectiles().add()!
+    // This fixes the systemic bug where player projectiles weren't getting ticked by the clock.
+    public void addProjectile(Projectile projectile) {
+        if (projectile == null) return;
+        projectiles.add(projectile);
+        clock.addEntity(projectile);
+    }
+
+    // FIX: Helper to safely spawn items so they get tracked by the GameClock
+    public void addItem(GroundItem item) {
+        if (item == null) return;
+        items.add(item);
+        clock.addEntity(item);
+    }
+
     public void notifyZombieDied(Zombie zombie, String killerPlantName) {
         eventBus.publish(new GameEvent.ZombieDied(
                 zombie.getAlias(),
@@ -236,6 +274,12 @@ public class GameSession {
                 zombie.getPosition().y(),
                 killerPlantName
         ));
+
+        // TODO: Zombie Loot Drop
+        //  1. Generate a random number (e.g., using java.util.Random).
+        //  2. If it hits a specific probability (e.g., 10%), instantiate a new CoinDrop or DiamondDrop.
+        //  3. Set the drop's position to zombie.getPosition().
+        //  4. Call this.addItem(drop) to spawn the loot on the lawn so the player can collect it.
 
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().onZombieDied(this, zombie);

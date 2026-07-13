@@ -35,7 +35,7 @@ public enum GameCommand {
     SMASH_VASE("^smash\\s+vase\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     ROLL_WALLNUT("^roll\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     PLACE_ZOMBIE("^place\\s+zombie\\s+-t\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
-
+    PLANT_FROM_SEEDPACK("^plant\\s+from\\s*\\(\\s*(?<sx>\\S+?)\\s*,\\s*(?<sy>\\S+?)\\s*\\)\\s+to\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     START_ZOMBIE_WAVES("^start\\s+zombie\\s+waves(?:\\s+.*)?$");
 
     private final String pattern;

@@ -8,8 +8,6 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class WallnutBowlingBehavior extends LevelBehavior {
 
-    //todo : handle it on you own i dont know what to do
-
     private final int redLineColumn;
 
     public WallnutBowlingBehavior(int redLineColumn) {
@@ -54,8 +52,8 @@ public class WallnutBowlingBehavior extends LevelBehavior {
         }
 
         BowlingNutProjectile nut = new BowlingNutProjectile(Vec2.of(x, y), type);
-        session.getProjectiles().add(nut);
-        session.getEventBus().subscribe(null, null); // Optionally emit a sound event here
+
+        session.addProjectile(nut);
 
         return "Rolled a " + nutTypeStr + "!";
     }

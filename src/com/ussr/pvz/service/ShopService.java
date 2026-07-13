@@ -14,9 +14,11 @@ public class ShopService {
 
     public String shopList() {
         rotateDailyOffersIfNeeded();
-        StringBuffer sb = new StringBuffer();
-        //todo organize this so it would be beautiful
-        sb.append("id    |name       |cost         |description     |discount\n");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount", "Description"));
+        sb.append("-".repeat(100)).append("\n");
+
         App.getShopManager().getShopItems().forEach(item -> {
             sb.append(makeItem(item));
         });
@@ -26,6 +28,10 @@ public class ShopService {
     public String shopDaily() {
         rotateDailyOffersIfNeeded();
         StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount", "Description"));
+        sb.append("-".repeat(100)).append("\n");
+
         App.getShopManager().getShopItems().forEach(item -> {
             if (item.getType().equals(ShopItemType.DAILY_OFFER)) {
                 sb.append(makeItem(item));
@@ -49,14 +55,16 @@ public class ShopService {
         });
     }
 
-    private StringBuilder makeItem(ShopItem item) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(item.getId()).append(",");
-        sb.append(item.getName()).append(",");
-        sb.append(item.getCost()).append(" ").append(item.getType().getCost()).append(",");
-        sb.append(item.getDescription()).append(",");
-        sb.append(item.getDiscountPercent()).append("\n");
-        return sb;
+    private String makeItem(ShopItem item) {
+        String costStr = item.getCost() + " " + item.getType().getCostType();
+        String discountStr = (item.getDiscountPercent() != null && item.getDiscountPercent() > 0) ? item.getDiscountPercent() + "%" : "None";
+
+        return String.format("%-4s | %-20s | %-12s | %-10s | %s\n",
+                item.getId(),
+                item.getName(),
+                costStr,
+                discountStr,
+                item.getDescription());
     }
 
     public String buy(ShopBuyRequest request) {
@@ -162,7 +170,8 @@ public class ShopService {
     }
 
     private String applyPlantFood(int count) {
-        // TODO: add plantFoodCount field to AdventureProgress
+        AdventureProgress adv = App.getAccount().getAdventureProgress();
+        adv.addPlantFood(count);
         return count + " plant food added";
     }
 
@@ -170,14 +179,21 @@ public class ShopService {
         String randomPlant = randomUnlockedPlant(adv);
         if (randomPlant == null) return "no unlocked plants to give seeds for";
         int seeds = count * item.getQuantityPerPurchase();
-        // TODO: add seed packet inventory logic
+        int currentSeeds = adv.getSeedPackets().getOrDefault(randomPlant, 0);
+        adv.getSeedPackets().put(randomPlant, currentSeeds + seeds);
+
         return seeds + " seed packets added for " + randomPlant;
     }
 
     private String applySeedPackSelective(ShopItem item, int count, String plantType) {
         String target = plantType.trim().toUpperCase();
         int seeds = count * item.getQuantityPerPurchase();
-        // TODO: add seed packet inventory logic
+
+        AdventureProgress adv = App.getAccount().getAdventureProgress();
+
+        int currentSeeds = adv.getSeedPackets().getOrDefault(target, 0);
+        adv.getSeedPackets().put(target, currentSeeds + seeds);
+
         return seeds + " seed packets added for " + target;
     }
 
@@ -191,7 +207,12 @@ public class ShopService {
         String plant = item.getFeaturedPlant();
         if (plant == null) plant = randomUnlockedPlant(adv);
         if (plant == null) return "no unlocked plants to give seeds for";
+
         int seeds = count * item.getQuantityPerPurchase();
+
+        int currentSeeds = adv.getSeedPackets().getOrDefault(plant, 0);
+        adv.getSeedPackets().put(plant, currentSeeds + seeds);
+
         return seeds + " seed packets added for " + plant + " (daily offer)";
     }
 
