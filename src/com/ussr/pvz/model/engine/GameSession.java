@@ -422,8 +422,14 @@ public class GameSession {
                     sb.append(".");
                 } else if (cell.getPlant() != null) {
                     sb.append("P");
-                } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave) {
-                    sb.append("G");
+                } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
+                    if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.SUN) {
+                        sb.append("S"); // Sun Grave
+                    } else if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.PLANT_FOOD) {
+                        sb.append("F"); // Plant Food Grave
+                    } else {
+                        sb.append("G"); // Standard Grave
+                    }
                 } else {
                     sb.append(".");
                 }

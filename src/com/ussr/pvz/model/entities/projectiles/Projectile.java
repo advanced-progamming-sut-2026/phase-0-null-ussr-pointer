@@ -107,6 +107,13 @@ public class Projectile extends GameEntity {
             for (Zombie zombie : zombies) {
                 if (!zombie.isAlive()) continue;
                 if (this.getPosition().distanceTo(zombie.getPosition()) < 0.2) {
+
+                    // TODO: [JESTER REFLECTION]
+                    // 1. Check if zombie.getDefenseBehavior() instanceof JesterDefense (or equivalent state).
+                    // 2. Verify if this Projectile's class/alias is within the Jester's BounceableProjectiles list.
+                    // 3. If true, invert the speed vector (this.getSpeed().scale(-1)), swap target to Plant,
+                    //    flag payload as 'Chilling' if it was an IceHit, and skip the rest of this hit resolution.
+
                     physicalImpactTarget = zombie;
                     break;
                 }
@@ -117,8 +124,7 @@ public class Projectile extends GameEntity {
             return null;
         }
 
-        return targetFinder(interactableStructures , session);
-
+        return targetFinder(interactableStructures, session);
     }
 
     private ArrayList<GameEntity> checkPlantCollision(GameSession session) {

@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class SproutPlant {
-    //todo check this logically
     private final String plantKey;
     private final boolean isMarigold;
     private PlantState state;

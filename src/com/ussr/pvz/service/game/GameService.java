@@ -176,8 +176,6 @@ public class GameService {
 
             Cell cell = requirePlantableCell(session, x, y, blueprint);
 
-            // Seed Packet Cooldown Validation
-            // 1. Checks if the blueprint plant's current 'recharge' or 'cooldown' timer is > 0.
             if (blueprint.getRecharge() > 0) {
                 throw new IllegalStateException("Plant is refreshing! Please wait.");
             }
@@ -189,8 +187,6 @@ public class GameService {
 
             Plant plant = instantiatePlant(blueprint, x, y);
 
-            // Greenhouse Boost Consumption
-            // Automatically triggers this plant's superpower if a saved boost exists in the player's profile.
             if (App.getAccount().getSavedBoosts() != null && App.getAccount().getSavedBoosts().useBoost(blueprint.getName())) {
                 if (plant.getPlantFoodType() != null && plant.getPlantFoodType() != PlantFoodType.NONE && plant.getPlantFoodEffect() != null) {
                     plant.getPlantFoodEffect().triggerSuperpower(plant, session);
@@ -207,8 +203,12 @@ public class GameService {
             cell.setPlant(plant);
             session.addPlant(plant);
 
-            // Set the blueprint's cooldown timer to a generic max recharge value once placed.
-            // GameSession's tick will handle decrementing this over time.
+            // TODO: [MINT FAMILY BUFFS]
+            // 1. Check if 'plant' is a Mint (e.g., blueprint.getAbilityType() == MINT_FAMILY_BOOST).
+            // 2. If true, iterate over session.getPlants(), match family tags, and apply a StatModifier
+            //    to their ModifiableStat fields (damage, attack speed, etc.).
+            // 3. Mark the Mint plant to despawn/setAlive(false) after its active duration expires.
+
             blueprint.setRecharge(150);
 
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
@@ -305,6 +305,11 @@ public class GameService {
                 throw new IllegalStateException("no plant food available");
             }
 
+            // TODO: [PLANT FOOD PARSERS]
+            // Implement concrete Strategy pattern classes for specific plantFoodTypes
+            // (e.g., MAP_WIDE_FREEZE, SPAWN_CLONES, PROJECTILE_BURST).
+            // Map these implementations to the JSON enum strings so triggerSuperpower()
+            // executes the exact simulation payload.
             plant.getPlantFoodEffect().triggerSuperpower(plant, session);
             plant.getPlantFoodEffect().applyStatusModifiers(plant);
             session.notifyPlantFoodUsed(plant);

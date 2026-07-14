@@ -17,7 +17,15 @@ public final class MoveBehaviorRegistry {
     private static final Map<String, MoveBehaviorFactory> FACTORIES = new HashMap<>();
 
     static {
-        register("NormalWalk", params -> new NormalWalk());
+        register("NormalWalk", params -> {
+            // TODO: [FROSTBITE CAVES SLIDER TILES]
+            // MoveBehavior interface currently lacks GameSession/Lawn context.
+            // 1. Refactor MoveBehavior.move() signature to accept GameSession.
+            // 2. Inside NormalWalk (and other movement classes), query session.getLawn().getTile(y, x).
+            // 3. If TileType == SLIPPERY, apply immediate vertical translation (y + 1 or y - 1)
+            //    based on the tile's SlipperyDirection enum.
+            return new NormalWalk();
+        });
 
         register("SprintMove", params -> {
             if (params == null || params.isEmpty()) return new SprintMove();

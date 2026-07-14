@@ -15,7 +15,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class CollectionService {
     private final Gson gson = new Gson();
@@ -146,7 +145,6 @@ public class CollectionService {
         return "Zombie type not registered in game parameters.";
     }
 
-    //todo check the seed pack cost and etc base on doc
     public String upgradePlant(PlantTypeRequest request) {
         Account account = App.getAccount();
         if (account == null) return "Please login first.";

@@ -6,7 +6,7 @@ import com.ussr.pvz.service.NewsService;
 import java.util.regex.Matcher;
 
 public class NewsController {
-    //TODO: Debug
+
     public NewsController() {
     }
 
