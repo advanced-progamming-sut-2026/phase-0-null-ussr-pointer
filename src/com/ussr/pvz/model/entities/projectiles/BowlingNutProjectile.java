@@ -11,7 +11,7 @@ public class BowlingNutProjectile extends Projectile {
     public enum NutType { NORMAL, EXPLODING, GIANT }
 
     private final NutType nutType;
-    private int bounceDirection = 0; // 0 = straight, 1 = up (negative Y), -1 = down (positive Y)
+    private int deflectionCount = 0;
 
     public BowlingNutProjectile(Vec2 position, NutType nutType) {
         super(null, position, Vec2.of(15.0, 0), resolveDamage(nutType), null, null);
@@ -32,16 +32,18 @@ public class BowlingNutProjectile extends Projectile {
         GameSession session = App.getGameSession();
         if (session == null) return;
 
-        // Move the nut based on current direction
         Vec2 pos = getPosition();
-        double speedX = getSpeed().x() * GameClock.SECONDS_PER_TICK;
-        double speedY = (bounceDirection * 15.0) * GameClock.SECONDS_PER_TICK;
-
-        setPosition(pos.add(Vec2.of(speedX, speedY)));
+        Vec2 step = getSpeed().scale(GameClock.SECONDS_PER_TICK);
+        setPosition(pos.add(step));
 
         // Handle wall bounces (top and bottom of lawn)
-        if (getPosition().y() <= 0) bounceDirection = 1; // Bounce down
-        if (getPosition().y() >= session.getLawn().getRows() - 1) bounceDirection = -1; // Bounce up
+        int maxRow = session.getLawn().getRows() - 1;
+        if (getPosition().y() <= 0 || getPosition().y() >= maxRow) {
+            // Clamp back inside the lawn so it doesn't keep drifting out before the turn takes effect
+            double clampedY = Math.max(0, Math.min(maxRow, getPosition().y()));
+            setPosition(Vec2.of(getPosition().x(), clampedY));
+            deflect(session);
+        }
 
         // Despawn if it rolls off the right edge
         if (getPosition().x() >= session.getLawn().getCols()) {
@@ -63,12 +65,7 @@ public class BowlingNutProjectile extends Projectile {
                 switch (nutType) {
                     case NORMAL -> {
                         zombie.takeDamage(getDamage(), this);
-                        // TODO(bowling-nut-angles): spec calls for a 45-degree deflection on the
-                        //  FIRST hit and 90-degree on subsequent hits (same for hitting the top/
-                        //  bottom edge). This just flips/picks a lane each time with no distinction
-                        //  between first and later hits — needs a hit counter to track which stage
-                        //  of deflection it's on.
-                        bounceDirection = (bounceDirection == 0) ? (Math.random() > 0.5 ? 1 : -1) : -bounceDirection;
+                        deflect(session);
                     }
                     case EXPLODING -> {
                         explode(session);
@@ -76,12 +73,32 @@ public class BowlingNutProjectile extends Projectile {
                     }
                     case GIANT -> {
                         zombie.takeDamage(getDamage(), this);
-                        // Keeps rolling straight, piercing zombies
+                        // Keeps rolling straight, piercing zombies - no deflection
                     }
                 }
                 break; // Only trigger hit on one zombie per tick for Normal/Exploding
             }
         }
+    }
+
+    private void deflect(GameSession session) {
+        deflectionCount++;
+        double turnAmountDeg = (deflectionCount == 1) ? 45.0 : 90.0;
+
+        double midRow = (session.getLawn().getRows() - 1) / 2.0;
+        double sign = (getPosition().y() < midRow) ? 1.0 : -1.0; // turn toward the middle row
+
+        setSpeed(rotate(getSpeed(), sign * turnAmountDeg));
+    }
+
+    private static Vec2 rotate(Vec2 v, double degrees) {
+        double rad = Math.toRadians(degrees);
+        double cos = Math.cos(rad);
+        double sin = Math.sin(rad);
+        return Vec2.of(
+                v.x() * cos - v.y() * sin,
+                v.x() * sin + v.y() * cos
+        );
     }
 
     private void explode(GameSession session) {
