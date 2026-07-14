@@ -119,7 +119,7 @@ public class ZombieFactory {
         zombie.setDefenseBehavior(DefenseBehaviorRegistry.create(defenseSpec));
         zombie.setEffectStatus(EffectStatusRegistry.createOrNull(effectSpec, data));
 
-        attachPushedStructureIfNeeded(zombie);
+        attachPushedStructureIfNeeded(zombie, data);
 
         return zombie;
     }
@@ -219,11 +219,8 @@ public class ZombieFactory {
     //  matching TODO in ZombotanyService.java). They'll need aliases + blueprint entries added
     //  either to zombies.json or a parallel minigame-only data source, plus effect/attack classes
     //  wired through the same registries used below (EffectStatusRegistry, AttackBehaviorRegistry).
-    //
-    // TODO(troglobite-ice-count): zombies.json's "NumberOfIceblocksToSpawnWith" (3) is never read
-    //  anywhere in this file or PushableStructure — Troglobite currently only ever pushes a single
-    //  generic PushableStructure(ICE_BLOCK, ...) instead of 3 separate ice blocks per spec.
-    private static void attachPushedStructureIfNeeded(Zombie zombie) {
+    @SuppressWarnings("unchecked")
+    private static void attachPushedStructureIfNeeded(Zombie zombie, Map<String, Object> data) {
         PushableType type = switch (zombie.getAlias()) {
             case "ZombieArcade" -> PushableType.ARCADE_CABINET;
             case "ZombieIceAgeTroglobite" -> PushableType.ICE_BLOCK;
@@ -236,6 +233,23 @@ public class ZombieFactory {
         PushableStructure structure = new PushableStructure(type, zombie.getPosition());
         zombie.setPushedStructure(structure);
         placeOnLawnIfPossible(zombie, structure);
+
+        if (type == PushableType.ICE_BLOCK) {
+            int totalIceBlocks = ((Number) data.getOrDefault("NumberOfIceblocksToSpawnWith", 1)).intValue();
+            zombie.setPushableRespawnsRemaining(Math.max(0, totalIceBlocks - 1));
+        }
+    }
+
+    public static void respawnPushedStructureIfNeeded(Zombie zombie) {
+        PushableStructure current = zombie.getPushedStructure();
+        if (current == null || current.isAlive() || zombie.getPushableRespawnsRemaining() <= 0) {
+            return;
+        }
+
+        PushableStructure fresh = new PushableStructure(current.getType(), zombie.getPosition());
+        zombie.setPushedStructure(fresh);
+        zombie.setPushableRespawnsRemaining(zombie.getPushableRespawnsRemaining() - 1);
+        placeOnLawnIfPossible(zombie, fresh);
     }
 
     private static void placeOnLawnIfPossible(Zombie zombie, PushableStructure structure) {

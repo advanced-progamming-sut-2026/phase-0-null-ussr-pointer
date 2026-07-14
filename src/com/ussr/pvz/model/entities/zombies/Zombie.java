@@ -33,6 +33,7 @@ public class Zombie extends GameEntity implements Damageable {
     private AttackBehavior attackBehavior;
     private Armor armor;
     private PushableStructure pushedStructure;
+    private int pushableRespawnsRemaining = 0;
 
     private int hp;
     private int maxHp;
@@ -97,6 +98,8 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive) return;
         GameSession session = App.getGameSession();
         if (session == null) return;
+
+        ZombieFactory.respawnPushedStructureIfNeeded(this);
 
         // If the zombie is NOT eating a plant, it is allowed to move
         if (!zombieService.processEating(this, session)) {
@@ -313,5 +316,13 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setPushedStructure(PushableStructure pushedStructure) {
         this.pushedStructure = pushedStructure;
+    }
+
+    public int getPushableRespawnsRemaining() {
+        return pushableRespawnsRemaining;
+    }
+
+    public void setPushableRespawnsRemaining(int pushableRespawnsRemaining) {
+        this.pushableRespawnsRemaining = pushableRespawnsRemaining;
     }
 }
