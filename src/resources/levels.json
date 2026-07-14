@@ -208,6 +208,17 @@
             { "id": "buckethead", "weight": 500 }
           ],
           "waves": []
+        },
+        {
+          "id": "minigame_vasebreaker",
+          "order": 0,
+          "deliveryStrategy": "regular",
+          "behavior": "VaseBreakerBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [],
+          "waves": []
         }
       ]
     }

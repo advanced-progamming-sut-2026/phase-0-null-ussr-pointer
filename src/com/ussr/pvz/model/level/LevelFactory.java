@@ -13,11 +13,6 @@ public class LevelFactory {
     private static final Map<String, Supplier<LevelBehavior>> BEHAVIOR_REGISTRY = new HashMap<>();
 
     static {
-        // TODO(vasebreaker-wiring): VaseBreakerBehavior exists (model/level/behavior/VaseBreakerBehavior.java)
-        //  but is never constructed anywhere. Register it here (or add an explicit case in
-        //  parseBehavior() below, mirroring WallnutBowlingBehavior/BeghouledBehavior) and add the
-        //  JSON fields it needs (vase layout, guaranteed plant/gargantuar vase positions) to
-        //  JsonContainer.JsonLevelData + levels.json before it can be reached from a real level.
         BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
         BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
         BEHAVIOR_REGISTRY.put("DeadlineBehavior", DeadlineBehavior::new);
@@ -25,6 +20,7 @@ public class LevelFactory {
         BEHAVIOR_REGISTRY.put("PlantWhatYouGetBehavior", PlantWhatYouGetBehavior::new);
         BEHAVIOR_REGISTRY.put("ZombotanyBehavior", ZombotanyBehavior::new);
         BEHAVIOR_REGISTRY.put("NormalBehavior", NormalBehavior::new);
+        BEHAVIOR_REGISTRY.put("VaseBreakerBehavior", VaseBreakerBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
