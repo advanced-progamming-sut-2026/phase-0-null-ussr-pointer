@@ -24,7 +24,7 @@ public class SunProduceStrategy implements ActStrategy {
                 int sunValue = (int) user.getAbilityValue();
 
                 ProducedSun sun = new ProducedSun(x, y, sunValue);
-                session.getItems().add(sun);
+                session.addItem(sun);
                 user.setInternalTimer(user.getActionInterval());
             }
         }

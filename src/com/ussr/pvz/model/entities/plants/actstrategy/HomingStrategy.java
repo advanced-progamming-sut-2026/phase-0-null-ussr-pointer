@@ -27,7 +27,7 @@ public class HomingStrategy implements ActStrategy {
         Zombie target = isMagic ? randomTarget(zombies) : nearestTarget(user, zombies);
         if (target == null) return;
 
-        session.getProjectiles().add(buildProjectile(user, target, isMagic));
+        session.addProjectile(buildProjectile(user, target, isMagic));
         user.setInternalTimer(user.getActionInterval());
     }
 

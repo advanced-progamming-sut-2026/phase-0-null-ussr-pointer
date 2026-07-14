@@ -84,7 +84,7 @@ public class TimedProjectileBurst implements PlantFoodEffect {
                 int baseDamage = user.getDamage();
                 int finalDamage = fireGiant ? (int) (baseDamage * giantPeaMultiplier) : baseDamage;
 
-                session.getProjectiles().add(new Projectile(
+                session.addProjectile(new Projectile(
                         user.getPosition(),
                         velocity,
                         target,

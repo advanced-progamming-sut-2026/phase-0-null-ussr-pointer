@@ -5,6 +5,8 @@ import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
+import com.ussr.pvz.model.entities.items.CoinDrop;
+import com.ussr.pvz.model.entities.items.DiamondDrop;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
@@ -24,7 +26,12 @@ import java.util.Optional;
 
 public class GameSession {
 
+    private static final int COIN_DROP_CHANCE_PERCENT = 15;
+    private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
+    private static final int DIAMOND_DROP_AMOUNT = 1;
+
     private final GameEventBus eventBus = new GameEventBus();
+    private final java.util.Random lootRandom = new java.util.Random();
 
     private GameClock clock = new GameClock();
     private Level level;
@@ -267,6 +274,30 @@ public class GameSession {
         clock.addEntity(item);
     }
 
+    private void rollZombieLoot(Zombie zombie) {
+        if (zombie.getPosition() == null) return;
+
+        if (lootRandom.nextInt(100) < COIN_DROP_CHANCE_PERCENT) {
+            CoinDrop.CoinTier tier = rollCoinTier();
+            CoinDrop coinDrop = new CoinDrop(tier);
+            coinDrop.setPosition(zombie.getPosition());
+            addItem(coinDrop);
+        }
+
+        if (lootRandom.nextInt(100) < DIAMOND_DROP_CHANCE_PERCENT) {
+            DiamondDrop diamondDrop = new DiamondDrop(DIAMOND_DROP_AMOUNT);
+            diamondDrop.setPosition(zombie.getPosition());
+            addItem(diamondDrop);
+        }
+    }
+
+    private CoinDrop.CoinTier rollCoinTier() {
+        int roll = lootRandom.nextInt(100);
+        if (roll < 70) return CoinDrop.CoinTier.BRONZE;
+        if (roll < 95) return CoinDrop.CoinTier.SILVER;
+        return CoinDrop.CoinTier.GOLD;
+    }
+
     public void notifyZombieDied(Zombie zombie, String killerPlantName) {
         eventBus.publish(new GameEvent.ZombieDied(
                 zombie.getAlias(),
@@ -275,11 +306,7 @@ public class GameSession {
                 killerPlantName
         ));
 
-        // TODO: Zombie Loot Drop
-        //  1. Generate a random number (e.g., using java.util.Random).
-        //  2. If it hits a specific probability (e.g., 10%), instantiate a new CoinDrop or DiamondDrop.
-        //  3. Set the drop's position to zombie.getPosition().
-        //  4. Call this.addItem(drop) to spawn the loot on the lawn so the player can collect it.
+        rollZombieLoot(zombie);
 
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().onZombieDied(this, zombie);

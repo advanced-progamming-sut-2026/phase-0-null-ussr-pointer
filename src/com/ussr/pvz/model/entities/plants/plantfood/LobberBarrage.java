@@ -67,7 +67,7 @@ public class LobberBarrage implements PlantFoodEffect{
                     hitEffectStrategy
             );
 
-            session.getProjectiles().add(projectile);
+            session.addProjectile(projectile);
         }
     }
 

@@ -139,7 +139,7 @@ public class MeleeStrategy implements ActStrategy {
         }
 
         for(Zombie zombie : targets) {
-            zombie.takeDamage(userDamage);
+            zombie.takeDamage(userDamage, user);
         }
     }
 }

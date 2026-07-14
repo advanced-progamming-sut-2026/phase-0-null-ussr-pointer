@@ -144,7 +144,7 @@ public class ExplodeStrategy implements ActStrategy {
             } else if (user.getTags().contains(Tag.FIRE)) {
                 zombie.setStatus(Zombie.Status.FIRED);
             }
-            zombie.takeDamage(userDamage, null);
+            zombie.takeDamage(userDamage, user);
         }
     }
 }

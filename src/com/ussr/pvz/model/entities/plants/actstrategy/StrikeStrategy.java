@@ -21,7 +21,7 @@ public class StrikeStrategy implements ActStrategy {
         if (target == null) return;
 
         int pierceCount = (int) user.getAbilityValue();
-        session.getProjectiles().add(new Projectile(
+        session.addProjectile(new Projectile(
                 user.getPosition(),
                 new Vec2(20, 0), target,
                 user.getDamage(),

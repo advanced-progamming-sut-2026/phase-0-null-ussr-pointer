@@ -44,7 +44,7 @@ public class Zombie extends GameEntity implements Damageable {
 
     @Override
     public void takeDamage(int damage) {
-
+        takeDamage(damage, null);
     }
 
     public void takeDamage(int damage, boolean isPoisonous) {
@@ -59,15 +59,20 @@ public class Zombie extends GameEntity implements Damageable {
                 this.isAlive = false;
                 this.state = ZombieActivity.DEAD;
 
+                GameSession session = App.getGameSession();
+
                 // Handle plant food drops on death
                 if (isGlowing) {
                     com.ussr.pvz.model.entities.items.PlantFoodDrop plantFoodDrop =
                             new com.ussr.pvz.model.entities.items.PlantFoodDrop(1);
                     plantFoodDrop.setPosition(this.getPosition());
-                    GameSession session = App.getGameSession();
                     if (session != null) {
-                        session.getItems().add(plantFoodDrop);
+                        session.addItem(plantFoodDrop);
                     }
+                }
+
+                if (session != null) {
+                    session.notifyZombieDied(this);
                 }
             }
         } else {
@@ -169,11 +174,11 @@ public class Zombie extends GameEntity implements Damageable {
         }
 
         if (actualDamage > 0) {
-            applyDamageCalculations(actualDamage);
+            applyDamageCalculations(actualDamage, damageSource);
         }
     }
 
-    private void applyDamageCalculations(int damage) {
+    private void applyDamageCalculations(int damage, Object damageSource) {
         int remaining = damage;
 
         if (armor != null && !armor.isDestroyed()) {
@@ -187,16 +192,33 @@ public class Zombie extends GameEntity implements Damageable {
                 isAlive = false;
                 state = ZombieActivity.DEAD;
 
+                GameSession session = App.getGameSession();
+
                 if (isGlowing) {
                     PlantFoodDrop plantFoodDrop = new PlantFoodDrop(1);
                     plantFoodDrop.setPosition(this.getPosition());
-                    GameSession session = App.getGameSession();
                     if (session != null) {
-                        session.getItems().add(plantFoodDrop);
+                        session.addItem(plantFoodDrop);
                     }
+                }
+
+                if (session != null) {
+                    String killerName = resolveKillerName(damageSource);
+                    session.notifyZombieDied(this, killerName);
                 }
             }
         }
+    }
+
+    // NOTE: Projectiles don't currently carry a reference back to the plant that fired them,
+    // so exact killer attribution isn't available for projectile kills yet. This resolves what
+    // it can and falls back to "Unknown" rather than guessing. Wiring a real owner reference
+    // through Plant -> ShootStrategy -> Projectile is a larger, separate change.
+    private String resolveKillerName(Object damageSource) {
+        if (damageSource instanceof com.ussr.pvz.model.entities.plants.Plant plant) {
+            return plant.getName();
+        }
+        return "Unknown";
     }
 
     public Vulnerability getVulnerabilityState() {

@@ -21,7 +21,7 @@ public class SunProducerZombieEffect implements EffectStatus {
             int zRow = (int) zombie.getPosition().y();
             int zCol = (int) zombie.getPosition().x();
             ProducedSun sun = new ProducedSun(zCol, zRow, 50);
-            session.getItems().add(sun);
+            session.addItem(sun);
 
             // Ramp up production rate based on custom formula requirement
             if (currentInterval > minInterval) {

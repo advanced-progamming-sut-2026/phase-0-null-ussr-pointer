@@ -35,7 +35,7 @@ public class InstantMassiveBlast implements PlantFoodEffect{
         for (int i = 0; i < firingHeadsCount; i++) {
             HitEffectStrategy hitEffectStrategy = handleHitEffect(user);
             MoveStrategy moveStrategy = handleMoveStrategy(user);
-            session.getProjectiles().add(new Projectile(
+            session.addProjectile(new Projectile(
                     new Vec2(user.getPosition().x() + (i * 10), user.getPosition().y()),
                     velocity,
                     null,

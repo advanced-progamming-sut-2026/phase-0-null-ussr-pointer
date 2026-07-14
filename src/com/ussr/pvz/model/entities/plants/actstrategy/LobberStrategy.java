@@ -30,7 +30,7 @@ public class LobberStrategy implements ActStrategy {
 
         Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
         HitEffectStrategy hitEffect = buildHitEffect(user);
-        session.getProjectiles().add(new Projectile(
+        session.addProjectile(new Projectile(
                 user.getPosition(),
                 initialVelocity, target,
                 user.getDamage(),

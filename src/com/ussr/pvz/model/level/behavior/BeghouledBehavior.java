@@ -219,7 +219,7 @@ public class BeghouledBehavior extends LevelBehavior {
     private void applyMatchRewards(GameSession session, int maxGroupSize, boolean isCascade) {
         int baseSun = (maxGroupSize >= 5) ? 3 : (maxGroupSize == 4) ? 2 : 1;
         if (isCascade) baseSun += 1;
-        for (int i = 0; i < baseSun; i++) session.getItems().add(new ProducedSun(5, 2, 50));
+        for (int i = 0; i < baseSun; i++) session.addItem(new ProducedSun(5, 2, 50));
     }
 
     private void dropPlants(GameSession session) {

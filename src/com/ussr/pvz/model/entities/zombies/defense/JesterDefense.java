@@ -45,7 +45,7 @@ public class JesterDefense implements DefenseBehavior {
         // in the negative X direction, straight down the same row.
         Vec2 velocity = new Vec2(-MIRROR_SPEED, 0);
 
-        session.getProjectiles().add(new Projectile(
+        session.addProjectile(new Projectile(
                 target,
                 zombie.getPosition(),
                 velocity,

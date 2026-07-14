@@ -46,13 +46,13 @@ public class PlantService {
         int y = plant.getLocation().y();
 
         ProducedSun sun = new ProducedSun(x, y, sunAmount);
-        session.getItems().add(sun);
+        session.addItem(sun);
     }
 
     public void fireProjectile(Plant plant, GameSession session, Projectile projectile) {
         if (plant == null || plant.getLocation() == null || session == null || projectile == null) return;
 
-        session.getProjectiles().add(projectile);
+        session.addProjectile(projectile);
         session.getEventBus().publish(new GameEvent.ProjectileFired(
                 plant.getName(), plant.getLocation().x(), plant.getLocation().y()
         ));

@@ -41,6 +41,11 @@ public class ChoosePlantService {
         return sb.toString().trim();
     }
 
+    private static String normalizePlantKey(String rawName) {
+        if (rawName == null) return "";
+        return rawName.trim().toUpperCase().replace('_', ' ');
+    }
+
     public String showAvailablePlants() {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         if (chapter == null) return "no chapter selected";
@@ -51,9 +56,10 @@ public class ChoosePlantService {
         AdventureProgress adv = App.getAccount().getAdventureProgress();
         StringBuilder sb = new StringBuilder("--- Available Plants ---\n");
         for (String name : allowed) {
-            int lvl = adv.getPlantLvls().getOrDefault(name.toUpperCase(), 0);
+            String key = normalizePlantKey(name);
+            int lvl = adv.getPlantLvls().getOrDefault(key, 0);
             if (lvl > 0) {
-                boolean selected = selectedPlants.contains(name.toUpperCase());
+                boolean selected = selectedPlants.contains(key);
                 sb.append(selected ? "[✓] " : "[ ] ")
                         .append(name)
                         .append(" (lvl ").append(lvl).append(")\n");
@@ -67,7 +73,7 @@ public class ChoosePlantService {
         if (selectedPlants.size() >= MAX_SEED_SLOTS)
             return "seed slots full (" + MAX_SEED_SLOTS + "/" + MAX_SEED_SLOTS + ")";
 
-        String name = request.type().trim().toUpperCase();
+        String name = normalizePlantKey(request.type());
         AdventureProgress adv = App.getAccount().getAdventureProgress();
         int lvl = adv.getPlantLvls().getOrDefault(name, 0);
         if (lvl == 0) return "you don't have " + name;
@@ -75,14 +81,14 @@ public class ChoosePlantService {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         if (chapter != null && chapter.getAllowedPlants() != null) {
             boolean allowed = chapter.getAllowedPlants().stream()
-                    .anyMatch(p -> p.equalsIgnoreCase(name));
+                    .anyMatch(p -> normalizePlantKey(p).equals(name));
             if (!allowed) return name + " is not allowed in this chapter";
         }
 
         Level level = App.getLevelManager().getCurrentLevel();
         if (level != null && level.getLockedPlants() != null) {
             boolean locked = level.getLockedPlants().stream()
-                    .anyMatch(p -> p.equalsIgnoreCase(name));
+                    .anyMatch(p -> normalizePlantKey(p).equals(name));
             if (locked) return name + " is locked in this level";
         }
 
@@ -93,14 +99,14 @@ public class ChoosePlantService {
     }
 
     public String removePlant(PlantTypeRequest request) {
-        String name = request.type().trim().toUpperCase();
+        String name = normalizePlantKey(request.type());
         if (!selectedPlants.remove(name))
             return name + " is not in your selection";
         return name + " removed (" + selectedPlants.size() + "/" + MAX_SEED_SLOTS + ")";
     }
 
     public String boostPlant(PlantTypeRequest request) {
-        String name = request.type().trim().toUpperCase();
+        String name = normalizePlantKey(request.type());
         if (!selectedPlants.contains(name))
             return name + " is not in your selection";
 

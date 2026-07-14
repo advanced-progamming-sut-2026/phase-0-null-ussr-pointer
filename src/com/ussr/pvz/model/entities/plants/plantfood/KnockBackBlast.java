@@ -27,12 +27,12 @@ public class KnockBackBlast implements PlantFoodEffect {
         MoveStrategy moveStrategy = new StraightMove();
         HitEffectStrategy hitEffectStrategy = new PierceKnockBackHit(-1 , knockbackDistance);
         Projectile projectile = new Projectile(userPos , vel , null , damage , moveStrategy , hitEffectStrategy);
-        session.getProjectiles().add(projectile);
+        session.addProjectile(projectile);
     }
 
     @Override
     public void applyStatusModifiers(Plant user) {
-        
+
     }
 
     @Override
