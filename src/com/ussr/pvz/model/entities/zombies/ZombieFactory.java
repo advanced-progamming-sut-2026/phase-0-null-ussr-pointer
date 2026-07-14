@@ -102,10 +102,12 @@ public class ZombieFactory {
     public static Zombie create(String alias, int row, int col) {
         init();
 
-        Map<String, Object> data = blueprints.get(alias);
-        if (data == null) {
+        Map<String, Object> blueprint = blueprints.get(alias);
+        if (blueprint == null) {
             throw new IllegalArgumentException("Unknown zombie alias: " + alias);
         }
+
+        Map<String, Object> data = new java.util.HashMap<>(blueprint);
 
         Zombie zombie = buildBaseZombie(alias, data, row, col);
 
@@ -173,13 +175,9 @@ public class ZombieFactory {
                         zombie.setHp(zombie.getMaxHp());
                     } else if ("EatDPS".equals(prop.get("Key"))) {
                         zombie.setEatDps(zombie.getEatDps() * scale);
+                    } else if ("SmashDamage".equals(prop.get("Key")) && data.get("SmashDamage") instanceof Number smashBase) {
+                        data.put("SmashDamage", (int) (smashBase.doubleValue() * scale));
                     }
-                    // TODO(scaling-gap): Gargantuar/All-Star's "SmashDamage" and CrystalSkull's
-                    //  "LaserBeamDamage" both appear in zombies.json's ScaledProps with the
-                    //  "standard" formula (meaning they ARE meant to scale with difficulty), but
-                    //  neither key is handled above, so those two attack values never scale.
-                    //  Need to plumb the scaled value into whatever reads SmashDamage/LaserBeamDamage
-                    //  when building SmashAttack / the laser-beam effect for these zombies.
                 }
             }
         }

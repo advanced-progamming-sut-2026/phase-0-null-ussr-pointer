@@ -99,12 +99,35 @@ public class WaveDirector {
         }
     }
 
-    // TODO(wave-weight-selection): all three strategies below pick from `pool` with a uniform
-    //  random index, completely ignoring each AllowedZombie's/zombies.json's `Weight` field.
-    //  Should instead do a weighted random pick (e.g. build a cumulative-weight list once per
-    //  wave and binary-search it) so heavier zombies are proportionally more common.
+    // Picks a zombie from the pool using AllowedZombie's Weight field (zombies.json's
+    // "Weight" data, carried through by LevelFactory.parseZombiesAndWaves) instead of a
+    // uniform random index, so heavier-weighted zombies are proportionally more common.
+    private Level.AllowedZombie pickWeighted(List<Level.AllowedZombie> pool) {
+        int totalWeight = 0;
+        for (Level.AllowedZombie z : pool) {
+            totalWeight += Math.max(z.weight(), 0);
+        }
+
+        if (totalWeight <= 0) {
+            // No usable weights (e.g. all zero/negative) - fall back to uniform pick.
+            return pool.get(random.nextInt(pool.size()));
+        }
+
+        int roll = random.nextInt(totalWeight);
+        int cumulative = 0;
+        for (Level.AllowedZombie z : pool) {
+            cumulative += Math.max(z.weight(), 0);
+            if (roll < cumulative) {
+                return z;
+            }
+        }
+
+        // Should be unreachable given the loop above, but guard against rounding edge cases.
+        return pool.get(pool.size() - 1);
+    }
+
     private void executeSimpleStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
-        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
+        Level.AllowedZombie choice = pickWeighted(pool);
         int cost = ZombieFactory.getZombieCost(choice.id());
         if (cost <= remainingBudget) {
             deploy(session, choice.id(), random.nextInt(rows), cols - 1, cost);
@@ -112,7 +135,7 @@ public class WaveDirector {
     }
 
     private void executeMediumStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
-        Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
+        Level.AllowedZombie choice = pickWeighted(pool);
         int cost = ZombieFactory.getZombieCost(choice.id());
         if (cost <= remainingBudget) {
             int targetedRow = calculateSmartTargetRow(session, rows);
@@ -132,7 +155,7 @@ public class WaveDirector {
             int targetedRow = random.nextInt(rows);
             for (int i = 0; i < stackSize; i++) {
                 if (remainingBudget <= 0) break;
-                Level.AllowedZombie choice = pool.get(random.nextInt(pool.size()));
+                Level.AllowedZombie choice = pickWeighted(pool);
                 int cost = ZombieFactory.getZombieCost(choice.id());
                 if (cost <= remainingBudget) {
                     deploy(session, choice.id(), targetedRow, cols - 1, cost);

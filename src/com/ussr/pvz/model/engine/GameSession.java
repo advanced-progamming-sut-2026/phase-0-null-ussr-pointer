@@ -1,6 +1,9 @@
 package com.ussr.pvz.model.engine;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.event.GameEvent;
@@ -20,15 +23,26 @@ import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.service.SaveService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class GameSession {
 
+    // Tunable loot-drop odds for GameSession#rollZombieLoot. Values are percentages out of 100
+    // and are checked independently (a zombie can drop both coins and a diamond on the same kill).
     private static final int COIN_DROP_CHANCE_PERCENT = 15;
     private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
     private static final int DIAMOND_DROP_AMOUNT = 1;
+
+    // Interval, in seconds, between sky sun drops on levels where the level allows sun to fall.
+    private static final double SKY_SUN_INTERVAL = 10.0;
+    private double skySunTimer = 0.0;
+
+    // Flat coin reward granted to the account on level completion, in the absence of any
+    // per-level reward configuration in levels.json.
+    private static final int LEVEL_COMPLETE_COIN_REWARD = 100;
 
     private final GameEventBus eventBus = new GameEventBus();
     private final java.util.Random lootRandom = new java.util.Random();
@@ -72,16 +86,18 @@ public class GameSession {
     }
 
     public void tick() {
-        // FIX: Freeze the entire simulation if the game has ended (Win or Loss)
         if (gameOver) {
             return;
         }
 
         clock.tick();
-        // TODO: Sky Sun Generation
-        //  1. Check if the level allows sky sun: if (level != null && level.isSunFalling())
-        //  2. Increment skySunTimer += GameClock.SECONDS_PER_TICK;
-        //  3. If timer >= SKY_SUN_INTERVAL, spawn a new SunToken, add it to the session, and reset timer.
+        if (level != null && level.isSunFalling() && lawn != null) {
+            skySunTimer += GameClock.SECONDS_PER_TICK;
+            if (skySunTimer >= SKY_SUN_INTERVAL) {
+                addItem(new com.ussr.pvz.model.entities.items.sun.SunToken(lawn.getRows(), lawn.getCols()));
+                skySunTimer = 0.0;
+            }
+        }
 
         if (level != null) {
             ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
@@ -90,7 +106,6 @@ public class GameSession {
             }
         }
 
-        // Delegate core tick progression directly to the behavior polymorphically
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().tick(this, GameClock.SECONDS_PER_TICK);
         }
@@ -104,23 +119,30 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
-        // Polymorphic loss condition check
         if (level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
             gameOver = true;
         }
 
-        // Check for Win Condition
         if (areWavesDone()) {
-            gameOver = true; // Freeze on win
+            gameOver = true;
 
-            // TODO: Level Progression & Saving
-            //  1. Call App.getLevelManager().nextLevel() to advance the campaign.
-            //  2. Apply level-completion rewards to App.getAccount().getAdventureProgress().
-            //  3. Convert all accounts to AccountState and call SaveService.saveAccounts() to persist progress to disk.
+            Account account = App.getAccount();
+            if (account != null) {
+                account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
+            }
 
-            // TODO: Exit Game State
-            //  Force the player back to the Main Menu or a Post-Game Summary screen so they aren't trapped.
-            //  App.setMenuState(MenuState.MAIN);
+            try {
+                App.getLevelManager().nextLevel();
+            } catch (IllegalStateException e) {
+                System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
+            }
+
+            List<AccountState> updatedStates = App.getAccounts().stream()
+                    .map(Account::toState)
+                    .toList();
+            SaveService.saveAccounts(updatedStates);
+
+            App.setMenuState(MenuState.MAIN);
         }
     }
 
@@ -169,7 +191,6 @@ public class GameSession {
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
                 } else {
-                    // Let the behavior safely decide how to handle breaches
                     level.getBehavior().onZombieBreach(this, zombie);
                     if (gameOver) break;
                 }
@@ -259,15 +280,13 @@ public class GameSession {
         ));
     }
 
-    // TODO: Ensure all Plant ShootStrategy logic calls this instead of session.getProjectiles().add()!
-    // This fixes the systemic bug where player projectiles weren't getting ticked by the clock.
+    /** Use this method to spawn projectiles so they are tracked by the GameClock. */
     public void addProjectile(Projectile projectile) {
         if (projectile == null) return;
         projectiles.add(projectile);
         clock.addEntity(projectile);
     }
 
-    // FIX: Helper to safely spawn items so they get tracked by the GameClock
     public void addItem(GroundItem item) {
         if (item == null) return;
         items.add(item);
@@ -526,6 +545,7 @@ public class GameSession {
 
     public void setLevel(Level level) {
         this.level = level;
+        this.skySunTimer = 0.0;
         if (level != null) {
             ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
             if (effect != null) {

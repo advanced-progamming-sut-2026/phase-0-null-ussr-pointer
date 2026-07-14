@@ -80,15 +80,19 @@ public class PlantFactory {
         return plant;
     }
 
-    // TODO: Upgrade findIdByName with fuzzy normalization (strip spaces/hyphens/underscores, lowercase).
+    private static String normalizeForLookup(String name) {
+        if (name == null) return "";
+        return name.trim().toLowerCase().replaceAll("[\\s_-]+", "");
+    }
+
     public static int findIdByName(String name) {
         if (name == null || App.getCachedPlantsData() == null) return -1;
 
-        String searchName = name.trim().toLowerCase();
+        String searchName = normalizeForLookup(name);
 
         for (int i = 0; i < App.getCachedPlantsData().size(); i++) {
             var data = App.getCachedPlantsData().get(i);
-            String plantName = ((String) data.get("name")).toLowerCase();
+            String plantName = normalizeForLookup((String) data.get("name"));
             if (plantName.equals(searchName)) {
                 return i + 1; // Assuming 1-based indexing for IDs
             }

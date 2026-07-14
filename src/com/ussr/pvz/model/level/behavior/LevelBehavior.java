@@ -27,8 +27,8 @@ public abstract class LevelBehavior {
     }
 
     public void onComplete(Level level) {
+        if (this.levelCompleted) return;
         this.levelCompleted = true;
-        level.onComplete();
 
         GameSession session = App.getGameSession();
         if (session != null) {
