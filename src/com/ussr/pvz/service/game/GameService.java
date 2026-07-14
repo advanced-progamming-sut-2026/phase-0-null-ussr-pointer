@@ -268,16 +268,19 @@ public class GameService {
             throw new IllegalStateException("no active account");
         }
 
-        String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase();
-        int unlockedLevel = account.getAdventureProgress().getPlantLvls().getOrDefault(plantKey, 0);
-        if (unlockedLevel <= 0) {
-            throw new IllegalStateException("you haven't unlocked " + requestedType);
-        }
+         String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase().replaceAll("[\\s_]", "");
 
         return account.getAdventureProgress().getAccountPlants().stream()
-                .filter(p -> p.getName() != null && p.getName().equalsIgnoreCase(plantKey))
+                .filter(p -> p.getName() != null &&
+                        p.getName().toUpperCase().replaceAll("[\\s_]", "").equals(plantKey))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("unknown plant type: " + requestedType));
+                .orElseThrow(() -> {
+                    String available = account.getAdventureProgress().getAccountPlants().stream()
+                            .map(p -> p.getName())
+                            .collect(java.util.stream.Collectors.joining(", "));
+                    return new IllegalStateException("You haven't unlocked " + requestedType +
+                            ". Available: " + available);
+                });
     }
 
     private Plant instantiatePlant(Plant blueprint, int x, int y) {

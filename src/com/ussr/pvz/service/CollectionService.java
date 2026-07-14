@@ -56,10 +56,10 @@ public class CollectionService {
 
     public String showPlant(String plantName) {
         List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
-        String targetName = plantName.trim().toUpperCase();
+        String targetName = ChoosePlantService.normalizePlantKey(plantName);
 
         for (Map<String, Object> plant : allPlants) {
-            if (plant.get("name").toString().toUpperCase().equals(targetName)) {
+            if (plant.get("name").toString().replaceAll("[\\s_\\-]", "").toUpperCase().equals(targetName.replaceAll("[\\s_\\-]", ""))) {
                 String sb = "Plant Name: " + plant.get("name") + "\n" +
                         "HP: " + plant.get("baseHp") + "\n" +
                         "Sun Cost: " + plant.get("cost") + "\n" +
@@ -150,8 +150,8 @@ public class CollectionService {
         if (account == null) return "Please login first.";
         AdventureProgress progress = account.getAdventureProgress();
 
-        String plantName = request.type().toUpperCase();
-        int currentLevel = progress.getPlantLvls().getOrDefault(plantName, 0);
+        String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
+        int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
         if (currentLevel == 0) return "Error: You do not own this plant yet.";
         if (currentLevel >= 4) return "Error: Plant is already at max level.";
@@ -160,14 +160,14 @@ public class CollectionService {
         int packetCost = currentLevel * 10;
 
         if (progress.getCoin() < coinCost) return "Error: Not enough coins. Need " + coinCost;
-        int currentPackets = progress.getSeedPackets().getOrDefault(plantName, 0);
+        int currentPackets = progress.getSeedPackets().getOrDefault(canonicalName, 0);
         if (currentPackets < packetCost) return "Error: Not enough seed packets. Need " + packetCost;
 
         progress.addCoin(-coinCost);
-        progress.getSeedPackets().put(plantName, currentPackets - packetCost);
-        progress.upgradePlant(plantName);
+        progress.getSeedPackets().put(canonicalName, currentPackets - packetCost);
+        progress.upgradePlant(canonicalName);
 
-        return "Success! " + plantName + " upgraded to level " + (currentLevel + 1) + ".";
+        return "Success! " + canonicalName + " upgraded to level " + (currentLevel + 1) + ".";
     }
 
     public String purchasePlant(PlantTypeRequest request) {
@@ -175,21 +175,20 @@ public class CollectionService {
         if (account == null) return "Please login first.";
         AdventureProgress progress = account.getAdventureProgress();
 
-        String plantName = request.type().toUpperCase();
-        int currentLevel = progress.getPlantLvls().getOrDefault(plantName, 0);
+        String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
+        int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
         if (currentLevel > 0) return "Error: You already own this plant.";
         if (progress.getCoin() < 2000) return "Error: Not enough coins to purchase. Cost is 2,000 coins.";
 
         progress.addCoin(-2000);
 
-        progress.getPlantLvls().put(plantName, 0);
-        progress.upgradePlant(plantName);
+        progress.getPlantLvls().put(canonicalName, 0);
+        progress.upgradePlant(canonicalName);
 
-        return "Success! " + plantName + " purchased and added to your collection.";
+        return "Success! " + canonicalName + " purchased and added to your collection.";
     }
 
-    // UTILITY
     private List<Map<String, Object>> loadConfigFromDisk(String path) {
         File file = new File(path);
         if (!file.exists()) return new ArrayList<>();

@@ -10,6 +10,7 @@ import com.ussr.pvz.model.dto.RegisterRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RegisterService {
 
@@ -18,6 +19,12 @@ public class RegisterService {
     public String register(RegisterRequest request) {
         String validationError = validateRegistration(request);
         if (validationError != null) return validationError;
+
+        Map<String, Integer> initialPlantMap = AdventureProgress.initializePlantsLvl();
+        initialPlantMap.put("PEASHOOTER", 1);
+        initialPlantMap.put("SUNFLOWER", 1);
+        initialPlantMap.put("WALL-NUT", 1);
+        initialPlantMap.put("POTATO MINE", 1);
 
         pendingAccount = new AccountState(
                 request.username(),
@@ -35,7 +42,7 @@ public class RegisterService {
                 0,     // coin
                 0,     // gem
                 0,     // score
-                AdventureProgress.initializePlantsLvl(),
+                initialPlantMap,
                 new ArrayList<>(),
                 List.of(NewsItem.initialNews()),
                 null,  // greenhouse

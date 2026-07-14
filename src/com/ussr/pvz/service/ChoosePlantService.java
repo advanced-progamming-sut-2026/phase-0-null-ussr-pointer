@@ -24,6 +24,22 @@ public class ChoosePlantService {
 
     private final List<String> selectedPlants = new ArrayList<>();
 
+    public static String normalizePlantKey(String rawName) {
+        if (rawName == null) return "";
+        String strippedInput = rawName.replaceAll("[\\s_\\-]", "").toUpperCase();
+
+        List<Map<String, Object>> allPlants = App.getCachedPlantsData();
+        if (allPlants != null) {
+            for (Map<String, Object> p : allPlants) {
+                String officialName = p.get("name").toString();
+                if (officialName.replaceAll("[\\s_\\-]", "").toUpperCase().equals(strippedInput)) {
+                    return officialName.toUpperCase();
+                }
+            }
+        }
+        return rawName.trim().toUpperCase().replace('_', ' ');
+    }
+
     public String showAllPlants() {
         AdventureProgress adv = App.getAccount().getAdventureProgress();
         Map<String, Integer> plantLvls = adv.getPlantLvls();
@@ -41,11 +57,6 @@ public class ChoosePlantService {
         return sb.toString().trim();
     }
 
-    private static String normalizePlantKey(String rawName) {
-        if (rawName == null) return "";
-        return rawName.trim().toUpperCase().replace('_', ' ');
-    }
-
     public String showAvailablePlants() {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         if (chapter == null) return "no chapter selected";
@@ -61,7 +72,7 @@ public class ChoosePlantService {
             if (lvl > 0) {
                 boolean selected = selectedPlants.contains(key);
                 sb.append(selected ? "[✓] " : "[ ] ")
-                        .append(name)
+                        .append(key)
                         .append(" (lvl ").append(lvl).append(")\n");
             }
         }
@@ -73,58 +84,57 @@ public class ChoosePlantService {
         if (selectedPlants.size() >= MAX_SEED_SLOTS)
             return "seed slots full (" + MAX_SEED_SLOTS + "/" + MAX_SEED_SLOTS + ")";
 
-        String name = normalizePlantKey(request.type());
+        String canonicalName = normalizePlantKey(request.type());
         AdventureProgress adv = App.getAccount().getAdventureProgress();
-        int lvl = adv.getPlantLvls().getOrDefault(name, 0);
-        if (lvl == 0) return "you don't have " + name;
+        int lvl = adv.getPlantLvls().getOrDefault(canonicalName, 0);
+        if (lvl == 0) return "you don't have " + canonicalName + " unlocked.";
 
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         if (chapter != null && chapter.getAllowedPlants() != null) {
             boolean allowed = chapter.getAllowedPlants().stream()
-                    .anyMatch(p -> normalizePlantKey(p).equals(name));
-            if (!allowed) return name + " is not allowed in this chapter";
+                    .anyMatch(p -> normalizePlantKey(p).equals(canonicalName));
+            if (!allowed) return canonicalName + " is not allowed in this chapter";
         }
 
         Level level = App.getLevelManager().getCurrentLevel();
         if (level != null && level.getLockedPlants() != null) {
             boolean locked = level.getLockedPlants().stream()
-                    .anyMatch(p -> normalizePlantKey(p).equals(name));
-            if (locked) return name + " is locked in this level";
+                    .anyMatch(p -> normalizePlantKey(p).equals(canonicalName));
+            if (locked) return canonicalName + " is locked in this level";
         }
 
-        if (selectedPlants.contains(name)) return name + " is already selected";
+        if (selectedPlants.contains(canonicalName)) return canonicalName + " is already selected";
 
-        selectedPlants.add(name);
-        return name + " added (" + selectedPlants.size() + "/" + MAX_SEED_SLOTS + ")";
+        selectedPlants.add(canonicalName);
+        return canonicalName + " added (" + selectedPlants.size() + "/" + MAX_SEED_SLOTS + ")";
     }
 
     public String removePlant(PlantTypeRequest request) {
-        String name = normalizePlantKey(request.type());
-        if (!selectedPlants.remove(name))
-            return name + " is not in your selection";
-        return name + " removed (" + selectedPlants.size() + "/" + MAX_SEED_SLOTS + ")";
+        String canonicalName = normalizePlantKey(request.type());
+        if (!selectedPlants.remove(canonicalName))
+            return canonicalName + " is not in your selection";
+        return canonicalName + " removed (" + selectedPlants.size() + "/" + MAX_SEED_SLOTS + ")";
     }
 
     public String boostPlant(PlantTypeRequest request) {
-        String name = normalizePlantKey(request.type());
-        if (!selectedPlants.contains(name))
-            return name + " is not in your selection";
+        String canonicalName = normalizePlantKey(request.type());
+        if (!selectedPlants.contains(canonicalName))
+            return canonicalName + " is not in your selection";
 
         AdventureProgress adv = App.getAccount().getAdventureProgress();
         Map<String, Integer> seeds = adv.getSeedPackets();
-        int available = seeds.getOrDefault(name, 0);
+        int available = seeds.getOrDefault(canonicalName, 0);
         if (available <= 0)
-            return "no seed packets available for " + name;
+            return "no seed packets available for " + canonicalName;
 
-        adv.spendSeedPacket(name);
-        return "seed packet used for " + name + " (" + (available - 1) + " remaining)";
+        adv.spendSeedPacket(canonicalName);
+        return "seed packet used for " + canonicalName + " (" + (available - 1) + " remaining)";
     }
 
     public String startGame() {
         Level level = App.getLevelManager().getCurrentLevel();
         if (level == null) return "no level selected";
 
-        // Check if it's a standard level that requires plant selection
         boolean requiresSelection = !(level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.BeghouledBehavior)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior)
@@ -144,15 +154,9 @@ public class ChoosePlantService {
         session.setLevel(level);
         session.addSun(INITIAL_SUN);
 
-        // Bind session globally BEFORE behavior onStart
         App.setGameSession(session);
-
-        // Ensure zombies are loaded before minigames (like IZombie or Vasebreaker) attempt to spawn them
         ZombieFactory.init();
-
-        // Now safe to initialize behavior grids (Vasebreaker, Beghouled, IZombie)
         level.onStart();
-
         session.initClock();
         App.setMenuState(MenuState.GAME);
 

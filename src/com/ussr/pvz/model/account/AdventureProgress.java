@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.service.ChoosePlantService;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.*;
+
+import static com.ussr.pvz.service.ChoosePlantService.normalizePlantKey;
 
 public class AdventureProgress {
     private int coin;
@@ -50,7 +53,7 @@ public class AdventureProgress {
             for (Map<String, Object> plantData : complexPlantsList) {
                 Object nameObj = plantData.get("name");
                 if (nameObj == null) continue;
-                String plantName = nameObj.toString().trim().toUpperCase();
+                String plantName = normalizePlantKey(nameObj.toString());
                 if (plantLvls.containsKey(plantName)) {
                     int currentLevel = plantLvls.get(plantName);
                     if (currentLevel > 0) {
@@ -122,7 +125,7 @@ public class AdventureProgress {
     }
 
     public void upgradePlant(String plantName) {
-        String key = plantName.trim().toUpperCase();
+        String key = normalizePlantKey(plantName);
         if (plantLvls.containsKey(key)) {
             plantLvls.put(key, plantLvls.get(key) + 1);
             populateAccountPlants();
@@ -244,7 +247,7 @@ public class AdventureProgress {
                 List<String> loadedStarters = gson.fromJson(reader, simpleListType);
                 if (loadedStarters != null) {
                     starterPlantNames = loadedStarters.stream()
-                            .map(name -> name.trim().toUpperCase())
+                            .map(ChoosePlantService::normalizePlantKey)
                             .toList();
                 }
             } catch (IOException e) {
@@ -261,7 +264,7 @@ public class AdventureProgress {
             for (Map<String, Object> plantData : complexPlantsList) {
                 Object nameObj = plantData.get("name");
                 if (nameObj != null) {
-                    String plantName = nameObj.toString().trim().toUpperCase();
+                    String plantName = normalizePlantKey(nameObj.toString());
                     if (starterPlantNames.contains(plantName)) {
                         defaultPlantLevels.put(plantName, 1);
                     } else {
