@@ -184,7 +184,7 @@ public class LevelManager {
 
         return switch (raw.trim().toUpperCase()) {
             case "MINIGAME" -> GameMode.MINIGAME;
-            case "BOUNCE"   -> GameMode.BOUNCE;
+            case "MEOW"   -> GameMode.MEOW;
             default         -> GameMode.ADVENTURE;
         };
     }

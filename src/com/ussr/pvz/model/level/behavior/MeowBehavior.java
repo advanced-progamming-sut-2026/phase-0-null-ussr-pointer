@@ -7,14 +7,14 @@ import com.ussr.pvz.model.level.Level;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BounceBehavior extends LevelBehavior {
+public class MeowBehavior extends LevelBehavior {
     private int currentScore = 0;
 
     private double lastKillTime = 0;
     private int simultaneousKillCount = 0;
     private final Map<String, Double> zombieSpawnTimes = new HashMap<>();
 
-    public BounceBehavior() {
+    public MeowBehavior() {
         this.autoWinOnWavesClear = false;
     }
 

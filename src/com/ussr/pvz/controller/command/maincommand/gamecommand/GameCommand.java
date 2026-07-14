@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public enum GameCommand {
     MENU_ENTER_CHAPTER("^menu\\s+enter\\s+chapter\\s+-c\\s+(?<chapterName>\\S+)(?:\\s+.*)?$"),
+    MENU_ENTER_MEOW("^menu\\s+enter\\s+meow(?:\\s+.*)?$"),
     MENU_GREENHOUSE("^menu\\s+greenhouse(?:\\s+.*)?$"),
     MENU_TRAVEL_LOG("^menu\\s+travel-log(?:\\s+.*)?$"),
     MENU_LEADERBOARD("^menu\\s+leaderboard(?:\\s+.*)?$"),
