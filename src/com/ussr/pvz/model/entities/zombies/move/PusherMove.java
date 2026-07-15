@@ -53,10 +53,6 @@ public class PusherMove implements MoveBehavior {
         }
 
         zombie.setPosition(Vec2.of(targetZombieX, pos.y()));
-
-        if (zombie.getPosition().x() < 0) {
-            session.onZombieReachedEnd();
-        }
     }
 
     private static List<CellStructureMapping> getCellStructureMappings(Row row, Vec2 pos) {

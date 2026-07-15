@@ -58,10 +58,6 @@ public class ProspectorMove implements MoveBehavior {
                         airborneSpeedX = pos.x() / timeToTravel;
                     }
                 }
-
-                if (newPos.x() < 0) {
-                    session.onZombieReachedEnd();
-                }
             }
 
             case AIRBORNE_LAUNCH -> {

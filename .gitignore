@@ -37,3 +37,4 @@ bin/
 # Ignore Gradle build output directory
 build
 users.json
+current_session.txt

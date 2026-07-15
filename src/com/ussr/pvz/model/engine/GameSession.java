@@ -11,6 +11,7 @@ import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.items.CoinDrop;
 import com.ussr.pvz.model.entities.items.DiamondDrop;
 import com.ussr.pvz.model.entities.items.GroundItem;
+import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
@@ -435,11 +436,26 @@ public class GameSession {
         StringBuilder sb = new StringBuilder();
         int rows = lawn.getRows();
         int cols = lawn.getCols();
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 var cell = lawn.getCell(r, c);
+
+                // Scan the items list to see if a Sun is physically resting on this coordinate
+                boolean hasSun = false;
+                if (items != null) {
+                    for (GroundItem item : items) {
+                        if (item.isAlive() && item.getItemType() == ItemType.SUN && item.getLocation() != null) {
+                            if (item.getLocation().x() == c && item.getLocation().y() == r) {
+                                hasSun = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (cell == null) {
-                    sb.append(".");
+                    sb.append(hasSun ? "*" : ".");
                 } else if (cell.getPlant() != null) {
                     sb.append("P");
                 } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
@@ -450,6 +466,10 @@ public class GameSession {
                     } else {
                         sb.append("G"); // Standard Grave
                     }
+                } else if (cell.getInteractableStructure() != null) {
+                    sb.append("I"); // Generic placeholder for structures like Ice Blocks
+                } else if (hasSun) {
+                    sb.append("*"); // Asterisk represents a dropped Sun!
                 } else {
                     sb.append(".");
                 }

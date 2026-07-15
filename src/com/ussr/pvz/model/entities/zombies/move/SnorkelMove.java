@@ -29,9 +29,5 @@ public class SnorkelMove implements MoveBehavior {
             // Surface unit when outside pool lanes or actively chewing a plant
             zombie.setVulnerabilityState(Vulnerability.FULLY_VULNERABLE);
         }
-
-        if (zombie.getPosition().x() < 0) {
-            session.onZombieReachedEnd();
-        }
     }
 }

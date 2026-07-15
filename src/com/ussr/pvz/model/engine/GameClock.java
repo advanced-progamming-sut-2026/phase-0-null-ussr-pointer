@@ -10,7 +10,9 @@ public class GameClock {
     private final List<Tickable> entities = new ArrayList<>();
 
     public void addEntity(Tickable entity) {
-        entities.add(entity);
+        if (!entities.contains(entity)) {
+            entities.add(entity);
+        }
     }
 
     public void removeEntity(Tickable entity) {
@@ -19,7 +21,25 @@ public class GameClock {
 
     public void tick() {
         tick++;
-        entities.forEach(Tickable::tick);
+
+        // 1. Remove dead entities to prevent memory leaks and ghost ticks
+        entities.removeIf(e -> {
+            if (e instanceof GameEntity ge) {
+                return !ge.isAlive();
+            }
+            return false;
+        });
+
+        // 2. Iterate over a copy of the list to prevent ConcurrentModificationException
+        // when new entities (like projectiles or dropped loot) are spawned during a tick.
+        List<Tickable> currentEntities = new ArrayList<>(entities);
+        for (Tickable entity : currentEntities) {
+            // Only tick if it didn't die earlier in this exact same tick loop
+            if (entity instanceof GameEntity ge && !ge.isAlive()) {
+                continue;
+            }
+            entity.tick();
+        }
     }
 
     public int getTicks() {
