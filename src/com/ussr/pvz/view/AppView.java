@@ -2,6 +2,8 @@ package com.ussr.pvz.view;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.mainmenu.gamemenu.ChoosePlantMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.CollectionMenu;
@@ -33,6 +35,29 @@ public class AppView {
 
         App.initShop();
         App.getLevelManager().loadFromJson();
+
+        tryAutoLogin();
+    }
+
+    private void tryAutoLogin() {
+        String savedUsername = SessionManager.getAutoLoginUsername();
+        if (savedUsername == null) {
+            return;
+        }
+
+        Account autoLoginAccount = App.getAccounts().stream()
+                .filter(a -> a.getName().equalsIgnoreCase(savedUsername))
+                .findFirst()
+                .orElse(null);
+
+        if (autoLoginAccount != null) {
+            App.login(autoLoginAccount);
+
+            App.setMenuState(MenuState.MAIN);
+            System.out.println("[Session] Welcome back, " + autoLoginAccount.getName() + "! Auto-login successful.");
+        } else {
+            SessionManager.clearSession();
+        }
     }
 
     public void run(Scanner scanner) {

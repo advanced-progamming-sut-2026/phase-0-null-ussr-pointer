@@ -2,10 +2,14 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.dto.AdvanceTimeRequest;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
+import com.ussr.pvz.model.util.SessionManager;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class GlobalService {
@@ -61,6 +65,26 @@ public class GlobalService {
 
         App.setMenuState(parent);
         return "menu changed to " + parent.getName();
+    }
+
+    public String handleLogout() {
+        if (App.getAccount() == null) {
+            return "you are not logged in";
+        }
+
+        String savedUsername = SessionManager.getAutoLoginUsername();
+        if (savedUsername != null && savedUsername.equalsIgnoreCase(App.getAccount().getName())) {
+            SessionManager.clearSession();
+        }
+
+        List<AccountState> updatedStates = App.getAccounts().stream()
+                .map(Account::toState)
+                .toList();
+        SaveService.saveAccounts(updatedStates);
+
+        App.login(null);
+        App.setMenuState(MenuState.LOGIN);
+        return "logged out successfully";
     }
 
     private MenuState parentOf(MenuState current) {

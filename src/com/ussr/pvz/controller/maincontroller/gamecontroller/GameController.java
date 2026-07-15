@@ -8,17 +8,14 @@ import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
-import com.ussr.pvz.service.AccountService;
 import com.ussr.pvz.service.game.GameService;
 import com.ussr.pvz.service.minigame.BeghouledService;
 import com.ussr.pvz.service.minigame.IZombieService;
 import com.ussr.pvz.service.minigame.VaseBreakerService;
 import com.ussr.pvz.service.minigame.WallnutBowlingService;
-
 import java.util.regex.Matcher;
 
 public class GameController {
-    private final AccountService accountService = new AccountService();
     private final GameService gameService = new GameService();
 
     // === MINIGAME SERVICES ===
@@ -51,7 +48,6 @@ public class GameController {
             case MENU_COIN_WALLET -> handleMenuCoinWallet();
             case MENU_GEM_WALLET -> handleMenuGemWallet();
             case MENU_SWITCH_WORLD -> handleMenuSwitchWorld(matcher);
-            case MENU_LOGOUT -> handleMenuLogout();
             case SHOW_SUN_AMOUNT -> handleShowSunAmount();
             case SHOW_MAP -> handleShowMap();
             case SHOW_PLANTS_STATUS -> handleShowPlantsStatus();
@@ -169,10 +165,6 @@ public class GameController {
     private String handleMenuSwitchWorld(Matcher matcher) {
         MenuSwitchWorldRequest request = new MenuSwitchWorldRequest(matcher.group("worldName"));
         return gameService.menuSwitchWorld(request);
-    }
-
-    private String handleMenuLogout() {
-        return accountService.logoutAccount();
     }
 
     private String handleCollectSun(Matcher matcher) {

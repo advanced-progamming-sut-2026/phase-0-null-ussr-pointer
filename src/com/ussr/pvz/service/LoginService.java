@@ -2,12 +2,14 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.controller.command.ValidationRegex;
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.dto.AnswerRequest;
 import com.ussr.pvz.model.dto.ForgetPasswordRequest;
 import com.ussr.pvz.model.dto.LoginRequest;
 import com.ussr.pvz.model.util.SecurityUtil;
+import com.ussr.pvz.model.util.SessionManager;
 
 import java.util.List;
 
@@ -27,10 +29,16 @@ public class LoginService {
             return "invalid password";
         }
 
+        if (request.stayLoggedIn()) {
+            SessionManager.saveSession(account.getName());
+        }
+
         App.login(account);
+
+        App.setMenuState(MenuState.MAIN);
         return "logged in successfully";
-        //check if user wants to stay logged in
     }
+
 
     public String forgetPassword(ForgetPasswordRequest request) {
         Account account = findAccountByUsername(request.username());

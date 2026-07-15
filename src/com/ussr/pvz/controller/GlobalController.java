@@ -23,11 +23,16 @@ public class GlobalController {
                     case MENU_ENTER -> handleMenuEnter(matcher);
                     case MENU_SHOW_CURRENT -> handleMenuShowCurrent();
                     case ADVANCE_TIME -> handleAdvanceTime(matcher);
+                    case MENU_LOGOUT -> handleMenuLogout();
                     case MENU_EXIT -> handleMenuExit();
                 };
             }
         }
         return "";
+    }
+
+    private String handleMenuLogout() {
+        return globalService.handleLogout();
     }
 
     private String handleMenuEnter(Matcher matcher) {

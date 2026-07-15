@@ -23,6 +23,8 @@ public class Account {
     private int difficultyLvl;
     private SavedBoosts savedBoosts;
     private QuestManager questManager;
+
+
     public Account(AccountState state, Collection collection) {
         this.name = state.username();
         this.nickname = state.nickname();
@@ -187,4 +189,8 @@ public class Account {
     public QuestManager getQuestManager() {
         return questManager;
     }
+
+//    public void setStayLoggedIn(boolean stayLoggedIn) { this.stayLoggedIn = stayLoggedIn; }
+//
+//    public boolean isStayLoggedIn() { return this.stayLoggedIn; }
 }
