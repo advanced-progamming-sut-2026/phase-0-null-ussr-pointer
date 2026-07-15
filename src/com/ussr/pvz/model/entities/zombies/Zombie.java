@@ -46,7 +46,7 @@ public class Zombie extends GameEntity implements Damageable {
 
     @Override
     public void takeDamage(int damage) {
-        takeDamage(damage, null);
+        takeDamage(damage, false);
     }
 
     public void takeDamage(int damage, boolean isPoisonous) {
@@ -108,28 +108,21 @@ public class Zombie extends GameEntity implements Damageable {
 
         ZombieFactory.respawnPushedStructureIfNeeded(this);
 
-        // If the zombie is NOT eating a plant, it is allowed to move
-        if (!zombieService.processEating(this, session)) {
-            if (moveBehavior != null) {
-                moveBehavior.move(this, session);
-            }
-        } else {
-            // trigger an eating animation or AttackBehavior here
+        if (effectStatus != null) effectStatus.effect(this, session);
+
+        // One single source of truth for targeting!
+        Damageable target = acquireTarget(session);
+
+        if (target != null && target.isAlive()) {
+            state = ZombieActivity.EATING;
             if (attackBehavior != null) {
                 attackBehavior.attack(this, session);
             }
-        }
-
-
-        if (effectStatus != null) effectStatus.effect(this, session);
-
-        Damageable target = acquireTarget(session);
-        if (target != null && target.isAlive()) {
-            state = ZombieActivity.EATING;
-            if (attackBehavior != null) attackBehavior.attack(this, session);
         } else {
             state = ZombieActivity.WALKING;
-            if (moveBehavior != null) moveBehavior.move(this, session);
+            if (moveBehavior != null) {
+                moveBehavior.move(this, session);
+            }
         }
     }
 

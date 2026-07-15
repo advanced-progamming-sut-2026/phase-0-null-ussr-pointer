@@ -63,11 +63,11 @@
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 100000
+              "cost": 10000
             },
             {
               "waveNumber": 2,
-              "cost": 150000
+              "cost": 15000
             }
           ]
         },

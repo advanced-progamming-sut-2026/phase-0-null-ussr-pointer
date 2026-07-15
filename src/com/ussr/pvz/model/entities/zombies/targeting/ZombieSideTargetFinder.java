@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
@@ -15,19 +16,43 @@ public class ZombieSideTargetFinder implements TargetFinder {
 
     @Override
     public Damageable findTarget(Zombie self, GameSession session) {
-        Damageable structure = structureInCurrentCell(self, session);
-        if (structure != null) return structure;
+        Damageable plantOrStructure = findPlantOrStructureAhead(self, session);
+        if (plantOrStructure != null) return plantOrStructure;
 
         return nearestEnemyAhead(self, session);
     }
 
-    private Damageable structureInCurrentCell(Zombie self, GameSession session) {
-        Cell cell = self.getCurrentCell(session);
+    private Damageable findPlantOrStructureAhead(Zombie self, GameSession session) {
+        if (self.getPosition() == null || session.getLawn() == null) return null;
+
+        int row = (int) self.getPosition().y();
+        double myX = self.getPosition().x();
+
+        // Check the cell the zombie is currently in, and the cell immediately ahead (left)
+        int currentCol = (int) Math.floor(myX);
+        int aheadCol = (int) Math.floor(myX - EATING_RANGE);
+
+        Damageable target = checkCellForEdibles(session, row, aheadCol);
+        if (target != null) return target;
+
+        return checkCellForEdibles(session, row, currentCol);
+    }
+
+    private Damageable checkCellForEdibles(GameSession session, int row, int col) {
+        if (col < 0 || col >= session.getLawn().getCols()) return null;
+        Cell cell = session.getLawn().getCell(row, col);
         if (cell == null) return null;
+
+        Plant plant = cell.getPlant();
+        if (plant != null && plant.isAlive()) {
+            return plant;
+        }
+
         InteractableStructure structure = cell.getInteractableStructure();
         if (structure instanceof Damageable damageable && structure.isAlive()) {
             return damageable;
         }
+
         return null;
     }
 

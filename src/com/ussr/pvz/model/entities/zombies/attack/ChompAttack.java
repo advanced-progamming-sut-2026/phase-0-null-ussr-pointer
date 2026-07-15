@@ -13,6 +13,7 @@ public class ChompAttack implements AttackBehavior {
         if (target == null || !target.isAlive()) return;
 
         int damage = (int) (zombie.getEatDps() * GameClock.SECONDS_PER_TICK);
+        damage = Math.max(1, damage);
         target.takeDamage(damage);
     }
 }
