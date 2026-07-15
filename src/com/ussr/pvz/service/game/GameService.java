@@ -16,6 +16,7 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
@@ -268,19 +269,11 @@ public class GameService {
             throw new IllegalStateException("no active account");
         }
 
-         String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase().replaceAll("[\\s_]", "");
-
-        return account.getAdventureProgress().getAccountPlants().stream()
-                .filter(p -> p.getName() != null &&
-                        p.getName().toUpperCase().replaceAll("[\\s_]", "").equals(plantKey))
-                .findFirst()
-                .orElseThrow(() -> {
-                    String available = account.getAdventureProgress().getAccountPlants().stream()
-                            .map(p -> p.getName())
-                            .collect(java.util.stream.Collectors.joining(", "));
-                    return new IllegalStateException("You haven't unlocked " + requestedType +
-                            ". Available: " + available);
-                });
+        String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase().replaceAll("[\\s_]", "");
+        if (account.getAdventureProgress().getPlantLvls().get(plantKey) == 0) {
+            throw new IllegalStateException("You haven't unlocked " + requestedType);
+        }
+        return PlantFactory.createPlant(PlantFactory.findIdByName(requestedType), account.getAdventureProgress().getPlantLvls().get(plantKey));
     }
 
     private Plant instantiatePlant(Plant blueprint, int x, int y) {

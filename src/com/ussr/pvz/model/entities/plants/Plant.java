@@ -101,9 +101,6 @@ public class Plant extends GameEntity implements Damageable {
         //this.isBuffed = blueprint.isBuffed;
         //this.internalTimer = blueprint.internalTimer;
         this.growthTracker = blueprint.growthTracker;
-        if(actStrategy == null) {
-            System.out.println("bozi jan act nadarom");
-        }
     }
 
     @Override
@@ -131,10 +128,10 @@ public class Plant extends GameEntity implements Damageable {
                 ? actionIntervalStat.getValue()
                 : actionInterval;
 
-        if (internalTimer <= 0) {
-            internalTimer = (actionIntervalStat != null ? actionIntervalStat.getValue() : actionInterval);
+        //if (internalTimer <= 0) {
+            //internalTimer = (actionIntervalStat != null ? actionIntervalStat.getValue() : actionInterval);
             actStrategy.act(this, com.ussr.pvz.model.App.getGameSession());
-        }
+        //}
     }
 
     @Override

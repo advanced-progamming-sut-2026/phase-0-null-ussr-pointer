@@ -19,14 +19,14 @@ public class SunProduceStrategy implements ActStrategy {
                         && item.getLocation().y() == y);
 
         if (!sunAlreadyExists) {
-            if(user.getIntervalTimer() <= 0) {
+            //if(user.getIntervalTimer() <= 0) {
                 // This naturally grabs the current stage's sun value thanks to Plant.java's getter
                 int sunValue = (int) user.getAbilityValue();
 
                 ProducedSun sun = new ProducedSun(x, y, sunValue, user.getName());
                 session.addItem(sun);
                 user.setInternalTimer(user.getActionInterval());
-            }
+            // }
         }
     }
 }
