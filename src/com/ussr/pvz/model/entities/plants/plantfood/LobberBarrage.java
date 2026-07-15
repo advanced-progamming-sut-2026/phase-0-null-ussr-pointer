@@ -18,13 +18,6 @@ public class LobberBarrage implements PlantFoodEffect{
     private final double splashRadius;
     private final int maxTargets; // -1 for all zombies in the pitch
 
-    /**
-     * Unified constructor to handle all high-arcing plant food barrages.
-     *
-     * @param damage             Direct impact damage of the ultimate projectile.
-     * @param splashRadius       The radius of the splash damage zone (0.0 for single-target).
-     * @param maxTargets         Maximum targets to hit. Use -1 to target every single alive zombie on the board.
-     */
 
     public LobberBarrage(int damage, double splashRadius, int maxTargets) {
         this.damage = damage;

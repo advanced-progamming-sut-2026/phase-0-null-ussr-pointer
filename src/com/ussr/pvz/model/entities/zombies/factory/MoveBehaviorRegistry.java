@@ -1,15 +1,8 @@
 package com.ussr.pvz.model.entities.zombies.factory;
 
-import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
-import com.ussr.pvz.model.entities.zombies.move.NormalWalk;
-import com.ussr.pvz.model.entities.zombies.move.SprintMove;
-import com.ussr.pvz.model.entities.zombies.move.PusherMove;
-import com.ussr.pvz.model.entities.zombies.move.ProspectorMove;
-import com.ussr.pvz.model.entities.zombies.move.JumpMove;
-import com.ussr.pvz.model.entities.zombies.move.SnorkelMove;
-import com.ussr.pvz.model.entities.zombies.move.StationaryMove;
-
+import com.ussr.pvz.model.entities.zombies.move.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class MoveBehaviorRegistry {
@@ -17,50 +10,51 @@ public final class MoveBehaviorRegistry {
     private static final Map<String, MoveBehaviorFactory> FACTORIES = new HashMap<>();
 
     static {
-        register("NormalWalk", params -> {
-            // TODO: [FROSTBITE CAVES SLIDER TILES]
-            // MoveBehavior interface currently lacks GameSession/Lawn context.
-            // 1. Refactor MoveBehavior.move() signature to accept GameSession.
-            // 2. Inside NormalWalk (and other movement classes), query session.getLawn().getTile(y, x).
-            // 3. If TileType == SLIPPERY, apply immediate vertical translation (y + 1 or y - 1)
-            //    based on the tile's SlipperyDirection enum.
-            return new NormalWalk();
-        });
+        register("NormalWalk", (params, data) -> new NormalWalk());
 
-        register("SprintMove", params -> {
+        register("SprintMove", (params, data) -> {
             if (params == null || params.isEmpty()) return new SprintMove();
-
             double baseSprintMultiplier = BehaviorSpec.getDouble(params, "baseSprintMultiplier", 1.0);
             double enrageMultiplier = BehaviorSpec.getDouble(params, "enrageMultiplier", 4.0);
             boolean enragesOnArmorLoss = BehaviorSpec.getBoolean(params, "enragesOnArmorLoss", false);
-
             return new SprintMove(baseSprintMultiplier, enrageMultiplier, enragesOnArmorLoss);
         });
 
-        register("PusherMove", params -> new PusherMove());
+        register("PusherMove", (params, data) -> new PusherMove());
+        register("ProspectorMove", (params, data) -> new ProspectorMove());
 
-        register("ProspectorMove", params -> new ProspectorMove());
+        register("JumpMove", (params, data) -> {
+            double addChance = BehaviorSpec.getDouble(data, "AddRandomChanceForJumpPerGridWalked", 0.0);
+            double cooldown = BehaviorSpec.getDouble(data, "CooldownSecondsUntilNextJumpAvailable", 0.0);
+            double initChance = BehaviorSpec.getDouble(data, "InitialSetRandomChanceForJump", 0.0);
+            double resetChance = BehaviorSpec.getDouble(data, "LandedResetRandomChanceForJump", 0.0);
 
-        register("JumpMove", params -> new JumpMove());
+            List<String> plantsToFlyOver = null;
+            if (data.containsKey("PlantsToFlyOver")) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> map = (Map<String, Object>) data.get("PlantsToFlyOver");
+                plantsToFlyOver = (List<String>) map.get("List");
+            }
 
-        register("SnorkelMove", params -> new SnorkelMove());
+            return new JumpMove(addChance, cooldown, initChance, resetChance, plantsToFlyOver);
+        });
 
-        register("StationaryMove", params -> new StationaryMove());
+        register("SnorkelMove", (params, data) -> new SnorkelMove());
+        register("StationaryMove", (params, data) -> new StationaryMove());
     }
 
-    private MoveBehaviorRegistry() {
-    }
+    private MoveBehaviorRegistry() {}
 
     public static void register(String type, MoveBehaviorFactory factory) {
         FACTORIES.put(type, factory);
     }
 
-    public static MoveBehavior create(Object rawSpec) {
+    public static MoveBehavior create(Object rawSpec, Map<String, Object> zombieData) {
         BehaviorSpec spec = BehaviorSpec.parse(rawSpec);
         MoveBehaviorFactory factory = FACTORIES.get(spec.getType());
         if (factory == null) {
             throw new IllegalArgumentException("Unknown move behavior type: " + spec.getType());
         }
-        return factory.create(spec.params());
+        return factory.create(spec.params(), zombieData);
     }
 }

@@ -2,60 +2,27 @@ package com.ussr.pvz.model.entities.zombies.defense;
 
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
-import com.ussr.pvz.model.entities.projectiles.Projectile;
-import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
-import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.effect.SpinEffect;
 import com.ussr.pvz.model.util.Vec2;
 
 public class JesterDefense implements DefenseBehavior {
-    private static final double MIRROR_SPEED = 20.0;
-    private static final double SPIN_DURATION_ON_DEFLECT = 1.0;
+    public static final double SPIN_DURATION_ON_DEFLECT = 1.0;
 
     @Override
     public int handleDamage(Zombie zombie, int rawDamage, Object damageSource, GameSession session) {
-        if (damageSource instanceof Projectile projectile) {
-            // Jester juggles standard straight shots and lobbed shots
-            if (projectile.getMoveStrategy() instanceof StraightMove ||
-                    projectile.getMoveStrategy() instanceof ArcMove) {
-
-                mirrorBack(zombie, projectile, session);
-                triggerSpin(zombie);
-
-                return 0; // Takes no damage from juggled objects
-            }
-        }
+        // Reflection is now completely handled pre-impact inside Projectile.java's checkCollision().
+        // If a projectile bypasses that check (e.g. Laser, AoE explosions), the Jester takes normal damage.
         return rawDamage;
     }
 
-    private void triggerSpin(Zombie zombie) {
+    public void triggerSpin(Zombie zombie) {
         if (zombie.getEffectStatus() instanceof SpinEffect spinEffect) {
             spinEffect.startSpin(SPIN_DURATION_ON_DEFLECT);
         }
     }
 
-    private void mirrorBack(Zombie zombie, Projectile incoming, GameSession session) {
-        if (session == null || zombie.getPosition() == null) return;
-
-        Plant target = findNearestPlantInLane(zombie, session);
-        if (target == null) return;
-
-        // Zombies live at higher X than plants, so the mirrored shot travels
-        // in the negative X direction, straight down the same row.
-        Vec2 velocity = new Vec2(-MIRROR_SPEED, 0);
-
-        session.addProjectile(new Projectile(
-                target,
-                zombie.getPosition(),
-                velocity,
-                incoming.getDamage(),
-                new StraightMove(),
-                incoming.getHitEffectStrategy()
-        ));
-    }
-
-    private Plant findNearestPlantInLane(Zombie zombie, GameSession session) {
+    public Plant findNearestPlantInLane(Zombie zombie, GameSession session) {
         double lane = zombie.getPosition().y();
         double zombieCol = zombie.getPosition().x();
 

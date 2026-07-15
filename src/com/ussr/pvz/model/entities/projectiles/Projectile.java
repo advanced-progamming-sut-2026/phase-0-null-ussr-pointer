@@ -107,12 +107,15 @@ public class Projectile extends GameEntity {
             for (Zombie zombie : zombies) {
                 if (!zombie.isAlive()) continue;
                 if (this.getPosition().distanceTo(zombie.getPosition()) < 0.2) {
+                    if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense.JesterDefense jester) {
+                        if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy() instanceof ArcMove) {
+                            this.setSpeed(this.getSpeed().scale(-1));
+                            this.target = jester.findNearestPlantInLane(zombie, session);
+                            jester.triggerSpin(zombie);
 
-                    // TODO: [JESTER REFLECTION]
-                    // 1. Check if zombie.getDefenseBehavior() instanceof JesterDefense (or equivalent state).
-                    // 2. Verify if this Projectile's class/alias is within the Jester's BounceableProjectiles list.
-                    // 3. If true, invert the speed vector (this.getSpeed().scale(-1)), swap target to Plant,
-                    //    flag payload as 'Chilling' if it was an IceHit, and skip the rest of this hit resolution.
+                            return new ArrayList<>();
+                        }
+                    }
 
                     physicalImpactTarget = zombie;
                     break;

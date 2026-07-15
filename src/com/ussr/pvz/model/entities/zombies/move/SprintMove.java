@@ -30,7 +30,15 @@ public class SprintMove implements MoveBehavior {
         if (pos == null) return;
 
         double deltaX = getActiveSpeedX(zombie) * GameClock.SECONDS_PER_TICK;
-        zombie.setPosition(Vec2.of(pos.x() + deltaX, pos.y()));
+        Vec2 newPos = Vec2.of(pos.x() + deltaX, pos.y());
+
+        int oldCol = (int) pos.x();
+        int newCol = (int) newPos.x();
+        if (newCol != oldCol) {
+            newPos = applySlipperyShift(newPos, session);
+        }
+
+        zombie.setPosition(newPos);
 
         if (zombie.getPosition().x() < 0) {
             session.onZombieReachedEnd();

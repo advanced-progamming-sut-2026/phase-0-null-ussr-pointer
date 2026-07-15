@@ -41,6 +41,8 @@ public class Zombie extends GameEntity implements Damageable {
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
     private final boolean isGlowing;
+    private java.util.List<String> damageWhileSubmerged;
+    private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
 
     @Override
     public void takeDamage(int damage) {
@@ -163,9 +165,27 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive || this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
 
         if (this.vulnerabilityState == Vulnerability.SUBMERGED) {
-            if (damageSource instanceof Projectile p && !(p.getMoveStrategy() instanceof ArcMove)) {
-                return;
+            boolean allowDamage = false;
+
+            if (damageSource instanceof com.ussr.pvz.model.entities.plants.Plant plant) {
+                String plantName = plant.getName().toLowerCase().replace("-", "").replace(" ", "");
+
+                // Check standard submerged damage whitelist (e.g. Tangle Kelp, Ghost Pepper)
+                if (damageWhileSubmerged != null && damageWhileSubmerged.contains(plantName)) {
+                    allowDamage = true;
+                }
+                // Check if the plant is currently using Plant Food and matches the secondary whitelist
+                else if (plant.getPlantFoodTimer() > 0 && damageWhileSubmergedPlantfoodOnly != null && damageWhileSubmergedPlantfoodOnly.contains(plantName)) {
+                    allowDamage = true;
+                }
+            } else if (damageSource instanceof Projectile p) {
+                // As a fallback for projectiles without an explicit Plant origin, Lobbed (ArcMove) shots always hit
+                if (p.getMoveStrategy() instanceof ArcMove) {
+                    allowDamage = true;
+                }
             }
+
+            if (!allowDamage) return;
         }
 
         int actualDamage = damage;
@@ -346,5 +366,13 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setPushableRespawnsRemaining(int pushableRespawnsRemaining) {
         this.pushableRespawnsRemaining = pushableRespawnsRemaining;
+    }
+
+    public void setDamageWhileSubmerged(java.util.List<String> damageWhileSubmerged) {
+        this.damageWhileSubmerged = damageWhileSubmerged;
+    }
+
+    public void setDamageWhileSubmergedPlantfoodOnly(java.util.List<String> damageWhileSubmergedPlantfoodOnly) {
+        this.damageWhileSubmergedPlantfoodOnly = damageWhileSubmergedPlantfoodOnly;
     }
 }

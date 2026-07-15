@@ -69,13 +69,10 @@ public class PlantFactory {
         plant.setPlantFoodType(config.plantFoodType);
         plant.setWrampUp(config.wrampUp);
 
-        // Map behavior and effects dynamically using Registry pattern
         plant.setShootingVectors(ShootingVectorRegistry.getVectors(config));
         plant.setActStrategy(ActStrategyRegistry.create(config));
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(config));
 
-        // TODO: Assigning Plant Strategies
-        //  Evaluate the plant's name or tags and assign the correct ActStrategy:
 
         return plant;
     }

@@ -116,7 +116,7 @@ public class ZombieFactory {
         Object defenseSpec = data.getOrDefault("defense", "NormalDefense");
         Object effectSpec = data.get("effect");
 
-        zombie.setMoveBehavior(MoveBehaviorRegistry.create(moveSpec));
+        zombie.setMoveBehavior(MoveBehaviorRegistry.create(moveSpec, data));
         zombie.setAttackBehavior(AttackBehaviorRegistry.create(attackSpec, data));
         zombie.setDefenseBehavior(DefenseBehaviorRegistry.create(defenseSpec));
         zombie.setEffectStatus(EffectStatusRegistry.createOrNull(effectSpec, data));
@@ -147,7 +147,14 @@ public class ZombieFactory {
         zombie.setHp(hp);
         zombie.setEatDps(eatDps);
         zombie.setSize(size);
-
+        if (data.containsKey("DamageWhileSubmerged")) {
+            Map<String, Object> map = (Map<String, Object>) data.get("DamageWhileSubmerged");
+            zombie.setDamageWhileSubmerged((List<String>) map.get("List"));
+        }
+        if (data.containsKey("DamageWhileSubmergedPlantfoodOnly")) {
+            Map<String, Object> map = (Map<String, Object>) data.get("DamageWhileSubmergedPlantfoodOnly");
+            zombie.setDamageWhileSubmergedPlantfoodOnly((List<String>) map.get("List"));
+        }
         Vec2 spawnPos = Vec2.of(col, row);
         zombie.setPosition(spawnPos);
         zombie.setSpeed(Vec2.of(-speed, 0));
@@ -212,11 +219,6 @@ public class ZombieFactory {
         return new Armor(ArmorType.CROWN, crownHp + shoulderHp);
     }
 
-    // TODO(zombotany-zombie-types): none of the 4 Zombotany-minigame zombie types exist yet
-    //  (peashooter-zombie / wall-nut-zombie / jalapeno-zombie / squash-zombie — see spec + the
-    //  matching TODO in ZombotanyService.java). They'll need aliases + blueprint entries added
-    //  either to zombies.json or a parallel minigame-only data source, plus effect/attack classes
-    //  wired through the same registries used below (EffectStatusRegistry, AttackBehaviorRegistry).
     @SuppressWarnings("unchecked")
     private static void attachPushedStructureIfNeeded(Zombie zombie, Map<String, Object> data) {
         PushableType type = switch (zombie.getAlias()) {

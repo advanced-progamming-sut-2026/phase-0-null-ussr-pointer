@@ -308,11 +308,6 @@ public class GameService {
                 throw new IllegalStateException("no plant food available");
             }
 
-            // TODO: [PLANT FOOD PARSERS]
-            // Implement concrete Strategy pattern classes for specific plantFoodTypes
-            // (e.g., MAP_WIDE_FREEZE, SPAWN_CLONES, PROJECTILE_BURST).
-            // Map these implementations to the JSON enum strings so triggerSuperpower()
-            // executes the exact simulation payload.
             plant.getPlantFoodEffect().triggerSuperpower(plant, session);
             plant.getPlantFoodEffect().applyStatusModifiers(plant);
             session.notifyPlantFoodUsed(plant);
