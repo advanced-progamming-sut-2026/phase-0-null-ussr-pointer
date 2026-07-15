@@ -29,6 +29,7 @@ public class AppView {
         menus.put(MenuState.TRAVEL_LOG, new TravelLogMenu());
         menus.put(MenuState.LEADERBOARD, new LeaderBoardMenu());
         menus.put(MenuState.CHOOSE_PLANT, new ChoosePlantMenu());
+        menus.put(MenuState.SHOP, new ShopMenu());
 
         App.initShop();
         App.getLevelManager().loadFromJson();

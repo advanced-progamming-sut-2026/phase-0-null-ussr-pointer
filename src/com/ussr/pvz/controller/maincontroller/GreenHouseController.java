@@ -5,18 +5,14 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.dto.GreenhousePotRequest;
 import com.ussr.pvz.service.GreenHouseService;
-import com.ussr.pvz.controller.command.maincommand.ShopCommand;
-import com.ussr.pvz.service.ShopService;
 
 import java.util.regex.Matcher;
 
 public class GreenHouseController {
     GreenHouseService greenHouseService;
-    ShopService shopService;
 
     public GreenHouseController() {
         greenHouseService = new GreenHouseService();
-        shopService = new ShopService();
     }
 
     public String handleCommand(String command) {
@@ -29,18 +25,6 @@ public class GreenHouseController {
                     case COLLECT -> handleCollect(matcher);
                     case GROW -> handleGrow(matcher);
                     case ENTER_SHOP -> handleEnterShop();
-
-                };
-            }
-        }
-
-        for (ShopCommand cmd : ShopCommand.values()) {
-            Matcher matcher = cmd.getMatcher(command);
-            if (matcher.matches()) {
-                return switch (cmd) {
-                    case SHOP_BUY -> handleShopBuy(matcher);
-                    case SHOP_LIST -> handleShopList();
-                    case SHOP_DAILY -> handleShopDaily();
                 };
             }
         }
@@ -48,7 +32,7 @@ public class GreenHouseController {
     }
 
     private String handleShowGreenhouse() {
-       return greenHouseService.showGreenHouse();
+        return greenHouseService.showGreenHouse();
     }
 
     private String handlePlantPot(Matcher matcher) {
@@ -82,27 +66,5 @@ public class GreenHouseController {
     private String handleEnterShop() {
         App.setMenuState(MenuState.SHOP);
         return "You are currently shopping";
-    }
-
-    private String handleShopList() {
-        return shopService.shopList();
-    }
-
-    private String handleShopDaily() {
-        return shopService.shopDaily();
-    }
-
-    private String handleShopBuy(Matcher matcher) {
-        com.ussr.pvz.model.dto.ShopBuyRequest request = new com.ussr.pvz.model.dto.ShopBuyRequest(
-                matcher.group("itemId"),
-                matcher.group("count"),
-                matcher.group("plantType")
-        );
-
-        try {
-            return shopService.buy(request);
-        } catch (Exception e) {
-            return e.getMessage();
-        }
     }
 }

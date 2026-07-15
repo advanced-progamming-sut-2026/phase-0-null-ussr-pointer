@@ -51,15 +51,27 @@ public class GlobalService {
         if (current == MenuState.MAIN) {
             return "please use logout command to exit main menu";
         }
-        MenuState parent = switch (current) {
+
+        MenuState parent = parentOf(current);
+
+        if (parent == null) {
+            App.setMenuState(null);
+            return "bye bye";
+        }
+
+        App.setMenuState(parent);
+        return "menu changed to " + parent.getName();
+    }
+
+    private MenuState parentOf(MenuState current) {
+        return switch (current) {
             case REGISTER -> null;
             case LOGIN -> MenuState.REGISTER;
             case GAME, SETTING, NETWORK, NEWS, PROFILE -> MenuState.MAIN;
-            case COLLECTION -> MenuState.GAME;
+            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG, CHOOSE_PLANT -> MenuState.GAME;
+            case SHOP -> MenuState.GREENHOUSE;
             default -> null;
         };
-        App.setMenuState(parent);
-        return parent != null ? "menu changed to " + parent.getName() : "bye bye";
     }
 
     public String advanceTime(AdvanceTimeRequest request) {
