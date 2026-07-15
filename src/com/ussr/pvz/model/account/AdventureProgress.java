@@ -94,7 +94,7 @@ public class AdventureProgress {
                 plantInstance.setCost(plantInstance.getCost() + (int) value);
                 break;
             case "RECHARGE":
-                plantInstance.setRecharge(plantInstance.getRecharge() + (int) value);
+                plantInstance.setMaxRecharge(Math.max(0.0, plantInstance.getMaxRecharge() + value));
                 break;
             case "ACTION_INTERVAL":
                 plantInstance.setActionInterval(plantInstance.getActionInterval() + value);
@@ -114,7 +114,7 @@ public class AdventureProgress {
         if (plantData.get("actionInterval") != null)
             plantInstance.setActionInterval(((Number) plantData.get("actionInterval")).doubleValue());
         if (plantData.get("recharge") != null)
-            plantInstance.setRecharge(((Number) plantData.get("recharge")).intValue());
+            plantInstance.setMaxRecharge(((Number) plantData.get("recharge")).doubleValue());
         if (plantData.get("abilityValue") != null)
             plantInstance.setAbilityValue(((Number) plantData.get("abilityValue")).doubleValue());
         if (plantData.get("wramp-up") != null) {

@@ -209,7 +209,7 @@ public class GameService {
             //    to their ModifiableStat fields (damage, attack speed, etc.).
             // 3. Mark the Mint plant to despawn/setAlive(false) after its active duration expires.
 
-            blueprint.setRecharge(150);
+            blueprint.setRecharge(blueprint.getMaxRecharge());
 
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
         } catch (IllegalStateException e) {

@@ -20,7 +20,8 @@ public class Plant extends GameEntity implements Damageable {
     private String name;
     private int level = 1;
     private int hp;
-    private int recharge;
+    private double maxRecharge;
+    private double recharge;
     private double actionInterval;
     private int cost;
     private Location location;
@@ -78,6 +79,7 @@ public class Plant extends GameEntity implements Damageable {
         this.damage = blueprint.damage;
         this.actionInterval = blueprint.actionInterval;
         this.recharge = blueprint.recharge;
+        this.maxRecharge = blueprint.maxRecharge;
         this.tags.addAll(blueprint.tags);
         this.rawUpgrades.addAll(blueprint.rawUpgrades);
         this.state = PlantState.ACTIVE;
@@ -212,8 +214,26 @@ public class Plant extends GameEntity implements Damageable {
         return hp;
     }
 
-    public int getRecharge() {
+    public double getRecharge() {
         return recharge;
+    }
+
+    public void setRecharge(double recharge) {
+        this.recharge = recharge;
+    }
+
+    public double getMaxRecharge() {
+        return maxRecharge;
+    }
+
+    public void setMaxRecharge(double maxRecharge) {
+        this.maxRecharge = maxRecharge;
+    }
+
+    public void tickRecharge(double deltaSeconds) {
+        if (recharge > 0) {
+            recharge = Math.max(0.0, recharge - deltaSeconds);
+        }
     }
 
     public void setRecharge(int recharge) {

@@ -4,8 +4,29 @@
       "id": "ancient_egypt",
       "name": "Ancient Egypt",
       "gameMode": "ADVENTURE",
-      "allowedPlants": ["sunflower", "peashooter", "wallnut", "potato_mine"],
-      "allowedTiles": ["SAND_TILE", "TOMBSTONE_TILE"],
+      "allowedPlants": [
+        "Sunflower",
+        "Twin Sunflower",
+        "Primal Sunflower",
+        "Gold Bloom",
+        "Peashooter",
+        "Repeater",
+        "Cactus",
+        "Potato Mine",
+        "Cherry Bomb",
+        "Wall-nut",
+        "Tall-nut",
+        "Garlic",
+        "Sun Bean",
+        "Grave Buster",
+        "Enlighten-mint",
+        "Appease-mint",
+        "Bombard-mint"
+      ],
+      "allowedTiles": [
+        "SAND_TILE",
+        "TOMBSTONE_TILE"
+      ],
       "levels": [
         {
           "id": "egypt_1_1",
@@ -16,27 +37,133 @@
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
           "environment": "AncientEgyptEnvironment",
-          "behavior": "PlantWhatYouGetBehavior",
+          "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
           "allowedZombies": [
-            { "id": "mummy_normal", "weight": 1000 },
-            { "id": "mummy_conehead", "weight": 400 }
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 400
+            }
           ],
           "sandstorms": [
-            { "triggerTimeSeconds": 45.0, "zombieAlias": "mummy_normal" },
-            { "triggerTimeSeconds": 90.5, "zombieAlias": "mummy_conehead" }
+            {
+              "triggerTimeSeconds": 45.0,
+              "zombieAlias": "ZombieDefault"
+            },
+            {
+              "triggerTimeSeconds": 90.5,
+              "zombieAlias": "ZombieArmor1"
+            }
           ],
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 1000,
-              "spawnData": [
-                { "zombieId": "mummy_normal", "lane": 2, "delaySeconds": 0.0 },
-                { "zombieId": "mummy_normal", "lane": 4, "delaySeconds": 3.5 }
-              ]
+              "cost": 1000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 1500
             }
           ]
+        },
+        {
+          "id": "egypt_1_2",
+          "order": 2,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": 3,
+          "environment": "AncientEgyptEnvironment",
+          "behavior": "LoveYourPlantsBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieDefault",
+              "weight": 800
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 400
+            },
+            {
+              "id": "ZombieRa",
+              "weight": 300
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 1400
+            }
+          ]
+        },
+        {
+          "id": "egypt_1_3",
+          "order": 3,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "AncientEgyptEnvironment",
+          "behavior": "NormalBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor2",
+              "weight": 700
+            },
+            {
+              "id": "ZombieImp",
+              "weight": 400
+            },
+            {
+              "id": "ZombieTombRaiser",
+              "weight": 350
+            },
+            {
+              "id": "ZombieCrystalSkull",
+              "weight": 200
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2200
+            },
+            {
+              "waveNumber": 2,
+              "cost": 2600
+            }
+          ]
+        },
+        {
+          "id": "egypt_1_4",
+          "order": 4,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "AncientEgyptEnvironment",
+          "behavior": "BossBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieGargantuar",
+              "weight": 1000
+            }
+          ],
+          "waves": []
         }
       ]
     },
@@ -44,8 +171,30 @@
       "id": "big_wave_beach",
       "name": "Big Wave Beach",
       "gameMode": "ADVENTURE",
-      "allowedPlants": ["sunflower", "lily_pad", "tangle_kelp", "peashooter"],
-      "allowedTiles": ["SAND_TILE", "WATER_TILE"],
+      "allowedPlants": [
+        "Lily Pad",
+        "Tangle Kelp",
+        "Sea-shroom",
+        "Snow Pea",
+        "Cat-tail",
+        "Bonk Choy",
+        "Threepeater",
+        "Split Pea",
+        "Kernel-pult",
+        "Melon-pult",
+        "Cabbage-pult",
+        "Pepper-pult",
+        "Hypno-shroom",
+        "Magnet-shroom",
+        "Endurian",
+        "Sweet Potato",
+        "catTail-mint",
+        "Explode-o-nut"
+      ],
+      "allowedTiles": [
+        "SAND_TILE",
+        "WATER_TILE"
+      ],
       "levels": [
         {
           "id": "beach_2_1",
@@ -56,28 +205,139 @@
           "deadlineColumn": 3,
           "allowedPlantsLost": 5,
           "environment": "BigWaveBeachEnvironment",
-          "behavior": "PlantWhatYouGetBehavior",
-          "lockedPlants": ["lily_pad"],
+          "behavior": "NormalBehavior",
+          "lockedPlants": [
+            "Lily Pad"
+          ],
           "seedPlants": [],
           "startingTideColumn": 6,
           "tides": [
-            { "triggerTimeSeconds": 30.0, "targetColumn": 5 },
-            { "triggerTimeSeconds": 75.0, "targetColumn": 7 }
+            {
+              "triggerTimeSeconds": 30.0,
+              "targetColumn": 5
+            },
+            {
+              "triggerTimeSeconds": 75.0,
+              "targetColumn": 7
+            }
           ],
           "allowedZombies": [
-            { "id": "beach_normal", "weight": 1000 },
-            { "id": "surfer_zombie", "weight": 300 }
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieBeachSnorkel",
+              "weight": 300
+            }
           ],
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 1500,
-              "spawnData": [
-                { "zombieId": "beach_normal", "lane": 1, "delaySeconds": 1.0 },
-                { "zombieId": "surfer_zombie", "lane": 3, "delaySeconds": 5.0 }
-              ]
+              "cost": 1500
             }
           ]
+        },
+        {
+          "id": "beach_2_2",
+          "order": 2,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "BigWaveBeachEnvironment",
+          "behavior": "SaveOurSeedsBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "plantLayout": [
+            {
+              "plantName": "Sea-shroom",
+              "row": 1,
+              "col": 4
+            },
+            {
+              "plantName": "Tangle Kelp",
+              "row": 3,
+              "col": 4
+            }
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieBeachFisherman",
+              "weight": 500
+            },
+            {
+              "id": "ZombieBeachOctopus",
+              "weight": 400
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 1600
+            }
+          ]
+        },
+        {
+          "id": "beach_2_3",
+          "order": 3,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "BigWaveBeachEnvironment",
+          "behavior": "NormalBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "startingTideColumn": 7,
+          "tides": [
+            {
+              "triggerTimeSeconds": 40.0,
+              "targetColumn": 6
+            }
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieProspector",
+              "weight": 500
+            },
+            {
+              "id": "ZombieLostCityJane",
+              "weight": 400
+            },
+            {
+              "id": "ZombieModernAllStar",
+              "weight": 300
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2400
+            }
+          ]
+        },
+        {
+          "id": "beach_2_4",
+          "order": 4,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "BigWaveBeachEnvironment",
+          "behavior": "BossBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieModernAllStar",
+              "weight": 1000
+            }
+          ],
+          "waves": []
         }
       ]
     },
@@ -85,37 +345,155 @@
       "id": "dark_ages",
       "name": "Dark Ages",
       "gameMode": "ADVENTURE",
-      "allowedPlants": ["sun_shroom", "puff_shroom", "fume_shroom"],
-      "allowedTiles": ["GRASS_TILE", "GRAVESTONE_TILE"],
+      "allowedPlants": [
+        "Fume-shroom",
+        "Puff-shroom",
+        "Sun-shroom",
+        "Doom-shroom",
+        "Ice-shroom",
+        "Squash",
+        "Grapeshot",
+        "Jalapeno",
+        "Chomper",
+        "Wasabi Whip",
+        "Phat Beet",
+        "Torchwood",
+        "Imitater",
+        "Pumpkin",
+        "Enforce-mint",
+        "Reinforce-mint",
+        "Enchant-mint",
+        "Hot Potato"
+      ],
+      "allowedTiles": [
+        "GRASS_TILE",
+        "GRAVESTONE_TILE"
+      ],
       "levels": [
         {
           "id": "dark_3_1",
           "order": 1,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "DarkAgesEnvironment",
+          "behavior": "NormalBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "necromancyZombieAlias": "ZombieDarkArmor3",
+          "zombiesPerNecromancyWave": 2,
+          "allowedZombies": [
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieArmor4",
+              "weight": 200
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2000
+            }
+          ]
+        },
+        {
+          "id": "dark_3_2",
+          "order": 2,
           "deliveryStrategy": "regular",
           "sunFalling": false,
           "timeLimitSeconds": 180,
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
           "environment": "DarkAgesEnvironment",
-          "behavior": "BossBehavior",
+          "behavior": "TimedWarBehavior",
+          "timedWarType": "ZOMBIE",
+          "timedWarTarget": 20,
           "lockedPlants": [],
           "seedPlants": [],
-          "necromancyZombieAlias": "zombie_peasant_knight",
-          "zombiesPerNecromancyWave": 4,
           "allowedZombies": [
-            { "id": "peasant_normal", "weight": 1000 },
-            { "id": "peasant_knight", "weight": 200 }
+            {
+              "id": "ZombieDarkJuggler",
+              "weight": 500
+            },
+            {
+              "id": "ZombieWizard",
+              "weight": 400
+            }
           ],
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 2000,
-              "spawnData": [
-                { "zombieId": "peasant_normal", "lane": 0, "delaySeconds": 0.0 },
-                { "zombieId": "peasant_knight", "lane": 2, "delaySeconds": 2.0 }
-              ]
+              "cost": 1800
             }
           ]
+        },
+        {
+          "id": "dark_3_3",
+          "order": 3,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "DarkAgesEnvironment",
+          "behavior": "NormalBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "necromancyZombieAlias": "ZombieDarkArmor3",
+          "zombiesPerNecromancyWave": 3,
+          "allowedZombies": [
+            {
+              "id": "ZombieDarkArmor3",
+              "weight": 600
+            },
+            {
+              "id": "ZombieDarkImpDragon",
+              "weight": 300
+            },
+            {
+              "id": "ZombiePiano",
+              "weight": 250
+            },
+            {
+              "id": "ZombieArcade",
+              "weight": 250
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2800
+            },
+            {
+              "waveNumber": 2,
+              "cost": 3000
+            }
+          ]
+        },
+        {
+          "id": "dark_3_4",
+          "order": 4,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "DarkAgesEnvironment",
+          "behavior": "BossBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieDarkKing",
+              "weight": 1000
+            }
+          ],
+          "waves": []
         }
       ]
     },
@@ -123,8 +501,28 @@
       "id": "frostbite_caves",
       "name": "Frostbite Caves",
       "gameMode": "ADVENTURE",
-      "allowedPlants": ["sunflower", "pepper_pult", "peashooter"],
-      "allowedTiles": ["ICE_TILE", "SLIDER_TILE"],
+      "allowedPlants": [
+        "Winter Melon",
+        "Iceberg Lettuce",
+        "Rotobaga",
+        "Starfruit",
+        "Goo Peashooter",
+        "Mega Gatling Pea",
+        "Fire Peashooter",
+        "Citron",
+        "Caulipower",
+        "Electric Blueberry",
+        "Bowling Bulb",
+        "Kiwibeast",
+        "Primal Potato Mine",
+        "Pea Pod",
+        "Pierce-mint",
+        "Arma-mint"
+      ],
+      "allowedTiles": [
+        "ICE_TILE",
+        "SLIDER_TILE"
+      ],
       "levels": [
         {
           "id": "frost_4_1",
@@ -135,24 +533,111 @@
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
           "environment": "FrostbiteEnvironment",
-          "behavior": "PlantWhatYouGetBehavior",
+          "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
           "windIntervalSeconds": 20.0,
           "freezeStacksPerWind": 1,
           "allowedZombies": [
-            { "id": "cave_normal", "weight": 1000 },
-            { "id": "yeti_imp", "weight": 500 }
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieIceAgeDodo",
+              "weight": 500
+            }
           ],
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 1200,
-              "spawnData": [
-                { "zombieId": "cave_normal", "lane": 3, "delaySeconds": 0.0 }
-              ]
+              "cost": 1200
             }
           ]
+        },
+        {
+          "id": "frost_4_2",
+          "order": 2,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": 2,
+          "allowedPlantsLost": -1,
+          "environment": "FrostbiteEnvironment",
+          "behavior": "DeadlineBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieIceAgeHunter",
+              "weight": 500
+            },
+            {
+              "id": "ZombieExplorer",
+              "weight": 400
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 1600
+            }
+          ]
+        },
+        {
+          "id": "frost_4_3",
+          "order": 3,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "FrostbiteEnvironment",
+          "behavior": "NormalBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "windIntervalSeconds": 15.0,
+          "freezeStacksPerWind": 1,
+          "allowedZombies": [
+            {
+              "id": "ZombieIceAgeTroglobite",
+              "weight": 600
+            },
+            {
+              "id": "ZombieIceAgeDodo",
+              "weight": 400
+            },
+            {
+              "id": "ZombieIceAgeHunter",
+              "weight": 300
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2500
+            }
+          ]
+        },
+        {
+          "id": "frost_4_4",
+          "order": 4,
+          "deliveryStrategy": "regular",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "FrostbiteEnvironment",
+          "behavior": "BossBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieIceAgeTroglobite",
+              "weight": 1000
+            }
+          ],
+          "waves": []
         }
       ]
     },
@@ -161,7 +646,9 @@
       "name": "Zomboss Arcade",
       "gameMode": "MINIGAME",
       "allowedPlants": [],
-      "allowedTiles": ["GRASS_TILE"],
+      "allowedTiles": [
+        "GRASS_TILE"
+      ],
       "levels": [
         {
           "id": "minigame_bowling",
@@ -172,7 +659,12 @@
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
-          "allowedZombies": [{ "id": "buckethead", "weight": 1000 }],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor2",
+              "weight": 1000
+            }
+          ],
           "waves": []
         },
         {
@@ -184,8 +676,18 @@
           "lockedPlants": [],
           "seedPlants": [],
           "targetMatches": 20,
-          "startingPlants": ["peashooter", "wallnut", "sunflower", "snow_pea"],
-          "allowedZombies": [{ "id": "gargantuar", "weight": 100 }],
+          "startingPlants": [
+            "Peashooter",
+            "Wall-nut",
+            "Sunflower",
+            "Snow Pea"
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieGargantuar",
+              "weight": 100
+            }
+          ],
           "waves": []
         },
         {
@@ -199,13 +701,35 @@
           "redLineColumn": 4,
           "startingSun": 200,
           "plantLayout": [
-            { "plantName": "sunflower", "row": 0, "col": 1 },
-            { "plantName": "peashooter", "row": 2, "col": 2 },
-            { "plantName": "wallnut", "row": 4, "col": 1 }
+            {
+              "plantName": "Sunflower",
+              "row": 0,
+              "col": 1
+            },
+            {
+              "plantName": "Peashooter",
+              "row": 2,
+              "col": 2
+            },
+            {
+              "plantName": "Wall-nut",
+              "row": 4,
+              "col": 1
+            }
           ],
           "allowedZombies": [
-            { "id": "imp_zombie", "weight": 1000 },
-            { "id": "buckethead", "weight": 500 }
+            {
+              "id": "ZombieImp",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 500
+            },
+            {
+              "id": "ZombieNewspaper",
+              "weight": 300
+            }
           ],
           "waves": []
         },

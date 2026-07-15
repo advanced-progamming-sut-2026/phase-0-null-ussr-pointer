@@ -63,7 +63,8 @@ public class PlantFactory {
         plant.setCost(Math.max(0, runtimeCost));
         plant.setActionInterval(Math.max(0.05, runtimeInterval));
         plant.setDamage(runtimeDamage);
-        plant.setRecharge((int) Math.max(0.0, runtimeRecharge));
+        plant.setMaxRecharge(Math.max(0.0, runtimeRecharge));
+        plant.setRecharge(0.0);
         plant.setAbilityValue(runtimeAbility);
         plant.setLevel(level);
         plant.setPlantFoodType(config.plantFoodType);

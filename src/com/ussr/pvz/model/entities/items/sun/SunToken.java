@@ -48,8 +48,10 @@ public class SunToken extends GroundItem {
         this.falling = true;
         this.currentY = 0.0;
         this.fallTargetY = targetRow;
+        this.setPosition(com.ussr.pvz.model.util.Vec2.of(targetCol, targetRow)); // <-- add this
+
         App.getGameSession().getEventBus()
-                .publish(new GameEvent.SunStartedFalling(selectedType.toString(),targetRow,targetCol));
+                .publish(new GameEvent.SunStartedFalling(selectedType.toString(), targetCol, targetRow));
     }
 
     @Override
@@ -75,7 +77,6 @@ public class SunToken extends GroundItem {
         int rCenter = targetRow;
         int cCenter = targetCol;
 
-        // Deal 150 damage to zombies in a 5x5 area (Radius of 2)
         if (session.getZombies() != null) {
             for (com.ussr.pvz.model.entities.zombies.Zombie zombie : session.getZombies()) {
                 if (!zombie.isAlive()) continue;
@@ -89,7 +90,6 @@ public class SunToken extends GroundItem {
             }
         }
 
-        // Deal 80 damage to plants in a 3x3 area (Radius of 1)
         if (session.getPlants() != null) {
             for (com.ussr.pvz.model.entities.plants.Plant plant : session.getPlants()) {
                 if (!plant.isAlive()) continue;
@@ -98,7 +98,6 @@ public class SunToken extends GroundItem {
                 int pX = plant.getLocation().x();
 
                 if (Math.abs(pY - rCenter) <= 1 && Math.abs(pX - cCenter) <= 1) {
-                    // Pass null for the dealer, or create a specific environmental damage source if needed
                     plant.takeDamage(80, null);
                 }
             }
@@ -115,11 +114,10 @@ public class SunToken extends GroundItem {
             double progress = (double) elapsedTicks / TOTAL_FALL_TICKS;
             currentY = progress * fallTargetY;
 
-
             if (elapsedTicks >= TOTAL_FALL_TICKS) {
                 falling = false;
                 currentY = fallTargetY;
-                App.getGameSession().getEventBus().publish(new GameEvent.SunGrounded(targetRow,targetCol));
+                App.getGameSession().getEventBus().publish(new GameEvent.SunGrounded(targetCol, targetRow));
             }
             return;
         }
@@ -129,7 +127,7 @@ public class SunToken extends GroundItem {
         groundedTicks++;
         if (groundedTicks >= TOTAL_EXPIRE_TICKS) {
             this.isAlive = false;
-            App.getGameSession().getEventBus().publish(new GameEvent.SunExpired(targetRow, targetCol));
+            App.getGameSession().getEventBus().publish(new GameEvent.SunExpired(targetCol, targetRow));
         }
     }
 

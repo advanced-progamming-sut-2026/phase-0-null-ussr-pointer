@@ -10,6 +10,7 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.view.CliGameEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,10 +152,15 @@ public class ChoosePlantService {
         session.setLawn(lawn);
         session.setPlants(new ArrayList<>());
         session.setZombies(new ArrayList<>());
+        session.setItems(new ArrayList<>());
         session.setLevel(level);
         session.addSun(INITIAL_SUN);
 
         App.setGameSession(session);
+
+        // Register the CLI View layer to listen to engine events
+        new CliGameEventListener(session);
+
         ZombieFactory.init();
         level.onStart();
         session.initClock();

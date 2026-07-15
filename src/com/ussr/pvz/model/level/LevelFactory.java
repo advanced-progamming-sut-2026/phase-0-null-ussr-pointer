@@ -94,7 +94,7 @@ public class LevelFactory {
         if (data.sandstorms != null) {
             List<Level.SandstormEvent> schedule = new ArrayList<>();
             for (JsonContainer.JsonSandstormEvent e : data.sandstorms) {
-                schedule.add(new Level.SandstormEvent(e.triggerTimeSeconds, e.zombieAlias));
+                schedule.add(new Level.SandstormEvent(e.triggerTimeSeconds, resolveZombieAlias(e.zombieAlias)));
             }
             level.setSandstormSchedule(schedule);
         }
@@ -108,7 +108,7 @@ public class LevelFactory {
             level.setTideSchedule(schedule);
         }
 
-        level.setNecromancyZombieAlias(data.necromancyZombieAlias);
+        level.setNecromancyZombieAlias(resolveZombieAlias(data.necromancyZombieAlias));
         level.setZombiesPerNecromancyWave(data.zombiesPerNecromancyWave);
         level.setWindIntervalSeconds(data.windIntervalSeconds);
         level.setFreezeStacksPerWind(data.freezeStacksPerWind);
@@ -119,7 +119,7 @@ public class LevelFactory {
             List<Level.AllowedZombie> allowed = new ArrayList<>();
             for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
                 if (entry.id != null) {
-                    allowed.add(new Level.AllowedZombie(entry.id, entry.weight > 0 ? entry.weight : 1000));
+                    allowed.add(new Level.AllowedZombie(resolveZombieAlias(entry.id), entry.weight > 0 ? entry.weight : 1000));
                 }
             }
             level.setAllowedZombies(allowed);
@@ -131,12 +131,29 @@ public class LevelFactory {
                 List<Level.SpawnData> spawns = new ArrayList<>();
                 if (waveData.spawnData != null) {
                     for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
-                        spawns.add(new Level.SpawnData(spawnEntry.zombieId, spawnEntry.lane, spawnEntry.delaySeconds));
+                        spawns.add(new Level.SpawnData(resolveZombieAlias(spawnEntry.zombieId), spawnEntry.lane, spawnEntry.delaySeconds));
                     }
                 }
                 waves.add(new Level.Wave(waveData.waveNumber, waveData.cost, spawns));
             }
             level.setWaves(waves);
         }
+    }
+
+    /**
+     * Bridges legacy JSON zombie nomenclature to strict internal zombie aliases from zombies.json.
+     */
+    private static String resolveZombieAlias(String rawAlias) {
+        if (rawAlias == null || rawAlias.isBlank()) return null;
+        return switch (rawAlias.trim().toLowerCase()) {
+            case "mummy_normal", "beach_normal", "peasant_normal", "cave_normal", "zombie" -> "ZombieDefault";
+            case "mummy_conehead", "conehead" -> "ZombieArmor1";
+            case "buckethead" -> "ZombieArmor2";
+            case "peasant_knight", "zombie_peasant_knight" -> "ZombieDarkArmor3";
+            case "surfer_zombie" -> "ZombieBeachSnorkel";
+            case "yeti_imp", "imp_zombie" -> "ZombieImp";
+            case "gargantuar" -> "ZombieGargantuar";
+            default -> rawAlias;
+        };
     }
 }

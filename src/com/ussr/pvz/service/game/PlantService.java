@@ -45,7 +45,7 @@ public class PlantService {
         int x = plant.getLocation().x();
         int y = plant.getLocation().y();
 
-        ProducedSun sun = new ProducedSun(x, y, sunAmount);
+        ProducedSun sun = new ProducedSun(x, y, sunAmount, plant.getName());
         session.addItem(sun);
     }
 

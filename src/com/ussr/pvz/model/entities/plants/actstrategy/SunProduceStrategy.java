@@ -23,7 +23,7 @@ public class SunProduceStrategy implements ActStrategy {
                 // This naturally grabs the current stage's sun value thanks to Plant.java's getter
                 int sunValue = (int) user.getAbilityValue();
 
-                ProducedSun sun = new ProducedSun(x, y, sunValue);
+                ProducedSun sun = new ProducedSun(x, y, sunValue, user.getName());
                 session.addItem(sun);
                 user.setInternalTimer(user.getActionInterval());
             }

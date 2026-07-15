@@ -45,7 +45,6 @@ public class Chapter {
      * Bridges the gap between raw JSON data configuration strings and
      * the internal strong-typed TileType enums used by the engine terrain system.
      */
-
     public void setAllowedTiles(List<String> rawTileNames) {
         if (rawTileNames == null) {
             this.allowedTiles = new ArrayList<>();
@@ -55,11 +54,24 @@ public class Chapter {
         List<TileType> parsedTypes = new ArrayList<>();
         for (String name : rawTileNames) {
             if (name == null || name.isBlank()) continue;
-            try {
-                // Safely sanitize and translate e.g., "sand_tile" into TileType.SAND_TILE
-                TileType type = TileType.valueOf(name.trim().toUpperCase());
+
+            String sanitized = name.trim().toUpperCase();
+            TileType type = switch (sanitized) {
+                case "SAND_TILE", "GRASS_TILE", "NORMAL" -> TileType.Normal;
+                case "WATER_TILE", "WATER" -> TileType.Water;
+                case "TOMBSTONE_TILE", "GRAVESTONE_TILE", "GRAVE" -> TileType.Grave;
+                case "ICE_TILE", "FROZEN" -> TileType.Frozen;
+                case "SLIDER_TILE", "SLIPPERY" -> TileType.Slippery;
+                case "SHALLOW_COAST", "SHALLOWCOAST" -> TileType.ShallowCoast;
+                case "NECROMANCY_TILE", "NECROMANCY" -> TileType.Necromancy;
+                case "CRATER_TILE", "CRATER" -> TileType.Crater;
+                case "BEGHOULED_TILE", "BEGHOULED" -> TileType.Beghouled;
+                default -> null;
+            };
+
+            if (type != null) {
                 parsedTypes.add(type);
-            } catch (IllegalArgumentException e) {
+            } else {
                 System.err.println("[Chapter Warning] Skipping invalid TileType entry configured in JSON: '" + name + "'");
             }
         }

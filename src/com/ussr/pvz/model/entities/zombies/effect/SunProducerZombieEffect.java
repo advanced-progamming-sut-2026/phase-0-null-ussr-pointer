@@ -20,7 +20,7 @@ public class SunProducerZombieEffect implements EffectStatus {
             // Drop sun at the zombie's location
             int zRow = (int) zombie.getPosition().y();
             int zCol = (int) zombie.getPosition().x();
-            ProducedSun sun = new ProducedSun(zCol, zRow, 50);
+            ProducedSun sun = new ProducedSun(zCol, zRow, 50, zombie.getAlias());
             session.addItem(sun);
 
             // Ramp up production rate based on custom formula requirement

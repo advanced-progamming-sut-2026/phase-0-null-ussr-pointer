@@ -74,7 +74,7 @@ class GameServiceTest {
     @DisplayName("✅ Should collect sun exactly at target coordinates")
     void collectSun_shouldSucceed_whenSunExistsAtLocation() {
         // Arrange
-        session.addItem(new ProducedSun(2, 3, 50));
+        session.addItem(new ProducedSun(2, 3, 50, "System"));
         LocationRequest request = new LocationRequest("2", "3");
 
         // Act

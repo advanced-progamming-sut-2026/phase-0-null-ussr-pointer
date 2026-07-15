@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.engine.event;
 
-
 public sealed interface GameEvent permits
         GameEvent.ZombieSpawned,
         GameEvent.ZombieDied,
@@ -31,26 +30,20 @@ public sealed interface GameEvent permits
     record ZombieSpawned(String alias, int lane, int col) implements GameEvent {
     }
 
-    record SunStartedFalling(String type,int x , int y) implements GameEvent {
-
+    record SunStartedFalling(String type, int x , int y) implements GameEvent {
     }
 
     record SunGrounded(int x , int y) implements GameEvent {
-
     }
 
     record SunExpired(int x, int y) implements GameEvent {
-
     }
-
 
     record ZombieDied(String alias, double x, double y, String killerPlantName) implements GameEvent {
     }
 
-
     record ZombieReachedHouse(int lane) implements GameEvent {
     }
-
 
     record ZombieBreachedLane(int lane) implements GameEvent {
     }
@@ -71,7 +64,7 @@ public sealed interface GameEvent permits
     record PlantPlucked(String plantName, int row, int col) implements GameEvent {
     }
 
-    record SunProduced(int value, double x, double y) implements GameEvent {
+    record SunProduced(String plantName, int value, double x, double y) implements GameEvent {
     }
 
     record SunCollected(int value, int totalSun) implements GameEvent {

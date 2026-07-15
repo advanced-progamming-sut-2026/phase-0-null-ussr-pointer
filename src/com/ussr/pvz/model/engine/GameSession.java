@@ -11,6 +11,7 @@ import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.items.CoinDrop;
 import com.ussr.pvz.model.entities.items.DiamondDrop;
 import com.ussr.pvz.model.entities.items.GroundItem;
+import com.ussr.pvz.model.entities.items.sun.SunToken;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -36,8 +37,6 @@ public class GameSession {
     private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
     private static final int DIAMOND_DROP_AMOUNT = 1;
 
-    // Interval, in seconds, between sky sun drops on levels where the level allows sun to fall.
-    private static final double SKY_SUN_INTERVAL = 10.0;
     private double skySunTimer = 0.0;
 
     // Flat coin reward granted to the account on level completion, in the absence of any
@@ -92,9 +91,17 @@ public class GameSession {
 
         clock.tick();
         if (level != null && level.isSunFalling() && lawn != null) {
+            double elapsed = clock.getElapsedSeconds();
+            double baseInterval = Math.max(6.0, 12.0 - 0.05 * elapsed);
+
+            // Adjust rate dynamically based on account difficulty modifier
+            int diff = App.getAccount() != null ? App.getAccount().getDifficultyLvl() : 3;
+            double diffMultiplier = diff / 3.0;
+            double actualInterval = baseInterval * diffMultiplier;
+
             skySunTimer += GameClock.SECONDS_PER_TICK;
-            if (skySunTimer >= SKY_SUN_INTERVAL) {
-                addItem(new com.ussr.pvz.model.entities.items.sun.SunToken(lawn.getRows(), lawn.getCols()));
+            if (skySunTimer >= actualInterval) {
+                addItem(new SunToken(lawn.getRows(), lawn.getCols()));
                 skySunTimer = 0.0;
             }
         }
@@ -110,6 +117,12 @@ public class GameSession {
             level.getBehavior().tick(this, GameClock.SECONDS_PER_TICK);
         }
 
+        if (App.getAccount() != null) {
+            for (Plant p : App.getAccount().getAdventureProgress().getAccountPlants()) {
+                p.tickRecharge(GameClock.SECONDS_PER_TICK);
+            }
+        }
+
         plants.removeIf(p -> !p.isAlive());
         zombies.removeIf(z -> !z.isAlive());
         items.removeIf(i -> !i.isAlive());
@@ -119,11 +132,12 @@ public class GameSession {
         cleanupDeadGridStructures();
         checkZombieBreaches();
 
-        if (level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
+        if (!gameOver && level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
             gameOver = true;
+            App.setMenuState(MenuState.MAIN);
         }
 
-        if (areWavesDone()) {
+        if (!gameOver && areWavesDone()) {
             gameOver = true;
 
             Account account = App.getAccount();
@@ -180,20 +194,24 @@ public class GameSession {
         if (level == null || level.getBehavior() == null) return;
 
         for (Zombie zombie : zombies) {
+            if (gameOver) break;
+
             if (!zombie.isAlive()) continue;
 
-            if (zombie.getPosition().x() < 0.0) {
-                int row = (int) zombie.getPosition().y();
-                LawnMower mower = getMowerForLane(row);
+            double zx = zombie.getPosition().x();
+            int row = (int) zombie.getPosition().y();
 
+            if (zx < 0.0) {
+                LawnMower mower = getMowerForLane(row);
                 if (mower != null && !mower.isActivated()) {
                     mower.activate();
                     eventBus.publish(new GameEvent.LawnMowerTriggered(row));
                     eventBus.publish(new GameEvent.ZombieBreachedLane(row));
-                } else {
-                    level.getBehavior().onZombieBreach(this, zombie);
-                    if (gameOver) break;
                 }
+            }
+
+            if (zx < -1.5) {
+                level.getBehavior().onZombieBreach(this, zombie);
             }
         }
     }
@@ -222,9 +240,12 @@ public class GameSession {
     }
 
     public void onZombieReachedEnd() {
+        if (gameOver) return;
+
         gameOver = true;
         eventBus.publish(new GameEvent.ZombieReachedHouse(-1));
         eventBus.publish(new GameEvent.GameOver());
+        App.setMenuState(MenuState.MAIN);
     }
 
     public void addPlant(Plant plant) {
@@ -280,7 +301,6 @@ public class GameSession {
         ));
     }
 
-    /** Use this method to spawn projectiles so they are tracked by the GameClock. */
     public void addProjectile(Projectile projectile) {
         if (projectile == null) return;
         projectiles.add(projectile);
@@ -379,8 +399,8 @@ public class GameSession {
     }
 
     public void removeAllCooldowns() {
-        if (App.getAccount() != null && App.getAccount().getCollection() != null) {
-            for (Plant plant : App.getAccount().getCollection().unlockedPlants()) {
+        if (App.getAccount() != null) {
+            for (Plant plant : App.getAccount().getAdventureProgress().getAccountPlants()) {
                 plant.setRecharge(0);
             }
         }
@@ -574,6 +594,10 @@ public class GameSession {
 
     public double getElapsedSeconds() {
         return clock.getElapsedSeconds();
+    }
+
+    public int getTicks() {
+        return clock.getTicks();
     }
 
     public void notifyPlantDied(Plant plant) {

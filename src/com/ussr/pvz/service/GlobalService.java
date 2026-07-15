@@ -77,7 +77,7 @@ public class GlobalService {
         for (int i = 0; i < count; i++) {
             App.getGameSession().tick();
             if (App.getGameSession().isGameOver()) {
-                return "advanced " + (i + 1) + " tick(s) — game over! a zombie reached the house.";
+                return "advanced " + (i + 1) + " tick(s) — game ended.";
             }
         }
 

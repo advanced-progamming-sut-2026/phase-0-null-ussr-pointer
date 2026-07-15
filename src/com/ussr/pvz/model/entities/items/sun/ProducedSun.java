@@ -12,13 +12,13 @@ public class ProducedSun extends GroundItem {
     private final int y;
     private final int value;
 
-    public ProducedSun(int x, int y, int value) {
+    public ProducedSun(int x, int y, int value, String sourcePlantName) {
         super(ItemType.SUN, 40f, 20f);
         this.x = x;
         this.y = y;
         this.value = value;
         this.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
-        App.getGameSession().getEventBus().publish(new GameEvent.SunProduced(value, x, y));
+        App.getGameSession().getEventBus().publish(new GameEvent.SunProduced(sourcePlantName, value, x, y));
     }
 
     @Override
@@ -40,5 +40,4 @@ public class ProducedSun extends GroundItem {
     public int getX() {
         return x;
     }
-
 }
