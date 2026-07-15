@@ -74,29 +74,25 @@ public class Plant extends GameEntity implements Damageable {
         this.id = blueprint.id;
         this.name = blueprint.name;
         this.type = blueprint.type;
-        this.cost = blueprint.cost;
-        this.hp = blueprint.hp;
-        this.damage = blueprint.damage;
-        this.actionInterval = blueprint.actionInterval;
-        this.recharge = blueprint.recharge;
-        this.maxRecharge = blueprint.maxRecharge;
         this.tags.addAll(blueprint.tags);
         this.rawUpgrades.addAll(blueprint.rawUpgrades);
         this.state = PlantState.ACTIVE;
         this.location = blueprint.location;
-        // Strategy attachments
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodEffect = blueprint.plantFoodEffect;
-
         this.setWrampUp(blueprint.getWrampUp());
-
-        // Initialize wrapper stats
-        this.hpStat = new ModifiableStat(this.hp);
-        this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
-        this.abilityValue = blueprint.abilityValue;
-
         this.plantFoodType = blueprint.plantFoodType;
         this.shootingVectors = new ArrayList<>(blueprint.shootingVectors);
+
+        this.hp = blueprint.hp;
+        this.cost = blueprint.cost;
+        this.damage = blueprint.damage;
+        this.actionInterval = blueprint.actionInterval;
+        this.recharge = blueprint.recharge;
+        this.abilityValue = blueprint.abilityValue;
+
+        this.hpStat = new ModifiableStat(this.hp);
+        this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
     }
 
     @Override

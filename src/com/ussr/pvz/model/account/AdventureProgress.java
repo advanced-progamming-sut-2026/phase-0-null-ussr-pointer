@@ -106,8 +106,10 @@ public class AdventureProgress {
     private void setDefaults(Plant plantInstance, Map<String, Object> plantData) {
         if (plantData.get("id") != null)
             plantInstance.setId(((Number) plantData.get("id")).intValue());
-        if (plantData.get("hp") != null)
-            plantInstance.setHp(((Number) plantData.get("hp")).intValue());
+
+        if (plantData.get("baseHp") != null)
+            plantInstance.setHp(((Number) plantData.get("baseHp")).intValue());
+
         if (plantData.get("cost") != null)
             plantInstance.setCost(((Number) plantData.get("cost")).intValue());
         if (plantData.get("damage") != null)
@@ -115,7 +117,7 @@ public class AdventureProgress {
         if (plantData.get("actionInterval") != null)
             plantInstance.setActionInterval(((Number) plantData.get("actionInterval")).doubleValue());
         if (plantData.get("recharge") != null)
-            plantInstance.setMaxRecharge(((Number) plantData.get("recharge")).doubleValue());
+            plantInstance.setRecharge(((Number) plantData.get("recharge")).intValue());
         if (plantData.get("abilityValue") != null)
             plantInstance.setAbilityValue(((Number) plantData.get("abilityValue")).doubleValue());
         if (plantData.get("wramp-up") != null) {
