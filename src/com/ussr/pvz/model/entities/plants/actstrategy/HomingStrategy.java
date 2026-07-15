@@ -18,8 +18,6 @@ public class HomingStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-        if (user.getIntervalTimer() > 0) return;
-
         List<Zombie> zombies = session.getZombies();
         if (zombies.isEmpty()) return;
 
@@ -28,7 +26,7 @@ public class HomingStrategy implements ActStrategy {
         if (target == null) return;
 
         session.addProjectile(buildProjectile(user, target, isMagic));
-        user.setInternalTimer(user.getActionInterval());
+        user.setInternalTimer(0.0);
     }
 
     private Projectile buildProjectile(Plant user, Zombie target, boolean isMagic) {

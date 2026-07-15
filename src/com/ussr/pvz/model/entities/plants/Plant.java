@@ -128,10 +128,9 @@ public class Plant extends GameEntity implements Damageable {
                 ? actionIntervalStat.getValue()
                 : actionInterval;
 
-        //if (internalTimer <= 0) {
-            //internalTimer = (actionIntervalStat != null ? actionIntervalStat.getValue() : actionInterval);
+        if (internalTimer >= interval) {
             actStrategy.act(this, com.ussr.pvz.model.App.getGameSession());
-        //}
+        }
     }
 
     @Override

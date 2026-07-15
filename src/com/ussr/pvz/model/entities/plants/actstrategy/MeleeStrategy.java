@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class MeleeStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
-        if(user.getIntervalTimer() > 0) return;
         if(!isEnemyAround(user , session)) return;
         ArrayList<Zombie> targets = switch ((int) user.getAbilityValue()) {
             case 1 -> frontBackDetect(user, session);
@@ -21,7 +20,7 @@ public class MeleeStrategy implements ActStrategy {
         };
         if(targets == null || targets.isEmpty()) return;
         userAct(user , targets);
-        user.setInternalTimer(user.getActionInterval());
+        user.setInternalTimer(0.0);
 
     }
 

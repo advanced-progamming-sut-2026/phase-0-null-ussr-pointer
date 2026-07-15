@@ -4,6 +4,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.event.GameEvent;
@@ -15,6 +16,7 @@ import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
@@ -120,6 +122,16 @@ public class GameSession {
         if (App.getAccount() != null) {
             for (Plant p : App.getAccount().getAdventureProgress().getAccountPlants()) {
                 p.tickRecharge(GameClock.SECONDS_PER_TICK);
+            }
+        }
+
+        for (Plant p : plants) {
+            if (!p.isAlive() && lawn != null && p.getLocation() != null) {
+                Cell cell = lawn.getCell(p.getLocation().y(), p.getLocation().x());
+                if (cell != null && cell.getPlant() == p) {
+                    cell.setPlant(null);
+                }
+                notifyPlantDied(p);
             }
         }
 
@@ -437,6 +449,7 @@ public class GameSession {
         int cols = lawn.getCols();
 
         for (int r = 0; r < rows; r++) {
+            StringBuilder leftSide = new StringBuilder();
             for (int c = 0; c < cols; c++) {
                 var cell = lawn.getCell(r, c);
 
@@ -454,26 +467,45 @@ public class GameSession {
                 }
 
                 if (cell == null) {
-                    sb.append(hasSun ? "*" : ".");
+                    leftSide.append(hasSun ? "*" : ".");
                 } else if (cell.getPlant() != null) {
-                    sb.append("P");
+                    leftSide.append("P");
                 } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
                     if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.SUN) {
-                        sb.append("S"); // Sun Grave
+                        leftSide.append("S"); // Sun Grave
                     } else if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.PLANT_FOOD) {
-                        sb.append("F"); // Plant Food Grave
+                        leftSide.append("F"); // Plant Food Grave
                     } else {
-                        sb.append("G"); // Standard Grave
+                        leftSide.append("G"); // Standard Grave
                     }
                 } else if (cell.getInteractableStructure() != null) {
-                    sb.append("I"); // Generic placeholder for structures like Ice Blocks
+                    leftSide.append("I"); // Generic placeholder for structures like Ice Blocks
                 } else if (hasSun) {
-                    sb.append("*"); // Asterisk represents a dropped Sun!
+                    leftSide.append("*"); // Asterisk represents a dropped Sun!
                 } else {
-                    sb.append(".");
+                    leftSide.append(".");
                 }
             }
-            sb.append("\n");
+
+            // Right side: Discrete Zombie Grid Overlay
+            StringBuilder rightSide = new StringBuilder();
+            for (int c = 0; c < cols; c++) {
+                int zCount = 0;
+                if (zombies != null) {
+                    for (Zombie z : zombies) {
+                        if (z.isAlive() && z.getPosition() != null) {
+                            int zRow = (int) z.getPosition().y();
+                            int zCol = (int) Math.floor(z.getPosition().x());
+                            if (zRow == r && zCol == c) {
+                                zCount++;
+                            }
+                        }
+                    }
+                }
+                rightSide.append(zCount == 0 ? "." : Math.min(zCount, 9));
+            }
+
+            sb.append(leftSide).append("   ||   ").append(rightSide).append("\n");
         }
         return sb.toString().trim();
     }
@@ -511,10 +543,47 @@ public class GameSession {
     public String renderZombiesInfo() {
         if (zombies == null || zombies.isEmpty()) return "no zombies on the field";
         StringBuilder sb = new StringBuilder();
+
         for (Zombie zombie : zombies) {
-            sb.append(zombie.toString()).append("\n");
+            if (!zombie.isAlive()) continue;
+
+            sb.append(zombie.getAlias()).append(":\n");
+            sb.append("position: ").append((int) zombie.getPosition().x())
+                    .append(", ").append((int) zombie.getPosition().y()).append("\n");
+            sb.append("health: ").append(zombie.getHp()).append("\n");
+
+            sb.append("armor:\n");
+            if (zombie.getArmor() != null && !zombie.getArmor().isDestroyed()) {
+                sb.append(zombie.getArmor().getArmorType().getName())
+                        .append(": ").append(zombie.getArmor().getArmorHp()).append("\n");
+            }
+
+            sb.append("effects:\n");
+            if (zombie.getStatus() != Zombie.Status.NORMAL) {
+                sb.append(statusLabel(zombie.getStatus()));
+                if (zombie.getStatusTimeRemaining() > 0) {
+                    sb.append(": ").append(formatSeconds(zombie.getStatusTimeRemaining()));
+                }
+                sb.append("\n");
+            }
         }
+
         return sb.toString().trim();
+    }
+
+    private String statusLabel(Zombie.Status status) {
+        return switch (status) {
+            case FREEZE -> "frozen";
+            case BUTTER -> "buttered";
+            case FIRED -> "burning";
+            case POISONED -> "poisoned";
+            case HYPNOTIZED -> "hypnotized";
+            default -> status.name().toLowerCase();
+        };
+    }
+
+    private String formatSeconds(double seconds) {
+        return (Math.round(seconds * 10) / 10.0) + "s";
     }
 
     public boolean removePlantAt(int x, int y) {

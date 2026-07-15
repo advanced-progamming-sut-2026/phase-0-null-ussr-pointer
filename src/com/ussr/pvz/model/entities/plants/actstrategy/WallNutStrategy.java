@@ -19,7 +19,6 @@ public class WallNutStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
         if (!user.getTags().contains(Tag.MOVE_ZOMBIES)) return;
-        if (user.getIntervalTimer() > 0) return;
 
         for (Zombie zombie : session.getZombies()) {
             if (zombie == null || !zombie.isAlive()) continue;
@@ -29,7 +28,7 @@ public class WallNutStrategy implements ActStrategy {
             }
         }
 
-        user.setInternalTimer(user.getActionInterval());
+        user.setInternalTimer(0.0);
     }
 
 

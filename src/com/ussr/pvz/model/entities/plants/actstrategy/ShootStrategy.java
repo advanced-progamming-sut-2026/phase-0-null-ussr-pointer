@@ -16,8 +16,6 @@ public class ShootStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-        if (user.getIntervalTimer() > 0) return;
-
         List<Vec2> vectors = user.getShootingVectors();
 
         if (vectors == null || vectors.isEmpty()) return;
@@ -25,6 +23,8 @@ public class ShootStrategy implements ActStrategy {
         boolean anyTarget = vectors.stream()
                 .anyMatch(v -> findTargetAlongVector(user, v, session) != null);
         if (!anyTarget) return;
+
+        user.setInternalTimer(0.0);
 
         HitEffectStrategy hitEffect = buildHitEffect(user);
 
@@ -43,8 +43,6 @@ public class ShootStrategy implements ActStrategy {
                     hitEffect
             ));
         }
-
-        user.setInternalTimer(user.getActionInterval());
     }
 
 

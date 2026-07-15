@@ -38,6 +38,7 @@ public class Zombie extends GameEntity implements Damageable {
     private int hp;
     private int maxHp;
     private double eatDps;
+    private double statusTimeRemaining = 0.0;
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
     private final boolean isGlowing;
@@ -109,6 +110,16 @@ public class Zombie extends GameEntity implements Damageable {
         ZombieFactory.respawnPushedStructureIfNeeded(this);
 
         if (effectStatus != null) effectStatus.effect(this, session);
+
+        if (statusTimeRemaining > 0) {
+            statusTimeRemaining -= com.ussr.pvz.model.engine.GameClock.SECONDS_PER_TICK;
+            if (statusTimeRemaining <= 0) {
+                statusTimeRemaining = 0;
+                if (status == Status.FREEZE || status == Status.BUTTER) {
+                    status = Status.NORMAL;
+                }
+            }
+        }
 
         // One single source of truth for targeting!
         Damageable target = acquireTarget(session);
@@ -335,6 +346,15 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setStatus(Status status) {
         this.status = status;
+        this.statusTimeRemaining = switch (status) {
+            case FREEZE -> 5.0;
+            case BUTTER -> 4.0;
+            default -> 0.0;
+        };
+    }
+
+    public double getStatusTimeRemaining() {
+        return statusTimeRemaining;
     }
 
     public void setArmor(Armor armor) {

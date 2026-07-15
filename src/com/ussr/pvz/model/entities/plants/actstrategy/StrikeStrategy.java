@@ -13,12 +13,10 @@ public class StrikeStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-        if (user.getIntervalTimer() > 0) return;
-
-        user.setInternalTimer(user.getActionInterval());
-
         Zombie target = findNearestInLane(user, session);
         if (target == null) return;
+
+        user.setInternalTimer(0.0);
 
         int pierceCount = (int) user.getAbilityValue();
         session.addProjectile(new Projectile(
