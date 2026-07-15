@@ -2,7 +2,6 @@ package com.ussr.pvz.model.entities.plants.factory;
 
 import com.ussr.pvz.model.entities.plants.PlantType;
 import com.ussr.pvz.model.entities.plants.Tag;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
 import com.ussr.pvz.model.entities.plants.plantfood.*;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -14,17 +13,22 @@ public final class PlantFoodEffectRegistry {
     private static final Map<PlantFoodType, PlantFoodEffectFactory> FACTORIES = new HashMap<>();
 
     static {
-        register(PlantFoodType.NONE, config -> null);
+        register(PlantFoodType.NONE, data -> null);
 
-        register(PlantFoodType.SPAWN_SUN_ITEMS, config -> new SpawnSun((int) config.plantFoodValue, false));
+        register(PlantFoodType.SPAWN_SUN_ITEMS, data -> new SpawnSun(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), false));
 
-        // Reroutes the generic PROJECTILE_BURST to the flawless implementations
-        register(PlantFoodType.PROJECTILE_BURST, config -> {
-            if (config.category == PlantType.LOBBER) {
-                return new LobberBarrage((int) config.plantFoodValue, 1.0, -1);
+        register(PlantFoodType.PROJECTILE_BURST, data -> {
+            String catStr = (String) data.get("category");
+            PlantType category = catStr != null ? PlantType.valueOf(catStr) : null;
+            double pfValue = ((Number) data.getOrDefault("plantFoodValue", 0)).doubleValue();
+            int damage = ((Number) data.getOrDefault("damage", 1)).intValue();
+            String name = (String) data.get("name");
+
+            if (category == PlantType.LOBBER) {
+                return new LobberBarrage((int) pfValue, 1.0, -1);
             }
 
-            switch (config.name) {
+            switch (name) {
                 case "Peashooter":
                 case "Fire Peashooter":
                 case "Goo Peashooter":
@@ -32,7 +36,6 @@ public final class PlantFoodEffectRegistry {
                 case "Rotobaga":
                 case "Starfruit":
                 case "Cat-tail":
-                    // 3 sec duration, fires every 0.1s. (Starfruit/Rotobaga will inherit their base multi-directional vectors)
                     return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, false, null, null);
                 case "Repeater":
                     return new TimedProjectileBurst(3.0, 0.1, 1, 20.0, false, null, null);
@@ -54,40 +57,39 @@ public final class PlantFoodEffectRegistry {
                 case "Pea Pod":
                     return new InstantMassiveBlast(20.0, true);
                 case "Torchwood":
-                    return new ModifierEffect(false, 3); // 3x damage multiplier
+                    return new ModifierEffect(false, 3);
                 default:
-                    // Citron, Bowling Bulb
-                    return new InstantMassiveBlast(config.plantFoodValue / Math.max(1.0, config.damage), false);
+                    return new InstantMassiveBlast(pfValue / Math.max(1.0, damage), false);
             }
         });
 
-        register(PlantFoodType.SPAWN_CLONES, config -> {
-            if ("Lily Pad".equals(config.name)) {
+        register(PlantFoodType.SPAWN_CLONES, data -> {
+            if ("Lily Pad".equals(data.get("name"))) {
                 return new ModifierEffect(true, 1);
             }
-            return new SpawnClones((int) config.plantFoodValue);
+            return new SpawnClones(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
         });
 
-        register(PlantFoodType.LOCAL_AOE_ATTACK, config -> new LocalAttack(5.0, 0.5, (int) config.plantFoodValue));
+        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5, ((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.GRANT_PERMANENT_ARMOR, config -> new GrantArmor((int) config.plantFoodValue, 0, false, false, false, true));
+        register(PlantFoodType.GRANT_PERMANENT_ARMOR, data -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true));
 
-        register(PlantFoodType.RANDOM_HYPNOTIZE, config -> new RandomHypnotize((int) config.plantFoodValue));
+        register(PlantFoodType.RANDOM_HYPNOTIZE, data -> new RandomHypnotize(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.KNOCKBACK_BLAST, config -> {
-            if ("Magnet-shroom".equals(config.name)) {
-                return new MetalAbsorb((int) config.plantFoodValue);
+        register(PlantFoodType.KNOCKBACK_BLAST, data -> {
+            if ("Magnet-shroom".equals(data.get("name"))) {
+                return new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
             }
-            return new KnockBackBlast((int) config.plantFoodValue, 2.0);
+            return new KnockBackBlast(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 2.0);
         });
 
-        register(PlantFoodType.PULL_UNDERWATER, config -> new PullUnderWater((int) config.plantFoodValue));
+        register(PlantFoodType.PULL_UNDERWATER, data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.MAP_WIDE_FREEZE, config -> new MapWideFreeze());
+        register(PlantFoodType.MAP_WIDE_FREEZE, data -> new MapWideFreeze());
 
-        register(PlantFoodType.INSTANT_KILL, config -> new InstantKill((int) config.plantFoodValue));
+        register(PlantFoodType.INSTANT_KILL, data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.LOBBER_BARRAGE, config -> new LobberBarrage((int) config.plantFoodValue, 1.0, -1));
+        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 1.0, -1));
     }
 
     private PlantFoodEffectRegistry() {}
@@ -96,13 +98,15 @@ public final class PlantFoodEffectRegistry {
         FACTORIES.put(type, factory);
     }
 
-    public static PlantFoodEffect create(PlantConfig config) {
-        if (config.plantFoodType == null || config.plantFoodType == PlantFoodType.NONE) return null;
+    public static PlantFoodEffect create(Map<String, Object> data) {
+        String pfTypeStr = (String) data.get("plantFoodType");
+        if (pfTypeStr == null || pfTypeStr.equals("NONE")) return null;
 
-        PlantFoodEffectFactory factory = FACTORIES.get(config.plantFoodType);
+        PlantFoodType type = PlantFoodType.valueOf(pfTypeStr);
+        PlantFoodEffectFactory factory = FACTORIES.get(type);
         if (factory == null) {
-            throw new IllegalArgumentException("Unknown PlantFoodEffect type: " + config.plantFoodType);
+            throw new IllegalArgumentException("Unknown PlantFoodEffect type: " + type);
         }
-        return factory.create(config);
+        return factory.create(data);
     }
 }

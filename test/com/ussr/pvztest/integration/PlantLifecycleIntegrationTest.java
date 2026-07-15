@@ -45,7 +45,7 @@ class PlantLifecycleIntegrationTest {
     @BeforeAll
     static void initPlantData() throws FileNotFoundException {
         InputStream stream = new FileInputStream("src/resources/plants.json");
-        PlantFactory.init(stream);
+        //PlantFactory.init(stream);
     }
 
     @BeforeEach

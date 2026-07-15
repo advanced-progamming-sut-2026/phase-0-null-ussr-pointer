@@ -1,8 +1,8 @@
 package com.ussr.pvz.model.entities.plants.factory;
 
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
+import java.util.Map;
 
 public interface ActStrategyFactory {
-    ActStrategy create(PlantConfig config);
+    ActStrategy create(Map<String, Object> data);
 }

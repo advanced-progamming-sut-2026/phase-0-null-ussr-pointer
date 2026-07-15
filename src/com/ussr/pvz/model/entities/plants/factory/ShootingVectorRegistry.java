@@ -1,7 +1,5 @@
 package com.ussr.pvz.model.entities.plants.factory;
 
-import com.ussr.pvz.model.entities.plants.AbilityType;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
@@ -36,19 +34,22 @@ public final class ShootingVectorRegistry {
         REGISTRY.put(name, vectors);
     }
 
-    public static List<Vec2> getVectors(PlantConfig config) {
-        if (config.abilityType != AbilityType.SHOOT_PROJECTILE) {
+    public static List<Vec2> getVectors(Map<String, Object> data) {
+        String abilityTypeStr = (String) data.get("abilityType");
+        if (abilityTypeStr == null || !abilityTypeStr.equals("SHOOT_PROJECTILE")) {
             return List.of();
         }
 
+        String name = (String) data.get("name");
+
         // Handle dynamically stacked vectors, e.g. Pea Pod
-        if ("Pea Pod".equals(config.name)) {
-            int count = Math.max(1, (int) config.abilityValue);
+        if ("Pea Pod".equals(name)) {
+            int count = Math.max(1, ((Number) data.getOrDefault("abilityValue", 1)).intValue());
             List<Vec2> vectors = new ArrayList<>();
             for (int i = 0; i < count; i++) vectors.add(Vec2.of(1, 0));
             return vectors;
         }
 
-        return REGISTRY.getOrDefault(config.name, List.of(Vec2.of(1, 0)));
+        return REGISTRY.getOrDefault(name, List.of(Vec2.of(1, 0)));
     }
 }

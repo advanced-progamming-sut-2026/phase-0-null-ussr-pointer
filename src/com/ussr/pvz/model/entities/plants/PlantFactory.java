@@ -1,57 +1,91 @@
 package com.ussr.pvz.model.entities.plants;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.UpgradeConfig;
 import com.ussr.pvz.model.entities.plants.factory.ActStrategyRegistry;
 import com.ussr.pvz.model.entities.plants.factory.PlantFoodEffectRegistry;
 import com.ussr.pvz.model.entities.plants.factory.ShootingVectorRegistry;
+import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 
-import java.io.InputStream;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlantFactory {
 
-    private static Map<Integer, PlantConfig> blueprints = new HashMap<>();
-
-    public static void init(InputStream jsonStream) {
-        blueprints = PlantJsonParser.loadConfigs(jsonStream);
+    private static String normalizeForLookup(String name) {
+        if (name == null) return "";
+        return name.trim().toLowerCase().replaceAll("[\\s_-]+", "");
     }
 
-    public static Plant createPlant(int id, int level) {
-        PlantConfig config = blueprints.get(id);
-        if (config == null) {
-            throw new IllegalArgumentException("Plant ID " + id + " does not exist in dataset.");
+    public static Map<String, Object> getPlantData(String name) {
+        if (name == null || App.getCachedPlantsData() == null) return null;
+        String searchName = normalizeForLookup(name);
+        for (Map<String, Object> data : App.getCachedPlantsData()) {
+            String plantName = normalizeForLookup((String) data.get("name"));
+            if (plantName.equals(searchName)) {
+                return data;
+            }
+        }
+        return null;
+    }
+
+    public static int findIdByName(String name) {
+        Map<String, Object> data = getPlantData(name);
+        if (data != null && data.containsKey("id")) {
+            return ((Number) data.get("id")).intValue();
+        }
+        return -1;
+    }
+
+    public static Plant createPlantByName(String name, int level) {
+        Map<String, Object> data = getPlantData(name);
+        if (data == null) {
+            throw new IllegalArgumentException("Plant name not found in registry: " + name);
         }
 
         Plant plant = new Plant();
-        plant.setId(config.id);
-        plant.setName(config.name);
-        plant.setType(config.category);
-        if (config.tags != null) {
-            plant.getTags().addAll(config.tags);
+        plant.setId(((Number) data.getOrDefault("id", 0)).intValue());
+        plant.setName((String) data.get("name"));
+
+        String catStr = (String) data.get("category");
+        if (catStr != null) plant.setType(PlantType.valueOf(catStr));
+
+        @SuppressWarnings("unchecked")
+        List<String> tagsList = (List<String>) data.get("tags");
+        if (tagsList != null) {
+            for (String tagStr : tagsList) {
+                Tag t = Tag.getByName(tagStr);
+                if (t != null) plant.getTags().add(t);
+            }
         }
 
-        int runtimeHp = config.baseHp;
-        int runtimeCost = config.cost;
-        double runtimeInterval = config.actionInterval;
-        int runtimeDamage = config.damage;
-        double runtimeRecharge = config.recharge;
-        double runtimeAbility = config.abilityValue;
+        int runtimeHp = ((Number) data.getOrDefault("baseHp", 0)).intValue();
+        int runtimeCost = ((Number) data.getOrDefault("cost", 0)).intValue();
+        double runtimeInterval = ((Number) data.getOrDefault("actionInterval", 0.0)).doubleValue();
+        int runtimeDamage = ((Number) data.getOrDefault("damage", 0)).intValue();
+        double runtimeRecharge = ((Number) data.getOrDefault("recharge", 0.0)).doubleValue();
+        double runtimeAbility = ((Number) data.getOrDefault("abilityValue", 0.0)).doubleValue();
 
-        if (config.upgrades != null) {
-            for (UpgradeConfig upgrade : config.upgrades) {
-                if (upgrade.level <= level) {
-                    switch (upgrade.type) {
-                        case BUFF_HP -> runtimeHp += (int) upgrade.value;
-                        case BUFF_COST -> runtimeCost += (int) upgrade.value;
-                        case BUFF_ACTION_INTERVAL -> runtimeInterval += upgrade.value;
-                        case BUFF_DAMAGE -> runtimeDamage += (int) upgrade.value;
-                        case BUFF_RECHARGE -> runtimeRecharge += upgrade.value;
-                        case SPECIAL_MECHANIC -> {
-                            if (upgrade.specialTag != null && !upgrade.specialTag.isEmpty()) {
-                                plant.getRawUpgrades().add(upgrade.specialTag);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> upgrades = (List<Map<String, Object>>) data.get("upgrades");
+        if (upgrades != null) {
+            for (Map<String, Object> upgrade : upgrades) {
+                int upLevel = ((Number) upgrade.getOrDefault("level", 0)).intValue();
+                if (upLevel <= level) {
+                    String upType = (String) upgrade.get("type");
+                    double upVal = ((Number) upgrade.getOrDefault("value", 0.0)).doubleValue();
+                    String specialTag = (String) upgrade.get("specialTag");
+
+                    if (upType != null) {
+                        switch (upType) {
+                            case "BUFF_HP" -> runtimeHp += (int) upVal;
+                            case "BUFF_COST" -> runtimeCost += (int) upVal;
+                            case "BUFF_ACTION_INTERVAL" -> runtimeInterval += upVal;
+                            case "BUFF_DAMAGE" -> runtimeDamage += (int) upVal;
+                            case "BUFF_RECHARGE" -> runtimeRecharge += upVal;
+                            case "SPECIAL_MECHANIC" -> {
+                                if (specialTag != null && !specialTag.isEmpty()) {
+                                    plant.getRawUpgrades().add(specialTag);
+                                }
                             }
                         }
                     }
@@ -63,46 +97,41 @@ public class PlantFactory {
         plant.setCost(Math.max(0, runtimeCost));
         plant.setActionInterval(Math.max(0.05, runtimeInterval));
         plant.setDamage(runtimeDamage);
-        plant.setMaxRecharge(Math.max(0.0, runtimeRecharge));
-        plant.setRecharge(0.0);
+
+        // Adjusted to maintain your setMaxRecharge logic
+        try {
+            plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant, Math.max(0.0, runtimeRecharge));
+            plant.getClass().getMethod("setRecharge", double.class).invoke(plant, 0.0);
+        } catch (Exception e) {
+            plant.setRecharge((int) Math.max(0.0, runtimeRecharge)); // Fallback if setMaxRecharge doesn't exist yet
+        }
+
         plant.setAbilityValue(runtimeAbility);
         plant.setLevel(level);
-        plant.setPlantFoodType(config.plantFoodType);
-        plant.setWrampUp(config.wrampUp);
 
-        plant.setShootingVectors(ShootingVectorRegistry.getVectors(config));
-        plant.setActStrategy(ActStrategyRegistry.create(config));
-        plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(config));
+        String pfType = (String) data.get("plantFoodType");
+        plant.setPlantFoodType(pfType != null && !pfType.equals("NONE") ? PlantFoodType.valueOf(pfType) : PlantFoodType.NONE);
 
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
+        plant.setWrampUp(wrampUp);
+
+        // Dynamic assignments via Maps
+        plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
+        plant.setActStrategy(ActStrategyRegistry.create(data));
+        plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
 
         return plant;
     }
 
-    private static String normalizeForLookup(String name) {
-        if (name == null) return "";
-        return name.trim().toLowerCase().replaceAll("[\\s_-]+", "");
-    }
-
-    public static int findIdByName(String name) {
-        if (name == null || App.getCachedPlantsData() == null) return -1;
-
-        String searchName = normalizeForLookup(name);
-
-        for (int i = 0; i < App.getCachedPlantsData().size(); i++) {
-            var data = App.getCachedPlantsData().get(i);
-            String plantName = normalizeForLookup((String) data.get("name"));
-            if (plantName.equals(searchName)) {
-                return i + 1; // Assuming 1-based indexing for IDs
+    public static Plant createPlant(int id, int level) {
+        if (App.getCachedPlantsData() != null) {
+            for (Map<String, Object> data : App.getCachedPlantsData()) {
+                if (((Number) data.get("id")).intValue() == id) {
+                    return createPlantByName((String) data.get("name"), level);
+                }
             }
         }
-        return -1;
-    }
-
-    public static Plant createPlantByName(String name, int level) {
-        int id = findIdByName(name);
-        if (id == -1) {
-            throw new IllegalArgumentException("Plant name not found in registry: " + name);
-        }
-        return createPlant(id, level);
+        throw new IllegalArgumentException("Plant ID " + id + " not found.");
     }
 }

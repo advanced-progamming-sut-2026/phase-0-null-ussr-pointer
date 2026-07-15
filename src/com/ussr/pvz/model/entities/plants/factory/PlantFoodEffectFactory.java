@@ -1,8 +1,8 @@
 package com.ussr.pvz.model.entities.plants.factory;
 
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
-import com.ussr.pvz.model.entities.plants.PlantJsonParser.PlantConfig;
+import java.util.Map;
 
 public interface PlantFoodEffectFactory {
-    PlantFoodEffect create(PlantConfig config);
+    PlantFoodEffect create(Map<String, Object> data);
 }

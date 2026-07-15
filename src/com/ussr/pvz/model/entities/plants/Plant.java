@@ -93,6 +93,17 @@ public class Plant extends GameEntity implements Damageable {
 
         this.hpStat = new ModifiableStat(this.hp);
         this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
+        this.actStrategy = blueprint.actStrategy;
+        this.plantFoodTimer = blueprint.plantFoodTimer;
+        this.armor = blueprint.armor;
+        this.plantFoodEffect =  blueprint.plantFoodEffect;
+        //this.stackNumber = blueprint.stackNumber;
+        //this.isBuffed = blueprint.isBuffed;
+        //this.internalTimer = blueprint.internalTimer;
+        this.growthTracker = blueprint.growthTracker;
+        if(actStrategy == null) {
+            System.out.println("bozi jan act nadarom");
+        }
     }
 
     @Override

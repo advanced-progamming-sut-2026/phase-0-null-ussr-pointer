@@ -69,8 +69,6 @@ public class App {
             if (cachedPlantsData == null) {
                 cachedPlantsData = new ArrayList<>();
             }
-            InputStream jsonStream = new FileInputStream(allPlantsFile);
-            PlantFactory.init(jsonStream);
         } catch (IOException e) {
             System.err.println("Error caching plants.json to memory: " + e.getMessage());
             cachedPlantsData = new ArrayList<>();
