@@ -32,7 +32,7 @@ class ChoosePlantServiceTest {
         Map<String, Integer> plantLevels = new HashMap<>();
         plantLevels.put("PEASHOOTER", 1);
         plantLevels.put("SUNFLOWER", 1);
-        plantLevels.put("WALLNUT", 1);
+        plantLevels.put("WALL-NUT", 1);
 
         AccountState state = new AccountState(
                 "plant-chooser", "Chooser", "pass", "chooser@example.com", Gender.FEMALE, 3,
@@ -68,7 +68,7 @@ class ChoosePlantServiceTest {
         String result = choosePlantService.addPlant(request);
 
         // Assert
-        assertEquals("you don't have WINTERMELON", result);
+        assertEquals("you don't have WINTER MELON unlocked.", result);
     }
 
     @Test
@@ -95,8 +95,7 @@ class ChoosePlantServiceTest {
         // Act
         String result = choosePlantService.removePlant(removeRequest);
 
-        // Assert
-        assertEquals("WALLNUT removed (0/8)", result);
+        assertEquals("WALL-NUT removed (0/8)", result);
     }
 
     @Test

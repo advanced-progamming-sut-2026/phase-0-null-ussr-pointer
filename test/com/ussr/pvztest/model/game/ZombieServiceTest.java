@@ -49,6 +49,7 @@ class ZombieServiceTest {
         Plant plant = new Plant();
         plant.setHp(300);
         plant.setAlive(true);
+        plant.setLocation(new Plant.Location(4, 2));
         session.getLawn().getCell(2, 4).setPlant(plant);
 
         Zombie zombie = new Zombie("Basic", null, false);

@@ -41,11 +41,11 @@ public class BeghouledBehavior extends LevelBehavior {
 
         level.setSunFalling(false);
 
-        // Fill the board randomly with the 5 types
         fillBoard(session);
 
-        // Prevent matches on initial generation
-        while (hasMatches(session.getLawn())) {
+        Lawn lawn = session.getLawn();
+        while (hasMatches(lawn)) {
+            clearBoard(session, lawn);
             fillBoard(session);
         }
 
@@ -56,6 +56,19 @@ public class BeghouledBehavior extends LevelBehavior {
                 cell.setTile(new Tile(TileType.Crater));
             }
         });
+    }
+
+    private void clearBoard(GameSession session, Lawn lawn) {
+        for (int r = 0; r < lawn.getRows(); r++) {
+            for (int c = 0; c < lawn.getCols(); c++) {
+                Cell cell = lawn.getCell(r, c);
+                if (cell.getPlant() != null) {
+                    cell.getPlant().setAlive(false);
+                    session.getPlants().remove(cell.getPlant());
+                    cell.setPlant(null);
+                }
+            }
+        }
     }
 
     @Override
@@ -301,24 +314,10 @@ public class BeghouledBehavior extends LevelBehavior {
     private void resetBoard(GameSession session) {
         // Clear non-crater plants and re-fill
         Lawn lawn = session.getLawn();
-        for (int r = 0; r < lawn.getRows(); r++) {
-            for (int c = 0; c < lawn.getCols(); c++) {
-                Cell cell = lawn.getCell(r, c);
-                if (cell.getPlant() != null) {
-                    cell.getPlant().setAlive(false);
-                    session.getPlants().remove(cell.getPlant());
-                    cell.setPlant(null);
-                }
-            }
-        }
+        clearBoard(session, lawn);
         fillBoard(session);
         while (hasMatches(lawn) || !hasPossibleMoves(lawn)) {
-            // Clear and retry if generated board is invalid
-            for (int r = 0; r < lawn.getRows(); r++) {
-                for (int c = 0; c < lawn.getCols(); c++) {
-                    if (lawn.getCell(r, c).getPlant() != null) lawn.getCell(r, c).setPlant(null);
-                }
-            }
+            clearBoard(session, lawn);
             fillBoard(session);
         }
     }

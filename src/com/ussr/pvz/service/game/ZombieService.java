@@ -13,7 +13,7 @@ public class ZombieService {
         if (session == null || session.getLawn() == null || zombie == null) return false;
 
         int row = (int) zombie.getPosition().y();
-        int col = (int) Math.floor(zombie.getPosition().x() - 0.2);
+        int col = (int) Math.floor(zombie.getPosition().x());
 
         if (col >= 0 && col < session.getLawn().getCols()) {
             Cell cell = session.getLawn().getCell(row, col);

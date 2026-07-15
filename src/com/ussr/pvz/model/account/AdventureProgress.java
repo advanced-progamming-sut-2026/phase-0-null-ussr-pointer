@@ -53,12 +53,13 @@ public class AdventureProgress {
             for (Map<String, Object> plantData : complexPlantsList) {
                 Object nameObj = plantData.get("name");
                 if (nameObj == null) continue;
-                String plantName = normalizePlantKey(nameObj.toString());
+                String displayName = nameObj.toString();
+                String plantName = normalizePlantKey(displayName);
                 if (plantLvls.containsKey(plantName)) {
                     int currentLevel = plantLvls.get(plantName);
                     if (currentLevel > 0) {
                         Plant plantInstance = new Plant();
-                        plantInstance.setName(plantName);
+                        plantInstance.setName(displayName);
                         plantInstance.setLevel(currentLevel);
                         setDefaults(plantInstance, plantData);
                         Object upgradesObj = plantData.get("upgrades");

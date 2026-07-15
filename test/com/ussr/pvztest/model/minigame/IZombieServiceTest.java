@@ -48,17 +48,17 @@ class IZombieServiceTest {
     @Test
     @DisplayName("❌ Should prevent placing a zombie behind the red line (Plant territory)")
     void placeZombie_shouldFail_whenBehindRedLine() {
-        String result = iZombieService.placeZombie("Zombie", 2, 2); // col 2 < red line 4
+        String result = iZombieService.placeZombie("ZombieDefault", 2, 2); // col 2 < red line 4
         assertTrue(result.contains("You can only spawn zombies to the right of the red line"));
     }
 
     @Test
     @DisplayName("✅ Should successfully spawn zombie in valid territory and deduct sun")
     void placeZombie_shouldSucceed_whenValidTerritoryAndSun() {
-        String result = iZombieService.placeZombie("Zombie", 6, 2); // basic zombie costs 50
+        String result = iZombieService.placeZombie("ZombieDefault", 6, 2); // ZombieDefault costs 100
 
-        assertEquals("Spawned Zombie at (6, 2).", result);
-        assertEquals(450, session.getSunCount());
+        assertEquals("Spawned ZombieDefault at (6, 2).", result);
+        assertEquals(400, session.getSunCount());
         assertEquals(1, session.getZombies().size());
     }
 }

@@ -37,16 +37,17 @@ public class Projectile extends GameEntity {
         this.moveStrategy = moveStrategy;
         this.hitEffectStrategy = hitEffectStrategy;
         this.isStunning = false;
-        if(moveStrategy instanceof ArcMove) {
-            ((ArcMove) moveStrategy).setGroundY(position.y());
+
+        if (moveStrategy != null) {
+            if (moveStrategy instanceof ArcMove arcMove) {
+                arcMove.setGroundY(position.y());
+            } else if (moveStrategy instanceof StraightMove straightMove) {
+                straightMove.setSpeedMagnitude(velocity.length());
+            } else if (moveStrategy instanceof BounceMove bounceMove) {
+                bounceMove.setSpeedMagnitude(velocity.length());
+            }
+            moveStrategy.initialize(this, target);
         }
-        else if(moveStrategy instanceof StraightMove) {
-            ((StraightMove) moveStrategy).setSpeedMagnitude(velocity.length());
-        }
-        else if(moveStrategy instanceof BounceMove) {
-            ((BounceMove) moveStrategy).setSpeedMagnitude(velocity.length());
-        }
-        moveStrategy.initialize(this , target);
     }
 
     public void setStunning(boolean isStunning) {

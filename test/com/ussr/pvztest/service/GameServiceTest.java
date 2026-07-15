@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,16 +35,18 @@ class GameServiceTest {
         App.login(null);
         gameService = new GameService();
 
+        Map<String, Integer> plantLevels = new HashMap<>();
+        plantLevels.put("PEASHOOTER", 1);
+        plantLevels.put("SUNFLOWER", 1);
+
         // Initialize user with some plants
         AccountState state = new AccountState(
                 "game-user", "Gamer", "pass", "gamer@example.com", Gender.MALE, 3,
                 null, null, 1, 1, 0, 0, 1000, 50, 0,
-                new HashMap<>(), new ArrayList<>(), new ArrayList<>(),
+                plantLevels, new ArrayList<>(), new ArrayList<>(),
                 null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
         );
         activeAccount = new Account(state, null);
-        activeAccount.getAdventureProgress().getPlantLvls().put("PEASHOOTER", 1);
-        activeAccount.getAdventureProgress().getPlantLvls().put("SUNFLOWER", 1);
         App.addAccount(activeAccount);
         App.login(activeAccount);
 
