@@ -32,7 +32,7 @@ public class GameController {
             Matcher matcher = cmd.getMatcher(command);
             if (matcher.matches()) {
                 String result = routeMenuAndInformationCommands(cmd, matcher);
-                if (!result.isEmpty() || cmd == GameCommand.START_ZOMBIE_WAVES) return result;
+                if (!result.isEmpty()) return result;
                 return routeActionAndCheatCommands(cmd, matcher);
             }
         }

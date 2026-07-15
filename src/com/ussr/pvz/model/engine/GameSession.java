@@ -113,7 +113,6 @@ public class GameSession {
                 effect.onTick(this, level, GameClock.SECONDS_PER_TICK);
             }
         }
-
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().tick(this, GameClock.SECONDS_PER_TICK);
         }

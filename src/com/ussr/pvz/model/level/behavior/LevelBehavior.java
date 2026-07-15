@@ -46,6 +46,8 @@ public abstract class LevelBehavior {
 
         if (aiManager != null) {
             aiManager.tick(session, deltaTime);
+        } else {
+            System.out.println("hello there");
         }
 
         checkLevelCompletion(session);

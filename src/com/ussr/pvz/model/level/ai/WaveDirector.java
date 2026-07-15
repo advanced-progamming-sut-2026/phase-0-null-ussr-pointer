@@ -22,12 +22,45 @@ public class WaveDirector {
     private double spawnTimer = 0.0;
     private final Difficulty difficulty;
 
+    // PRECALCULATED CONSTANTS
+    private final double baseInterval;
+    private final double speedMultiplier;
+    private final SpawnStrategy spawnStrategy;
+
+    // A lightweight functional interface to store our spawning strategies
+    @FunctionalInterface
+    private interface SpawnStrategy {
+        void execute(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols);
+    }
+
     public WaveDirector(int waveIndex, Level.Wave waveData, Difficulty difficulty, double costMultiplier) {
         this.waveIndex = waveIndex;
         this.waveData = waveData;
         this.difficulty = difficulty;
         this.initialBudget = (int) (waveData.cost() * costMultiplier);
         this.remainingBudget = this.initialBudget;
+
+        // 1. Precalculate the base spawn interval once
+        double calculatedBase = switch (difficulty) {
+            case SIMPLE -> 7.5 * Math.pow(0.85, waveIndex);
+            case MEDIUM -> 6.5 * Math.pow(0.80, waveIndex);
+            case HARD   -> 5.5 * Math.pow(0.75, waveIndex);
+        };
+        this.baseInterval = Math.max(calculatedBase, 1.0);
+
+        // 2. Precalculate the speed multiplier once
+        this.speedMultiplier = switch (difficulty) {
+            case SIMPLE -> 0.45;
+            case MEDIUM -> 0.60;
+            case HARD   -> 0.70;
+        };
+
+        // 3. Select the correct spawning strategy method once on startup
+        this.spawnStrategy = switch (difficulty) {
+            case SIMPLE -> this::executeSimpleStrategy;
+            case MEDIUM -> this::executeMediumStrategy;
+            case HARD   -> this::executeHardStrategy;
+        };
     }
 
     public void tick(GameSession session, double deltaTime) {
@@ -42,36 +75,31 @@ public class WaveDirector {
 
         if (remainingBudget <= 0) return;
 
-        double baseInterval = switch (difficulty) {
-            case SIMPLE -> 7.5 * Math.pow(0.85, waveIndex);
-            case MEDIUM -> 6.5 * Math.pow(0.80, waveIndex);
-            case HARD   -> 5.5 * Math.pow(0.75, waveIndex);
-        };
-        baseInterval = Math.max(baseInterval, 1.0);
-
+        // Uses precalculated baseInterval and speedMultiplier directly without switches
         double waveProgress = initialBudget > 0 ? (double) (initialBudget - remainingBudget) / initialBudget : 0.0;
-        double speedMultiplier = switch (difficulty) {
-            case SIMPLE -> 0.45;
-            case MEDIUM -> 0.60;
-            case HARD   -> 0.70;
-        };
         double currentInterval = baseInterval * (1.0 - (waveProgress * speedMultiplier));
 
         spawnTimer += deltaTime;
         if (spawnTimer >= currentInterval) {
             spawnTimer = 0.0;
-            executeDifficultyStrategy(session);
+
+            // Fetch level-specific environment values once before invoking the strategy
+            Level level = session.getLevel();
+            List<Level.AllowedZombie> pool = level.getAllowedZombies();
+            if (pool == null || pool.isEmpty()) return;
+
+            int rows = session.getLawn() != null ? session.getLawn().getRows() : 5;
+            int cols = session.getLawn() != null ? session.getLawn().getCols() : 9;
+
+            // Polymorphically execute strategy without switch blocks!
+            spawnStrategy.execute(session, pool, rows, cols);
         }
     }
 
-    /**
-     * Helper method that scans the level's allowed zombie pool to find the absolute lowest point cost.
-     * This value dictates the structural floor underneath which no more spawns can physically occur.
-     */
     private int getMinZombieCost(Level level) {
         List<Level.AllowedZombie> pool = level.getAllowedZombies();
         if (pool == null || pool.isEmpty()) {
-            return Integer.MAX_VALUE; // Safety fallback if no pool configuration is found
+            return Integer.MAX_VALUE;
         }
 
         int minCost = Integer.MAX_VALUE;
@@ -84,24 +112,6 @@ public class WaveDirector {
         return minCost;
     }
 
-    private void executeDifficultyStrategy(GameSession session) {
-        Level level = session.getLevel();
-        List<Level.AllowedZombie> pool = level.getAllowedZombies();
-        if (pool == null || pool.isEmpty()) return;
-
-        int rows = session.getLawn() != null ? session.getLawn().getRows() : 5;
-        int cols = session.getLawn() != null ? session.getLawn().getCols() : 9;
-
-        switch (difficulty) {
-            case SIMPLE -> executeSimpleStrategy(session, pool, rows, cols);
-            case MEDIUM -> executeMediumStrategy(session, pool, rows, cols);
-            case HARD -> executeHardStrategy(session, pool, rows, cols);
-        }
-    }
-
-    // Picks a zombie from the pool using AllowedZombie's Weight field (zombies.json's
-    // "Weight" data, carried through by LevelFactory.parseZombiesAndWaves) instead of a
-    // uniform random index, so heavier-weighted zombies are proportionally more common.
     private Level.AllowedZombie pickWeighted(List<Level.AllowedZombie> pool) {
         int totalWeight = 0;
         for (Level.AllowedZombie z : pool) {
@@ -109,7 +119,6 @@ public class WaveDirector {
         }
 
         if (totalWeight <= 0) {
-            // No usable weights (e.g. all zero/negative) - fall back to uniform pick.
             return pool.get(random.nextInt(pool.size()));
         }
 
@@ -122,8 +131,7 @@ public class WaveDirector {
             }
         }
 
-        // Should be unreachable given the loop above, but guard against rounding edge cases.
-        return pool.get(pool.size() - 1);
+        return pool.getLast();
     }
 
     private void executeSimpleStrategy(GameSession session, List<Level.AllowedZombie> pool, int rows, int cols) {
@@ -148,7 +156,7 @@ public class WaveDirector {
             int spawns = 1 + random.nextInt(3);
             for (int i = 0; i < spawns; i++) {
                 if (remainingBudget <= 0) break;
-                executeSimpleStrategy(session, pool, rows, cols); // Re-use simple logic for random scattering
+                executeSimpleStrategy(session, pool, rows, cols);
             }
         } else {
             int stackSize = 2 + random.nextInt(3);
@@ -188,7 +196,6 @@ public class WaveDirector {
             }
         }
 
-        // 85% bias towards weak lanes, 15% random deviation
         if (random.nextDouble() < 0.85 && !weakestLanes.isEmpty()) {
             return weakestLanes.get(random.nextInt(weakestLanes.size()));
         }
@@ -207,7 +214,6 @@ public class WaveDirector {
         if (remainingBudget > 0) return false;
         if (totalZombiesSpawned == 0) return true;
 
-        // 80% wave completion calculation rule
         int deadCount = totalZombiesSpawned - mySpawnedZombies.size();
         return deadCount >= (totalZombiesSpawned * 0.80);
     }
