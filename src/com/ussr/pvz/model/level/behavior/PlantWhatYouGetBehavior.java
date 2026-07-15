@@ -8,6 +8,10 @@ public class PlantWhatYouGetBehavior extends LevelBehavior {
 
     private int startingSun = 800;
 
+    public PlantWhatYouGetBehavior() {
+        this.waitForManualWaveStart = true;
+    }
+
     public void setStartingSun(int startingSun) {
         this.startingSun = startingSun;
     }

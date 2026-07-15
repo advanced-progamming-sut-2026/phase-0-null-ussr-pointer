@@ -14,8 +14,15 @@ public abstract class LevelBehavior {
     protected boolean autoWinOnWavesClear = true;
     protected boolean levelCompleted = false;
 
+    protected boolean waitForManualWaveStart = false;
+
     public void onStart(Level level) {
         this.aiManager = new ZombieAIManager(App.getAccount().getDifficultyLvl());
+
+        GameSession session = App.getGameSession();
+        if (session != null && !waitForManualWaveStart && !session.isWavesStarted()) {
+            session.startWaves();
+        }
     }
 
     public void onWaveComplete(Level level, int waveNumber) {
