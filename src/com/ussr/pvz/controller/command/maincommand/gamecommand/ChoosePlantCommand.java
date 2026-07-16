@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public enum ChoosePlantCommand {
     SHOW_ALL_PLANTS("^show\\s+all\\s+plants(?:\\s+.*)?$"),
     SHOW_AVAILABLE_PLANTS("^show\\s+available\\s+plants(?:\\s+.*)?$"),
-    ADD_PLANT("^add\\s+plant\\s+-t\\s+(?<type>\\S+)(?:\\s+.*)?$"),
+    ADD_PLANT("^add\\s+plant\\s+-t\\s+\"(?<type>.+)\"(?:\\s+.*)?$"),
     REMOVE_PLANT("^remove\\s+plant\\s+-t\\s+(?<type>\\S+)(?:\\s+.*)?$"),
     BOOST_PLANT("^boost\\s+plant\\s+-t\\s+(?<type>\\S+)(?:\\s+.*)?$"),
     START_GAME("^start\\s+game(?:\\s+.*)?$");
