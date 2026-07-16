@@ -32,7 +32,6 @@ public class ShootStrategy implements ActStrategy {
 
         for (Vec2 direction : vectors) {
             GameEntity target = findTargetAlongVector(user, direction, session);
-            if (target == null) continue;
 
             // Kept at 6.0 to prevent the bullet from tunneling over the target!
             Vec2 velocity = direction.normalize().scale(6.0);
@@ -68,7 +67,7 @@ public class ShootStrategy implements ActStrategy {
 
             double relX = zp.x() - origin.x();
             double relY = zp.y() - origin.y();
-            if (!isInCone(relX, relY, dx, dy)) continue;
+            if (!isParallelSameDirection(relX, relY, dx, dy)) continue;
 
             double dist = Math.sqrt(relX * relX + relY * relY);
             if (dist < bestDist) {
@@ -84,7 +83,7 @@ public class ShootStrategy implements ActStrategy {
 
                 double relX = sp.x() - origin.x();
                 double relY = sp.y() - origin.y();
-                if (!isInCone(relX, relY, dx, dy)) continue;
+                if (!isParallelSameDirection(relX, relY, dx, dy)) continue;
 
                 double dist = Math.sqrt(relX * relX + relY * relY);
                 if (dist < bestDist) {
@@ -97,25 +96,26 @@ public class ShootStrategy implements ActStrategy {
         return nearest;
     }
 
-    private boolean isInCone(double relX, double relY, double dx, double dy) {
-        double dirLen = Math.sqrt(dx * dx + dy * dy);
-        if (dirLen == 0) return false;
-
-        if (dy == 0) {
-            return Math.abs(relY) < 0.75 && Math.signum(relX) == Math.signum(dx);
-        }
-
-        if (dx != 0 && Math.abs(dy) <= 1.5) {
-            boolean correctXDir = Math.signum(relX) == Math.signum(dx) && Math.abs(relX) > 0;
-            boolean correctRow = Math.abs(relY - dy) < 0.75;
-            return correctXDir && correctRow;
-        }
-
+    private boolean isParallelSameDirection(double relX, double relY, double dx, double dy) {
         double relLen = Math.sqrt(relX * relX + relY * relY);
-        if (relLen == 0) return false;
-        double ndx = dx / dirLen;
-        double ndy = dy / dirLen;
-        double dot = (relX / relLen) * ndx + (relY / relLen) * ndy;
-        return dot > 0.6;
+        double dirLen = Math.sqrt(dx * dx + dy * dy);
+
+        // Cannot compare zero-length vectors
+        if (relLen == 0 || dirLen == 0) {
+            return false;
+        }
+
+        // Cross product == 0 => parallel
+        double cross = relX * dy - relY * dx;
+
+        // Use an epsilon because of floating-point precision
+        double EPSILON = 0.3;
+        if (Math.abs(cross) > EPSILON) {
+            return false;
+        }
+
+        // Dot product > 0 => same direction
+        double dot = relX * dx + relY * dy;
+        return dot > 0;
     }
 }
