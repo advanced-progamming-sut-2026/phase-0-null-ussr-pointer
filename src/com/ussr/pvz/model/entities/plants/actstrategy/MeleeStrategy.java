@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
+import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -10,7 +12,9 @@ import java.util.ArrayList;
 public class MeleeStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
-        if(!isEnemyAround(user , session)) return;
+        ArrayList<PushableStructure> structureTargets = nearbyStructures(user, session);
+        if (!isEnemyAround(user, session) && structureTargets.isEmpty()) return;
+
         ArrayList<Zombie> targets = switch ((int) user.getAbilityValue()) {
             case 1 -> frontBackDetect(user, session);
             case 2 -> areaDetect(user, session);
@@ -18,10 +22,41 @@ public class MeleeStrategy implements ActStrategy {
             case 4 -> swallowDetect(user, session);
             default -> null;
         };
-        if(targets == null || targets.isEmpty()) return;
-        userAct(user , targets);
-        user.setInternalTimer(0.0);
 
+        boolean actedOnZombies = targets != null && !targets.isEmpty();
+        if (actedOnZombies) {
+            userAct(user, targets);
+        }
+        if (!structureTargets.isEmpty()) {
+            userActOnStructures(user, structureTargets);
+        }
+        if (actedOnZombies || !structureTargets.isEmpty()) {
+            user.setInternalTimer(0.0);
+        }
+    }
+
+    private ArrayList<PushableStructure> nearbyStructures(Plant user, GameSession session) {
+        ArrayList<PushableStructure> found = new ArrayList<>();
+        int abilityValue = (int) user.getAbilityValue();
+        if (abilityValue != 1 && abilityValue != 2) return found;
+
+        Vec2 userPos = user.getPosition();
+        for (InteractableStructure structure : session.getLawn().getAllInteractable()) {
+            if (!(structure instanceof PushableStructure pushable) || !pushable.isAlive()) continue;
+            Vec2 structPos = pushable.getPosition();
+            if (structPos == null) continue;
+            if (Math.abs(structPos.y() - userPos.y()) < 1 && Math.abs(structPos.x() - userPos.x()) < 1) {
+                found.add(pushable);
+            }
+        }
+        return found;
+    }
+
+    private void userActOnStructures(Plant user, ArrayList<PushableStructure> structures) {
+        int userDamage = user.getDamage();
+        for (PushableStructure structure : structures) {
+            structure.takeDamage(userDamage);
+        }
     }
 
     private boolean isEnemyAround(Plant user , GameSession session) {

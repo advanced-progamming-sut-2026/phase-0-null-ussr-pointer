@@ -63,7 +63,7 @@ public class PusherMove implements MoveBehavior {
             if (structure instanceof PushableStructure ps && structure.isAlive()) {
                 double structX = ps.getPosition().x();
 
-                if (structX < pos.x() && (pos.x() - structX) <= PUSH_RANGE) {
+                if (structX <= pos.x() && (pos.x() - structX) <= PUSH_RANGE) {
                     itemsToPush.add(new CellStructureMapping(cell, ps));
                 }
             }
