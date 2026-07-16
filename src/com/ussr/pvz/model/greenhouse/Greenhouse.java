@@ -69,7 +69,7 @@ public class Greenhouse {
         return unlockedPots;
     }
 
-    public void plant(int x, int y, Collection collection) {
+    public void plant(int x, int y, List<Plant> unlockedPlants) {
         Pot targetPot = pots.get(new Location(x, y));
         if (targetPot == null || !targetPot.isUnlocked() || targetPot.isOccupied()) {
             return;
@@ -77,7 +77,7 @@ public class Greenhouse {
 
         SproutPlant plant;
         if (RAND.nextInt(2) == 0) {
-            plant = randomPlant(collection);
+            plant = randomPlant(unlockedPlants);
         } else {
             plant = new SproutPlant("MARIGOLD", true, PlantState.GROWING, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
@@ -161,9 +161,8 @@ public class Greenhouse {
             for (Map<String, Object> potMap : potsList) {
                 int x = ((Number) potMap.get("x")).intValue();
                 int y = ((Number) potMap.get("y")).intValue();
-                boolean unlocked = (boolean) potMap.get("unlocked");
-                boolean occupied = (boolean) potMap.get("occupied");
-
+                boolean unlocked = Boolean.TRUE.equals(potMap.get("unlocked"));
+                boolean occupied = Boolean.TRUE.equals(potMap.get("occupied"));
                 Pot pot = gh.pots.get(new Location(x, y));
                 if (pot != null) {
                     pot.setUnlocked(unlocked);
@@ -177,20 +176,19 @@ public class Greenhouse {
         return gh;
     }
 
-    private SproutPlant randomPlant(Collection collection) {
-        List<Plant> unlocked = (collection != null) ? collection.unlockedPlants() : null;
-        if (unlocked == null || unlocked.isEmpty()) {
+    private SproutPlant randomPlant(List<Plant> unlockedPlants) {
+        if (unlockedPlants == null || unlockedPlants.isEmpty()) {
             return new SproutPlant("MARIGOLD", true, PlantState.GROWING, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
 
-        int max = unlocked.size();
+        int max = unlockedPlants.size();
         int initialIdx = RAND.nextInt(max);
         int currentIdx = initialIdx;
-        Plant typePlant = unlocked.get(currentIdx);
+        Plant typePlant = unlockedPlants.get(currentIdx);
 
         while (typePlant.getPlantFoodType().equals(PlantFoodType.NONE)) {
             currentIdx = (currentIdx + 1) % max;
-            typePlant = unlocked.get(currentIdx);
+            typePlant = unlockedPlants.get(currentIdx);
             if (currentIdx == initialIdx) {
                 break;
             }
