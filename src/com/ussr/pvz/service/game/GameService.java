@@ -310,10 +310,19 @@ public class GameService {
                     blueprint.getName().equalsIgnoreCase("LilyPad");
         }
 
+        boolean hasLilyPadUnderneath = false;
+        if (!cell.isEmpty()) {
+            Plant existingPlant = cell.getPlant();
+            if (existingPlant != null && existingPlant.getName() != null) {
+                hasLilyPadUnderneath = existingPlant.getName().equalsIgnoreCase("Lily Pad") ||
+                        existingPlant.getName().equalsIgnoreCase("LilyPad");
+            }
+        }
+
         String displayName = blueprint.getName() != null ? blueprint.getName() : "this plant";
 
         if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
-            if (!(isWaterTile && isAquaticPlant)) {
+            if (!(isWaterTile && (isAquaticPlant || hasLilyPadUnderneath))) {
                 throw new IllegalStateException("cannot plant " + displayName + " on this tile (" + x + ", " + y + ")");
             }
         } else if (isWaterTile && !isAquaticPlant && cell.isEmpty()) {
@@ -321,14 +330,7 @@ public class GameService {
         }
 
         if (!cell.isEmpty()) {
-            Plant existingPlant = cell.getPlant();
-            boolean isLilyPad = false;
-            if (existingPlant != null && existingPlant.getName() != null) {
-                isLilyPad = existingPlant.getName().equalsIgnoreCase("Lily Pad") ||
-                        existingPlant.getName().equalsIgnoreCase("LilyPad");
-            }
-
-            if (isLilyPad && !isAquaticPlant) {
+            if (hasLilyPadUnderneath && !isAquaticPlant) {
             } else {
                 throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
             }
@@ -594,7 +596,7 @@ public class GameService {
         }
 
         var quest = matchingQuest.get();
-        
+
         if (quest.isCompleted()) {
             return "quest already completed: " + quest.getTitle();
         }

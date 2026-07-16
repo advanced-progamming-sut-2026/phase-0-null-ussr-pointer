@@ -131,6 +131,13 @@ public class ZombieFactory {
         double speed = ((Number) data.get("Speed")).doubleValue();
         double eatDps = ((Number) data.get("EatDPS")).doubleValue();
 
+        if (data.containsKey("RunningSpeedScale")) {
+            double runningSpeedScale = ((Number) data.get("RunningSpeedScale")).doubleValue();
+            if (runningSpeedScale > 0) {
+                speed = speed / runningSpeedScale;
+            }
+        }
+
         String sizeStr = data.containsKey("Size") ? (String) data.get("Size") : "default";
         ZombieSize size = switch (sizeStr.toLowerCase()) {
             case "imp" -> ZombieSize.IMP;

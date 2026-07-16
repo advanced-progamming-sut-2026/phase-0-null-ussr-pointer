@@ -2289,7 +2289,8 @@
           "Value": "speed0"
         }
       ],
-      "attack": "CrushAttack"
+      "attack": "CrushAttack",
+      "effect": "PianistEffect"
     }
   },
   {
