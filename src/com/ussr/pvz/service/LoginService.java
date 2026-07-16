@@ -33,6 +33,9 @@ public class LoginService {
             SessionManager.saveSession(account.getName());
         }
 
+        // Update login time and check for daily resets
+        account.updateLoginTime();
+
         App.login(account);
 
         App.setMenuState(MenuState.MAIN);

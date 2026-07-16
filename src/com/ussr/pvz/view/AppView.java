@@ -52,6 +52,9 @@ public class AppView {
                 .orElse(null);
 
         if (autoLoginAccount != null) {
+            // Update login time and check for daily resets
+            autoLoginAccount.updateLoginTime();
+
             App.login(autoLoginAccount);
 
             App.setMenuState(MenuState.MAIN);

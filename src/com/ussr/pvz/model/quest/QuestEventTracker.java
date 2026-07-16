@@ -66,6 +66,8 @@ public class QuestEventTracker {
             ctx.sunProducerCount = countSunProducers(session);
             ctx.gardenSymmetric = checkSymmetry(session);
             ctx.gardenAsymmetric = !ctx.gardenSymmetric;
+            ctx.emptyColumns = findEmptyColumns(session);
+            ctx.emptyRows = findEmptyRows(session);
 
             questManager.onLevelEnd(ctx);
             questManager.onGameEvent("WIN_LEVEL_EXACT_SUN_LEFT", 1, ctx);
@@ -74,6 +76,9 @@ public class QuestEventTracker {
             questManager.onGameEvent("WIN_LEVEL_ASYMMETRIC", 1, ctx);
             questManager.onGameEvent("WIN_LEVEL_MAX_SUN_PRODUCERS", 1, ctx);
             questManager.onGameEvent("WIN_DAY_LEVEL_WITH_NIGHT_PLANTS", 1, ctx);
+            questManager.onGameEvent("WIN_LEVEL_EMPTY_COLUMN", 1, ctx);
+            questManager.onGameEvent("WIN_LEVEL_EMPTY_ROW", 1, ctx);
+            questManager.onGameEvent("WIN_LEVEL_EMPTY_ROW_AND_COLUMN", 1, ctx);
         });
     }
 
@@ -101,5 +106,49 @@ public class QuestEventTracker {
             }
         }
         return true;
+    }
+
+    private java.util.List<Integer> findEmptyColumns(GameSession session) {
+        java.util.List<Integer> emptyColumns = new java.util.ArrayList<>();
+        if (session.getLawn() == null) return emptyColumns;
+
+        int rows = session.getLawn().getRows();
+        int cols = session.getLawn().getCols();
+
+        for (int c = 0; c < cols; c++) {
+            boolean isEmpty = true;
+            for (int r = 0; r < rows; r++) {
+                if (session.getLawn().getCell(r, c).getPlant() != null) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            if (isEmpty) {
+                emptyColumns.add(c);
+            }
+        }
+        return emptyColumns;
+    }
+
+    private java.util.List<Integer> findEmptyRows(GameSession session) {
+        java.util.List<Integer> emptyRows = new java.util.ArrayList<>();
+        if (session.getLawn() == null) return emptyRows;
+
+        int rows = session.getLawn().getRows();
+        int cols = session.getLawn().getCols();
+
+        for (int r = 0; r < rows; r++) {
+            boolean isEmpty = true;
+            for (int c = 0; c < cols; c++) {
+                if (session.getLawn().getCell(r, c).getPlant() != null) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            if (isEmpty) {
+                emptyRows.add(r);
+            }
+        }
+        return emptyRows;
     }
 }

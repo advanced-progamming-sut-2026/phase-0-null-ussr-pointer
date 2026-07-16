@@ -23,6 +23,7 @@ public class Account {
     private int difficultyLvl;
     private SavedBoosts savedBoosts;
     private QuestManager questManager;
+    private long lastLoginTime;
 
 
     public Account(AccountState state, Collection collection) {
@@ -64,6 +65,9 @@ public class Account {
         } catch (Exception e) {
             System.err.println("Failed to load quests: " + e.getMessage());
         }
+
+        this.lastLoginTime = System.currentTimeMillis();
+        checkAndResetDailyQuests();
     }
 
     public AccountState toState() {
@@ -190,7 +194,33 @@ public class Account {
         return questManager;
     }
 
-//    public void setStayLoggedIn(boolean stayLoggedIn) { this.stayLoggedIn = stayLoggedIn; }
-//
-//    public boolean isStayLoggedIn() { return this.stayLoggedIn; }
+    public long getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void updateLoginTime() {
+        this.lastLoginTime = System.currentTimeMillis();
+        checkAndResetDailyQuests();
+    }
+
+    private void checkAndResetDailyQuests() {
+        long currentTime = System.currentTimeMillis();
+        long timeDiffMillis = currentTime - lastLoginTime;
+        long timeDiffHours = timeDiffMillis / (1000 * 60 * 60);
+
+        // Reset daily quests and shop offers if more than 24 hours have passed
+        if (timeDiffHours >= 24) {
+            questManager.resetDaily();
+            resetDailyShopOffers();
+            this.lastLoginTime = currentTime;
+        }
+    }
+
+    private void resetDailyShopOffers() {
+        com.ussr.pvz.model.shop.ShopManager shopManager = com.ussr.pvz.model.App.getShopManager();
+        if (shopManager != null) {
+            // Reinitialize the shop to reset daily offers
+            com.ussr.pvz.model.App.initShop();
+        }
+    }
 }

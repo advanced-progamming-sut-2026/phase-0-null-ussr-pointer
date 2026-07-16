@@ -1,6 +1,8 @@
 package com.ussr.pvz.model.quest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class QuestContext {
@@ -19,6 +21,8 @@ public class QuestContext {
     public int sunProducerCount = 0;
     public int explosivesUsed = 0;
     public int consecutiveWins = 0;
+    public List<Integer> emptyColumns = new ArrayList<>();
+    public List<Integer> emptyRows = new ArrayList<>();
 
     public Map<String, Object> extra = new HashMap<>();
 }

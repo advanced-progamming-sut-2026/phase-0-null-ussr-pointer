@@ -44,6 +44,9 @@ public class ConfigurableQuest implements Quest {
 
     @Override
     public void onLevelEnd(QuestContext ctx) {
+        if (completed || isExpired()) {
+            return;
+        }
         onProgress("LEVEL_END", 1, ctx);
     }
 
@@ -51,6 +54,8 @@ public class ConfigurableQuest implements Quest {
         boolean allMet = criteria.stream().allMatch(CriterionProgress::isMet);
         if (allMet && !completed) {
             completed = true;
+            // Apply reward and send notification
+            QuestRewardApplier.applyReward(reward, title);
         }
     }
 
@@ -69,6 +74,29 @@ public class ConfigurableQuest implements Quest {
                 return ctx.gardenAsymmetric;
             case "KILL_ZOMBIES_FIRST_COLUMN_NO_LAWNMOWER":
                 return !ctx.hadLawnmower && ctx.columnIndex == 0;
+            case "WIN_LEVEL_EMPTY_COLUMN":
+                return ctx.emptyColumns != null && !ctx.emptyColumns.isEmpty();
+            case "WIN_LEVEL_EMPTY_ROW":
+                return ctx.emptyRows != null && !ctx.emptyRows.isEmpty();
+            case "WIN_LEVEL_EMPTY_ROW_AND_COLUMN":
+                return (ctx.emptyColumns != null && !ctx.emptyColumns.isEmpty()) &&
+                       (ctx.emptyRows != null && !ctx.emptyRows.isEmpty());
+            case "KILL_ZOMBIES_IN_CHAPTER":
+                String chapter = c.getString("chapter");
+                return chapter == null || chapter.equals("any") || chapter.equals(ctx.chapterId);
+            case "KILL_ZOMBIES_WITH_SPECIFIC_PLANT":
+                String plant = c.getString("plantType");
+                if (plant == null || plant.equals("any_offensive")) return true;
+                return ctx.plantKey != null && ctx.plantKey.toLowerCase().contains(plant.toLowerCase());
+            case "KILL_ZOMBIES_TIME_LIMIT":
+                int timeLimit = c.getInt("timeLimitSeconds", Integer.MAX_VALUE);
+                return ctx.elapsedSeconds <= timeLimit;
+            case "KILL_ZOMBIES_EXCLUSIVE_FAMILY":
+                return true; // Additional logic can be implemented
+            case "WIN_DAY_LEVEL_WITH_NIGHT_PLANTS":
+                return true; // Additional logic for mushrooms can be implemented
+            case "WIN_CONSECUTIVE_LEVELS_MAX_DIFFICULTY":
+                return ctx.consecutiveWins >= c.getInt("difficulty", 1);
             default:
                 return true;
         }
