@@ -97,6 +97,7 @@ public class Projectile extends GameEntity {
         ArrayList<InteractableStructure> interactableStructures = session.getLawn().getAllInteractable();
         for (InteractableStructure structure : interactableStructures) {
             if (!structure.isAlive()) continue;
+            if (structure.getPosition() == null) continue;
             if (this.getPosition().distanceTo(structure.getPosition()) < 0.2) {
                 physicalImpactTarget = structure;
                 break;
@@ -182,6 +183,7 @@ public class Projectile extends GameEntity {
         for (InteractableStructure structure : interactableStructures) {
             if (!structure.isAlive()) continue;
             Vec2 pos = structure.getPosition();
+            if (pos == null) continue;
             if (Math.abs(explosionEpicenter.y() - pos.y()) < straightDist && Math.abs(explosionEpicenter.x() - pos.x()) < straightDist) {
                 targets.add(structure);
             }

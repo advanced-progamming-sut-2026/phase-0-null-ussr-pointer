@@ -35,7 +35,10 @@ public class OctopusProjectile extends ZombieProjectile {
 
             // Only attach an octopus if the plant isn't already incapacitated by something else
             if (targetPlant.getState() != Plant.PlantState.INCAPACITATED) {
-                targetCell.setStructure(new OctopusWrap(targetPlant, 800));
+                OctopusWrap wrap = new OctopusWrap(targetPlant, 800);
+                wrap.setPosition(Vec2.of(targetCol, targetRow));
+                targetCell.setStructure(wrap);
+                session.registerStructure(wrap);
             }
         }
     }

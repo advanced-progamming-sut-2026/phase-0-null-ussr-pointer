@@ -34,7 +34,10 @@ public class SnowballProjectile extends ZombieProjectile {
 
                 // If it hits 3 stacks, freeze it completely
                 if (targetPlant.getChillLevel() >= 3) {
-                    targetCell.setStructure(new IceBlock(targetPlant, 500));
+                    IceBlock iceBlock = new IceBlock(targetPlant, 500);
+                    iceBlock.setPosition(Vec2.of(targetCol, targetRow));
+                    targetCell.setStructure(iceBlock);
+                    session.registerStructure(iceBlock);
                 }
             }
         }

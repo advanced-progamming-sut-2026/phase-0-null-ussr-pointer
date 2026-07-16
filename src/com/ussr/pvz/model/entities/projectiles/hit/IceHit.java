@@ -11,6 +11,7 @@ import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.effect.FireEffect;
 import com.ussr.pvz.model.entities.zombies.move.ProspectorMove;
+import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
 
 public class IceHit implements HitEffectStrategy {
@@ -76,6 +77,7 @@ public class IceHit implements HitEffectStrategy {
             if (cell == null) return;
 
             IceBlock iceBlock = new IceBlock(plant, ICE_BLOCK_HP);
+            iceBlock.setPosition(Vec2.of(plant.getLocation().x(), plant.getLocation().y()));
             cell.setStructure(iceBlock);
             session.registerStructure(iceBlock);
         }
