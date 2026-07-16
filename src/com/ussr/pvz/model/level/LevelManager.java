@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.level;
 
+import com.ussr.pvz.model.engine.NewsObserver;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.RegularDeliveryStrategy;
@@ -134,11 +135,8 @@ public class LevelManager {
         JsonContainer.JsonLevelData data = levelConfigs.get(level.getId());
         if (data != null) {
             Level freshLevel = LevelFactory.create(data);
+            NewsObserver.triggerNewLevel(freshLevel);
             level.setBehavior(freshLevel.getBehavior());
-
-            // Reset chapter-effect schedule progress (sandstorms, tides,
-            // wind timers) so a replayed level starts its mechanics over,
-            // rather than continuing from the previous attempt's cursor.
             level.setSandstormSchedule(freshLevel.getSandstormSchedule());
             level.setStartingTideColumn(freshLevel.getStartingTideColumn());
             level.setTideSchedule(freshLevel.getTideSchedule());

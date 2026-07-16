@@ -11,7 +11,6 @@ import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.view.CliGameEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class ChoosePlantService {
             for (Map<String, Object> p : allPlants) {
                 String officialName = p.get("name").toString();
                 if (officialName.replaceAll("[\\s_\\-]", "").toUpperCase().equals(strippedInput)) {
-                    return officialName.toUpperCase();
+                    return strippedInput;
                 }
             }
         }

@@ -4,6 +4,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.model.account.NewsItem;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
@@ -34,16 +35,12 @@ import java.util.Optional;
 
 public class GameSession {
 
-    // Tunable loot-drop odds for GameSession#rollZombieLoot. Values are percentages out of 100
-    // and are checked independently (a zombie can drop both coins and a diamond on the same kill).
     private static final int COIN_DROP_CHANCE_PERCENT = 15;
     private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
     private static final int DIAMOND_DROP_AMOUNT = 1;
     private boolean progressTracked = true;
     private double skySunTimer = 0.0;
 
-    // Flat coin reward granted to the account on level completion, in the absence of any
-    // per-level reward configuration in levels.json.
     private static final int LEVEL_COMPLETE_COIN_REWARD = 100;
 
     private final GameEventBus eventBus = new GameEventBus();
@@ -159,7 +156,7 @@ public class GameSession {
 
                     for (String plantAlias : level.getRewardPlantAliases()) {
                         account.getAdventureProgress().upgradePlant(plantAlias);
-                        System.out.println("Unlocked plant: " + plantAlias); // Optional debug
+                        NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
                     }
                 }
 
@@ -248,6 +245,7 @@ public class GameSession {
             List<String> seen = App.getAccount().getAdventureProgress().getSeenZombies();
             if (!seen.contains(zombie.getAlias())) {
                 App.getAccount().getAdventureProgress().addSeenZombies(zombie.getAlias());
+                NewsObserver.triggerNewZombie(zombie);
             }
         }
         eventBus.publish(new GameEvent.ZombieSpawned(
