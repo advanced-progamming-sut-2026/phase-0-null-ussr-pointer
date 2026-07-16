@@ -29,6 +29,10 @@ public class GameService {
     public String menuEnterChapter(MenuEnterChapterRequest request) {
         String chapterId = request.chapterName();
 
+        if (App.getGameSession() != null && !App.getGameSession().isGameOver()) {
+            return "Cannot enter a chapter mid-game. Quit or finish the current game first.";
+        }
+
         if (chapterId.toLowerCase().contains("minigame")) {
             return "Minigames can only be accessed from the Travel Log.";
         }
@@ -179,7 +183,12 @@ public class GameService {
 
         try {
             GameSession session = requireSession();
-            Plant blueprint = requireUnlockedPlant(request.type());
+            Plant blueprint;
+            try {
+                blueprint = requireUnlockedPlant(request.type());
+            } catch (Exception e) {
+                return "Invalid or unknown plant type: " + request.type();
+            }
 
             Cell cell = requirePlantableCell(session, x, y, blueprint);
 
@@ -209,12 +218,6 @@ public class GameService {
 
             cell.setPlant(plant);
             session.addPlant(plant);
-
-            // TODO: [MINT FAMILY BUFFS]
-            // 1. Check if 'plant' is a Mint (e.g., blueprint.getAbilityType() == MINT_FAMILY_BOOST).
-            // 2. If true, iterate over session.getPlants(), match family tags, and apply a StatModifier
-            //    to their ModifiableStat fields (damage, attack speed, etc.).
-            // 3. Mark the Mint plant to despawn/setAlive(false) after its active duration expires.
 
             blueprint.setRecharge(blueprint.getMaxRecharge());
 
@@ -425,6 +428,31 @@ public class GameService {
         } catch (IllegalArgumentException e) {
             return "unknown zombie type: " + request.type();
         }
+    }
+
+    public String cheatDecreaseHealth(String type, int amount) {
+        GameSession session = App.getGameSession();
+        if (session == null) return "no active game session";
+        int count = 0;
+        for (Zombie z : session.getZombies()) {
+            if (z.isAlive() && z.getAlias().equalsIgnoreCase(type.trim())) {
+                z.takeDamage(amount);
+                count++;
+            }
+        }
+        return "Decreased health of " + count + " " + type + " zombies by " + amount;
+    }
+
+    public String cheatUnlockAll() {
+        Account account = App.getAccount();
+        if (account == null) return "no active account";
+        account.getAdventureProgress().setCurrentLvl(999);
+        account.getAdventureProgress().setCurrentChapter(999);
+        for (java.util.Map<String, Object> p : App.getCachedPlantsData()) {
+            String name = p.get("name").toString().toUpperCase().replaceAll("[\\s_\\-]", "");
+            account.getAdventureProgress().getPlantLvls().put(name, 1);
+        }
+        return "all chapters and plants unlocked";
     }
 
     public String cheatAddCurrency(CheatAddCurrencyRequest request) {

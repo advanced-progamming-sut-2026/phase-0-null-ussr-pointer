@@ -69,6 +69,8 @@ public class GameController {
             case FEED_PLANT -> handleFeedPlant(matcher);
             case CHEAT_ADD_PLANT_FOOD -> handleCheatAddPlantFood();
             case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
+            case CHEAT_DECREASE_HEALTH -> handleCheatDecreaseHealth(matcher);
+            case CHEAT_UNLOCK_ALL -> handleCheatUnlockAll();
             case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
             case CHEAT_COMPLETE_QUEST -> handleCheatCompleteQuest(matcher);
             case START_ZOMBIE_WAVES -> handleStartZombieWaves();
@@ -237,6 +239,20 @@ public class GameController {
                 matcher.group("y")
         );
         return gameService.cheatSpawnZombie(request);
+    }
+
+    private String handleCheatDecreaseHealth(Matcher matcher) {
+        try {
+            String type = matcher.group("type");
+            int amount = Integer.parseInt(matcher.group("amount"));
+            return gameService.cheatDecreaseHealth(type, amount);
+        } catch (NumberFormatException e) {
+            return "invalid health amount";
+        }
+    }
+
+    private String handleCheatUnlockAll() {
+        return gameService.cheatUnlockAll();
     }
 
     private String handleCheatAddCurrency(Matcher matcher) {
