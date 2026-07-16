@@ -69,6 +69,11 @@ public class ProfileService {
         return "username: " + account.getName() + "\n" +
                 "nickname: " + account.getNickname() + "\n" +
                 "email: " + account.getEmail() + "\n" +
-                "gender: " + account.getGender().name().toLowerCase();
+                "gender: " + account.getGender().name().toLowerCase() + "\n" +
+                "coin: " + account.getAdventureProgress().getCoin() + "\n" +
+                "gems: " + account.getAdventureProgress().getGem() + "\n" +
+                "mewo points: " + account.getScoreRecord().getScore() + "\n" +
+                "current chapter: " + account.getAdventureProgress().getCurrentChapter() + "\n" +
+                "current level: " + account.getAdventureProgress().getCurrentLvl();
     }
 }
