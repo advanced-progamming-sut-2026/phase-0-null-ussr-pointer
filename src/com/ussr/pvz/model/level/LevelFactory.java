@@ -44,6 +44,7 @@ public class LevelFactory {
         level.setAllowedPlantsLost(data.allowedPlantsLost);
         level.setLockedPlants(data.lockedPlants != null ? data.lockedPlants : new ArrayList<>());
         level.setSeedPlants(data.seedPlants != null ? data.seedPlants : new ArrayList<>());
+        level.setRewardPlantAliases(data.rewardPlantAliases != null ? data.rewardPlantAliases : new ArrayList<>());
     }
 
     private static LevelBehavior parseBehavior(JsonContainer.JsonLevelData data) {

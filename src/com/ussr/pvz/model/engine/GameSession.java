@@ -156,6 +156,11 @@ public class GameSession {
                 Account account = App.getAccount();
                 if (account != null) {
                     account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
+
+                    for (String plantAlias : level.getRewardPlantAliases()) {
+                        account.getAdventureProgress().upgradePlant(plantAlias);
+                        System.out.println("Unlocked plant: " + plantAlias); // Optional debug
+                    }
                 }
 
                 try {
@@ -169,8 +174,7 @@ public class GameSession {
                         .toList();
                 SaveService.saveAccounts(updatedStates);
             }
-
-            App.setMenuState(MenuState.MAIN);
+            App.setMenuState(MenuState.GAME);
         }
     }
 

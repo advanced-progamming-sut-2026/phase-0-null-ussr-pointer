@@ -14,34 +14,34 @@ public class NewsService {
             }
         });
         if (output.isEmpty()) {
-            return "============================================================\n" +
-                    "                  No unread news right now.                 \n" +
-                    "============================================================\n";
+            return """
+                    ============================================================
+                                      No unread news right now.                \s
+                    ============================================================
+                    """;
         }
         return output.toString();
     }
 
     public static String showAll() {
         StringBuilder output = new StringBuilder();
-        App.getAccount().getPersonalNews().forEach(newsItem -> {
-            output.append(formatNewsCard(newsItem));
-        });
+        App.getAccount().getPersonalNews().forEach(newsItem -> output.append(formatNewsCard(newsItem)));
 
         if (output.isEmpty()) {
-            return "============================================================\n" +
-                    "                     Your inbox is empty.                   \n" +
-                    "============================================================\n";
+            return """
+                    ============================================================
+                                         Your inbox is empty.                  \s
+                    ============================================================
+                    """;
         }
         return output.toString();
     }
 
     private static String formatNewsCard(NewsItem item) {
-        StringBuilder card = new StringBuilder();
-        card.append("============================================================\n");
-        card.append(String.format(" %-35s | %s\n", item.getTitle(), item.getFormattedDate()));
-        card.append("------------------------------------------------------------\n");
-        card.append(item.getContent()).append("\n");
-        card.append("============================================================\n\n");
-        return card.toString();
+        return "============================================================\n" +
+                String.format(" %-35s | %s\n", item.getTitle(), item.getFormattedDate()) +
+                "------------------------------------------------------------\n" +
+                item.getContent() + "\n" +
+                "============================================================\n\n";
     }
 }

@@ -289,7 +289,18 @@ public class Level {
     }
 
     // === Core Inner Records ===
+    private final List<String> rewardPlantAliases = new ArrayList<>();
 
+    public List<String> getRewardPlantAliases() {
+        return rewardPlantAliases;
+    }
+
+    public void setRewardPlantAliases(List<String> rewardPlantAliases) {
+        this.rewardPlantAliases.clear();
+        if (rewardPlantAliases != null) {
+            this.rewardPlantAliases.addAll(rewardPlantAliases);
+        }
+    }
     public record AllowedZombie(String id, int weight) {}
 
     public record Wave(int waveNumber, int cost, List<SpawnData> spawnData) {}
