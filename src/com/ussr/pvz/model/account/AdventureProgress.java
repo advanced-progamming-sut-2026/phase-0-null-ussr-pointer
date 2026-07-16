@@ -4,15 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.Plant;
-import com.ussr.pvz.service.ChoosePlantService;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.*;
-
-import static com.ussr.pvz.service.ChoosePlantService.normalizePlantKey;
 
 public class AdventureProgress {
     private int coin;
@@ -27,7 +24,13 @@ public class AdventureProgress {
     private final Map<String, Integer> seedPackets;
     private final List<Plant> accountPlants;
 
-    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> plantLvls) {
+    // A static normalizer so it's fully self-contained and accessible anywhere
+    public static String normalizeKey(String rawKey) {
+        if (rawKey == null) return "";
+        return rawKey.trim().toUpperCase().replaceAll("[\\s_]", "");
+    }
+
+    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> rawPlantLvls) {
         this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
         this.minigamesWon = minigamesWon;
@@ -35,7 +38,17 @@ public class AdventureProgress {
         this.coin = coin;
         this.gem = gem;
         this.plantFoodCount = 0;
-        this.plantLvls = plantLvls;
+
+        // FIX: Rebuild the map to normalize any raw keys (e.g., converting "Sun Flower" to "SUNFLOWER")
+        this.plantLvls = new HashMap<>();
+        if (rawPlantLvls != null) {
+            for (Map.Entry<String, Integer> entry : rawPlantLvls.entrySet()) {
+                if (entry.getKey() != null) {
+                    this.plantLvls.put(normalizeKey(entry.getKey()), entry.getValue());
+                }
+            }
+        }
+
         this.seedPackets = new HashMap<>();
         this.seenZombies = new ArrayList<>();
         this.accountPlants = new ArrayList<>();
@@ -54,7 +67,7 @@ public class AdventureProgress {
                 Object nameObj = plantData.get("name");
                 if (nameObj == null) continue;
                 String displayName = nameObj.toString();
-                String plantName = normalizePlantKey(displayName);
+                String plantName = normalizeKey(displayName);
                 if (plantLvls.containsKey(plantName)) {
                     int currentLevel = plantLvls.get(plantName);
                     if (currentLevel > 0) {
@@ -128,7 +141,7 @@ public class AdventureProgress {
     }
 
     public void upgradePlant(String plantName) {
-        String key = normalizePlantKey(plantName);
+        String key = normalizeKey(plantName);
         if (plantLvls.containsKey(key)) {
             plantLvls.put(key, plantLvls.get(key) + 1);
             populateAccountPlants();
@@ -226,13 +239,14 @@ public class AdventureProgress {
     }
 
     public void addSeedPackets(String plantName, int amount) {
-        seedPackets.merge(plantName, amount, Integer::sum);
+        seedPackets.merge(normalizeKey(plantName), amount, Integer::sum);
     }
 
     public boolean spendSeedPacket(String plantName) {
-        int current = seedPackets.getOrDefault(plantName, 0);
+        String normalizedKey = normalizeKey(plantName);
+        int current = seedPackets.getOrDefault(normalizedKey, 0);
         if (current <= 0) return false;
-        seedPackets.put(plantName, current - 1);
+        seedPackets.put(normalizedKey, current - 1);
         return true;
     }
 
@@ -245,12 +259,11 @@ public class AdventureProgress {
         List<String> starterPlantNames = new ArrayList<>();
         if (defaultUnlockedFile.exists()) {
             try (FileReader reader = new FileReader(defaultUnlockedFile)) {
-                Type simpleListType = new TypeToken<List<String>>() {
-                }.getType();
+                Type simpleListType = new TypeToken<List<String>>() {}.getType();
                 List<String> loadedStarters = gson.fromJson(reader, simpleListType);
                 if (loadedStarters != null) {
                     starterPlantNames = loadedStarters.stream()
-                            .map(ChoosePlantService::normalizePlantKey)
+                            .map(AdventureProgress::normalizeKey)
                             .toList();
                 }
             } catch (IOException e) {
@@ -267,10 +280,10 @@ public class AdventureProgress {
             for (Map<String, Object> plantData : complexPlantsList) {
                 Object nameObj = plantData.get("name");
                 if (nameObj != null) {
-                    String plantName = normalizePlantKey(nameObj.toString());
+                    String plantName = normalizeKey(nameObj.toString());
                     //todo:for now leave it like it but after debugging meke lines not comment
 //                    if (starterPlantNames.contains(plantName)) {
-                        defaultPlantLevels.put(plantName, 1);
+                    defaultPlantLevels.put(plantName, 1);
 //                    } else {
 //                        defaultPlantLevels.put(plantName, 0);
 //                    }
