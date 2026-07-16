@@ -30,7 +30,7 @@ public class JsonContainer {
         public List<String> lockedPlants;
         public List<String> seedPlants;
         public String behavior;
-
+        public List<String> rewardPlantAliases;
         // === Timed War Parameters ===
         public String timedWarType;
         public int timedWarTarget;

@@ -132,4 +132,8 @@ public class ConfigurableQuest implements Quest {
     @Override public List<CriterionProgress> getCriteria() { return criteria; }
     @Override public QuestReward getReward() { return reward; }
     @Override public boolean isCompleted() { return completed; }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }

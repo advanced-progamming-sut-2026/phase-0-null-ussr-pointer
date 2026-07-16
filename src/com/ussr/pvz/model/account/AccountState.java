@@ -29,7 +29,8 @@ public record AccountState(
         int plantFoodCount,
         Map<String, Integer> seedPackets,
         List<String> completedQuests,
-        Map<String, List<Integer>> activeQuestProgress
+        Map<String, List<Integer>> activeQuestProgress,
+        long lastLoginTime
 ) {
     public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
         return new AccountState(
@@ -56,7 +57,8 @@ public record AccountState(
                 this.plantFoodCount,
                 this.seedPackets,
                 this.completedQuests,
-                this.activeQuestProgress
+                this.activeQuestProgress,
+                this.lastLoginTime
         );
     }
 }

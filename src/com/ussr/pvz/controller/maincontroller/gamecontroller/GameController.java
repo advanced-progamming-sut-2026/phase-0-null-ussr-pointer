@@ -70,6 +70,7 @@ public class GameController {
             case CHEAT_ADD_PLANT_FOOD -> handleCheatAddPlantFood();
             case CHEAT_SPAWN_ZOMBIE -> handleCheatSpawnZombie(matcher);
             case CHEAT_ADD_CURRENCY -> handleCheatAddCurrency(matcher);
+            case CHEAT_COMPLETE_QUEST -> handleCheatCompleteQuest(matcher);
             case START_ZOMBIE_WAVES -> handleStartZombieWaves();
 
             // Minigame Integrations
@@ -244,6 +245,11 @@ public class GameController {
                 matcher.group("currency")
         );
         return gameService.cheatAddCurrency(request);
+    }
+
+    private String handleCheatCompleteQuest(Matcher matcher) {
+        String questId = matcher.group("questId");
+        return gameService.cheatCompleteQuest(questId);
     }
 
     private String handleStartZombieWaves() {

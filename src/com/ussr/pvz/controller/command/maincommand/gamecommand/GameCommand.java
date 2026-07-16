@@ -27,9 +27,10 @@ public enum GameCommand {
     SHOW_TILE_STATUS("^show\\s+tile\\s+status\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     ZOMBIES_INFO("^zombies\\s+info(?:\\s+.*)?$"),
     CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>\\S+)\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),
-    CHEAT_ADD_CURRENCY("^menu\\s+cheat\\s+add\\s+(?<amount>\\S+)\\s+(?<currency>\\S+)(?:\\s+.*)?$"),
+     CHEAT_ADD_CURRENCY("^menu\\s+cheat\\s+add\\s+(?<amount>\\S+)\\s+(?<currency>\\S+)(?:\\s+.*)?$"),
+     CHEAT_COMPLETE_QUEST("^cheat\\s+complete-quest\\s+-q\\s+(?<questId>\\S+)(?:\\s+.*)?$"),
 
-    // === Minigame Commands ===
+     // === Minigame Commands ===
     SWAP_PLANTS("^swap\\s+\\(\\s*(?<r1>\\S+?)\\s*,\\s*(?<c1>\\S+?)\\s*\\)\\s+with\\s+\\(\\s*(?<r2>\\S+?)\\s*,\\s*(?<c2>\\S+?)\\s*\\)(?:\\s+.*)?$"),
     UPGRADE_BEGHOULED_PLANT("^upgrade\\s+(?<plantType>.+?)(?:\\s+.*)?$"),
     SMASH_VASE("^smash\\s+vase\\s+-l\\s*\\(\\s*(?<x>\\S+?)\\s*,\\s*(?<y>\\S+?)\\s*\\)(?:\\s+.*)?$"),

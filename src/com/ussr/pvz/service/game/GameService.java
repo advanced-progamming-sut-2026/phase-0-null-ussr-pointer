@@ -21,13 +21,14 @@ import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.quest.QuestRewardApplier;
+import com.ussr.pvz.model.quest.QuestType;
 
 public class GameService {
 
     public String menuEnterChapter(MenuEnterChapterRequest request) {
         String chapterId = request.chapterName();
 
-        // 1. Block Minigames from Adventure access
         if (chapterId.toLowerCase().contains("minigame")) {
             return "Minigames can only be accessed from the Travel Log.";
         }
@@ -42,7 +43,6 @@ public class GameService {
             return "could not enter chapter '" + chapterId + "': " + e.getMessage();
         }
 
-        // 2. Go to Level Selection instead of Choose Plant directly
         App.setMenuState(MenuState.LEVEL_SELECTION);
         return "entered chapter: " + request.chapterName() + ". Type 'show levels' to see options.";
     }
@@ -261,7 +261,6 @@ public class GameService {
             boolean isLilyPad = existingPlant.getName().equalsIgnoreCase("Lily Pad") || existingPlant.getName().equalsIgnoreCase("LilyPad");
 
             if (isLilyPad && !isAquaticPlant) {
-                // This is allowed, do nothing here.
             } else {
                 throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
             }
@@ -449,6 +448,45 @@ public class GameService {
                 return "invalid currency type";
             }
         }
+    }
+
+    public String cheatCompleteQuest(String questId) {
+        Account account = App.getAccount();
+        if (account == null) {
+            return "no account logged in";
+        }
+
+        var allQuests = account.getQuestManager().getByType(QuestType.DAILY);
+        allQuests.addAll(account.getQuestManager().getByType(QuestType.CHALLENGE));
+        allQuests.addAll(account.getQuestManager().getByType(QuestType.EPIC));
+
+        var matchingQuest = allQuests.stream()
+                .filter(q -> q.getId().equalsIgnoreCase(questId))
+                .findFirst();
+
+        if (matchingQuest.isEmpty()) {
+            return "quest not found: " + questId + " | Available quest types: DAILY, CHALLENGE, EPIC";
+        }
+
+        var quest = matchingQuest.get();
+        
+        if (quest.isCompleted()) {
+            return "quest already completed: " + quest.getTitle();
+        }
+
+        for (var criterion : quest.getCriteria()) {
+            for (int i = 0; i < criterion.getTarget(); i++) {
+                criterion.increment(1);
+            }
+        }
+
+        // Mark quest as completed
+        quest.setCompleted(true);
+
+        // Apply reward automatically
+        QuestRewardApplier.applyReward(quest.getReward(), quest.getTitle());
+
+        return "quest completed: " + quest.getTitle() + " | Reward: " + quest.getReward().amount() + " " + quest.getReward().rewardType();
     }
 
     public String startZombieWaves() {

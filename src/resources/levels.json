@@ -40,6 +40,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Twin Sunflower",
+            "Repeater",
+            "Cabbage-pult",
+            "Grave Buster"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieDefault",
@@ -83,6 +89,12 @@
           "behavior": "LoveYourPlantsBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Snow Pea",
+            "Kernel-pult",
+            "Tall-nut",
+            "Torchwood"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieDefault",
@@ -116,6 +128,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Cherry Bomb",
+            "Split Pea",
+            "Squash",
+            "Bonk Choy"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieArmor2",
@@ -157,6 +175,12 @@
           "behavior": "BossBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Melon-pult",
+            "Threepeater",
+            "Jalapeno",
+            "Garlic"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieGargantuar",
@@ -210,6 +234,12 @@
             "Lily Pad"
           ],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Lily Pad",
+            "Tangle Kelp",
+            "Sea-shroom",
+            "Chomper"
+          ],
           "startingTideColumn": 6,
           "tides": [
             {
@@ -250,6 +280,12 @@
           "behavior": "SaveOurSeedsBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Cat-tail",
+            "Sweet Potato",
+            "Magnet-shroom",
+            "Phat Beet"
+          ],
           "plantLayout": [
             {
               "plantName": "Sea-shroom",
@@ -291,6 +327,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Endurian",
+            "Pea Pod",
+            "Rotobaga",
+            "Explode-o-nut"
+          ],
           "startingTideColumn": 7,
           "tides": [
             {
@@ -331,6 +373,12 @@
           "behavior": "BossBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Bowling Bulb",
+            "Citron",
+            "Starfruit",
+            "Grapeshot"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieModernAllStar",
@@ -382,6 +430,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Sun-shroom",
+            "Puff-shroom",
+            "Fume-shroom",
+            "Hypno-shroom"
+          ],
           "necromancyZombieAlias": "ZombieDarkArmor3",
           "zombiesPerNecromancyWave": 2,
           "allowedZombies": [
@@ -415,6 +469,12 @@
           "timedWarTarget": 20,
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Doom-shroom",
+            "Ice-shroom",
+            "Pumpkin",
+            "Sun Bean"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieDarkJuggler",
@@ -444,6 +504,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Caulipower",
+            "Electric Blueberry",
+            "Wasabi Whip",
+            "Kiwibeast"
+          ],
           "necromancyZombieAlias": "ZombieDarkArmor3",
           "zombiesPerNecromancyWave": 3,
           "allowedZombies": [
@@ -487,6 +553,12 @@
           "behavior": "BossBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Primal Sunflower",
+            "Primal Potato Mine",
+            "Imitater",
+            "Gold Bloom"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieDarkKing",
@@ -536,6 +608,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Hot Potato",
+            "Iceberg Lettuce",
+            "Fire Peashooter",
+            "Pepper-pult"
+          ],
           "windIntervalSeconds": 20.0,
           "freezeStacksPerWind": 1,
           "allowedZombies": [
@@ -567,6 +645,12 @@
           "behavior": "DeadlineBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Winter Melon",
+            "Cactus",
+            "Goo Peashooter",
+            "Mega Gatling Pea"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieIceAgeHunter",
@@ -596,6 +680,12 @@
           "behavior": "NormalBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Enlighten-mint",
+            "Appease-mint",
+            "Arma-mint",
+            "Bombard-mint"
+          ],
           "windIntervalSeconds": 15.0,
           "freezeStacksPerWind": 1,
           "allowedZombies": [
@@ -631,6 +721,13 @@
           "behavior": "BossBehavior",
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [
+            "Enforce-mint",
+            "Reinforce-mint",
+            "Enchant-mint",
+            "Pierce-mint",
+            "catTail-mint"
+          ],
           "allowedZombies": [
             {
               "id": "ZombieIceAgeTroglobite",
@@ -659,6 +756,7 @@
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [],
           "allowedZombies": [
             {
               "id": "ZombieArmor2",
@@ -675,6 +773,7 @@
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [],
           "targetMatches": 20,
           "startingPlants": [
             "Peashooter",
@@ -698,6 +797,7 @@
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [],
           "redLineColumn": 4,
           "startingSun": 200,
           "plantLayout": [
@@ -741,6 +841,7 @@
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
+          "rewardPlantAliases": [],
           "allowedZombies": [],
           "waves": []
         }
