@@ -249,7 +249,7 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setActionInterval(double actionInterval) {
         this.actionInterval = actionInterval;
-        if (actionIntervalStat != null) actionIntervalStat.setBaseValue((int) actionInterval);
+        if (actionIntervalStat != null) actionIntervalStat.setBaseValue((float) actionInterval);
     }
 
     public int getCost() {

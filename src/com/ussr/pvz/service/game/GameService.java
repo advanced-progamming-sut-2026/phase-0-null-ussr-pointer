@@ -394,8 +394,9 @@ public class GameService {
     }
 
     public String cheatSpawnZombie(CheatSpawnZombieRequest request) {
-        int row;
+        int row, col;
         try {
+            col = Integer.parseInt(request.x());
             row = Integer.parseInt(request.y());
         } catch (NumberFormatException e) {
             return "invalid location";
@@ -408,11 +409,14 @@ public class GameService {
         if (row < 0 || row >= lawn.getRows()) {
             return "row out of bounds (0-" + (lawn.getRows() - 1) + ")";
         }
+        if (col < 0 || col >= lawn.getCols()) {
+            return "col out of bounds (0-" + (lawn.getCols() - 1) + ")";
+        }
 
         try {
-            Zombie zombie = ZombieFactory.create(request.type(), row, lawn.getCols());
+            Zombie zombie = ZombieFactory.create(request.type(), row, col);
             session.spawnZombie(zombie);
-            return request.type() + " spawned in row " + row;
+            return request.type() + " spawned in row " + row + " at col " + col;
         } catch (IllegalArgumentException e) {
             return "unknown zombie type: " + request.type();
         }

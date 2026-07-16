@@ -11,21 +11,21 @@ public class FrostbiteCavesEffect implements ChapterEffect {
 
     @Override
     public void onTick(GameSession session, Level level, double deltaTime) {
-        double windTimer = level.getWindTimerElapsed() + deltaTime;
         double thawTimer = level.getThawTimerElapsed() + deltaTime;
 
+        // Thawing remains continuous (60 HP per second check)
         if (thawTimer >= 1.0) {
             thawTimer = 0.0;
             processFireThawing(session);
         }
         level.setThawTimerElapsed(thawTimer);
+    }
 
-        double windInterval = level.getWindIntervalSeconds();
-        if (windInterval > 0 && windTimer >= windInterval) {
-            windTimer = 0.0;
-            applyFreezingWind(session, level);
-        }
-        level.setWindTimerElapsed(windTimer);
+    @Override
+    public void onWaveStart(GameSession session, Level level, int waveNumber, boolean isFinalWave) {
+        // "در هر موج از زامبی، ممکن است باد یخی به تعدادی از ردیف ها برخورد کند"
+        // Freezing wind triggers on wave starts instead of a continuous tick timer
+        applyFreezingWind(session, level);
     }
 
     private void processFireThawing(GameSession session) {
@@ -62,7 +62,7 @@ public class FrostbiteCavesEffect implements ChapterEffect {
 
             plant.setChillLevel(Math.min(3, plant.getChillLevel() + stacks));
             if (plant.getChillLevel() == 3 && plant.getState() != Plant.PlantState.INCAPACITATED) {
-                IceBlock iceBlock = new IceBlock(plant, 600);
+                IceBlock iceBlock = new IceBlock(plant, 600); // 600 HP matches rule document
                 iceBlock.setPosition(Vec2.of(plant.getLocation().x(), plant.getLocation().y()));
                 session.getLawn().getCell(plant.getLocation().y(), plant.getLocation().x()).setStructure(iceBlock);
                 session.registerStructure(iceBlock);

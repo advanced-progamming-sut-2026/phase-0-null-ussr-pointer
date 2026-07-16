@@ -453,7 +453,6 @@ public class GameSession {
             for (int c = 0; c < cols; c++) {
                 var cell = lawn.getCell(r, c);
 
-                // Scan the items list to see if a Sun is physically resting on this coordinate
                 boolean hasSun = false;
                 if (items != null) {
                     for (GroundItem item : items) {
@@ -472,22 +471,21 @@ public class GameSession {
                     leftSide.append("P");
                 } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
                     if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.SUN) {
-                        leftSide.append("S"); // Sun Grave
+                        leftSide.append("S");
                     } else if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.PLANT_FOOD) {
-                        leftSide.append("F"); // Plant Food Grave
+                        leftSide.append("F");
                     } else {
-                        leftSide.append("G"); // Standard Grave
+                        leftSide.append("G");
                     }
                 } else if (cell.getInteractableStructure() != null) {
-                    leftSide.append("I"); // Generic placeholder for structures like Ice Blocks
+                    leftSide.append("I");
                 } else if (hasSun) {
-                    leftSide.append("*"); // Asterisk represents a dropped Sun!
+                    leftSide.append("*");
                 } else {
                     leftSide.append(".");
                 }
             }
 
-            // Right side: Discrete Zombie Grid Overlay
             StringBuilder rightSide = new StringBuilder();
             for (int c = 0; c < cols; c++) {
                 int zCount = 0;
@@ -505,7 +503,35 @@ public class GameSession {
                 rightSide.append(zCount == 0 ? "." : Math.min(zCount, 9));
             }
 
-            sb.append(leftSide).append("   ||   ").append(rightSide).append("\n");
+            StringBuilder projSide = new StringBuilder();
+            for (int c = 0; c < cols; c++) {
+                int pCount = 0;
+
+                for (Projectile p : projectiles) {
+                    if (p.isAlive() && p.getPosition() != null) {
+                        int pRow = (int) p.getPosition().y();
+                        int pCol = (int) Math.floor(p.getPosition().x());
+                        if (pRow == r && pCol == c) {
+                            pCount++;
+                        }
+                    }
+                }
+
+                for (ZombieProjectile zp : zombieProjectiles) {
+                    if (zp.isAlive() && zp.getPosition() != null) {
+                        int zpRow = (int) zp.getPosition().y();
+                        int zpCol = (int) Math.floor(zp.getPosition().x());
+                        if (zpRow == r && zpCol == c) {
+                            pCount++;
+                        }
+                    }
+                }
+
+                projSide.append(pCount == 0 ? "." : Math.min(pCount, 9));
+            }
+
+            // Combine all three grids
+            sb.append(leftSide).append("   ||   ").append(rightSide).append("   ||   ").append(projSide).append("\n");
         }
         return sb.toString().trim();
     }

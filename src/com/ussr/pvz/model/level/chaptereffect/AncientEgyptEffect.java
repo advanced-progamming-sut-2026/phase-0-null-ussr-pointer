@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.level.chaptereffect;
 
+import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.Grave;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
@@ -9,26 +11,45 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Ancient Egypt: at scheduled times (level.getSandstormSchedule(), driven by
- * the "sandstorms" array in levels.json), a sandstorm drops an extra zombie
- * into a random lane/column.
- */
 public class AncientEgyptEffect implements ChapterEffect {
 
     private static final Random RAND = new Random();
 
     @Override
-    public void onTick(GameSession session, Level level, double deltaTime) {
+    public void onStart(GameSession session, Level level) {
+        // Spawn initial graves at the start of the level as per the document rules
+        if (session.getLawn() == null) return;
+
+        int gravesToSpawn = 3; // You can adjust this or pull it dynamically from the Level config
+        int spawned = 0;
+        int maxAttempts = 20;
+
+        while (spawned < gravesToSpawn && maxAttempts > 0) {
+            maxAttempts--;
+            // Spawn graves primarily in the right half of the board
+            int targetCol = RAND.nextInt(4) + 5;
+            int targetRow = RAND.nextInt(session.getLawn().getRows());
+
+            Cell cell = session.getLawn().getCell(targetRow, targetCol);
+            if (cell != null && cell.getInteractableStructure() == null && cell.getPlant() == null) {
+                Grave grave = new Grave();
+                grave.setPosition(Vec2.of(targetCol, targetRow));
+                cell.setStructure(grave);
+                session.registerStructure(grave);
+                spawned++;
+            }
+        }
+    }
+
+    @Override
+    public void onWaveStart(GameSession session, Level level, int waveNumber, boolean isFinalWave) {
+        if (!isFinalWave) return;
+
         List<Level.SandstormEvent> schedule = level.getSandstormSchedule();
-        int nextIndex = level.getNextSandstormIndex();
-
-        if (nextIndex >= schedule.size()) return;
-
-        Level.SandstormEvent nextEvent = schedule.get(nextIndex);
-        if (session.getElapsedSeconds() >= nextEvent.triggerTimeSeconds()) {
-            triggerSandstorm(session, nextEvent.zombieAlias());
-            level.setNextSandstormIndex(nextIndex + 1);
+        if (schedule != null) {
+            for (Level.SandstormEvent event : schedule) {
+                triggerSandstorm(session, event.zombieAlias());
+            }
         }
     }
 

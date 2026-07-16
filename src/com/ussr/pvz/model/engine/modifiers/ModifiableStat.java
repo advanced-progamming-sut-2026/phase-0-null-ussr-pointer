@@ -37,7 +37,7 @@ public class ModifiableStat {
         return finalValue;
     }
 
-    public void setBaseValue(int baseValue) {
+    public void setBaseValue(float baseValue) {
         this.baseValue = baseValue;
     }
 }

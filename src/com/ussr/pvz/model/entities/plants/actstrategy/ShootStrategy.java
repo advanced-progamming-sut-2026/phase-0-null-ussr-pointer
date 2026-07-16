@@ -1,5 +1,8 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
+import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.engine.Damageable;
+import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
@@ -10,7 +13,6 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.List;
-
 
 public class ShootStrategy implements ActStrategy {
 
@@ -29,22 +31,22 @@ public class ShootStrategy implements ActStrategy {
         HitEffectStrategy hitEffect = buildHitEffect(user);
 
         for (Vec2 direction : vectors) {
-            Zombie target = findTargetAlongVector(user, direction, session);
+            GameEntity target = findTargetAlongVector(user, direction, session);
             if (target == null) continue;
 
-            Vec2 velocity = direction.normalize().scale(20.0);
+            // Kept at 6.0 to prevent the bullet from tunneling over the target!
+            Vec2 velocity = direction.normalize().scale(6.0);
 
             session.addProjectile(new Projectile(
+                    (Damageable) target, // Cast the GameEntity to Damageable
                     user.getPosition(),
                     velocity,
-                    target,
                     user.getDamage(),
                     new StraightMove(),
                     hitEffect
             ));
         }
     }
-
 
     private HitEffectStrategy buildHitEffect(Plant user) {
         if (user.getTags().contains(Tag.FIRE)) return new FireHit(1);
@@ -53,12 +55,11 @@ public class ShootStrategy implements ActStrategy {
         return new NormalHit(1);
     }
 
-
-    private Zombie findTargetAlongVector(Plant user, Vec2 direction, GameSession session) {
+    private GameEntity findTargetAlongVector(Plant user, Vec2 direction, GameSession session) {
         Vec2 origin = user.getPosition();
         double dx = direction.x();
         double dy = direction.y();
-        Zombie nearest = null;
+        GameEntity nearest = null;
         double bestDist = Double.MAX_VALUE;
 
         for (Zombie zombie : session.getZombies()) {
@@ -75,9 +76,26 @@ public class ShootStrategy implements ActStrategy {
                 nearest = zombie;
             }
         }
+
+        if (session.getLawn() != null) {
+            for (InteractableStructure structure : session.getLawn().getAllInteractable()) {
+                if (structure == null || !structure.isAlive()) continue;
+                Vec2 sp = structure.getPosition();
+
+                double relX = sp.x() - origin.x();
+                double relY = sp.y() - origin.y();
+                if (!isInCone(relX, relY, dx, dy)) continue;
+
+                double dist = Math.sqrt(relX * relX + relY * relY);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    nearest = structure;
+                }
+            }
+        }
+
         return nearest;
     }
-
 
     private boolean isInCone(double relX, double relY, double dx, double dy) {
         double dirLen = Math.sqrt(dx * dx + dy * dy);
