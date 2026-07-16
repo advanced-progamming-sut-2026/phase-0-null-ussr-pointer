@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.board.Cell;
@@ -60,11 +61,11 @@ public class SunThief implements EffectStatus {
         if (isBankThief) {
             processBankThief(zombie, session);
         } else {
-            processGroundThief(session);
+            processGroundThief(zombie, session);
         }
     }
 
-    private void processGroundThief(GameSession session) {
+    private void processGroundThief(Zombie zombie, GameSession session) {
         if (stolenSuns >= maxSunsToSteal) return;
 
         if (currentTarget != null && (!currentTarget.isAlive() || currentTarget.getItemType() != ItemType.SUN)) {
@@ -81,7 +82,7 @@ public class SunThief implements EffectStatus {
         targetTimer += GameClock.SECONDS_PER_TICK;
 
         if (targetTimer >= STEAL_DURATION_SECONDS) {
-            stealSun(currentTarget);
+            stealSun(zombie, session, currentTarget);
             currentTarget = null;
             targetTimer = 0;
         }
@@ -96,7 +97,7 @@ public class SunThief implements EffectStatus {
         return null;
     }
 
-    private void stealSun(GroundItem item) {
+    private void stealSun(Zombie zombie, GameSession session, GroundItem item) {
         int sunValue = 0;
         if (item instanceof ProducedSun producedSun) {
             sunValue = producedSun.getValue();
@@ -106,6 +107,12 @@ public class SunThief implements EffectStatus {
 
         if (sunValue > 0) {
             stolenSuns = Math.min(stolenSuns + sunValue, maxSunsToSteal);
+
+            if (session != null) {
+                session.getEventBus().publish(new GameEvent.SunAbsorbedByZombie(
+                        zombie.getAlias(), sunValue, item.getPosition().x(), item.getPosition().y()
+                ));
+            }
         }
         item.setAlive(false);
     }

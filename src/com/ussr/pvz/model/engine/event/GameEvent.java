@@ -12,6 +12,7 @@ public sealed interface GameEvent permits
         GameEvent.PlantPlucked,
         GameEvent.SunProduced,
         GameEvent.SunCollected,
+        GameEvent.SunAbsorbedByZombie,
         GameEvent.PlantFoodDropped,
         GameEvent.PlantFoodUsed,
         GameEvent.ProjectileFired,
@@ -68,6 +69,9 @@ public sealed interface GameEvent permits
     }
 
     record SunCollected(int value, int totalSun) implements GameEvent {
+    }
+
+    record SunAbsorbedByZombie(String zombieAlias, int value, double x, double y) implements GameEvent {
     }
 
     record PlantFoodDropped(double x, double y) implements GameEvent {

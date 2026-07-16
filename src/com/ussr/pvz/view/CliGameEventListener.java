@@ -37,13 +37,13 @@ public class CliGameEventListener {
 
     private void registerPlantEvents(GameEventBus bus) {
         bus.subscribe(GameEvent.PlantDied.class,
-                e -> System.out.println(tick() + "[PLANT DIED] " + e.plantName() + " at (" + e.row() + ", " + e.col() + ")"));
+                e -> System.out.println(tick() + "[PLANT DIED] " + e.plantName() + " at (" + e.col() + ", " + e.row() + ")"));
 
         bus.subscribe(GameEvent.PlantPlanted.class,
-                e -> System.out.println(tick() + "[PLANTED] " + e.plantName() + " at (" + e.row() + ", " + e.col() + ")"));
+                e -> System.out.println(tick() + "[PLANTED] " + e.plantName() + " at (" + e.col() + ", " + e.row() + ")"));
 
         bus.subscribe(GameEvent.PlantPlucked.class,
-                e -> System.out.println(tick() + "[PLUCKED] " + e.plantName() + " removed from (" + e.row() + ", " + e.col() + ")"));
+                e -> System.out.println(tick() + "[PLUCKED] " + e.plantName() + " removed from (" + e.col() + ", " + e.row() + ")"));
     }
 
     private void registerSystemEvents(GameEventBus bus) {
@@ -51,10 +51,10 @@ public class CliGameEventListener {
                 e -> System.out.println(tick() + "[LAWNMOWER] Triggered on row " + e.lane()));
 
         bus.subscribe(GameEvent.GraveDestroyed.class,
-                e -> System.out.println(tick() + "[GRAVE] A tombstone at (" + e.row() + ", " + e.col() + ") has been destroyed!"));
+                e -> System.out.println(tick() + "[GRAVE] A tombstone at (" + e.col() + ", " + e.row() + ") has been destroyed!"));
 
         bus.subscribe(GameEvent.StructureDestroyed.class,
-                e -> System.out.println(tick() + "[STRUCTURE] " + e.structureType() + " at (" + e.row() + ", " + e.col() + ") destroyed"));
+                e -> System.out.println(tick() + "[STRUCTURE] " + e.structureType() + " at (" + e.col() + ", " + e.row() + ") destroyed"));
 
         bus.subscribe(GameEvent.WaveStarted.class, e -> {
             if (e.isFinalWave()) System.out.println(tick() + "The final wave has come.");
@@ -86,5 +86,8 @@ public class CliGameEventListener {
 
         bus.subscribe(GameEvent.SunCollected.class,
                 e -> System.out.println(tick() + "Collected a sun! (+" + e.value() + ") Total sun: " + e.totalSun()));
+
+        bus.subscribe(GameEvent.SunAbsorbedByZombie.class,
+                e -> System.out.println(tick() + "[SUN STOLEN] " + e.zombieAlias() + " absorbed a sun (+" + e.value() + ") at (" + (int) e.x() + ", " + (int) e.y() + ")"));
     }
 }
