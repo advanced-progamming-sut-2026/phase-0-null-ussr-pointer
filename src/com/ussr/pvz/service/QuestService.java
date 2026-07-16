@@ -1,6 +1,7 @@
 package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
 import com.ussr.pvz.model.quest.QuestType;
@@ -43,4 +44,32 @@ public class QuestService {
         }
         return sb.toString();
     }
+
+    public String playMinigame(String levelId) {
+        try {
+            // Load the arcade chapter dynamically
+            App.getLevelManager().startChapter("minigames_arcade");
+            com.ussr.pvz.model.level.Chapter chapter = App.getLevelManager().getCurrentChapter();
+
+            if (chapter != null) {
+                com.ussr.pvz.model.level.Level target = null;
+                for (com.ussr.pvz.model.level.Level l : chapter.getLevels()) {
+                    if (l.getId().equals(levelId)) {
+                        target = l;
+                        break;
+                    }
+                }
+                if (target != null) {
+                    App.setCheatedLevel(false); // Minigames don't strictly use adventure progress
+                    //App.getGameSession().setLevel(target);
+                    App.setMenuState(MenuState.CHOOSE_PLANT); // Jump to game prep
+                    return "Starting minigame: " + levelId;
+                }
+            }
+            return "Minigame not found: " + levelId;
+        } catch (Exception e) {
+            return "Error starting minigame: " + e.getMessage();
+        }
+    }
+
 }

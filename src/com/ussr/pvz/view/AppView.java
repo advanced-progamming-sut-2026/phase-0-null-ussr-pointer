@@ -32,6 +32,7 @@ public class AppView {
         menus.put(MenuState.LEADERBOARD, new LeaderBoardMenu());
         menus.put(MenuState.CHOOSE_PLANT, new ChoosePlantMenu());
         menus.put(MenuState.SHOP, new ShopMenu());
+        menus.put(MenuState.LEVEL_SELECTION, new LevelSelectionMenu());
 
         App.initShop();
         App.getLevelManager().loadFromJson();

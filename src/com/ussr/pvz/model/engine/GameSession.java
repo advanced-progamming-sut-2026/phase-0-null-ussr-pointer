@@ -39,7 +39,7 @@ public class GameSession {
     private static final int COIN_DROP_CHANCE_PERCENT = 15;
     private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
     private static final int DIAMOND_DROP_AMOUNT = 1;
-
+    private boolean progressTracked = true;
     private double skySunTimer = 0.0;
 
     // Flat coin reward granted to the account on level completion, in the absence of any
@@ -152,21 +152,23 @@ public class GameSession {
         if (!gameOver && areWavesDone()) {
             gameOver = true;
 
-            Account account = App.getAccount();
-            if (account != null) {
-                account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
-            }
+            if (this.progressTracked) {
+                Account account = App.getAccount();
+                if (account != null) {
+                    account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
+                }
 
-            try {
-                App.getLevelManager().nextLevel();
-            } catch (IllegalStateException e) {
-                System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
-            }
+                try {
+                    App.getLevelManager().nextLevel();
+                } catch (IllegalStateException e) {
+                    System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
+                }
 
-            List<AccountState> updatedStates = App.getAccounts().stream()
-                    .map(Account::toState)
-                    .toList();
-            SaveService.saveAccounts(updatedStates);
+                List<AccountState> updatedStates = App.getAccounts().stream()
+                        .map(Account::toState)
+                        .toList();
+                SaveService.saveAccounts(updatedStates);
+            }
 
             App.setMenuState(MenuState.MAIN);
         }
@@ -724,5 +726,9 @@ public class GameSession {
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().onPlantDied(this, plant);
         }
+    }
+
+    public void setProgressTracked(boolean progressTracked) {
+        this.progressTracked = progressTracked;
     }
 }

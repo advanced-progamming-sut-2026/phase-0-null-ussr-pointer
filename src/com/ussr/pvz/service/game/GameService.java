@@ -27,6 +27,11 @@ public class GameService {
     public String menuEnterChapter(MenuEnterChapterRequest request) {
         String chapterId = request.chapterName();
 
+        // 1. Block Minigames from Adventure access
+        if (chapterId.toLowerCase().contains("minigame")) {
+            return "Minigames can only be accessed from the Travel Log.";
+        }
+
         if (App.getLevelManager().findChapter(chapterId) == null) {
             return "chapter not found: " + chapterId;
         }
@@ -37,8 +42,9 @@ public class GameService {
             return "could not enter chapter '" + chapterId + "': " + e.getMessage();
         }
 
-        App.setMenuState(MenuState.CHOOSE_PLANT);
-        return "entered chapter: " + request.chapterName();
+        // 2. Go to Level Selection instead of Choose Plant directly
+        App.setMenuState(MenuState.LEVEL_SELECTION);
+        return "entered chapter: " + request.chapterName() + ". Type 'show levels' to see options.";
     }
 
     public String menuGreenhouse() {

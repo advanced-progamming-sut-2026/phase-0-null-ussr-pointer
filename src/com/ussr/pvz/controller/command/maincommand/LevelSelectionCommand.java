@@ -3,13 +3,14 @@ package com.ussr.pvz.controller.command.maincommand;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum TravelLogCommand {
-    PAGE("^travel\\s+log\\s+page\\s+(?<pageName>\\S+)(?:\\s+.*)?$"),
-    PLAY_MINIGAME("^play\\s+minigame\\s+(?<levelId>\\S+)(?:\\s+.*)?$"); // Added this
+public enum LevelSelectionCommand {
+    SHOW_LEVELS("^show\\s+levels(?:\\s+.*)?$"),
+    SELECT_LEVEL("^select\\s+level\\s+(?<levelId>\\S+)(?:\\s+.*)?$"),
+    CONFIRM_CHEAT("^(yes|no)$");
 
     private final String pattern;
 
-    TravelLogCommand(String pattern) {
+    LevelSelectionCommand(String pattern) {
         this.pattern = pattern;
     }
 

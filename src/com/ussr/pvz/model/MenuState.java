@@ -14,6 +14,7 @@ public enum MenuState {
     TRAVEL_LOG("travel log"),
     CHOOSE_PLANT("choose plant"),
     COLLECTION("collection"),
+    LEVEL_SELECTION("Level Selection Menu"),
     SHOP("shop");
 
     private String name;

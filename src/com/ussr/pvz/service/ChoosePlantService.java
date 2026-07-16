@@ -155,7 +155,7 @@ public class ChoosePlantService {
         session.setItems(new ArrayList<>());
         session.setLevel(level);
         session.addSun(INITIAL_SUN);
-
+        session.setProgressTracked(!App.isCheatedLevel());
         App.setGameSession(session);
 
         // Register the CLI View layer to listen to engine events

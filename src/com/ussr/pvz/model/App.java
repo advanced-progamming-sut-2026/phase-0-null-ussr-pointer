@@ -26,6 +26,7 @@ public class App {
     private static GameSession gameSession;
     private static List<Map<String, Object>> cachedPlantsData = null;
     private static ShopManager shopManager;
+    private static boolean cheatedLevel = false;
     private static final LevelManager levelManager = new LevelManager();
     private static final List<Account> accounts = new ArrayList<>(
             SaveService.loadAccounts().stream()
@@ -125,5 +126,13 @@ public class App {
 
     public static List<Map<String, Object>> getCachedPlantsData() {
         return cachedPlantsData;
+    }
+
+    public static boolean isCheatedLevel() {
+        return cheatedLevel;
+    }
+
+    public static void setCheatedLevel(boolean cheatedLevel) {
+        App.cheatedLevel = cheatedLevel;
     }
 }

@@ -19,12 +19,17 @@ public class TravelLogController {
         for (TravelLogCommand cmd : TravelLogCommand.values()) {
             Matcher matcher = cmd.getMatcher(command);
             if (matcher.matches()) {
-                if (cmd == TravelLogCommand.PAGE) {
-                    return handlePage(matcher);
-                }
+                return switch (cmd) {
+                    case PAGE -> handlePage(matcher);
+                    case PLAY_MINIGAME -> handlePlayMinigame(matcher); // Route it
+                };
             }
         }
         return "Invalid Travel Log command.";
+    }
+
+    private String handlePlayMinigame(Matcher matcher) {
+        return questService.playMinigame(matcher.group("levelId"));
     }
 
     private String handlePage(Matcher matcher) {

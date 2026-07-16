@@ -92,7 +92,7 @@ public class GlobalService {
             case REGISTER -> null;
             case LOGIN -> MenuState.REGISTER;
             case GAME, SETTING, NETWORK, NEWS, PROFILE -> MenuState.MAIN;
-            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG, CHOOSE_PLANT -> MenuState.GAME;
+            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG, CHOOSE_PLANT, LEVEL_SELECTION -> MenuState.GAME;
             case SHOP -> MenuState.GREENHOUSE;
             default -> null;
         };
