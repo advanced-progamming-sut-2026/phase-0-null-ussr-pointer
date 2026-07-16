@@ -2,7 +2,12 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.dto.GreenhousePotRequest;
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.greenhouse.SproutPlant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GreenHouseService {
 
@@ -41,8 +46,13 @@ public class GreenHouseService {
 
         validatePotUnlocked(x, y);
         validatePotNotOccupied(x, y);
-
-        App.getAccount().getGreenhouse().plant(x, y, App.getAccount().getCollection());
+        List<Plant> plants = new ArrayList<>();
+        for (Plant plant : App.getAccount().getAdventureProgress().getAccountPlants()) {
+            if (plant.getLevel() > 0) {
+                plants.add(PlantFactory.createPlantByName(plant.getName(), plant.getLevel()));
+            }
+        }
+        App.getAccount().getGreenhouse().plant(x, y, plants);
         return "Plant planted in " + x + " " + y + " successfully";
     }
 

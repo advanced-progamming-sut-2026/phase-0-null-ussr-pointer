@@ -57,11 +57,17 @@ public class SproutPlant {
 
     public static SproutPlant fromMap(Map<String, Object> map) {
         String plantKey = (String) map.get("plantKey");
-        boolean isMarigold = (boolean) map.get("isMarigold");
+
+        // Safer boolean parsing to avoid null crashes
+        boolean isMarigold = Boolean.TRUE.equals(map.get("isMarigold"));
+
         PlantState state = PlantState.valueOf((String) map.get("state"));
         String type = (String) map.get("type");
-        long plantedAtMillis = (long) map.get("plantedAtMillis");
-        long growthDurationMillis = (long) map.get("growthDurationMillis");
+
+        // 👇 The Fix: Cast to Number first, then extract the long value 👇
+        long plantedAtMillis = ((Number) map.get("plantedAtMillis")).longValue();
+        long growthDurationMillis = ((Number) map.get("growthDurationMillis")).longValue();
+
         return new SproutPlant(plantKey, isMarigold, state, type, plantedAtMillis, growthDurationMillis);
     }
 

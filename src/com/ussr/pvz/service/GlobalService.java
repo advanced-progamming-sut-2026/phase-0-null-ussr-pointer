@@ -121,4 +121,15 @@ public class GlobalService {
                 + String.format("%.1f", App.getGameSession().getElapsedSeconds()) + "s"
                 + " | zombies: " + App.getGameSession().getZombies().size();
     }
+
+    public String handleQuit() {
+        if (App.getAccount() != null) {
+            List<AccountState> updatedStates = App.getAccounts().stream()
+                    .map(Account::toState)
+                    .toList();
+            SaveService.saveAccounts(updatedStates);
+        }
+        System.exit(0);
+        return "";
+    }
 }
