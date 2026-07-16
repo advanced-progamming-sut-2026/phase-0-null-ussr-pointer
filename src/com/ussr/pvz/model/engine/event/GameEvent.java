@@ -1,31 +1,6 @@
 package com.ussr.pvz.model.engine.event;
 
-public sealed interface GameEvent permits
-        GameEvent.ZombieSpawned,
-        GameEvent.ZombieDied,
-        GameEvent.ZombieReachedHouse,
-        GameEvent.ZombieBreachedLane,
-        GameEvent.LawnMowerTriggered,
-        GameEvent.PlantDamaged,
-        GameEvent.PlantDied,
-        GameEvent.PlantPlanted,
-        GameEvent.PlantPlucked,
-        GameEvent.SunProduced,
-        GameEvent.SunCollected,
-        GameEvent.SunAbsorbedByZombie,
-        GameEvent.PlantFoodDropped,
-        GameEvent.PlantFoodUsed,
-        GameEvent.ProjectileFired,
-        GameEvent.ProjectileHit,
-        GameEvent.WaveStarted,
-        GameEvent.WavesCompleted,
-        GameEvent.GameOver,
-        GameEvent.GameWon,
-        GameEvent.StructureDestroyed,
-        GameEvent.SunStartedFalling,
-        GameEvent.SunGrounded,
-        GameEvent.SunExpired,
-        GameEvent.GraveDestroyed {
+public sealed interface GameEvent permits GameEvent.GameOver, GameEvent.GameWon, GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked, GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned {
 
 
     record ZombieSpawned(String alias, int lane, int col) implements GameEvent {
@@ -72,6 +47,9 @@ public sealed interface GameEvent permits
     }
 
     record SunAbsorbedByZombie(String zombieAlias, int value, double x, double y) implements GameEvent {
+    }
+
+    record PlantIncinerated(String plantName, String sourceZombieAlias, int row, int col) implements GameEvent {
     }
 
     record PlantFoodDropped(double x, double y) implements GameEvent {

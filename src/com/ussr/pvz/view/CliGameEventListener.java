@@ -44,6 +44,9 @@ public class CliGameEventListener {
 
         bus.subscribe(GameEvent.PlantPlucked.class,
                 e -> System.out.println(tick() + "[PLUCKED] " + e.plantName() + " removed from (" + e.col() + ", " + e.row() + ")"));
+
+        bus.subscribe(GameEvent.PlantIncinerated.class,
+                e -> System.out.println(tick() + "[INCINERATED] " + e.plantName() + " was burned to death by " + e.sourceZombieAlias() + "'s torch at (" + e.col() + ", " + e.row() + ")"));
     }
 
     private void registerSystemEvents(GameEventBus bus) {

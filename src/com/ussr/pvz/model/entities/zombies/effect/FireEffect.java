@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -51,7 +52,15 @@ public class FireEffect implements EffectStatus {
             Plant targetPlant = cell.getPlant();
             double distance = zColDouble - targetPlant.getLocation().x();
             if (distance >= 0 && distance <= reach) {
+                String plantName = targetPlant.getName();
+
                 targetPlant.takeDamage(targetPlant.getHp(), zombie);
+
+                if (!targetPlant.isAlive() && session != null) {
+                    session.getEventBus().publish(new GameEvent.PlantIncinerated(
+                            plantName, zombie.getAlias(), row, col
+                    ));
+                }
             }
         }
     }
