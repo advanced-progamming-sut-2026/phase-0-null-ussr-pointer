@@ -1,5 +1,9 @@
 package com.ussr.pvz.model.account;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class NewsItem {
     private final String title;
     private final String content;
@@ -23,6 +27,17 @@ public class NewsItem {
 
     public int getDate() {
         return this.date;
+    }
+
+    public String getFormattedDate() {
+        try {
+            Instant instant = Instant.ofEpochSecond(this.date);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    .withZone(ZoneId.systemDefault());
+            return formatter.format(instant);
+        } catch (Exception e) {
+            return "Unknown Date";
+        }
     }
 
     public boolean isRead() {

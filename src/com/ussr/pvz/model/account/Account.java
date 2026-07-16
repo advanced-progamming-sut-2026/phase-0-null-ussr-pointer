@@ -66,7 +66,9 @@ public class Account {
             System.err.println("Failed to load quests: " + e.getMessage());
         }
 
-        this.lastLoginTime = System.currentTimeMillis();
+        // Handle lastLoginTime: use from state if provided, otherwise use current time
+        // (for backward compatibility with old accounts that don't have lastLoginTime)
+        this.lastLoginTime = (state.lastLoginTime() > 0) ? state.lastLoginTime() : System.currentTimeMillis();
         checkAndResetDailyQuests();
     }
 
@@ -98,7 +100,8 @@ public class Account {
                 adventureProgress.getPlantFoodCount(),
                 adventureProgress.getSeedPackets(),
                 completedIds,
-                this.questManager.exportProgressMap()
+                this.questManager.exportProgressMap(),
+                this.lastLoginTime
         );
     }
 

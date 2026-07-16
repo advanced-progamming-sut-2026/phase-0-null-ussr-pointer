@@ -50,7 +50,8 @@ public class RegisterService {
                 0,     // plantFoodCount
                 new HashMap<>(),   //seedPackets
                 new ArrayList<>(),
-                new HashMap<>()
+                new HashMap<>(),
+                System.currentTimeMillis()  // lastLoginTime
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");
