@@ -268,11 +268,12 @@ public class AdventureProgress {
                 Object nameObj = plantData.get("name");
                 if (nameObj != null) {
                     String plantName = normalizePlantKey(nameObj.toString());
-                    if (starterPlantNames.contains(plantName)) {
+                    //todo:for now leave it like it but after debugging meke lines not comment
+//                    if (starterPlantNames.contains(plantName)) {
                         defaultPlantLevels.put(plantName, 1);
-                    } else {
-                        defaultPlantLevels.put(plantName, 0);
-                    }
+//                    } else {
+//                        defaultPlantLevels.put(plantName, 0);
+//                    }
                 }
             }
         }

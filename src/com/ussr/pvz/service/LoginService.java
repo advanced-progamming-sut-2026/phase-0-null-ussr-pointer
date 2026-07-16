@@ -72,6 +72,11 @@ public class LoginService {
         return "Enter your new password:";
     }
 
+    public String handleSwitchRegister() {
+        App.setMenuState(MenuState.REGISTER);
+        return "Menu changed: register";
+    }
+
     public String resetPassword(String newPass) {
         if(!waitingForNewPass)
             return "Invalid Command";

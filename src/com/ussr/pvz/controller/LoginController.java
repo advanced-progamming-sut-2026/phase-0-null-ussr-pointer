@@ -25,12 +25,18 @@ public class LoginController {
                         return handleForgetPassword(matcher);
                     case ANSWER:
                         return handleAnswer(matcher);
+                    case MENU_CHANGE_REGISTER:
+                        return handle_change_menu();
                     default:
                         return handleResetPassword(command);
                 }
             }
         }
         return "";
+    }
+
+    private String handle_change_menu() {
+        return loginService.handleSwitchRegister();
     }
 
     private String handleLogin(Matcher matcher) {
