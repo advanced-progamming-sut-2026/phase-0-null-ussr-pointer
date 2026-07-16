@@ -103,9 +103,13 @@ public class Zombie extends GameEntity implements Damageable {
 
     @Override
     public void tick() {
-        if (!isAlive) return;
         GameSession session = App.getGameSession();
         if (session == null) return;
+
+        if (!isAlive) {
+            if (effectStatus != null) effectStatus.effect(this, session);
+            return;
+        }
 
         ZombieFactory.respawnPushedStructureIfNeeded(this);
 
