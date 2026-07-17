@@ -629,6 +629,9 @@ public class GameSession {
     public boolean isGameOver() {
         return gameOver;
     }
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
 
     public Lawn getLawn() {
         return lawn;
