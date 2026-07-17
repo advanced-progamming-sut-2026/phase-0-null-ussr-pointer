@@ -39,6 +39,7 @@ public class SaveOurSeedsBehavior extends LevelBehavior {
             specialPlant.setName(target.plantName());
             specialPlant.setHp(300);
             specialPlant.setAlive(true);
+            specialPlant.setState(Plant.PlantState.ACTIVE);
             specialPlant.setLocation(new Plant.Location(target.col(), target.row()));
 
             if (session.getPlants() != null) {
