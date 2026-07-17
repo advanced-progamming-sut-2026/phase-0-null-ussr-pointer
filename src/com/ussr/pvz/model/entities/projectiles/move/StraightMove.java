@@ -45,7 +45,7 @@ public class StraightMove implements MoveStrategy {
             }
         }
 
-        projectile.setSpeed(Vec2.of(speedMagnitude, 0));
+        //projectile.setSpeed(Vec2.of(speedMagnitude, 0));
     }
 
     public void setSpeedMagnitude(double speedMagnitude) {
