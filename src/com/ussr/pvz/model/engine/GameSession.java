@@ -424,6 +424,16 @@ public class GameSession {
         int cols = lawn.getCols();
 
         for (int r = 0; r < rows; r++) {
+            StringBuilder tileSide = new StringBuilder();
+            for (int c = 0; c < cols; c++) {
+                var cell = lawn.getCell(r, c);
+                if (cell == null || cell.getTile() == null) {
+                    tileSide.append('?');
+                } else {
+                    tileSide.append(tileSymbol(cell.getTile().getType()));
+                }
+            }
+
             StringBuilder leftSide = new StringBuilder();
             for (int c = 0; c < cols; c++) {
                 var cell = lawn.getCell(r, c);
@@ -505,10 +515,26 @@ public class GameSession {
                 projSide.append(pCount == 0 ? "." : Math.min(pCount, 9));
             }
 
-            // Combine all three grids
-            sb.append(leftSide).append("   ||   ").append(rightSide).append("   ||   ").append(projSide).append("\n");
+            // Combine all four grids: tiles | plants/structures | zombies | projectiles
+            sb.append(tileSide).append("   ||   ").append(leftSide).append("   ||   ").append(rightSide).append("   ||   ").append(projSide).append("\n");
         }
-        return sb.toString().trim();
+
+        String legend = "Tiles: _ normal, W water, C shallow coast, G grave, N necromancy, I frozen, L slippery, X crater, B beghouled\n";
+        return legend + sb.toString().trim();
+    }
+
+    private char tileSymbol(com.ussr.pvz.model.board.terrain.TileType type) {
+        return switch (type) {
+            case Normal -> '_';
+            case Water -> 'W';
+            case ShallowCoast -> 'C';
+            case Grave -> 'G';
+            case Necromancy -> 'N';
+            case Frozen -> 'I';
+            case Slippery -> 'L';
+            case Crater -> 'X';
+            case Beghouled -> 'B';
+        };
     }
 
     public String renderPlantsStatus() {
@@ -529,6 +555,14 @@ public class GameSession {
         if (cell == null) return "invalid tile (" + row + ", " + col + ")";
         StringBuilder sb = new StringBuilder();
         sb.append("tile (").append(row).append(", ").append(col).append("): ");
+
+        if (cell.getTile() != null) {
+            sb.append("type=").append(cell.getTile().getType());
+            if (cell.getTile().getSlipperyDirection() != null) {
+                sb.append(" (").append(cell.getTile().getSlipperyDirection()).append(")");
+            }
+            sb.append(" | ");
+        }
 
         if (cell.getPlant() != null) {
             sb.append("plant=").append(cell.getPlant().getName())
