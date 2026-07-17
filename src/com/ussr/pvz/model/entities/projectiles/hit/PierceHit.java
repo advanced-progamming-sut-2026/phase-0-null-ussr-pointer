@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import java.util.ArrayList;
 
@@ -14,6 +15,7 @@ public class PierceHit implements HitEffectStrategy {
     public PierceHit(int pierceNumber) {
         this.pierceNumber = pierceNumber;
         hitZombies = new ArrayList<>();
+        System.out.println(this.pierceNumber);
     }
 
     @Override
@@ -34,6 +36,9 @@ public class PierceHit implements HitEffectStrategy {
         if (shouldDestroyProjectile) {
             projectile.setAlive(false);
         }
+        if(projectile.getMoveStrategy() instanceof BounceMove bounceMove) {
+            bounceMove.bounce(projectile);
+        }
     }
 
     private boolean processTarget(GameEntity target, int damageAmount, Projectile projectile) {
@@ -42,6 +47,7 @@ public class PierceHit implements HitEffectStrategy {
                 if (hitZombies.size() < pierceNumber) {
                     zombie.takeDamage(damageAmount, projectile);
                     hitZombies.add(zombie);
+                    System.out.println("hittidam");
                 }
                 return hitZombies.size() >= pierceNumber;
             }

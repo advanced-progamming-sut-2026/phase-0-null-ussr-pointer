@@ -8,10 +8,10 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class BounceMove implements MoveStrategy {
     private double speedMagnitude = 4.0d;
-    private final double MIN_X = 1d;
-    private final double MIN_Y = 1d;
-    private final double MAX_X = 9d;
-    private final double MAX_Y = 5d;
+    private final double MIN_X = 0d;
+    private final double MIN_Y = 0d;
+    private final double MAX_X = 8d;
+    private final double MAX_Y = 4d;
 
     private int hitCount = 0;
 

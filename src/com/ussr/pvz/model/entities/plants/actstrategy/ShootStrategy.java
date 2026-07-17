@@ -8,6 +8,8 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.*;
+import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
+import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
@@ -35,13 +37,14 @@ public class ShootStrategy implements ActStrategy {
 
             // Kept at 6.0 to prevent the bullet from tunneling over the target!
             Vec2 velocity = direction.normalize().scale(6.0);
+            MoveStrategy moveStrategy = buildMoveStrategy(user);
 
             session.addProjectile(new Projectile(
                     (Damageable) target, // Cast the GameEntity to Damageable
                     user.getPosition(),
                     velocity,
                     user.getDamage(),
-                    new StraightMove(),
+                    moveStrategy,
                     hitEffect
             ));
         }
@@ -51,7 +54,14 @@ public class ShootStrategy implements ActStrategy {
         if (user.getTags().contains(Tag.FIRE)) return new FireHit(1);
         if (user.getTags().contains(Tag.ICE)) return new IceHit(1);
         if (user.getTags().contains(Tag.POISON)) return new PoisonHit(1);
+        if (user.getName().equalsIgnoreCase("bowling bulb")) return new PierceHit(Integer.MAX_VALUE);
         return new NormalHit(1);
+    }
+
+    private MoveStrategy buildMoveStrategy(Plant user) {
+        if(user.getName().equalsIgnoreCase("bowling bulb"))
+            return new BounceMove();
+        return new StraightMove();
     }
 
     private GameEntity findTargetAlongVector(Plant user, Vec2 direction, GameSession session) {

@@ -6,6 +6,8 @@ import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.util.Vec2;
 
+//todo : since we assume that the y+ is in down direction we should negate all the y s in this class
+
 public class ArcMove implements MoveStrategy {
     private final double gravity;
     private double groundY;
