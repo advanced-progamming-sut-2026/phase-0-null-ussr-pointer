@@ -202,6 +202,7 @@ public class GameService {
     }
 
     public String plantPlant(PlantPlantRequest request) {
+        //todo : we should check the plant that if it exist in the list of plants we have chosen in the add plant not the plants in the account
         int x, y;
         try {
             x = Integer.parseInt(request.x());

@@ -20,6 +20,8 @@ public class NormalHit implements HitEffectStrategy {
             return;
         }
 
+        System.out.println("hittidam");
+
         projectile.setAlive(false);
 
         int damageAmount = projectile.getDamage();

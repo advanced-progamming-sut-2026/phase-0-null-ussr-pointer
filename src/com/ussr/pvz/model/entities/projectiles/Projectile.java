@@ -72,16 +72,16 @@ public class Projectile extends GameEntity {
             targets = checkCollision();
         }
 
-        if(targets != null && targets.isEmpty())
+        if(targets == null || targets.isEmpty())
             return ;
         if(hitEffectStrategy != null)
             hitEffectStrategy.apply(targets , this);
         else
             this.isAlive = false;
-        if (moveStrategy instanceof BounceMove bounceMove) {
-            bounceMove.bounce(this);
-            this.isAlive = true;
-        }
+//        if (moveStrategy instanceof BounceMove bounceMove) {
+//            bounceMove.bounce(this);
+//            this.isAlive = true;
+//        }
     }
 
     private ArrayList<GameEntity> checkCollision() {
