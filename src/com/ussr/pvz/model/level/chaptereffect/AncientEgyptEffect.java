@@ -2,6 +2,8 @@ package com.ussr.pvz.model.level.chaptereffect;
 
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.Grave;
+import com.ussr.pvz.model.board.terrain.Tile;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
@@ -35,6 +37,7 @@ public class AncientEgyptEffect implements ChapterEffect {
                 Grave grave = new Grave();
                 grave.setPosition(Vec2.of(targetCol, targetRow));
                 cell.setStructure(grave);
+                cell.setTile(new Tile(TileType.Grave));
                 session.registerStructure(grave);
                 spawned++;
             }

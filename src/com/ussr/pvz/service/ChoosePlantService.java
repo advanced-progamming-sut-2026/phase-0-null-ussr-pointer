@@ -164,7 +164,6 @@ public class ChoosePlantService {
         level.onStart();
         session.initClock();
         App.setMenuState(MenuState.GAME);
-
         selectedPlants.clear();
         return "game started! sun: " + INITIAL_SUN;
     }
