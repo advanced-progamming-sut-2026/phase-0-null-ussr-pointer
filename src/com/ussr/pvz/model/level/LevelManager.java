@@ -63,38 +63,40 @@ public class LevelManager {
     }
 
     public void startChapter(String id) {
-        if (id == null) throw new IllegalArgumentException("Chapter ID cannot be null");
+        if (id == null)
+            throw new IllegalArgumentException("Chapter ID cannot be null");
 
         currentChapter = chapters.stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Chapter not found: " + id));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Chapter not found: " + id));
 
-        if (currentChapter.getLevels().isEmpty()) {
-            throw new IllegalStateException("Cannot start chapter '" + id + "' because it contains no levels.");
-        }
+        if (currentChapter.getLevels().isEmpty())
+            throw new IllegalStateException(
+                    "Chapter '" + id + "' contains no levels.");
 
-        currentLevel = currentChapter.getLevels().getFirst();
+        // automatically prepare the first level
+        startLevel(currentChapter.getLevels().getFirst().getId());
     }
 
     public void startLevel(String id) {
-        if (currentChapter == null) {
-            throw new IllegalStateException("Cannot start a level before a chapter has been initialized.");
-        }
-        if (id == null) throw new IllegalArgumentException("Level ID cannot be null");
+        if (currentChapter == null)
+            throw new IllegalStateException("No chapter selected.");
 
-        currentLevel = currentChapter.findLevel(id)
-                .orElseThrow(() -> new IllegalArgumentException("Level '" + id + "' not found in chapter: " + currentChapter.getId()));
+        if (currentChapter.findLevel(id).isEmpty())
+            throw new IllegalArgumentException("Level not found: " + id);
 
-        refreshLevelState(currentLevel);
+        refreshLevelState(id);
     }
 
     public void nextLevel() {
-        if (currentChapter == null || currentLevel == null) {
-            throw new IllegalStateException("Cannot advance level; active session state is missing.");
-        }
+
+        if (currentChapter == null || currentLevel == null)
+            throw new IllegalStateException("No active level.");
 
         List<Level> levels = currentChapter.getLevels();
+
         int currentIndex = -1;
 
         for (int i = 0; i < levels.size(); i++) {
@@ -104,57 +106,84 @@ public class LevelManager {
             }
         }
 
-        if (currentIndex == -1) {
-            throw new IllegalStateException("System error: current level tracking broken out of its parent chapter collection.");
-        }
+        if (currentIndex == -1)
+            throw new IllegalStateException(
+                    "Current level is not part of the current chapter.");
+
+        // ---------- Next level in same chapter ----------
 
         if (currentIndex + 1 < levels.size()) {
-            currentLevel = levels.get(currentIndex + 1);
-            refreshLevelState(currentLevel);
+            startLevel(levels.get(currentIndex + 1).getId());
             return;
         }
 
-        int currentChapterIndex = chapters.indexOf(currentChapter);
-        if (currentChapterIndex >= 0 && currentChapterIndex + 1 < chapters.size()) {
-            currentChapter = chapters.get(currentChapterIndex + 1);
+        // ---------- Next chapter ----------
 
-            if (currentChapter.getLevels().isEmpty()) {
-                throw new IllegalStateException("Campaign transition failed: Next chapter '" + currentChapter.getId() + "' has zero levels configured.");
-            }
+        int chapterIndex = chapters.indexOf(currentChapter);
 
-            currentLevel = currentChapter.getLevels().getFirst();
-            refreshLevelState(currentLevel);
-            System.out.println("[LevelManager] Chapter completed! Advancing to: " + currentChapter.getName());
-        } else {
-            System.out.println("[LevelManager] Final campaign chapter fully cleared! Triggering Game Cleared Engine UI Event.");
+        if (chapterIndex + 1 < chapters.size()) {
+
+            currentChapter = chapters.get(chapterIndex + 1);
+
+            if (currentChapter.getLevels().isEmpty())
+                throw new IllegalStateException(
+                        "Next chapter has no levels.");
+
+            startLevel(currentChapter.getLevels().getFirst().getId());
+
+            System.out.println(
+                    "[LevelManager] Chapter completed! Advancing to: "
+                            + currentChapter.getName());
+
+            return;
         }
+
+        System.out.println(
+                "[LevelManager] Final campaign completed.");
     }
 
-    private void refreshLevelState(Level level) {
-        if (level == null) return;
-        JsonContainer.JsonLevelData data = levelConfigs.get(level.getId());
-        if (data != null) {
-            Level freshLevel = LevelFactory.create(data);
-            NewsObserver.triggerNewLevel(freshLevel);
-            level.setBehavior(freshLevel.getBehavior());
-            level.setSandstormSchedule(freshLevel.getSandstormSchedule());
-            level.setStartingTideColumn(freshLevel.getStartingTideColumn());
-            level.setTideSchedule(freshLevel.getTideSchedule());
-            level.setWindTimerElapsed(0.0);
-            level.setThawTimerElapsed(0.0);
-        }
+    private void refreshLevelState(String levelId) {
+        JsonContainer.JsonLevelData data = levelConfigs.get(levelId);
+
+        if (data == null)
+            throw new IllegalArgumentException(
+                    "No JSON configuration found for level: " + levelId);
+
+        Level fresh = LevelFactory.create(data);
+
+        fresh.setChapter(currentChapter.getId());
+        fresh.setDeliveryStrategy(buildDeliveryStrategy(data.deliveryStrategy));
+
+        currentLevel = fresh;
+
+        NewsObserver.triggerNewLevel(currentLevel);
     }
 
     public boolean hasNextLevel() {
-        if (currentChapter == null || currentLevel == null) return false;
+
+        if (currentChapter == null || currentLevel == null)
+            return false;
 
         List<Level> levels = currentChapter.getLevels();
-        int currentIndex = levels.indexOf(currentLevel);
 
-        if (currentIndex >= 0 && currentIndex + 1 < levels.size()) return true;
+        int currentIndex = -1;
 
-        int currentChapterIndex = chapters.indexOf(currentChapter);
-        return currentChapterIndex >= 0 && currentChapterIndex + 1 < chapters.size();
+        for (int i = 0; i < levels.size(); i++) {
+            if (levels.get(i).getId().equals(currentLevel.getId())) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (currentIndex == -1)
+            return false;
+
+        if (currentIndex + 1 < levels.size())
+            return true;
+
+        int chapterIndex = chapters.indexOf(currentChapter);
+
+        return chapterIndex + 1 < chapters.size();
     }
 
     public void completeCurrentLevel() {

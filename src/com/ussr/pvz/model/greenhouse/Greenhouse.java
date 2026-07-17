@@ -125,7 +125,11 @@ public class Greenhouse {
         if (pot.getPlant().isReady()) {
             throw new IllegalStateException("SproutPlant is ready");
         }
-        pot.getPlant().setState(PlantState.READY);
+
+        SproutPlant plant = pot.getPlant();
+        plant.setPlantedAtMillis(System.currentTimeMillis());
+        plant.setGrowthDurationMillis(0);
+        plant.setState(PlantState.READY);
     }
 
     public Map<String, Object> toMap() {

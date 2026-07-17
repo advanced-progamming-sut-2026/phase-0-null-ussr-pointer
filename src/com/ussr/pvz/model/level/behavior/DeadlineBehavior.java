@@ -6,6 +6,7 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 
 public class DeadlineBehavior extends LevelBehavior {
+    private boolean failed;
 
     @Override
     public void tick(GameSession session, double deltaTime) {
@@ -19,8 +20,14 @@ public class DeadlineBehavior extends LevelBehavior {
         for (Zombie zombie : session.getZombies()) {
             if (zombie.isAlive() && zombie.getPosition().x() < level.getDeadlineColumn()) {
                 session.getEventBus().publish(new GameEvent.GameOver());
+                failed = true;
                 break;
             }
         }
+    }
+
+    @Override
+    public boolean isFailed(Level level) {
+        return failed;
     }
 }

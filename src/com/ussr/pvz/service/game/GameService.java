@@ -329,6 +329,10 @@ public class GameService {
             throw new IllegalStateException(displayName + " must be planted on a Lily Pad!");
         }
 
+        if(cell.getPlant() != null) {
+            throw new IllegalStateException("can not plant plant here cause there is an interactible structure here");
+        }
+
         if (!cell.isEmpty()) {
             if (hasLilyPadUnderneath && !isAquaticPlant) {
             } else {

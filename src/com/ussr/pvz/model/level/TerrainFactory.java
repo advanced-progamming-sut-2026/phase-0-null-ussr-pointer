@@ -3,6 +3,7 @@ package com.ussr.pvz.model.level;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.Row;
+import com.ussr.pvz.model.board.structures.Grave;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 
@@ -33,10 +34,10 @@ public final class TerrainFactory {
         if (chapterId == null) return lawn;
 
         switch (chapterId) {
-            case "egypt-1" -> scatterGraves(lawn, rows, cols);
-            case "frostbite-caves-1" -> scatterFrostbiteTerrain(lawn, rows, cols);
-            case "big-wave-beach-1" -> scatterBeachTerrain(lawn, rows, cols);
-            case "dark-ages-1" -> scatterDarkAgesTerrain(lawn, rows, cols);
+            case "ancient_egypt" -> scatterGraves(lawn, rows, cols);
+            case "frostbite_caves" -> scatterFrostbiteTerrain(lawn, rows, cols);
+            case "big_wave_beach" -> scatterBeachTerrain(lawn, rows, cols);
+            case "dark_ages" -> scatterDarkAgesTerrain(lawn, rows, cols);
             default -> {}
         }
 
@@ -44,11 +45,12 @@ public final class TerrainFactory {
     }
 
     private static void scatterGraves(Lawn lawn, int rows, int cols) {
-        int count = 2 + RAND.nextInt(3);
+        int count = 3 + RAND.nextInt(3);
         for (int i = 0; i < count; i++) {
             int r = RAND.nextInt(rows);
             int c = RAND.nextInt(cols);
             lawn.getCell(r, c).setTile(new Tile(TileType.Grave));
+            lawn.getCell(r, c).setStructure(new Grave());
         }
     }
 

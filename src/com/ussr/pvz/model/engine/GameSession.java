@@ -4,7 +4,6 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
-import com.ussr.pvz.model.account.NewsItem;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
@@ -17,16 +16,13 @@ import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
-import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
-import com.ussr.pvz.model.state.ResourceState;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.service.SaveService;
 import java.util.ArrayList;
@@ -34,7 +30,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class GameSession {
-
     private static final int COIN_DROP_CHANCE_PERCENT = 15;
     private static final int DIAMOND_DROP_CHANCE_PERCENT = 2;
     private static final int DIAMOND_DROP_AMOUNT = 1;
@@ -46,9 +41,8 @@ public class GameSession {
     private final GameEventBus eventBus = new GameEventBus();
     private final java.util.Random lootRandom = new java.util.Random();
 
-    private GameClock clock = new GameClock();
+    private final GameClock clock = new GameClock();
     private Level level;
-    private ResourceState resourceState;
     private List<Zombie> zombies;
     private List<GroundItem> items;
     private List<Plant> plants;
@@ -58,8 +52,7 @@ public class GameSession {
     private Lawn lawn;
     private boolean gameOver = false;
 
-    private static final int LAWN_COLS = 9;
-    private List<LawnMower> lawnMowers = new ArrayList<>();
+    private final List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
 
@@ -94,7 +87,6 @@ public class GameSession {
             double elapsed = clock.getElapsedSeconds();
             double baseInterval = Math.max(6.0, 12.0 - 0.05 * elapsed);
 
-            // Adjust rate dynamically based on account difficulty modifier
             int diff = App.getAccount() != null ? App.getAccount().getDifficultyLvl() : 3;
             double diffMultiplier = diff / 3.0;
             double actualInterval = baseInterval * diffMultiplier;
@@ -151,6 +143,7 @@ public class GameSession {
 
             if (this.progressTracked) {
                 Account account = App.getAccount();
+                App.getLevelManager().completeCurrentLevel();
                 if (account != null) {
                     account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
 
@@ -277,28 +270,6 @@ public class GameSession {
                 plant.getLocation().y(),
                 plant.getLocation().x()
         ));
-    }
-
-    public void notifyPlantDamaged(Plant plant, int damageDealt) {
-        eventBus.publish(new GameEvent.PlantDamaged(
-                plant.getName(),
-                plant.getLocation().y(),
-                plant.getLocation().x(),
-                damageDealt,
-                plant.getHp()
-        ));
-
-        if (!plant.isAlive()) {
-            eventBus.publish(new GameEvent.PlantDied(
-                    plant.getName(),
-                    plant.getLocation().y(),
-                    plant.getLocation().x()
-            ));
-
-            if (level != null && level.getBehavior() != null) {
-                level.getBehavior().onPlantDied(this, plant);
-            }
-        }
     }
 
     public void notifyPlantPlanted(Plant plant) {
@@ -657,6 +628,9 @@ public class GameSession {
 
     public boolean isGameOver() {
         return gameOver;
+    }
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
     public Lawn getLawn() {

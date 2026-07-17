@@ -77,13 +77,15 @@ public class LevelSelectionService {
 
     private String enterLevel(Level level, boolean isCheated) {
         App.setCheatedLevel(isCheated);
-        // Load the level configuration to the manager
-        //App.getGameSession().setLevel(level);
-        // Transition to plant selection prep phase
+
+        // Tell LevelManager this is now the active level.
+        App.getLevelManager().startLevel(level.getId());
+
         App.setMenuState(MenuState.CHOOSE_PLANT);
 
         return isCheated
-                ? "Cheat enabled! Entering locked level: " + level.getId() + " (Progress will NOT be saved)"
+                ? "Cheat enabled! Entering locked level: " + level.getId() +
+                  " (Progress will NOT be saved)"
                 : "Entering level: " + level.getId();
     }
 }

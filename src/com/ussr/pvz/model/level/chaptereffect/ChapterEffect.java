@@ -4,7 +4,7 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.level.Level;
 
 public interface ChapterEffect {
-
+    //todo check setting the right tiles
     default void onStart(GameSession session, Level level) {
     }
 

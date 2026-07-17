@@ -146,29 +146,47 @@ public class GreenHouseService {
         return sb.toString();
     }
 
-    @SuppressWarnings("unchecked")
     private String formatPotStatus(java.util.Map<String, Object> pot) {
-        if (pot == null) return "[LOCKED]";
+        if (pot == null) {
+            return "[LOCKED]";
+        }
 
         boolean unlocked = (boolean) pot.get("unlocked");
         boolean occupied = (boolean) pot.get("occupied");
 
-        if (!unlocked) return "[LOCKED]";
-        if (!occupied || !pot.containsKey("plant")) return "[EMPTY]";
+        if (!unlocked) {
+            return "[LOCKED]";
+        }
 
-        java.util.Map<String, Object> plant = (java.util.Map<String, Object>) pot.get("plant");
-        String stateStr = (String) plant.get("state");
+        if (!occupied || !pot.containsKey("plant")) {
+            return "[EMPTY]";
+        }
 
-        if ("READY".equals(stateStr)) return "[READY]";
+        java.util.Map<String, Object> plant =
+                (java.util.Map<String, Object>) pot.get("plant");
+
+        long plantedAt =
+                ((Number) plant.get("plantedAtMillis")).longValue();
+        long duration =
+                ((Number) plant.get("growthDurationMillis")).longValue();
+
+        long finishTime = plantedAt + duration;
+
+        boolean ready =
+                System.currentTimeMillis() >= finishTime ||
+                        "READY".equals(plant.get("state"));
+
+        if (ready) {
+            return "[READY]";
+        }
 
         String name = (String) plant.get("type");
-        if (name == null || name.isEmpty() || (boolean) plant.get("isMarigold")) {
+
+        if (Boolean.TRUE.equals(plant.get("isMarigold"))) {
             name = "Marigold";
         }
 
-        long plantedAt = ((Number) plant.get("plantedAtMillis")).longValue();
-        long duration = ((Number) plant.get("growthDurationMillis")).longValue();
-        long remainingMillis = Math.max(0, (plantedAt + duration) - System.currentTimeMillis());
+        long remainingMillis = finishTime - System.currentTimeMillis();
         long remainingHours = (remainingMillis + 3599999) / 3600000;
 
         return String.format("[%s: %dh remaining]", name, remainingHours);
