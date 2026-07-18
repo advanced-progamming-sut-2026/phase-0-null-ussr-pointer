@@ -13,7 +13,7 @@ public class ArcMove implements MoveStrategy {
     private double groundY;
     private boolean landed = false;
 
-    private final double DESIRED_APEX_HEIGHT = 2.5;
+    private static final double HORIZONTAL_SPEED = 4.0;
 
 
     public ArcMove(double gravity) {
@@ -28,13 +28,13 @@ public class ArcMove implements MoveStrategy {
         Vec2 speed = projectile.getSpeed();
 
         if (pos != null && speed != null) {
-            double newSpeedY = speed.y() - (gravity * GameClock.SECONDS_PER_TICK);
+            double newSpeedY = speed.y() + (gravity * GameClock.SECONDS_PER_TICK);
             Vec2 newSpeed = Vec2.of(speed.x(), newSpeedY);
 
             Vec2 newPos = pos.add(newSpeed.scale(GameClock.SECONDS_PER_TICK));
 
-            boolean isFalling = newSpeedY < 0;
-            boolean hitTheGroundLevel = newPos.y() <= groundY;
+            boolean isFalling = newSpeedY > 0;
+            boolean hitTheGroundLevel = newPos.y() - groundY > -0.15;
 
             if (isFalling && hitTheGroundLevel) {
                 newPos = Vec2.of(newPos.x(), groundY);
@@ -60,17 +60,16 @@ public class ArcMove implements MoveStrategy {
 
             if (targetPos != null && targetSpeed != null) {
 
-                double initialSpeedY = Math.sqrt(2 * gravity * DESIRED_APEX_HEIGHT);
+                double distanceX = targetPos.x() - startPos.x();
 
-                double timeOfFlight = 2 * (initialSpeedY / gravity);
+                double timeOfFlight = distanceX / HORIZONTAL_SPEED;
 
                 if (timeOfFlight > 0) {
 
-                    double distanceX = targetPos.x() - startPos.x();
+                    double initialVelocityY = -0.5 * gravity * timeOfFlight;
 
-                    double initialSpeedX = (distanceX / timeOfFlight) + targetSpeed.x();
-
-                    projectile.setSpeed(Vec2.of(initialSpeedX, initialSpeedY));
+                    Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
+                    projectile.setSpeed(initialVelocity);
                 }
             }
         }
