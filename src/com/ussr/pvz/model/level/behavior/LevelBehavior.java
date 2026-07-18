@@ -18,7 +18,6 @@ public abstract class LevelBehavior {
 
     public void onStart(Level level) {
         this.aiManager = new ZombieAIManager(App.getAccount().getDifficultyLvl());
-
         GameSession session = App.getGameSession();
         if (session != null && !waitForManualWaveStart && !session.isWavesStarted()) {
             session.startWaves();

@@ -765,6 +765,10 @@
             {
               "id": "ZombieDefault",
               "weight": 1000
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 600
             }
           ],
           "waves": [

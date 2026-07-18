@@ -20,7 +20,7 @@ public class WallnutBowlingBehavior extends LevelBehavior {
 
     @Override
     public void onStart(Level level) {
-        // Disable normal sun production entirely
+        super.onStart(level);
         DeliveryStrategy strategy = level.getDeliveryStrategy();
         strategy.deliver();
         level.setSunFalling(false);
