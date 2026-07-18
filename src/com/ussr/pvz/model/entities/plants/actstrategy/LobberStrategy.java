@@ -11,7 +11,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 
 public class LobberStrategy implements ActStrategy {
-    private static final double GRAVITY = 15.0;
+    private static final double GRAVITY = 8;
     private static final double HORIZONTAL_SPEED = 4.0;
 
     @Override
