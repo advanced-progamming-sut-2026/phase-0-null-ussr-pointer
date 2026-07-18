@@ -42,10 +42,6 @@ public class GameService {
             return "Minigames can only be accessed from the Travel Log.";
         }
 
-        if (App.getLevelManager() == null) {
-            return "system error: LevelManager not initialized.";
-        }
-
         if (App.getLevelManager().findChapter(chapterId) == null) {
             return "chapter not found: " + chapterId;
         }
@@ -96,10 +92,6 @@ public class GameService {
 
         if (worldId == null) {
             return "world name cannot be null.";
-        }
-
-        if (App.getLevelManager() == null) {
-            return "system error: LevelManager not initialized.";
         }
 
         if (App.getLevelManager().findChapter(worldId) == null) {

@@ -34,4 +34,8 @@ public class ConveyorDeliveryStrategy implements DeliveryStrategy {
     public List<String> getConveyorBelt() {
         return conveyorBelt;
     }
+
+    public void setAvailablePlants(List<String> availablePlants) {
+        this.availablePlants = availablePlants;
+    }
 }

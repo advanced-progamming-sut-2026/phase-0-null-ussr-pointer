@@ -5,7 +5,8 @@ import java.util.regex.Pattern;
 
 public enum TravelLogCommand {
     PAGE("^travel\\s+log\\s+page\\s+(?<pageName>\\S+)(?:\\s+.*)?$"),
-    PLAY_MINIGAME("^play\\s+minigame\\s+(?<levelId>\\S+)(?:\\s+.*)?$"); // Added this
+    PLAY_MINIGAME("^play\\s+minigame\\s+(?<levelId>\\S+)(?:\\s+.*)?$"),
+    SHOW_MINI_GAMES_REGEX ("(?i)^show\\s+mini-games$");
 
     private final String pattern;
 

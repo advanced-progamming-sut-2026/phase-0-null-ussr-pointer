@@ -46,7 +46,7 @@ class WallnutBowlingServiceTest {
     @DisplayName("❌ Should reject rolling a nut past the red line")
     void rollWallnut_shouldFail_whenPastRedLine() {
         // Act
-        String result = bowlingService.rollWallnut("GIANT_WALLNUT", 4, 2);
+        String result = bowlingService.rollWallnut("GIANT-WALLNUT", 4, 2);
 
         // Assert
         assertEquals("You cannot place a Wall-nut past the red line!", result);
