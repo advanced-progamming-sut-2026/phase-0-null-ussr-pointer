@@ -2,6 +2,7 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.level.GameMode;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
 import com.ussr.pvz.model.quest.QuestType;
@@ -61,7 +62,7 @@ public class QuestService {
                 }
                 if (target != null) {
                     App.setCheatedLevel(false); // Minigames don't strictly use adventure progress
-                    //App.getGameSession().setLevel(target);
+                    App.getLevelManager().startLevel(target.getId());
                     App.setMenuState(MenuState.CHOOSE_PLANT); // Jump to game prep
                     return "Starting minigame: " + levelId;
                 }
@@ -72,4 +73,19 @@ public class QuestService {
         }
     }
 
+    public String showMinigames() {
+        StringBuilder sb = new StringBuilder();
+
+        App.getLevelManager().getChapters().stream()
+                .filter(chapter -> chapter.getGameMode().equals(GameMode.MINIGAME))
+                .forEach(chapter -> {
+                    sb.append("=== Minigame Chapter ===\n");
+                    chapter.getLevels().forEach(level ->
+                            sb.append(" - Level ID: ").append(level.getId()).append("\n")
+                    );
+                    sb.append("------------------------\n");
+                });
+
+        return sb.toString();
+    }
 }

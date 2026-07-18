@@ -36,13 +36,13 @@ public class BowlingNutProjectile extends Projectile {
         Vec2 step = getSpeed().scale(GameClock.SECONDS_PER_TICK);
         setPosition(pos.add(step));
 
-        // Handle wall bounces (top and bottom of lawn)
+        // Fix: Proper Wall Bounce Logic
         int maxRow = session.getLawn().getRows() - 1;
         if (getPosition().y() <= 0 || getPosition().y() >= maxRow) {
-            // Clamp back inside the lawn so it doesn't keep drifting out before the turn takes effect
             double clampedY = Math.max(0, Math.min(maxRow, getPosition().y()));
             setPosition(Vec2.of(getPosition().x(), clampedY));
-            deflect(session);
+            // Simply invert the Y velocity to bounce off the wall
+            setSpeed(Vec2.of(getSpeed().x(), -getSpeed().y()));
         }
 
         // Despawn if it rolls off the right edge
@@ -51,7 +51,6 @@ public class BowlingNutProjectile extends Projectile {
             return;
         }
 
-        // Check collision with zombies
         checkZombieCollision(session);
     }
 
@@ -61,7 +60,6 @@ public class BowlingNutProjectile extends Projectile {
 
             double distance = zombie.getPosition().distanceTo(getPosition());
             if (distance <= 0.8) {
-
                 switch (nutType) {
                     case NORMAL -> {
                         zombie.takeDamage(getDamage(), this);
@@ -69,43 +67,40 @@ public class BowlingNutProjectile extends Projectile {
                     }
                     case EXPLODING -> {
                         explode(session);
-                        setAlive(false); // Destroy nut on explosion
+                        setAlive(false);
                     }
                     case GIANT -> {
                         zombie.takeDamage(getDamage(), this);
-                        // Keeps rolling straight, piercing zombies - no deflection
+                        // Keeps rolling straight, piercing zombies
                     }
                 }
-                break; // Only trigger hit on one zombie per tick for Normal/Exploding
+                break; // Prevent multi-hit on stacked zombies in a single tick
             }
         }
     }
 
     private void deflect(GameSession session) {
         deflectionCount++;
-        double turnAmountDeg = (deflectionCount == 1) ? 45.0 : 90.0;
+        double speedMag = getSpeed().length();
 
-        double midRow = (session.getLawn().getRows() - 1) / 2.0;
-        double sign = (getPosition().y() < midRow) ? 1.0 : -1.0; // turn toward the middle row
-
-        setSpeed(rotate(getSpeed(), sign * turnAmountDeg));
-    }
-
-    private static Vec2 rotate(Vec2 v, double degrees) {
-        double rad = Math.toRadians(degrees);
-        double cos = Math.cos(rad);
-        double sin = Math.sin(rad);
-        return Vec2.of(
-                v.x() * cos - v.y() * sin,
-                v.x() * sin + v.y() * cos
-        );
+        if (deflectionCount == 1) {
+            // First hit: 45 degree deflection towards the center or randomly
+            double midRow = (session.getLawn().getRows() - 1) / 2.0;
+            double sign = (getPosition().y() < midRow) ? 1.0 : -1.0;
+            double rad = Math.toRadians(45);
+            // Calculate new velocity vector maintaining forward momentum
+            setSpeed(Vec2.of(speedMag * Math.cos(rad), speedMag * Math.sin(rad) * sign));
+        } else {
+            // Subsequent hits: 90 degree deflection relative to current path (ricochet effect)
+            // By negating the Y velocity, it accurately simulates a 90-degree zig-zag bounce
+            setSpeed(Vec2.of(getSpeed().x(), -getSpeed().y()));
+        }
     }
 
     private void explode(GameSession session) {
         double currentX = getPosition().x();
         double currentY = getPosition().y();
 
-        // 3x3 Explosion logic
         for (Zombie z : session.getZombies()) {
             if (z.isAlive() && Math.abs(z.getPosition().x() - currentX) <= 1.5 && Math.abs(z.getPosition().y() - currentY) <= 1.5) {
                 z.takeDamage(getDamage(), this);

@@ -4,11 +4,15 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
+import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.util.Vec2;
 
 public class WallnutBowlingBehavior extends LevelBehavior {
 
     private final int redLineColumn;
+    private double timer;
+    private double max = 5.0;
 
     public WallnutBowlingBehavior(int redLineColumn) {
         this.redLineColumn = redLineColumn;
@@ -17,20 +21,34 @@ public class WallnutBowlingBehavior extends LevelBehavior {
     @Override
     public void onStart(Level level) {
         // Disable normal sun production entirely
+        DeliveryStrategy strategy = level.getDeliveryStrategy();
+        strategy.deliver();
         level.setSunFalling(false);
     }
 
     @Override
-    public void onWaveComplete(Level level, int waveNumber) {}
+    public void tick(GameSession session, double deltaTime) {
+        timer += deltaTime;
+        if (timer >= max) {
+            session.getLevel().getDeliveryStrategy().deliver();
+            timer = 0;
+        }
+    }
 
     @Override
-    public void onComplete(Level level) {}
+    public void onWaveComplete(Level level, int waveNumber) {
+    }
+
+    @Override
+    public void onComplete(Level level) {
+    }
 
     @Override
     public boolean isFailed(Level level) {
         // Fails if any zombie crosses the player's defenses (handled by main GameSession)
         return false;
     }
+
 
     /**
      * Call this from your GameController instead of standard planting logic
@@ -43,17 +61,25 @@ public class WallnutBowlingBehavior extends LevelBehavior {
 
         GameSession session = App.getGameSession();
         if (session == null) return "Game session not active.";
+        DeliveryStrategy strategy = session.getLevel().getDeliveryStrategy();
+        if (strategy instanceof ConveyorDeliveryStrategy) {
+            ((ConveyorDeliveryStrategy) strategy).getConveyorBelt().stream().filter(
+                    s ->
+                            s.equalsIgnoreCase(nutTypeStr)
 
-        BowlingNutProjectile.NutType type;
-        switch (nutTypeStr.toUpperCase()) {
-            case "EXPLODE_O_NUT": type = BowlingNutProjectile.NutType.EXPLODING; break;
-            case "GIANT_WALLNUT": type = BowlingNutProjectile.NutType.GIANT; break;
-            default: type = BowlingNutProjectile.NutType.NORMAL; break;
+            ).findFirst().ifPresent(s -> {
+                BowlingNutProjectile.NutType type = switch (s.toUpperCase()) {
+                    case "EXPLODE-O-NUT" -> BowlingNutProjectile.NutType.EXPLODING;
+                    case "GIANT-WALLNUT" -> BowlingNutProjectile.NutType.GIANT;
+                    default -> BowlingNutProjectile.NutType.NORMAL;
+                };
+
+                BowlingNutProjectile nut = new BowlingNutProjectile(Vec2.of(x, y), type);
+
+                session.addProjectile(nut);
+                ((ConveyorDeliveryStrategy) strategy).getConveyorBelt().remove(s);
+            });
         }
-
-        BowlingNutProjectile nut = new BowlingNutProjectile(Vec2.of(x, y), type);
-
-        session.addProjectile(nut);
 
         return "Rolled a " + nutTypeStr + "!";
     }

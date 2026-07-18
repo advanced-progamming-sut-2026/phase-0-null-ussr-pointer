@@ -39,12 +39,12 @@ public class Projectile extends GameEntity {
         this.isStunning = false;
 
         if (moveStrategy != null) {
-            if (moveStrategy instanceof ArcMove arcMove) {
-                arcMove.setGroundY(position.y());
-            } else if (moveStrategy instanceof StraightMove straightMove) {
-                straightMove.setSpeedMagnitude(velocity.length());
-            } else if (moveStrategy instanceof BounceMove bounceMove) {
-                bounceMove.setSpeedMagnitude(velocity.length());
+            switch (moveStrategy) {
+                case ArcMove arcMove -> arcMove.setGroundY(position.y());
+                case StraightMove straightMove -> straightMove.setSpeedMagnitude(velocity.length());
+                case BounceMove bounceMove -> bounceMove.setSpeedMagnitude(velocity.length());
+                default -> {
+                }
             }
             moveStrategy.initialize(this, target);
         }

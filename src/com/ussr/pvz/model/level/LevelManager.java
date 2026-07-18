@@ -4,6 +4,7 @@ import com.ussr.pvz.model.engine.NewsObserver;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.RegularDeliveryStrategy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class LevelManager {
                     levelConfigs.put(levelData.id, levelData);
                     Level level = LevelFactory.create(levelData);
                     level.setChapter(chapter.getId());
-                    level.setDeliveryStrategy(buildDeliveryStrategy(levelData.deliveryStrategy));
+                    level.setDeliveryStrategy(buildDeliveryStrategy(levelData.deliveryStrategy,level));
                     chapter.addLevel(level);
                 }
             }
@@ -152,7 +153,7 @@ public class LevelManager {
         Level fresh = LevelFactory.create(data);
 
         fresh.setChapter(currentChapter.getId());
-        fresh.setDeliveryStrategy(buildDeliveryStrategy(data.deliveryStrategy));
+        fresh.setDeliveryStrategy(buildDeliveryStrategy(data.deliveryStrategy,fresh));
 
         currentLevel = fresh;
 
@@ -192,11 +193,17 @@ public class LevelManager {
         }
     }
 
-    public Chapter getCurrentChapter() { return currentChapter; }
+    public Chapter getCurrentChapter() {
+        return currentChapter;
+    }
 
-    public Level getCurrentLevel() { return currentLevel; }
+    public Level getCurrentLevel() {
+        return currentLevel;
+    }
 
-    public List<Chapter> getChapters() { return Collections.unmodifiableList(chapters); }
+    public List<Chapter> getChapters() {
+        return Collections.unmodifiableList(chapters);
+    }
 
     public Chapter findChapter(String id) {
         if (id == null) return null;
@@ -211,17 +218,21 @@ public class LevelManager {
 
         return switch (raw.trim().toUpperCase()) {
             case "MINIGAME" -> GameMode.MINIGAME;
-            case "MEOW"   -> GameMode.MEOW;
-            default         -> GameMode.ADVENTURE;
+            case "MEOW" -> GameMode.MEOW;
+            default -> GameMode.ADVENTURE;
         };
     }
 
-    private DeliveryStrategy buildDeliveryStrategy(String raw) {
+    private DeliveryStrategy buildDeliveryStrategy(String raw,Level level) {
         if (raw == null || raw.isBlank()) return new RegularDeliveryStrategy();
 
         return switch (raw.trim().toLowerCase()) {
-            case "conveyor" -> new ConveyorDeliveryStrategy();
-            default         -> new RegularDeliveryStrategy();
+            case "conveyor" -> {
+                ConveyorDeliveryStrategy strategy = new ConveyorDeliveryStrategy();
+                strategy.setAvailablePlants(level.getSeedPlants());
+                yield strategy;
+            }
+            default -> new RegularDeliveryStrategy();
         };
     }
 }

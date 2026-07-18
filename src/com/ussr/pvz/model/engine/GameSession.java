@@ -19,12 +19,14 @@ import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.projectiles.ZombieProjectile;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.level.GameMode;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.service.SaveService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,6 +159,9 @@ public class GameSession {
                     App.getLevelManager().nextLevel();
                 } catch (IllegalStateException e) {
                     System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
+                }
+                if (App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
+                    NewsObserver.triggerNewMiniGame(this.level);
                 }
 
                 List<AccountState> updatedStates = App.getAccounts().stream()
@@ -663,6 +668,7 @@ public class GameSession {
     public boolean isGameOver() {
         return gameOver;
     }
+
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }

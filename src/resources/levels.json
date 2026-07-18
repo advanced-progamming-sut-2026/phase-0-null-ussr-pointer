@@ -734,7 +734,8 @@
               "weight": 1000
             }
           ],
-          "waves": []
+          "waves": [
+          ]
         }
       ]
     },
@@ -748,26 +749,124 @@
       ],
       "levels": [
         {
-          "id": "minigame_bowling",
+          "id": "minigame_bowling_1",
           "order": 1,
           "deliveryStrategy": "conveyor",
           "behavior": "WallnutBowlingBehavior",
           "redLineColumn": 2,
           "sunFalling": false,
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": [
+            "Wall-nut",
+            "Explode-o-nut"
+          ],
           "rewardPlantAliases": [],
           "allowedZombies": [
             {
-              "id": "ZombieArmor2",
+              "id": "ZombieDefault",
               "weight": 1000
             }
           ],
-          "waves": []
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 3000
+            }
+          ]
         },
         {
-          "id": "minigame_beghouled",
+          "id": "minigame_bowling_2",
           "order": 2,
+          "deliveryStrategy": "conveyor",
+          "behavior": "WallnutBowlingBehavior",
+          "redLineColumn": 2,
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [
+            "Wall-nut",
+            "Explode-o-nut",
+            "Giant Wall-nut"
+          ],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieDefault",
+              "weight": 800
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 600
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 3000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 4500
+            },
+            {
+              "waveNumber": 3,
+              "cost": 6000
+            }
+          ]
+        },
+        {
+          "id": "minigame_bowling_3",
+          "order": 3,
+          "deliveryStrategy": "conveyor",
+          "behavior": "WallnutBowlingBehavior",
+          "redLineColumn": 2,
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [
+            "Wall-nut",
+            "Explode-o-nut",
+            "Giant Wall-nut"
+          ],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor1",
+              "weight": 500
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 800
+            },
+            {
+              "id": "ZombieNewspaper",
+              "weight": 400
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 100
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 5000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 8000
+            },
+            {
+              "waveNumber": 3,
+              "cost": 12000
+            }
+          ]
+        },
+        {
+          "id": "minigame_beghouled_1",
+          "order": 4,
           "deliveryStrategy": "regular",
           "behavior": "BeghouledBehavior",
           "sunFalling": false,
@@ -778,20 +877,77 @@
           "startingPlants": [
             "Peashooter",
             "Wall-nut",
-            "Sunflower",
-            "Snow Pea"
+            "Puff-shroom",
+            "Cabbage-pult"
           ],
           "allowedZombies": [
             {
-              "id": "ZombieGargantuar",
-              "weight": 100
+              "id": "ZombieDefault",
+              "weight": 1000
             }
           ],
           "waves": []
         },
         {
-          "id": "minigame_izombie",
-          "order": 3,
+          "id": "minigame_beghouled_2",
+          "order": 5,
+          "deliveryStrategy": "regular",
+          "behavior": "BeghouledBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "targetMatches": 35,
+          "startingPlants": [
+            "Repeater",
+            "Tall-nut",
+            "Snow Pea",
+            "Melon-pult"
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor1",
+              "weight": 600
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 400
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_beghouled_3",
+          "order": 6,
+          "deliveryStrategy": "regular",
+          "behavior": "BeghouledBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "targetMatches": 50,
+          "startingPlants": [
+            "Mega Gatling Pea",
+            "Tall-nut",
+            "Winter Melon",
+            "Fume-shroom",
+            "Magnet-shroom"
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor2",
+              "weight": 500
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 200
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_izombie_1",
+          "order": 7,
           "deliveryStrategy": "regular",
           "behavior": "IZombieBehavior",
           "sunFalling": false,
@@ -799,7 +955,7 @@
           "seedPlants": [],
           "rewardPlantAliases": [],
           "redLineColumn": 4,
-          "startingSun": 200,
+          "startingSun": 150,
           "plantLayout": [
             {
               "plantName": "Sunflower",
@@ -810,6 +966,11 @@
               "plantName": "Peashooter",
               "row": 2,
               "col": 2
+            },
+            {
+              "plantName": "Squash",
+              "row": 3,
+              "col": 3
             },
             {
               "plantName": "Wall-nut",
@@ -823,6 +984,65 @@
               "weight": 1000
             },
             {
+              "id": "ZombieDefault",
+              "weight": 500
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 300
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_izombie_2",
+          "order": 8,
+          "deliveryStrategy": "regular",
+          "behavior": "IZombieBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "redLineColumn": 5,
+          "startingSun": 150,
+          "plantLayout": [
+            {
+              "plantName": "Snow Pea",
+              "row": 0,
+              "col": 1
+            },
+            {
+              "plantName": "Chomper",
+              "row": 1,
+              "col": 2
+            },
+            {
+              "plantName": "Sunflower",
+              "row": 1,
+              "col": 0
+            },
+            {
+              "plantName": "Repeater",
+              "row": 2,
+              "col": 2
+            },
+            {
+              "plantName": "Potato Mine",
+              "row": 3,
+              "col": 4
+            },
+            {
+              "plantName": "Tall-nut",
+              "row": 4,
+              "col": 3
+            }
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieImp",
+              "weight": 500
+            },
+            {
               "id": "ZombieArmor2",
               "weight": 500
             },
@@ -834,16 +1054,267 @@
           "waves": []
         },
         {
-          "id": "minigame_vasebreaker",
-          "order": 0,
+          "id": "minigame_izombie_3",
+          "order": 9,
           "deliveryStrategy": "regular",
-          "behavior": "VaseBreakerBehavior",
+          "behavior": "IZombieBehavior",
           "sunFalling": false,
           "lockedPlants": [],
           "seedPlants": [],
           "rewardPlantAliases": [],
-          "allowedZombies": [],
+          "redLineColumn": 6,
+          "startingSun": 150,
+          "plantLayout": [
+            {
+              "plantName": "Magnet-shroom",
+              "row": 0,
+              "col": 4
+            },
+            {
+              "plantName": "Starfruit",
+              "row": 1,
+              "col": 2
+            },
+            {
+              "plantName": "Fume-shroom",
+              "row": 2,
+              "col": 1
+            },
+            {
+              "plantName": "Tall-nut",
+              "row": 2,
+              "col": 5
+            },
+            {
+              "plantName": "Squash",
+              "row": 3,
+              "col": 4
+            },
+            {
+              "plantName": "Threepeater",
+              "row": 4,
+              "col": 0
+            }
+          ],
+          "allowedZombies": [
+            {
+              "id": "ZombieImp",
+              "weight": 500
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 500
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 100
+            },
+            {
+              "id": "ZombieProspector",
+              "weight": 300
+            }
+          ],
           "waves": []
+        },
+        {
+          "id": "minigame_vasebreaker_1",
+          "order": 10,
+          "deliveryStrategy": "regular",
+          "behavior": "VaseBreakerBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [
+            "Peashooter",
+            "Wall-nut",
+            "Squash"
+          ],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 300
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_vasebreaker_2",
+          "order": 11,
+          "deliveryStrategy": "regular",
+          "behavior": "VaseBreakerBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [
+            "Repeater",
+            "Snow Pea",
+            "Cherry Bomb",
+            "Potato Mine"
+          ],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor1",
+              "weight": 800
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 400
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_vasebreaker_3",
+          "order": 12,
+          "deliveryStrategy": "regular",
+          "behavior": "VaseBreakerBehavior",
+          "sunFalling": false,
+          "lockedPlants": [],
+          "seedPlants": [
+            "Melon-pult",
+            "Tall-nut",
+            "Jalapeno",
+            "Squash"
+          ],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombieArmor2",
+              "weight": 600
+            },
+            {
+              "id": "ZombieNewspaper",
+              "weight": 400
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 150
+            }
+          ],
+          "waves": []
+        },
+        {
+          "id": "minigame_zombotany_1",
+          "order": 13,
+          "deliveryStrategy": "regular",
+          "behavior": "NormalBehavior",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombiePeashooter",
+              "weight": 800
+            },
+            {
+              "id": "ZombieWallnut",
+              "weight": 200
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 1500
+            },
+            {
+              "waveNumber": 2,
+              "cost": 2000
+            }
+          ]
+        },
+        {
+          "id": "minigame_zombotany_2",
+          "order": 14,
+          "deliveryStrategy": "regular",
+          "behavior": "NormalBehavior",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombiePeashooter",
+              "weight": 500
+            },
+            {
+              "id": "ZombieWallnut",
+              "weight": 500
+            },
+            {
+              "id": "ZombieSquash",
+              "weight": 200
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2500
+            },
+            {
+              "waveNumber": 2,
+              "cost": 3500
+            },
+            {
+              "waveNumber": 3,
+              "cost": 4500
+            }
+          ]
+        },
+        {
+          "id": "minigame_zombotany_3",
+          "order": 15,
+          "deliveryStrategy": "regular",
+          "behavior": "NormalBehavior",
+          "sunFalling": true,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "allowedZombies": [
+            {
+              "id": "ZombiePeashooter",
+              "weight": 400
+            },
+            {
+              "id": "ZombieWallnut",
+              "weight": 400
+            },
+            {
+              "id": "ZombieSquash",
+              "weight": 300
+            },
+            {
+              "id": "ZombieJalapeno",
+              "weight": 200
+            }
+          ],
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 4000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 6000
+            },
+            {
+              "waveNumber": 3,
+              "cost": 9000
+            }
+          ]
         }
       ]
     }

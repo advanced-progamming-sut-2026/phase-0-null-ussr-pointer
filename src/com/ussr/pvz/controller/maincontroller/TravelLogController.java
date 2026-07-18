@@ -22,10 +22,15 @@ public class TravelLogController {
                 return switch (cmd) {
                     case PAGE -> handlePage(matcher);
                     case PLAY_MINIGAME -> handlePlayMinigame(matcher); // Route it
+                    case SHOW_MINI_GAMES_REGEX -> handleShowMinigames();
                 };
             }
         }
         return "Invalid Travel Log command.";
+    }
+
+    private String handleShowMinigames() {
+        return questService.showMinigames();
     }
 
     private String handlePlayMinigame(Matcher matcher) {
