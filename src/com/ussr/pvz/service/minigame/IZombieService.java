@@ -24,13 +24,13 @@ public class IZombieService {
         }
 
         // Optional: Ensure the zombie is part of the 5 allowed zombies for this specific stage
-        /*
+
         boolean isAllowed = session.getLevel().getAllowedZombies().stream()
                 .anyMatch(z -> z.id().equalsIgnoreCase(zombieAlias));
         if (!isAllowed) {
             return zombieAlias + " is not available in this stage.";
         }
-        */
+
 
         // 2. Validate placement area (must be to the right of the red line)
         if (x < iZombieBehavior.getRedLineColumn()) {

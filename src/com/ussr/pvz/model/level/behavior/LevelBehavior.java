@@ -17,6 +17,9 @@ public abstract class LevelBehavior {
     protected boolean waitForManualWaveStart = false;
 
     public void onStart(Level level) {
+        if(level.getBehavior() instanceof VaseBreakerBehavior){
+            return;
+        }
         this.aiManager = new ZombieAIManager(App.getAccount().getDifficultyLvl());
         GameSession session = App.getGameSession();
         if (session != null && !waitForManualWaveStart && !session.isWavesStarted()) {
@@ -52,8 +55,6 @@ public abstract class LevelBehavior {
 
         if (aiManager != null) {
             aiManager.tick(session, deltaTime);
-        } else {
-            System.out.println("hello there");
         }
 
         checkLevelCompletion(session);

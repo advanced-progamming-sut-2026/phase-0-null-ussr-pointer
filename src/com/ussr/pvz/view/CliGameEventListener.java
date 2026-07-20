@@ -85,7 +85,7 @@ public class CliGameEventListener {
                 e -> System.out.println(tick() + "Sun at position (" + e.x() + ", " + e.y() + ") expired and disappeared"));
 
         bus.subscribe(GameEvent.SunProduced.class,
-                e -> System.out.println(tick() + "plant " + e.plantName() + " produced a sun at (" + (int)e.x() + ", " + (int)e.y() + ")"));
+                e -> System.out.println(tick() + e.plantName() + " produced a sun at (" + (int) e.x() + ", " + (int) e.y() + ")"));
 
         bus.subscribe(GameEvent.SunCollected.class,
                 e -> System.out.println(tick() + "Collected a sun! (+" + e.value() + ") Total sun: " + e.totalSun()));

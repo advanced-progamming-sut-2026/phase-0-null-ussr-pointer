@@ -8,7 +8,7 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import java.util.Random;
 
 public class Vase extends InteractableStructure implements Damageable {
-    private int hp = 200; //temp
+    private int hp = 200;
     private VaseType type;
     private SeedPackDrop seedPackDrop;
     private Zombie containedZombie;
@@ -34,15 +34,13 @@ public class Vase extends InteractableStructure implements Damageable {
                 }
             }
             case NORMAL -> {
-                Random rand = new Random();
-                int random = rand.nextInt(3);
-                if (random == 0 && seedPackDrop != null) {
+               if(seedPackDrop != null) {
                     seedPackDrop.setPosition(this.getPosition());
                     session.addItem(seedPackDrop);
-                } else if (random == 1 && containedZombie != null) {
-                    containedZombie.setPosition(this.getPosition());
-                    session.spawnZombie(containedZombie);
-                }
+               } else if (containedZombie != null) {
+                   containedZombie.setPosition(this.getPosition());
+                   session.spawnZombie(containedZombie);
+               }
             }
             case GARGANTAUR -> {
                 if (containedZombie != null) {

@@ -23,7 +23,7 @@ public class VaseBreakerService {
         if (cell.getInteractableStructure() instanceof Vase vase) {
             if (vase.isAlive()) {
                 // Instantly break the vase
-                vase.takeDamage(vase.getHp());
+                vase.takeDamage(vase.getHp() + 20);
                 return "Vase smashed at (" + x + ", " + y + ")!";
             }
         }

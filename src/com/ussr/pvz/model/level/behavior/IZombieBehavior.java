@@ -16,6 +16,7 @@ import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +26,6 @@ public class IZombieBehavior extends LevelBehavior {
     private final List<Brain> brains = new ArrayList<>();
 
     private boolean missionFailed = false;
-    private double sunZombieTimer = 0.0;
     private final Random random = new Random();
 
     public IZombieBehavior(int redLineColumn, int startingSun) {
@@ -56,16 +56,23 @@ public class IZombieBehavior extends LevelBehavior {
     }
 
     private void placeBrains(GameSession session, int rows) {
+        // Remove standard lawnmowers
+        session.getLawnMowers().clear();
+
         for (int r = 0; r < rows; r++) {
-            Cell cell = session.getLawn().getCell(r, 0);
-            if (cell != null) {
-                Brain brain = new Brain();
-                brain.setPosition(Vec2.of(0, r));
-                cell.setStructure(brain);
-                brains.add(brain);
-                session.registerStructure(brain);
-            }
+            Brain brain = new Brain();
+            // Place brains outside the grid where LawnMowers normally sit
+            brain.setPosition(Vec2.of(-0.5, r));
+            brains.add(brain);
+            session.registerStructure(brain);
         }
+    }
+
+    public Brain getBrainInLane(int lane) {
+        return brains.stream()
+                .filter(b -> (int)b.getPosition().y() == lane)
+                .findFirst()
+                .orElse(null);
     }
 
     private void spawnDynamicPlants(GameSession session, int rows) {
@@ -86,13 +93,28 @@ public class IZombieBehavior extends LevelBehavior {
     }
 
     private void spawnSunProducers(GameSession session, int rows, int cols) {
+        // Collect available columns past the red line to ensure unique X values
+        List<Integer> availableCols = new ArrayList<>();
+        for (int c = redLineColumn; c < cols; c++) {
+            availableCols.add(c);
+        }
+        Collections.shuffle(availableCols, random);
+
         for (int r = 0; r < rows; r++) {
+            // Assign a unique column per row if enough columns exist
+            int c = cols - 1;
+            if (!availableCols.isEmpty()) {
+                c = availableCols.removeFirst();
+            } else {
+                c = redLineColumn + random.nextInt(cols - redLineColumn);
+            }
+
             Zombie sunZombie = new Zombie("SunProducerZombie", null, false);
             sunZombie.setMaxHp(1300);
             sunZombie.setHp(1300);
             sunZombie.setEatDps(0);
             sunZombie.setSize(ZombieSize.DEFAULT);
-            sunZombie.setPosition(Vec2.of(cols - 1, r));
+            sunZombie.setPosition(Vec2.of(c, r));
 
             sunZombie.setMoveBehavior(new StationaryMove());
             sunZombie.setAttackBehavior(new ChompAttack());
@@ -115,44 +137,25 @@ public class IZombieBehavior extends LevelBehavior {
             return;
         }
 
-        // 2. Scaling Sun Production Logic
-        sunZombieTimer += deltaTime;
-
-        // Custom Formula: Starts at a slow 20-second interval, dropping by 1 second
-        // every 30 seconds of elapsed gameplay down to a fast 6-second floor cap.
-        double currentInterval = Math.max(6.0, 20.0 - (session.getElapsedSeconds() / 10.0));
-
-        if (sunZombieTimer >= currentInterval) {
-            sunZombieTimer = 0.0;
-
-            // Count active, living sun-producing generators on the lawn
-            long aliveProducers = session.getZombies().stream()
-                    .filter(z -> z.isAlive() && "SunProducerZombie".equals(z.getAlias()))
-                    .count();
-
-            if (aliveProducers > 0) {
-                session.addSun((int) (aliveProducers * 25)); // Generates 25 sun per alive unit
-            }
-        }
-
-        // 3. Defeat Evaluation (Out of options entirely)
+        // 2. Defeat Evaluation (Out of options entirely)
         boolean outOfSun = session.getSunCount() < 50;
-
-        // Are there any player-deployed attacking forces currently pushing lines?
         boolean anyAttackersAlive = session.getZombies().stream()
                 .filter(z -> !"SunProducerZombie".equals(z.getAlias()))
                 .anyMatch(GameEntity::isAlive);
-
-        // Are there any income units left alive to rescue the player with more sun drops?
         boolean anyProducersAlive = session.getZombies().stream()
                 .filter(z -> "SunProducerZombie".equals(z.getAlias()))
                 .anyMatch(GameEntity::isAlive);
 
-        // Defeat condition: Broke AND no army active AND all income generators killed by plants
         if (outOfSun && !anyAttackersAlive && !anyProducersAlive) {
             this.missionFailed = true;
             session.getEventBus().publish(new GameEvent.GameOver());
         }
+    }
+
+    @Override
+    public void onZombieBreach(GameSession session, Zombie zombie) {
+        // Do nothing! In i,Zombie, zombies walking off screen past the brain is standard behavior.
+        // Game victory relies solely on all Brain structures dying.
     }
 
     @Override
