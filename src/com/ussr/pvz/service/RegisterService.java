@@ -26,6 +26,8 @@ public class RegisterService {
         initialPlantMap.put("WALL-NUT", 1);
         initialPlantMap.put("POTATO MINE", 1);
 
+        long now = System.currentTimeMillis();
+
         pendingAccount = new AccountState(
                 request.username(),
                 request.nickname(),
@@ -51,7 +53,8 @@ public class RegisterService {
                 new HashMap<>(),   //seedPackets
                 new ArrayList<>(),
                 new HashMap<>(),
-                System.currentTimeMillis()  // lastLoginTime
+                now,  // lastLoginTime
+                now   // lastDailyResetTime
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");

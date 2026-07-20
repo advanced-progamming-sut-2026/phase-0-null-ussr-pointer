@@ -4,6 +4,9 @@ import com.ussr.pvz.model.greenhouse.Greenhouse;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class Account {
     private SavedBoosts savedBoosts;
     private QuestManager questManager;
     private long lastLoginTime;
+    private long lastDailyResetTime;
 
 
     public Account(AccountState state, Collection collection) {
@@ -67,6 +71,8 @@ public class Account {
         }
 
         this.lastLoginTime = (state.lastLoginTime() > 0) ? state.lastLoginTime() : System.currentTimeMillis();
+        this.lastDailyResetTime = (state.lastDailyResetTime() > 0) ? state.lastDailyResetTime() : this.lastLoginTime;
+
         checkAndResetDailyQuests();
     }
 
@@ -99,7 +105,8 @@ public class Account {
                 adventureProgress.getSeedPackets(),
                 completedIds,
                 this.questManager.exportProgressMap(),
-                this.lastLoginTime
+                this.lastLoginTime,
+                this.lastDailyResetTime
         );
     }
 
@@ -199,21 +206,24 @@ public class Account {
         return lastLoginTime;
     }
 
+    public long getLastDailyResetTime() {
+        return lastDailyResetTime;
+    }
+
     public void updateLoginTime() {
         this.lastLoginTime = System.currentTimeMillis();
         checkAndResetDailyQuests();
     }
 
     private void checkAndResetDailyQuests() {
-        long currentTime = System.currentTimeMillis();
-        long timeDiffMillis = currentTime - lastLoginTime;
-        long timeDiffHours = timeDiffMillis / (1000 * 60 * 60);
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate lastResetDay = Instant.ofEpochMilli(lastDailyResetTime).atZone(zone).toLocalDate();
+        LocalDate today = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(zone).toLocalDate();
 
-        // Reset daily quests and shop offers if more than 24 hours have passed
-        if (timeDiffHours >= 24) {
+        if (today.isAfter(lastResetDay)) {
             questManager.resetDaily();
             resetDailyShopOffers();
-            this.lastLoginTime = currentTime;
+            this.lastDailyResetTime = System.currentTimeMillis();
         }
     }
 

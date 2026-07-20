@@ -11,7 +11,7 @@ public class ConfigurableQuest implements Quest {
     private final List<CriterionProgress> criteria;
     private final QuestReward reward;
     private final Long expiresAfterSeconds;
-    private final long createdAt;
+    private long createdAt;
     private boolean completed;
 
     public ConfigurableQuest(String id, String title, QuestType type, QuestPriority priority,
@@ -111,6 +111,14 @@ public class ConfigurableQuest implements Quest {
     }
     public void restoreProgress(boolean isCompleted, List<Integer> criteriaProgress) {
         this.completed = isCompleted;
+
+        if (isCompleted) {
+            for (CriterionProgress c : this.criteria) {
+                c.set(c.getTarget());
+            }
+            return;
+        }
+
         if (criteriaProgress != null && criteriaProgress.size() == this.criteria.size()) {
             for (int i = 0; i < criteriaProgress.size(); i++) {
                 this.criteria.get(i).set(criteriaProgress.get(i));
@@ -135,5 +143,9 @@ public class ConfigurableQuest implements Quest {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public void initCreatedAt(long timestamp) {
+        this.createdAt = timestamp;
     }
 }

@@ -2,11 +2,13 @@ package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.items.PlantFoodDrop;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
@@ -16,6 +18,7 @@ import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.service.game.ZombieService;
 
 import java.util.Random;
@@ -142,14 +145,29 @@ public class Zombie extends GameEntity implements Damageable {
 
     public Damageable acquireTarget(GameSession session) {
         if (this.getPosition().x() <= -0.5) {
-            if (session.getLevel() != null && session.getLevel().getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior izb) {
-                com.ussr.pvz.model.board.structures.Brain b = izb.getBrainInLane((int) this.getPosition().y());
+            if (session.getLevel() != null && session.getLevel().getBehavior() instanceof IZombieBehavior izb) {
+                Brain b = izb.getBrainInLane((int) this.getPosition().y());
                 if (b != null && b.isAlive()) {
                     return b;
                 }
             }
         }
-        return faction.findTarget(this, session);
+
+        Damageable target = faction.findTarget(this, session);
+
+        if (target instanceof Plant targetPlant) {
+            double deltaX = Math.abs(this.getPosition().x() - targetPlant.getLocation().x());
+            if (deltaX > 0.5) {
+                return null;
+            }
+        } else if (target instanceof GameEntity targetEntity) {
+            double deltaX = Math.abs(this.getPosition().x() - targetEntity.getPosition().x());
+            if (deltaX > 0.5) {
+                return null;
+            }
+        }
+
+        return target;
     }
 
     public void hypnotize() {
