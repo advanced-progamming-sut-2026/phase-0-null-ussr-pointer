@@ -30,7 +30,8 @@ public record AccountState(
         Map<String, Integer> seedPackets,
         List<String> completedQuests,
         Map<String, List<Integer>> activeQuestProgress,
-        long lastLoginTime
+        long lastLoginTime,
+        long lastDailyResetTime
 ) {
     public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
         return new AccountState(
@@ -58,7 +59,8 @@ public record AccountState(
                 this.seedPackets,
                 this.completedQuests,
                 this.activeQuestProgress,
-                this.lastLoginTime
+                this.lastLoginTime,
+                this.lastDailyResetTime
         );
     }
 }
