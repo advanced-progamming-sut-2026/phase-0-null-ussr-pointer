@@ -6,6 +6,7 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
+//TODO: Nuts bounce one row too early(should bounce off roll 4 but bounces off at roll 3). fix this
 public class BowlingNutProjectile extends Projectile {
 
     public enum NutType { NORMAL, EXPLODING, GIANT }
@@ -13,9 +14,29 @@ public class BowlingNutProjectile extends Projectile {
     private final NutType nutType;
     private int deflectionCount = 0;
 
+    private static final double NUT_SPEED = 4.0;
+
     public BowlingNutProjectile(Vec2 position, NutType nutType) {
-        super(null, position, Vec2.of(15.0, 0), resolveDamage(nutType), null, null);
+        this(position, nutType, defaultVerticalSign(position));
+    }
+
+    public BowlingNutProjectile(Vec2 position, NutType nutType, double verticalSign) {
+        super(null, position, diagonalVelocity(verticalSign), resolveDamage(nutType), null, null);
         this.nutType = nutType;
+    }
+
+    private static double defaultVerticalSign(Vec2 position) {
+        GameSession session = App.getGameSession();
+        double midRow = (session != null && session.getLawn() != null)
+                ? (session.getLawn().getRows() - 1) / 2.0
+                : 2.0;
+        return position.y() < midRow ? 1.0 : -1.0;
+    }
+
+    private static Vec2 diagonalVelocity(double verticalSign) {
+        double rad = Math.toRadians(45);
+        double sign = verticalSign >= 0 ? 1.0 : -1.0;
+        return Vec2.of(NUT_SPEED * Math.cos(rad), NUT_SPEED * Math.sin(rad) * sign);
     }
 
     private static int resolveDamage(NutType type) {
@@ -32,9 +53,9 @@ public class BowlingNutProjectile extends Projectile {
         GameSession session = App.getGameSession();
         if (session == null) return;
 
-        Vec2 pos = getPosition();
+        Vec2 prevPos = getPosition();
         Vec2 step = getSpeed().scale(GameClock.SECONDS_PER_TICK);
-        setPosition(pos.add(step));
+        setPosition(prevPos.add(step));
 
         // Fix: Proper Wall Bounce Logic
         int maxRow = session.getLawn().getRows() - 1;
@@ -51,15 +72,24 @@ public class BowlingNutProjectile extends Projectile {
             return;
         }
 
-        checkZombieCollision(session);
+        checkZombieCollision(session, prevPos);
     }
 
-    private void checkZombieCollision(GameSession session) {
+    private void checkZombieCollision(GameSession session, Vec2 prevPos) {
+        Vec2 currentPos = getPosition();
+
         for (Zombie zombie : session.getZombies()) {
             if (!zombie.isAlive()) continue;
 
-            double distance = zombie.getPosition().distanceTo(getPosition());
-            if (distance <= 0.8) {
+            Vec2 zombiePos = zombie.getPosition();
+            double distance = zombiePos.distanceTo(currentPos);
+
+            boolean withinRadius = distance <= 0.8;
+            boolean sameLane = Math.abs(zombiePos.y() - currentPos.y()) < 0.5;
+            boolean crossedX = sameLane && getSpeed().x() > 0
+                    && prevPos.x() <= zombiePos.x() && currentPos.x() >= zombiePos.x();
+
+            if (withinRadius || crossedX) {
                 switch (nutType) {
                     case NORMAL -> {
                         zombie.takeDamage(getDamage(), this);

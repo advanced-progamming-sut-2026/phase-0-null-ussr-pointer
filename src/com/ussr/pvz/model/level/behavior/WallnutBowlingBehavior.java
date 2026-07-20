@@ -28,6 +28,10 @@ public class WallnutBowlingBehavior extends LevelBehavior {
 
     @Override
     public void tick(GameSession session, double deltaTime) {
+        super.tick(session, deltaTime);
+
+        if (session.isGameOver() || levelCompleted) return;
+
         timer += deltaTime;
         if (timer >= max) {
             session.getLevel().getDeliveryStrategy().deliver();
@@ -61,26 +65,35 @@ public class WallnutBowlingBehavior extends LevelBehavior {
 
         GameSession session = App.getGameSession();
         if (session == null) return "Game session not active.";
-        DeliveryStrategy strategy = session.getLevel().getDeliveryStrategy();
-        if (strategy instanceof ConveyorDeliveryStrategy) {
-            ((ConveyorDeliveryStrategy) strategy).getConveyorBelt().stream().filter(
-                    s ->
-                            s.equalsIgnoreCase(nutTypeStr)
 
-            ).findFirst().ifPresent(s -> {
-                BowlingNutProjectile.NutType type = switch (s.toUpperCase()) {
-                    case "EXPLODE-O-NUT" -> BowlingNutProjectile.NutType.EXPLODING;
-                    case "GIANT-WALLNUT" -> BowlingNutProjectile.NutType.GIANT;
-                    default -> BowlingNutProjectile.NutType.NORMAL;
-                };
-
-                BowlingNutProjectile nut = new BowlingNutProjectile(Vec2.of(x, y), type);
-
-                session.addProjectile(nut);
-                ((ConveyorDeliveryStrategy) strategy).getConveyorBelt().remove(s);
-            });
+        if (session.getLawn() == null || y < 0 || y >= session.getLawn().getRows()) {
+            return "Invalid row for rolling a nut.";
         }
 
-        return "Rolled a " + nutTypeStr + "!";
+        DeliveryStrategy strategy = session.getLevel().getDeliveryStrategy();
+        if (!(strategy instanceof ConveyorDeliveryStrategy conveyorStrategy)) {
+            return "Current level has no conveyor belt to roll from.";
+        }
+
+        java.util.Optional<String> matched = conveyorStrategy.getConveyorBelt().stream()
+                .filter(s -> s.equalsIgnoreCase(nutTypeStr))
+                .findFirst();
+
+        if (matched.isEmpty()) {
+            return "No \"" + nutTypeStr + "\" available on the conveyor belt.";
+        }
+
+        String belt = matched.get();
+        BowlingNutProjectile.NutType type = switch (belt.toUpperCase()) {
+            case "EXPLODE-O-NUT" -> BowlingNutProjectile.NutType.EXPLODING;
+            case "GIANT-WALLNUT" -> BowlingNutProjectile.NutType.GIANT;
+            default -> BowlingNutProjectile.NutType.NORMAL;
+        };
+
+        BowlingNutProjectile nut = new BowlingNutProjectile(Vec2.of(x, y), type);
+        session.addProjectile(nut);
+        conveyorStrategy.getConveyorBelt().remove(belt);
+
+        return "Rolled a " + belt + "!";
     }
 }

@@ -36,6 +36,8 @@ public class BeghouledBehavior extends LevelBehavior {
 
     @Override
     public void onStart(Level level) {
+        super.onStart(level);
+
         GameSession session = App.getGameSession();
         if (session == null || session.getLawn() == null) return;
 
