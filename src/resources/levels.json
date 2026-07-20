@@ -734,8 +734,7 @@
               "weight": 1000
             }
           ],
-          "waves": [
-          ]
+          "waves": []
         }
       ]
     },
@@ -890,7 +889,20 @@
               "weight": 1000
             }
           ],
-          "waves": []
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 1500
+            },
+            {
+              "waveNumber": 2,
+              "cost": 2000
+            },
+            {
+              "waveNumber": 3,
+              "cost": 3000
+            }
+          ]
         },
         {
           "id": "minigame_beghouled_2",
@@ -918,7 +930,24 @@
               "weight": 400
             }
           ],
-          "waves": []
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 2500
+            },
+            {
+              "waveNumber": 2,
+              "cost": 3500
+            },
+            {
+              "waveNumber": 3,
+              "cost": 5000
+            },
+            {
+              "waveNumber": 4,
+              "cost": 6500
+            }
+          ]
         },
         {
           "id": "minigame_beghouled_3",
@@ -947,7 +976,28 @@
               "weight": 200
             }
           ],
-          "waves": []
+          "waves": [
+            {
+              "waveNumber": 1,
+              "cost": 4000
+            },
+            {
+              "waveNumber": 2,
+              "cost": 6000
+            },
+            {
+              "waveNumber": 3,
+              "cost": 9000
+            },
+            {
+              "waveNumber": 4,
+              "cost": 12000
+            },
+            {
+              "waveNumber": 5,
+              "cost": 16000
+            }
+          ]
         },
         {
           "id": "minigame_izombie_1",

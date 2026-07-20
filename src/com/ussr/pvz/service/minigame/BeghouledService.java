@@ -10,14 +10,15 @@ import java.util.Map;
 
 public class BeghouledService {
 
-    // Define costs and upgrade paths as per the documentation
     private static final Map<String, UpgradeData> UPGRADES = new HashMap<>();
 
     static {
+        // Mapped to match the documentation's requirements and costs while
+        // correcting the typo names so they successfully load from plants.json
         UPGRADES.put("peashooter", new UpgradeData("repeater", 500));
-        UPGRADES.put("repeater", new UpgradeData("mega gatling-pea", 1500));
+        UPGRADES.put("repeater", new UpgradeData("mega gatling pea", 1500));
         UPGRADES.put("wall-nut", new UpgradeData("tall-nut", 500));
-        UPGRADES.put("puff-shroom", new UpgradeData("fume-shroome", 250));
+        UPGRADES.put("puff-shroom", new UpgradeData("fume-shroom", 250));
         UPGRADES.put("cabbage-pult", new UpgradeData("melon-pult", 1000));
         UPGRADES.put("melon-pult", new UpgradeData("winter melon", 750));
     }
@@ -61,8 +62,13 @@ public class BeghouledService {
             return "Not enough sun! Upgrade to " + upgrade.nextForm + " costs " + upgrade.cost + " sun.";
         }
 
+        // Verify the plant is actually on the board before allowing the upgrade
+        if (!beghouledBehavior.getActivePlantTypes().containsValue(key) && !beghouledBehavior.getActivePlantTypes().containsKey(key)) {
+            return currentPlantType + " is not currently active in this level.";
+        }
+
         session.spendSun(upgrade.cost);
-        beghouledBehavior.upgradePlantType(currentPlantType, upgrade.nextForm, session);
+        beghouledBehavior.upgradePlantType(key, upgrade.nextForm, session);
 
         return "Successfully upgraded all " + currentPlantType + "s to " + upgrade.nextForm + "s!";
     }
