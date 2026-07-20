@@ -7,6 +7,7 @@ import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
+import com.ussr.pvz.model.board.structures.Vase;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.items.CoinDrop;
@@ -38,7 +39,7 @@ public class GameSession {
     private boolean progressTracked = true;
     private double skySunTimer = 0.0;
 
-    private static final int LEVEL_COMPLETE_COIN_REWARD = 100;
+    private static final int LEVEL_COMPLETE_COIN_REWARD = 1000;
 
     private final GameEventBus eventBus = new GameEventBus();
     private final java.util.Random lootRandom = new java.util.Random();
@@ -444,6 +445,7 @@ public class GameSession {
                 var cell = lawn.getCell(r, c);
 
                 boolean hasSun = false;
+                boolean hasSeedPack = false;
                 if (items != null) {
                     for (GroundItem item : items) {
                         if (item.isAlive() && item.getItemType() == ItemType.SUN && item.getLocation() != null) {
@@ -452,11 +454,22 @@ public class GameSession {
                                 break;
                             }
                         }
+                        if (item.isAlive && item.getItemType() == ItemType.SEED_PACK && item.getLocation() != null) {
+                            if (item.getLocation().x() == c && item.getLocation().y() == r) {
+                                hasSeedPack = true;
+                                break;
+                            }
+                        }
                     }
                 }
 
                 if (cell == null) {
-                    leftSide.append(hasSun ? "*" : ".");
+                    if (hasSun)
+                        leftSide.append('*');
+                    else if (hasSeedPack)
+                        leftSide.append('@');
+                    else
+                        leftSide.append('.');
                 } else if (cell.getPlant() != null) {
                     leftSide.append("P");
                 } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
@@ -468,7 +481,10 @@ public class GameSession {
                         leftSide.append("G");
                     }
                 } else if (cell.getInteractableStructure() != null) {
-                    leftSide.append("I");
+                    if (cell.getInteractableStructure() instanceof Vase) {
+                        leftSide.append("V");
+                    } else
+                        leftSide.append("I");
                 } else if (hasSun) {
                     leftSide.append("*");
                 } else {
