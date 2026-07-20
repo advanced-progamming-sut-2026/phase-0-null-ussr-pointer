@@ -9,11 +9,10 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
 
 public class ExplodeStrategy implements ActStrategy {
-    private final double TRAP_ACTIVATION_RADIUS = 0.3;
+    private final double TRAP_ACTIVATION_RADIUS = 1;
 
     @Override
     public void act(Plant user, GameSession session) {
-        if (user.getIntervalTimer() > 0) return;
 
         // Arming Delay logic: If it's a delayed explosive (like Potato Mine)
         // and hasn't matured yet, use the action interval as its arming countdown.

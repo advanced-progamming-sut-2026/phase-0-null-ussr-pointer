@@ -12,7 +12,7 @@ import java.util.Comparator;
 
 public class ZombieSideTargetFinder implements TargetFinder {
 
-    private static final double EATING_RANGE = 0.5;
+    private static final double EATING_RANGE = 0.4;
 
     @Override
     public Damageable findTarget(Zombie self, GameSession session) {
@@ -30,7 +30,7 @@ public class ZombieSideTargetFinder implements TargetFinder {
 
         // Check the cell the zombie is currently in, and the cell immediately ahead (left)
         int currentCol = (int) Math.floor(myX);
-        int aheadCol = (int) Math.floor(myX - EATING_RANGE);
+        int aheadCol = (int) Math.round(myX - EATING_RANGE);
 
         Damageable target = checkCellForEdibles(session, row, aheadCol);
         if (target != null) return target;
