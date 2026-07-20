@@ -80,4 +80,8 @@ public class ZombieAIManager {
     public boolean areAllWavesDone(List<Level.Wave> waves) {
         return nextWaveIndexToSpawn >= waves.size() && activeDirectors.isEmpty();
     }
+
+    public void resetWaves() {
+        this.nextWaveIndexToSpawn = 0;
+    }
 }
