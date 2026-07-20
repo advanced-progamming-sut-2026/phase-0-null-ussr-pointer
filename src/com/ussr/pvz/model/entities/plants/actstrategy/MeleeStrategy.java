@@ -100,7 +100,7 @@ public class MeleeStrategy implements ActStrategy {
         Vec2 userPos = user.getPosition();
         for(Zombie zombie : session.getZombies()) {
             Vec2 zomPos = zombie.getPosition();
-            if(Math.abs(zomPos.y() - userPos.y()) < 0.5) continue;
+            if(Math.abs(zomPos.y() - userPos.y()) > 0.5) continue;
             if(zomPos.x() - userPos.x() > 0 && zomPos.x() - userPos.x() < 1) {
                 double distance = zomPos.distanceTo(userPos);
                 if(distance < shortestFront) {
@@ -126,13 +126,14 @@ public class MeleeStrategy implements ActStrategy {
         Vec2 userPos = user.getPosition();
         for(Zombie zombie : session.getZombies()) {
             Vec2 zomPos = zombie.getPosition();
-            if(Math.abs(zomPos.y() - userPos.y()) < 1 && Math.abs(zomPos.x() - userPos.x()) < 1)
+            if(Math.abs(zomPos.y() - userPos.y()) < 1.2 && Math.abs(zomPos.x() - userPos.x()) < 1.2)
                 targets.add(zombie);
         }
         return targets;
     }
 
     private ArrayList<Zombie> waveDetect(Plant user , GameSession session) {
+        //todo : we may need to make a wave class for this
         ArrayList<Zombie> targets = new ArrayList<>();
         Vec2 userPos = user.getPosition();
         for(Zombie zombie : session.getZombies()) {
@@ -151,7 +152,7 @@ public class MeleeStrategy implements ActStrategy {
         Vec2 userPos = user.getPosition();
         for(Zombie zombie : session.getZombies()) {
             Vec2 zomPos = zombie.getPosition();
-            if(Math.abs(zomPos.y() - userPos.y()) < 0.5) continue;
+            if(Math.abs(zomPos.y() - userPos.y()) > 0.5) continue;
             if(zomPos.x() - userPos.x() > 0 && zomPos.x() - userPos.x() < 1) {
                 double distance = zomPos.distanceTo(userPos);
                 if(distance < shortest) {
@@ -173,6 +174,8 @@ public class MeleeStrategy implements ActStrategy {
         }
 
         for(Zombie zombie : targets) {
+//            System.out.println("helllo");
+//            System.out.println("x : " + zombie.getPosition().x() + " y : " + zombie.getPosition().y());
             zombie.takeDamage(userDamage, user);
         }
     }

@@ -145,6 +145,9 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void takeDamage(int damage, Zombie dealer) {
+//        System.out.println("o yeah");
+//        if(dealer != null)
+//            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
         if (!isAlive) return;
 
         int remainingDamage = damage;
