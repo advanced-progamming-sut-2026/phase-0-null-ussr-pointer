@@ -1,10 +1,13 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -143,6 +146,9 @@ public class Plant extends GameEntity implements Damageable {
 //        if(dealer != null)
 //            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
         if (!isAlive) return;
+
+        if(this.actStrategy instanceof WallNutStrategy strategy)
+            strategy.onDamageAct(this , dealer);
 
         int remainingDamage = damage;
 
