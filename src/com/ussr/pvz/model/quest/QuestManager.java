@@ -27,6 +27,10 @@ public class QuestManager {
 
             if (loadedQuests != null) {
                 allQuests.clear();
+                long now = System.currentTimeMillis();
+                for (ConfigurableQuest q : loadedQuests) {
+                    q.initCreatedAt(now);
+                }
                 allQuests.addAll(loadedQuests);
             }
         } catch (Exception e) {
