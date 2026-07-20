@@ -3,6 +3,7 @@ package com.ussr.pvz.model.board;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.util.Vec2;
 
 public class Cell {
     private int row;
@@ -50,6 +51,9 @@ public class Cell {
 
     public void setStructure(InteractableStructure interactableStructure) {
         this.interactableStructure = interactableStructure;
+        if (interactableStructure != null && interactableStructure.getPosition() == null) {
+            interactableStructure.setPosition(Vec2.of(this.col, this.row));
+        }
     }
 
     public boolean isEmpty() {
