@@ -69,14 +69,14 @@ public class VaseBreakerBehavior extends LevelBehavior {
 
     private void assignVaseContents(Vase vase, VaseType type, int r, int c) {
         if (type == VaseType.GARGANTAUR) {
-            vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Gargantuar", r, c));
+            vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("ZombieGargantuar", r, c));
         } else if (type == VaseType.PLANT) {
             // FIX: Uses correct parameters (type, lifetime, radius, plantId)
             vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f, rand.nextInt(50) + 1));
         } else if (type == VaseType.NORMAL) {
             int roll = rand.nextInt(3);
             if (roll == 0) {
-                vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("Zombie", r, c));
+                vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("ZombieDefault", r, c));
             } else if (roll == 1) {
                 // FIX: Uses correct parameters
                 vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f, rand.nextInt(50) + 1));

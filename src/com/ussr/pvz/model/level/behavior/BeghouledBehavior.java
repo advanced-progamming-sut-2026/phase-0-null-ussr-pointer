@@ -30,7 +30,7 @@ public class BeghouledBehavior extends LevelBehavior {
         this.targetMatches = targetMatches;
         this.rootPlantTypes = startingPlants;
         for (String plant : startingPlants) {
-            activePlantTypes.put(plant, plant);
+            activePlantTypes.put(plant.toLowerCase(), plant.toLowerCase());
         }
     }
 
@@ -51,7 +51,7 @@ public class BeghouledBehavior extends LevelBehavior {
             fillBoard(session);
         }
 
-        // Subscribe to plant deaths to create craters if eaten by zombies
+        // According to the doc: When a zombie eats a plant, a crater is created there.
         session.getEventBus().subscribe(GameEvent.PlantDied.class, event -> {
             Cell cell = session.getLawn().getCell(event.row(), event.col());
             if (cell != null) {
@@ -75,7 +75,6 @@ public class BeghouledBehavior extends LevelBehavior {
 
     @Override
     public void onWaveComplete(Level level, int waveNumber) {
-        // Zombies enter like a normal level, but waves never end
     }
 
     @Override
@@ -84,7 +83,7 @@ public class BeghouledBehavior extends LevelBehavior {
 
     @Override
     public boolean isFailed(Level level) {
-        return false; // Handled by zombies reaching the house
+        return false;
     }
 
     public boolean isWon() {
@@ -93,7 +92,6 @@ public class BeghouledBehavior extends LevelBehavior {
 
     public void checkWinCondition(GameSession session) {
         if (isWon()) {
-            // After reaching the target, all existing zombies disappear and the player wins
             session.killAllZombies();
             session.getEventBus().publish(new GameEvent.GameWon());
         }
@@ -107,7 +105,7 @@ public class BeghouledBehavior extends LevelBehavior {
             for (int c = 0; c < lawn.getCols(); c++) {
                 Cell cell = lawn.getCell(r, c);
                 if (cell.getTile().getType() != TileType.Crater && cell.getPlant() == null) {
-                    String rootType = rootPlantTypes.get(rand.nextInt(rootPlantTypes.size()));
+                    String rootType = rootPlantTypes.get(rand.nextInt(rootPlantTypes.size())).toLowerCase();
                     Plant plant = spawnPlant(activePlantTypes.get(rootType), r, c);
                     cell.setPlant(plant);
                     session.getPlants().add(plant);
@@ -126,7 +124,7 @@ public class BeghouledBehavior extends LevelBehavior {
         Cell cell1 = lawn.getCell(r1, c1);
         Cell cell2 = lawn.getCell(r2, c2);
 
-        // Check for craters
+        // Cannot move plants into craters
         if (cell1.getTile().getType() == TileType.Crater || cell2.getTile().getType() == TileType.Crater) {
             return false;
         }
@@ -166,7 +164,7 @@ public class BeghouledBehavior extends LevelBehavior {
 
         if (matchedPlants.isEmpty()) return;
 
-        applyMatchRewards(session, maxGroupSize, isCascade);
+        applyMatchRewards(session, maxGroupSize, isCascade, matchedPlants);
         currentMatches++;
 
         for (Plant p : matchedPlants) {
@@ -186,7 +184,6 @@ public class BeghouledBehavior extends LevelBehavior {
     private int findHorizontalMatches(Lawn lawn, Set<Plant> matchedPlants) {
         int maxGroupSize = 0;
 
-        // Horizontal matches
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols() - 2; c++) {
                 Plant p1 = lawn.getCell(r, c).getPlant();
@@ -231,10 +228,32 @@ public class BeghouledBehavior extends LevelBehavior {
         return maxGroupSize;
     }
 
-    private void applyMatchRewards(GameSession session, int maxGroupSize, boolean isCascade) {
-        int baseSun = (maxGroupSize >= 5) ? 3 : (maxGroupSize == 4) ? 2 : 1;
+    private void applyMatchRewards(GameSession session, int maxGroupSize, boolean isCascade, Set<Plant> matchedPlants) {
+        int baseSun = 0;
+
+        // Match Document Logic Exactly:
+        // 3-match = 1 sun token
+        // 4-match = 2 sun tokens
+        // 5-match = 3 sun tokens
+        if (maxGroupSize == 3) baseSun = 1;
+        else if (maxGroupSize == 4) baseSun = 2;
+        else if (maxGroupSize >= 5) baseSun = 3;
+
+        // Cascades add 1 bonus sun token
         if (isCascade) baseSun += 1;
-        for (int i = 0; i < baseSun; i++) session.addItem(new ProducedSun(5, 2, 50, "Beghouled Match"));
+
+        int sumX = 0, sumY = 0;
+        for (Plant p : matchedPlants) {
+            sumX += p.getLocation().x();
+            sumY += p.getLocation().y();
+        }
+        int avgX = sumX / Math.max(1, matchedPlants.size());
+        int avgY = sumY / Math.max(1, matchedPlants.size());
+
+        for (int i = 0; i < baseSun; i++) {
+            // Each token is worth 50 sun
+            session.addItem(new ProducedSun(avgX, avgY, 50, "Beghouled Match"));
+        }
     }
 
     private void dropPlants(GameSession session) {
@@ -261,13 +280,11 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     private boolean hasMatches(Lawn lawn) {
-        // Horizontal
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols() - 2; c++) {
                 if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r, c + 1), lawn.getCell(r, c + 2))) return true;
             }
         }
-        // Vertical
         for (int c = 0; c < lawn.getCols(); c++) {
             for (int r = 0; r < lawn.getRows() - 2; r++) {
                 if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r + 1, c), lawn.getCell(r + 2, c))) return true;
@@ -286,7 +303,6 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     private boolean hasPossibleMoves(Lawn lawn) {
-        // Simplified check: iterate and conceptually swap horizontally/vertically to check hasMatch
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols(); c++) {
                 if (c < lawn.getCols() - 1 && testSimulatedSwap(lawn, r, c, r, c + 1)) return true;
@@ -314,7 +330,8 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     private void resetBoard(GameSession session) {
-        // Clear non-crater plants and re-fill
+        // Document: "If a match-3 cannot be created, the whole board must be reset
+        // and a random plant is placed where a plant was in the garden."
         Lawn lawn = session.getLawn();
         clearBoard(session, lawn);
         fillBoard(session);
@@ -325,9 +342,17 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     public void upgradePlantType(String baseType, String newType, GameSession session) {
-        activePlantTypes.put(baseType, newType);
+        String rootToUpdate = null;
+        for (Map.Entry<String, String> entry : activePlantTypes.entrySet()) {
+            if (entry.getValue().equalsIgnoreCase(baseType)) {
+                rootToUpdate = entry.getKey();
+                break;
+            }
+        }
+        if (rootToUpdate != null) {
+            activePlantTypes.put(rootToUpdate, newType.toLowerCase());
+        }
 
-        // Convert all existing plants on the board
         Lawn lawn = session.getLawn();
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols(); c++) {
@@ -345,8 +370,7 @@ public class BeghouledBehavior extends LevelBehavior {
     }
 
     private Plant spawnPlant(String alias, int row, int col) {
-        Plant p = PlantFactory.createPlant(1, 1);
-        p.setName(alias);
+        Plant p = PlantFactory.createPlantByName(alias, 1);
         p.setLocation(new Plant.Location(col, row));
         p.setPosition(Vec2.of(col, row));
         return p;
@@ -354,4 +378,5 @@ public class BeghouledBehavior extends LevelBehavior {
 
     public int getTargetMatches() { return targetMatches; }
     public int getCurrentMatches() { return currentMatches; }
+    public Map<String, String> getActivePlantTypes() { return activePlantTypes; }
 }

@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.zombies.effect;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class JalapenoZombieEffect implements EffectStatus {
@@ -23,11 +24,18 @@ public class JalapenoZombieEffect implements EffectStatus {
             for (int c = 0; c < cols; c++) {
                 Cell cell = session.getLawn().getCell(row, c);
                 if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
+                    // Send out the incineration event for CLI/Logging
+                    session.getEventBus().publish(new GameEvent.PlantIncinerated(
+                            cell.getPlant().getName(),
+                            zombie.getAlias(),
+                            row,
+                            c
+                    ));
+
                     cell.getPlant().takeDamage(99999, zombie);
                 }
             }
 
-            // Destroy the Jalapeno zombie
             zombie.takeDamage(zombie.getHp(), false);
         }
     }

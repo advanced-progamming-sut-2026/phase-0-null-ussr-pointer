@@ -20,8 +20,9 @@ public class GrowthTracker {
         if (!hasStages()) return;
         ageInSeconds += deltaTimeSeconds;
         for (Map<String, Object> stageData : stages) {
-            int stage = ((Double) stageData.get("stage")).intValue();
-            double targetTime = (Double) stageData.get("time");
+            int stage = ((Number) stageData.get("stage")).intValue();
+            double targetTime = ((Number) stageData.get("time")).doubleValue();
+
             if (ageInSeconds >= targetTime && stage > currentStage) {
                 currentStage = stage;
             }
@@ -35,8 +36,9 @@ public class GrowthTracker {
         double maxTime = ageInSeconds;
 
         for (Map<String, Object> stageData : stages) {
-            int stage = ((Double) stageData.get("stage")).intValue();
-            double targetTime = (Double) stageData.get("time");
+            // Safe casting using Number
+            int stage = ((Number) stageData.get("stage")).intValue();
+            double targetTime = ((Number) stageData.get("time")).doubleValue();
 
             if (stage > maxStage) {
                 maxStage = stage;
@@ -61,9 +63,11 @@ public class GrowthTracker {
     public Double getStageValue(String key) {
         if (!hasStages()) return null;
         for (Map<String, Object> stageData : stages) {
-            int stage = ((Double) stageData.get("stage")).intValue();
+            // Safe casting using Number
+            int stage = ((Number) stageData.get("stage")).intValue();
             if (stage == currentStage && stageData.containsKey(key)) {
-                return (Double) stageData.get(key);
+                // Return as double, safely parsing from Number
+                return ((Number) stageData.get(key)).doubleValue();
             }
         }
         return null;
