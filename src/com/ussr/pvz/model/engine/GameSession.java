@@ -763,4 +763,7 @@ public class GameSession {
     public void setProgressTracked(boolean progressTracked) {
         this.progressTracked = progressTracked;
     }
+    public List<LawnMower> getLawnMowers() {
+        return lawnMowers;
+    }
 }

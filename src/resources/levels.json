@@ -994,6 +994,14 @@
             {
               "id": "ZombieArmor1",
               "weight": 300
+            },
+            {
+              "id": "ZombieExplorer",
+              "weight": 250
+            },
+            {
+              "id": "ZombieCrystalSkull",
+              "weight": 200
             }
           ],
           "waves": []
@@ -1044,7 +1052,7 @@
           "allowedZombies": [
             {
               "id": "ZombieImp",
-              "weight": 500
+              "weight": 600
             },
             {
               "id": "ZombieArmor2",
@@ -1053,6 +1061,14 @@
             {
               "id": "ZombieNewspaper",
               "weight": 300
+            },
+            {
+              "id": "ZombiePiano",
+              "weight": 250
+            },
+            {
+              "id": "ZombieDefault",
+              "weight": 500
             }
           ],
           "waves": []
@@ -1103,7 +1119,7 @@
           "allowedZombies": [
             {
               "id": "ZombieImp",
-              "weight": 500
+              "weight": 700
             },
             {
               "id": "ZombieArmor2",
@@ -1116,6 +1132,10 @@
             {
               "id": "ZombieProspector",
               "weight": 300
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 400
             }
           ],
           "waves": []

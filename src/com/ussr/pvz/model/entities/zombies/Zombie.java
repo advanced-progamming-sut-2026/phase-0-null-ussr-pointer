@@ -22,7 +22,6 @@ import java.util.Random;
 
 public class Zombie extends GameEntity implements Damageable {
 
-    private final ZombieService zombieService = new ZombieService();
 
     private static final Random RAND = new Random();
     private final String name;
@@ -142,6 +141,14 @@ public class Zombie extends GameEntity implements Damageable {
     }
 
     public Damageable acquireTarget(GameSession session) {
+        if (this.getPosition().x() <= -0.5) {
+            if (session.getLevel() != null && session.getLevel().getBehavior() instanceof com.ussr.pvz.model.level.behavior.IZombieBehavior izb) {
+                com.ussr.pvz.model.board.structures.Brain b = izb.getBrainInLane((int) this.getPosition().y());
+                if (b != null && b.isAlive()) {
+                    return b;
+                }
+            }
+        }
         return faction.findTarget(this, session);
     }
 
