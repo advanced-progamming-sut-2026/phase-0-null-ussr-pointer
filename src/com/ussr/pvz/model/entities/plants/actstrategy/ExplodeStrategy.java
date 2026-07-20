@@ -1,8 +1,12 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
+import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -28,6 +32,13 @@ public class ExplodeStrategy implements ActStrategy {
                 break;
             case 2:
                 targets = areaDetect(user, session);
+                if(user.getName().equalsIgnoreCase("grapeshot"))
+                    App.getGameSession().addProjectile(new Projectile(user.getPosition(),
+                            new Vec2(4 , 0),
+                            null,
+                            50,
+                            new BounceMove(),
+                            new PierceHit(Integer.MAX_VALUE)));
                 break;
             case 3:
                 targets = lineDetect(user, session);
