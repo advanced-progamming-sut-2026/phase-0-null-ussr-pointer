@@ -30,8 +30,8 @@ public class ModifyStrategy implements ActStrategy {
                 modifyTargets(user, targets);
                 break;
             case 3:
-                ArrayList<Projectile> hypnoTargets = projectileThroughDetect(user, session);
-                applyHypnoModification(hypnoTargets);
+//                ArrayList<Projectile> hypnoTargets = projectileThroughDetect(user, session);
+//                applyHypnoModification(hypnoTargets);
                 break;
         }
     }
