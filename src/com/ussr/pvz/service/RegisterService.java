@@ -54,7 +54,8 @@ public class RegisterService {
                 new ArrayList<>(),
                 new HashMap<>(),
                 now,  // lastLoginTime
-                now   // lastDailyResetTime
+                now,
+                new ArrayList<>()// lastDailyResetTime
         );
 
         StringBuilder sb = new StringBuilder("pick a security question:\n");

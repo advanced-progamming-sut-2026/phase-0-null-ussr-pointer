@@ -36,6 +36,7 @@ public class GlobalController {
 
     private String handleHelp() {
         return globalService.showHelp();
+    }
     private String handleMenuShowAll() {
        return globalService.handleMenuShowAll();
     }

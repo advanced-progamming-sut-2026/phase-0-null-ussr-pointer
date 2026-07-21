@@ -3,7 +3,7 @@ package com.ussr.pvz.model.entities.plants.factory;
 import com.ussr.pvz.model.entities.plants.PlantType;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.plants.plantfood.*;
-import com.ussr.pvz.model.entities.plants.plantfood.localattack.LocalAttack;
+import com.ussr.pvz.model.entities.plants.plantfood.localattack.*;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Arrays;
@@ -11,102 +11,146 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PlantFoodEffectRegistry {
-    private static final Map<PlantFoodType, PlantFoodEffectFactory> FACTORIES = new HashMap<>();
+    // Map using String keys straight from JSON to bypass the incomplete PlantFoodType enum
+    private static final Map<String, PlantFoodEffectFactory> FACTORIES = new HashMap<>();
 
     static {
-        register(PlantFoodType.NONE, data -> null);
+        register("NONE", data -> null);
 
-        register(PlantFoodType.SPAWN_SUN_ITEMS, data -> new SpawnSun(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), false));
+        register("SPAWN_SUN", data -> {
+            int pfValue = ((Number) data.getOrDefault("plantFoodValue", 0)).intValue();
+            boolean instantGrow = Boolean.TRUE.equals(data.get("instantMaxGrowth"));
+            return new SpawnSun(pfValue, instantGrow);
+        });
 
-        register(PlantFoodType.PROJECTILE_BURST, data -> {
-            String catStr = (String) data.get("category");
-            PlantType category = catStr != null ? PlantType.valueOf(catStr) : null;
-            double pfValue = ((Number) data.getOrDefault("plantFoodValue", 0)).doubleValue();
-            int damage = ((Number) data.getOrDefault("damage", 1)).intValue();
+        register("PROJECTILE_BURST", data -> {
             String name = (String) data.get("name");
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
 
-            if (category == PlantType.LOBBER) {
-                return new LobberBarrage();
-            }
-
-            switch (name) {
-                case "Peashooter":
-                case "Fire Peashooter":
-                case "Goo Peashooter":
-                case "Cactus":
-                case "Rotobaga":
-                case "Starfruit":
-                case "Cat-tail":
-                    return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, false, null, null);
-                case "Repeater":
-                    return new TimedProjectileBurst(3.0, 0.1, 1, 20.0, false, null, null);
-                case "Mega Gatling Pea":
-                    return new TimedProjectileBurst(3.0, 0.1, 4, 20.0, false, null, null);
-                case "Threepeater":
-                    return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, false, null, Arrays.asList(
-                            Vec2.of(1, -1), Vec2.of(1, 0), Vec2.of(1, 1), Vec2.of(1, -2), Vec2.of(1, 2)
-                    ));
-                case "Split Pea":
-                    return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, false, null, Arrays.asList(
-                            Vec2.of(1, 0), Vec2.of(-1, 0)
-                    ));
-                case "Snow Pea":
-                    return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, true, null, null);
-                case "Sea-shroom":
-                case "Puff-shroom":
-                    return new TimedProjectileBurst(3.0, 0.1, 0, 1.0, false, Tag.SHROOM, null);
-                case "Pea Pod":
-                    return new InstantMassiveBlast(20.0, true);
-                case "Torchwood":
-                    return new ModifierEffect(false, 3);
-                default:
-                    return new InstantMassiveBlast(pfValue / Math.max(1.0, damage), false);
-            }
+            return switch (name) {
+                case "Peashooter", "Fire Peashooter", "Goo Peashooter", "Cactus", "Rotobaga", "Starfruit", "Cat-tail" ->
+                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, null);
+                case "Repeater" ->
+                        new TimedProjectileBurst(duration, strikeRate, 1, 20.0, false, null, null);
+                case "Mega Gatling Pea" ->
+                        new TimedProjectileBurst(duration, strikeRate, 4, 20.0, false, null, null);
+                case "Threepeater" ->
+                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, Arrays.asList(
+                                Vec2.of(1, -1), Vec2.of(1, 0), Vec2.of(1, 1), Vec2.of(1, -2), Vec2.of(1, 2)
+                        ));
+                case "Split Pea" ->
+                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, Arrays.asList(
+                                Vec2.of(1, 0), Vec2.of(-1, 0)
+                        ));
+                case "Snow Pea" ->
+                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, true, null, null);
+                case "Sea-shroom", "Puff-shroom" ->
+                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, Tag.SHROOM, null);
+                case "Pea Pod" ->
+                        new InstantMassiveBlast(20.0, true);
+                case "Torchwood" ->
+                        new ModifierEffect(false, 3);
+                default ->
+                        new InstantMassiveBlast(((Number) data.getOrDefault("plantFoodValue", 10.0)).doubleValue(), false);
+            };
         });
 
-        register(PlantFoodType.SPAWN_CLONES, data -> {
+        register("REPEATER_ATTACK", data -> {
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            return new RepeaterAttack(duration, strikeRate);
+        });
+
+        // JSON has a trailing space for Snow Pea ("SNOW_PEA_ATTACK "), but it gets trimmed by our loader logic
+        register("SNOW_PEA_ATTACK", data -> {
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            return new SnowPeaAttack(duration, strikeRate);
+        });
+
+        register("PLASMA_WIPE", data -> {
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 0.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.0)).doubleValue();
+            return new PlasmaWipe(duration, strikeRate);
+        });
+
+        register("BOWLING_BULB_ATTACK", data -> new BowlingBulbAttack(10, 15, 20));
+
+        register("GLOBAL_SHROOM_ATTACK", data -> {
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            return new GlobalShroomAttack(duration, strikeRate, (String) data.get("name"));
+        });
+
+        register("AREA_3X3_ATTACK", data -> {
+            double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
+            double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            return new Area3x3Attack(duration, strikeRate);
+        });
+
+        register("SPAWN_CLONES", data -> {
+            int pfValue = ((Number) data.getOrDefault("plantFoodValue", 0)).intValue();
             if ("Lily Pad".equals(data.get("name"))) {
-                return new ModifierEffect(true, 1);
+                return SpawnClones.forLilyPad(pfValue);
             }
-            return new SpawnClones(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
+            return new SpawnClones(pfValue);
         });
 
-        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5));
+        register("GRANT_PERMANENT_ARMOR", data -> {
+            String name = (String) data.get("name");
+            return switch (name) {
+                case "Wall-nut" -> GrantArmor.forWallNut();
+                case "Tall-nut" -> GrantArmor.forTallNut();
+                case "Endurian" -> GrantArmor.forEndurian();
+                case "Garlic" -> GrantArmor.forGarlic();
+                case "Sweet Potato" -> GrantArmor.forSweetPotato();
+                case "Explode-o-nut" -> GrantArmor.forExplodeONut();
+                case "Pumpkin" -> GrantArmor.forPumpkin();
+                case "Sun Bean" -> GrantArmor.forSunBean();
+                default -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true);
+            };
+        });
 
-        register(PlantFoodType.GRANT_PERMANENT_ARMOR, data -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true));
+        register("RANDOM_HYPNOTIZE", data -> new RandomHypnotize(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.RANDOM_HYPNOTIZE, data -> new RandomHypnotize(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
-
-        register(PlantFoodType.KNOCKBACK_BLAST, data -> {
+        register("KNOCKBACK_BLAST", data -> {
             if ("Magnet-shroom".equals(data.get("name"))) {
-                return new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
+                return new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 15)).intValue());
             }
             return new KnockBackBlast(3.0);
         });
 
-        register(PlantFoodType.PULL_UNDERWATER, data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register("METAL_ABSORB", data -> new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 15)).intValue()));
 
-        register(PlantFoodType.MAP_WIDE_FREEZE, data -> new MapWideFreeze());
+        register("PULL_UNDERWATER", data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.INSTANT_KILL, data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register("MAP_WIDE_FREEZE", data -> new MapWideFreeze());
 
-        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage());
+        register("INSTANT_KILL", data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+
+        register("LOBBER_BARRAGE", data -> new LobberBarrage());
     }
 
     private PlantFoodEffectRegistry() {}
 
-    public static void register(PlantFoodType type, PlantFoodEffectFactory factory) {
-        FACTORIES.put(type, factory);
+    public static void register(String typeName, PlantFoodEffectFactory factory) {
+        FACTORIES.put(typeName.trim().toUpperCase(), factory);
     }
 
     public static PlantFoodEffect create(Map<String, Object> data) {
         String pfTypeStr = (String) data.get("plantFoodType");
-        if (pfTypeStr == null || pfTypeStr.equals("NONE")) return null;
 
-        PlantFoodType type = PlantFoodType.valueOf(pfTypeStr);
-        PlantFoodEffectFactory factory = FACTORIES.get(type);
+        if (pfTypeStr == null) return null;
+
+        // Cleanse spacing issues commonly found in the JSON (like "SNOW_PEA_ATTACK ")
+        pfTypeStr = pfTypeStr.trim().toUpperCase();
+        if (pfTypeStr.equals("NONE")) return null;
+
+        PlantFoodEffectFactory factory = FACTORIES.get(pfTypeStr);
         if (factory == null) {
-            throw new IllegalArgumentException("Unknown PlantFoodEffect type: " + type);
+            System.err.println("Warning: Unknown PlantFoodEffect string from JSON: " + pfTypeStr);
+            return null;
         }
         return factory.create(data);
     }

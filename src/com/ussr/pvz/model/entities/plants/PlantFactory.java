@@ -110,15 +110,23 @@ public class PlantFactory {
         plant.setLevel(level);
 
         String pfType = (String) data.get("plantFoodType");
-        plant.setPlantFoodType(pfType != null && !pfType.equals("NONE") ? PlantFoodType.valueOf(pfType) : PlantFoodType.NONE);
+        if (pfType != null && !pfType.trim().isEmpty() && !pfType.trim().equalsIgnoreCase("NONE")) {
+            try {
+                plant.setPlantFoodType(PlantFoodType.valueOf(pfType.trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                plant.setPlantFoodType(PlantFoodType.NONE);
+            }
+        } else {
+            plant.setPlantFoodType(PlantFoodType.NONE);
+        }
 
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
         plant.setWrampUp(wrampUp);
 
-        // Dynamic assignments via Maps
         plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
         plant.setActStrategy(ActStrategyRegistry.create(data));
+
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
 
         return plant;

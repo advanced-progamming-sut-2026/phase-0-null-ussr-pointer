@@ -10,7 +10,7 @@ public enum GlobalCommand {
     MENU_LOGOUT("^menu\\s+logout(?:\\s+.*)?$"),
     MENU_QUIT("^menu\\s+quit(?:\\s+.*)?$"),
     MENU_EXIT("^menu\\s+exit(?:\\s+.*)?$"),
-    HELP("^help(?:\\s+.*)?$");
+    HELP("^help(?:\\s+.*)?$"),
     MENU_SHOW_ALL("^menu\\s+show\\s+all(?:\\s+.*)?$");
 
     private final String pattern;
