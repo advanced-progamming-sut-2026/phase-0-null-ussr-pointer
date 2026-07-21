@@ -54,6 +54,7 @@ public class GameController {
             case SHOW_TILE_STATUS -> handleShowTileStatus(matcher);
             case ZOMBIES_INFO -> handleZombiesInfo();
             case SHOW_CONVEYOR -> handleShowConveyor();
+            case SHOW_PLANT_FOOD -> handleShowPlantFood();
             default -> "";
         };
     }
@@ -233,10 +234,12 @@ public class GameController {
     }
 
     private String handleCheatSpawnZombie(Matcher matcher) {
+        boolean glowing = matcher.group("glowing") != null;
         CheatSpawnZombieRequest request = new CheatSpawnZombieRequest(
                 matcher.group("type"),
                 matcher.group("x"),
-                matcher.group("y")
+                matcher.group("y"),
+                glowing
         );
         return gameService.cheatSpawnZombie(request);
     }
@@ -286,5 +289,9 @@ public class GameController {
 
     private String handleShowConveyor() {
         return gameService.showConveyor();
+    }
+
+    private String handleShowPlantFood() {
+        return gameService.showPlantFood();
     }
 }

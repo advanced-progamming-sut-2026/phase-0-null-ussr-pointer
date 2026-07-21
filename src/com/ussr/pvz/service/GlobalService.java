@@ -1,5 +1,12 @@
 package com.ussr.pvz.service;
 
+import com.ussr.pvz.controller.command.GlobalCommand;
+import com.ussr.pvz.controller.command.LoginCommand;
+import com.ussr.pvz.controller.command.RegisterCommand;
+import com.ussr.pvz.controller.command.maincommand.*;
+import com.ussr.pvz.controller.command.maincommand.gamecommand.ChoosePlantCommand;
+import com.ussr.pvz.controller.command.maincommand.gamecommand.CollectionCommand;
+import com.ussr.pvz.controller.command.maincommand.gamecommand.GameCommand;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
@@ -133,7 +140,40 @@ public class GlobalService {
         return "";
     }
 
-    public String handleMenuShowAll() {
+    public String showHelp() {
+        MenuState current = App.getMenuState();
+        StringBuilder sb = new StringBuilder();
+        sb.append("--- Global Commands ---\n");
+        for (GlobalCommand cmd : GlobalCommand.values()) {
+            sb.append("- ").append(cmd.name().replace('_', ' ').toLowerCase()).append("\n");
+        }
+
+        sb.append("\n--- ").append(current.getName()).append(" Commands ---\n");
+
+        Enum<?>[] specificCommands = switch (current) {
+            case REGISTER -> RegisterCommand.values();
+            case LOGIN -> LoginCommand.values();
+            case GAME -> GameCommand.values();
+            case COLLECTION -> CollectionCommand.values();
+            case CHOOSE_PLANT -> ChoosePlantCommand.values();
+            case LEADERBOARD -> LeaderBoardCommand.values();
+            case PROFILE -> ProfileCommand.values();
+            case SETTING -> SettingCommand.values();
+            case GREENHOUSE -> GreenHouseCommand.values();
+            case SHOP -> ShopCommand.values();
+            case LEVEL_SELECTION -> LevelSelectionCommand.values();
+            case TRAVEL_LOG -> TravelLogCommand.values();
+            case NEWS -> NewsCommand.values();
+            default -> new Enum<?>[0];
+        };
+
+        for (Enum<?> cmd : specificCommands) {
+            sb.append("- ").append(cmd.name().replace('_', ' ').toLowerCase()).append("\n");
+        }
+
+        return sb.toString().trim();
+    }
+     public String handleMenuShowAll() {
         StringBuilder result = new StringBuilder();
         Arrays.stream(MenuState.values()).toList().forEach(state -> {
             result.append(state.getName()).append("\n");
