@@ -518,7 +518,7 @@ public class GameService {
         try {
             Zombie zombie = ZombieFactory.create(request.type(), row, col);
             session.spawnZombie(zombie);
-            return request.type() + " spawned in row " + row + " at col " + col;
+            return "spawned via cheat";
         } catch (IllegalArgumentException e) {
             return "unknown zombie type: " + request.type();
         }
@@ -626,5 +626,12 @@ public class GameService {
         return totalWaves > 0
                 ? "zombie waves started (" + totalWaves + " waves loaded)"
                 : "zombie waves started (no wave data — add waves to your level JSON)";
+    }
+
+    public String showPlantFood() {
+        if (App.getGameSession() == null) {
+            return "no active game session";
+        }
+        return "Plant foods available: " + App.getGameSession().getPlantFoodCount();
     }
 }

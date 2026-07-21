@@ -238,6 +238,10 @@ public class GameSession {
     }
 
     public void spawnZombie(Zombie zombie) {
+        if (!zombie.isGlowing() && Math.random() < 0.05) {
+            zombie.setGlowing(true);
+        }
+
         zombies.add(zombie);
         clock.addEntity(zombie);
         if (App.getAccount() != null) {
@@ -250,7 +254,8 @@ public class GameSession {
         eventBus.publish(new GameEvent.ZombieSpawned(
                 zombie.getAlias(),
                 (int) zombie.getPosition().y(),
-                (int) zombie.getPosition().x()
+                (int) zombie.getPosition().x(),
+                zombie.isGlowing()
         ));
     }
 
@@ -340,6 +345,13 @@ public class GameSession {
 
         rollZombieLoot(zombie);
 
+        if (zombie.isGlowing()) {
+            if (plantFoodCount < 3) {
+                plantFoodCount++;
+            }
+            eventBus.publish(new GameEvent.GlowingZombieDroppedPlantFood(plantFoodCount));
+        }
+
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().onZombieDied(this, zombie);
         }
@@ -382,6 +394,10 @@ public class GameSession {
         if (plantFoodCount <= 0) return false;
         plantFoodCount--;
         return true;
+    }
+
+    public int getPlantFoodCount() {
+        return plantFoodCount;
     }
 
     public void killAllZombies() {

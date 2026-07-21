@@ -44,7 +44,7 @@ public class Zombie extends GameEntity implements Damageable {
     private double statusTimeRemaining = 0.0;
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
-    private final boolean isGlowing;
+    private boolean isGlowing;
     private java.util.List<String> damageWhileSubmerged;
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
 
@@ -82,6 +82,10 @@ public class Zombie extends GameEntity implements Damageable {
         } else {
             takeDamage(damage, null);
         }
+    }
+
+    public void setGlowing(boolean isGlowing) {
+        this.isGlowing = isGlowing;
     }
 
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}

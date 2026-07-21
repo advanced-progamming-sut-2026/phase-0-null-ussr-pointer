@@ -23,7 +23,10 @@ public class CliGameEventListener {
 
     private void registerZombieEvents(GameEventBus bus) {
         bus.subscribe(GameEvent.ZombieSpawned.class,
-                e -> System.out.println(tick() + "[SPAWN] " + e.alias() + " entered lane " + e.lane() + " at col " + e.col()));
+                e -> {
+                    String glowLabel = e.isGlowing() ? " [GLOWING]" : "";
+                    System.out.println(tick() + "[SPAWN] " + e.alias() + glowLabel + " entered lane " + e.lane() + " at col " + e.col());
+                });
 
         bus.subscribe(GameEvent.ZombieDied.class,
                 e -> System.out.println(tick() + "[DEAD] " + e.alias() + " was defeated at (" + String.format("%.1f", e.x()) + ", " + String.format("%.1f", e.y()) + ")"));
@@ -33,6 +36,9 @@ public class CliGameEventListener {
 
         bus.subscribe(GameEvent.ZombieReachedHouse.class,
                 e -> System.out.println(tick() + "[BREACH] A zombie reached the house!"));
+
+        bus.subscribe(GameEvent.GlowingZombieDroppedPlantFood.class,
+                e -> System.out.println(tick() + "The glowing zombie dropeed a plant food; you have " + e.currentCount() + " plant foods now."));
     }
 
     private void registerPlantEvents(GameEventBus bus) {
