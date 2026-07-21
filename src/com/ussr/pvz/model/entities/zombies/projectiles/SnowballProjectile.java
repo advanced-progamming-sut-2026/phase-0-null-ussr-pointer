@@ -36,8 +36,15 @@ public class SnowballProjectile extends ZombieProjectile {
                 if (targetPlant.getChillLevel() >= 3) {
                     IceBlock iceBlock = new IceBlock(targetPlant, 500);
                     iceBlock.setPosition(Vec2.of(targetCol, targetRow));
+
+                    // Register the ice block structure
                     targetCell.setStructure(iceBlock);
                     session.registerStructure(iceBlock);
+
+                    // Suspend the plant: remove from cell and session without killing it
+                    targetCell.setPlant(null);
+                    targetPlant.setState(Plant.PlantState.INCAPACITATED);
+                    session.getPlants().remove(targetPlant);
                 }
             }
         }

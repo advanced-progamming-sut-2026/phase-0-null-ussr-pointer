@@ -437,7 +437,7 @@
         "y": 2,
         "z": 115
       },
-      "ImpTargetColumn": 2,
+      "ImpTargetColumn": 3,
       "ImpType": "egypt_imp",
       "IsValidPinchTarget": false,
       "MinPosXThrowImp": 400,
@@ -521,7 +521,7 @@
       },
       "CanSpawnPlantFood": false,
       "Cost": 150,
-      "EatDPS": 100,
+      "EatDPS": 300,
       "GroundTrackName": "ground_swatch",
       "HitRect": {
         "mHeight": 80,
@@ -562,7 +562,7 @@
         "z": 0.8
       },
       "Size": "imp",
-      "Speed": 0.22,
+      "Speed": 0.50,
       "WavePointCost": 100,
       "Weight": 1000,
       "ZombieStats": [

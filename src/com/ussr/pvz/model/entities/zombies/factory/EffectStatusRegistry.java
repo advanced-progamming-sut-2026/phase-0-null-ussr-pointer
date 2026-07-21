@@ -35,7 +35,8 @@ public final class EffectStatusRegistry {
         ));
 
         register("IceAgeHunterEffect", (params, data) -> new IceAgeHunterEffect(
-                BehaviorSpec.getDouble(params, "throwCooldown", 4.0)
+                BehaviorSpec.getDouble(params,"FarAttackRange",4),
+                BehaviorSpec.getDouble(params,"NearAttackRange",1)
         ));
 
         register("FireEffect", (params, data) -> new FireEffect(

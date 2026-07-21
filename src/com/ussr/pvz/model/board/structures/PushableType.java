@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.board.structures;
 
 public enum PushableType {
-    ICE_BLOCK(500, null),
+    ICE_BLOCK(500, "ZombieImp"),
     ARCADE_CABINET(1100, null),
     BARREL(500, "ZombieImp"); // Barrel added, spawns Imps upon breaking
 
