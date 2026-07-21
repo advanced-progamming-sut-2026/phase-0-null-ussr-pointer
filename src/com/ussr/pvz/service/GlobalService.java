@@ -173,4 +173,11 @@ public class GlobalService {
 
         return sb.toString().trim();
     }
+     public String handleMenuShowAll() {
+        StringBuilder result = new StringBuilder();
+        Arrays.stream(MenuState.values()).toList().forEach(state -> {
+            result.append(state.getName()).append("\n");
+        });
+        return result.toString();
+    }
 }

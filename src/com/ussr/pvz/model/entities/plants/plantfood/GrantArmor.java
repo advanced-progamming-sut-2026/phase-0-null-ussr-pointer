@@ -24,35 +24,69 @@ public class GrantArmor implements PlantFoodEffect {
         this.healToFull = healToFull;
     }
 
+    public static GrantArmor forWallNut() {
+        return new GrantArmor(4000, 0, false, false, false, true);
+    }
+
+    public static GrantArmor forTallNut() {
+        return new GrantArmor(8000, 0, false, false, false, true);
+    }
+
+    public static GrantArmor forEndurian() {
+        return new GrantArmor(3000, 50, false, false, false, true);
+    }
+
+    public static GrantArmor forGarlic() {
+        return new GrantArmor(0, 0, false, true, false, true);
+    }
+
+    public static GrantArmor forSweetPotato() {
+        return new GrantArmor(0, 0, false, false, true, true);
+    }
+
+    public static GrantArmor forExplodeONut() {
+        return new GrantArmor(4000, 0, true, false, false, true);
+    }
+
+    public static GrantArmor forPumpkin() {
+        return new GrantArmor(4000, 0, false, false, false, true);
+    }
+
+    public static GrantArmor forSunBean() {
+        return new GrantArmor(1000, 0, false, false, false, true);
+    }
+
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
-        // 1. Handle healing if specified (Great for Wall-nuts and Sweet Potato)
+        if (user == null || session == null) return;
+
         if (this.healToFull && user.getMaxHp() > 0) {
             user.setHp(user.getMaxHp());
         }
 
-        int currentLane = user.getLocation().y();
-        double currentColumn = user.getLocation().x();
+        applyStatusModifiers(user);
 
-        if (this.disperseZombies) {
+        int currentLane = user.getLocation() != null ? user.getLocation().y() : (int) user.getPosition().y();
+
+        // 3. Garlic effect: Disperse zombies in the same lane to upper/lower lanes
+        if (this.disperseZombies && session.getZombies() != null) {
             for (Zombie zombie : session.getZombies()) {
-                if (zombie.isAlive() && (int) zombie.getPosition().y() == currentLane) {
-                    // Force the zombie up or down a lane randomly
+                if (zombie != null && zombie.isAlive() && (int) zombie.getPosition().y() == currentLane) {
                     int alternateLane = currentLane + (Math.random() > 0.5 ? 1 : -1);
-
-
                     if (alternateLane < 1) alternateLane = 2;
                     if (alternateLane > 5) alternateLane = 4;
-
                     zombie.setPosition(new Vec2(zombie.getPosition().x(), alternateLane));
                 }
             }
         }
 
-        if (this.attractZombies) {
+        if (this.attractZombies && session.getZombies() != null) {
             for (Zombie zombie : session.getZombies()) {
-                if (zombie.isAlive() && Math.abs(zombie.getPosition().y() - currentLane) <= 1.5) {
-                    zombie.setPosition(new Vec2(currentColumn, currentLane));
+                if (zombie != null && zombie.isAlive()) {
+                    int zombieLane = (int) zombie.getPosition().y();
+                    if (Math.abs(zombieLane - currentLane) <= 1 && zombieLane != currentLane) {
+                        zombie.setPosition(new Vec2(zombie.getPosition().x(), currentLane));
+                    }
                 }
             }
         }
@@ -60,12 +94,13 @@ public class GrantArmor implements PlantFoodEffect {
 
     @Override
     public void applyStatusModifiers(Plant user) {
-        if (this.armorAmount > 0) {
+        if (this.armorAmount > 0 && user != null) {
             user.setArmor(new PlantArmor(this.armorAmount, this.reflectiveDamage, this.explodeOnBreak));
         }
     }
 
     @Override
     public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
+        // Instant defensive superpowers do not require ongoing tick logic
     }
 }

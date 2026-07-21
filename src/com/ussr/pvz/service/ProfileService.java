@@ -76,4 +76,5 @@ public class ProfileService {
                 "current chapter: " + account.getAdventureProgress().getCurrentChapter() + "\n" +
                 "current level: " + account.getAdventureProgress().getCurrentLvl();
     }
+
 }

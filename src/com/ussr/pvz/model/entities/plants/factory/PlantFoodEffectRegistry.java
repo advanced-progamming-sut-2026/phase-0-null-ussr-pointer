@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.plants.factory;
 import com.ussr.pvz.model.entities.plants.PlantType;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.plants.plantfood.*;
+import com.ussr.pvz.model.entities.plants.plantfood.localattack.LocalAttack;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public final class PlantFoodEffectRegistry {
             String name = (String) data.get("name");
 
             if (category == PlantType.LOBBER) {
-                return new LobberBarrage((int) pfValue, 1.0, -1);
+                return new LobberBarrage();
             }
 
             switch (name) {
@@ -70,7 +71,7 @@ public final class PlantFoodEffectRegistry {
             return new SpawnClones(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
         });
 
-        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5, ((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5));
 
         register(PlantFoodType.GRANT_PERMANENT_ARMOR, data -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true));
 
@@ -80,7 +81,7 @@ public final class PlantFoodEffectRegistry {
             if ("Magnet-shroom".equals(data.get("name"))) {
                 return new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
             }
-            return new KnockBackBlast(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 2.0);
+            return new KnockBackBlast(3.0);
         });
 
         register(PlantFoodType.PULL_UNDERWATER, data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
@@ -89,7 +90,7 @@ public final class PlantFoodEffectRegistry {
 
         register(PlantFoodType.INSTANT_KILL, data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 1.0, -1));
+        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage());
     }
 
     private PlantFoodEffectRegistry() {}
