@@ -26,10 +26,15 @@ public class GlobalController {
                     case MENU_LOGOUT -> handleMenuLogout();
                     case MENU_QUIT -> handMenuQuit();
                     case MENU_EXIT -> handleMenuExit();
+                    case HELP -> handleHelp();
                 };
             }
         }
         return "";
+    }
+
+    private String handleHelp() {
+        return globalService.showHelp();
     }
 
     private String handMenuQuit() {
