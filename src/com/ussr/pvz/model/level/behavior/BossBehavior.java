@@ -14,11 +14,6 @@ public class BossBehavior extends LevelBehavior {
     }
 
     @Override
-    public void onComplete(Level level) {
-
-    }
-
-    @Override
     public boolean isFailed(Level level) {
         return false;
     }

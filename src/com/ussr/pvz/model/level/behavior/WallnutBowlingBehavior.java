@@ -40,14 +40,6 @@ public class WallnutBowlingBehavior extends LevelBehavior {
     }
 
     @Override
-    public void onWaveComplete(Level level, int waveNumber) {
-    }
-
-    @Override
-    public void onComplete(Level level) {
-    }
-
-    @Override
     public boolean isFailed(Level level) {
         // Fails if any zombie crosses the player's defenses (handled by main GameSession)
         return false;

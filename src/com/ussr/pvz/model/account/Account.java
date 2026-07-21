@@ -47,7 +47,8 @@ public class Account {
                 state.questsCompleted(),
                 state.coin(),
                 state.gem(),
-                state.plantLvl()
+                state.plantLvl(),
+                state.completedLevels() != null ? state.completedLevels() : new ArrayList<>() // <--- PASS HERE
         );
 
         this.scoreRecord = new ScoreRecord(state.score());
@@ -106,7 +107,8 @@ public class Account {
                 completedIds,
                 this.questManager.exportProgressMap(),
                 this.lastLoginTime,
-                this.lastDailyResetTime
+                this.lastDailyResetTime,
+                adventureProgress.getCompletedLevels()
         );
     }
 
@@ -230,7 +232,6 @@ public class Account {
     private void resetDailyShopOffers() {
         com.ussr.pvz.model.shop.ShopManager shopManager = com.ussr.pvz.model.App.getShopManager();
         if (shopManager != null) {
-            // Reinitialize the shop to reset daily offers
             com.ussr.pvz.model.App.initShop();
         }
     }

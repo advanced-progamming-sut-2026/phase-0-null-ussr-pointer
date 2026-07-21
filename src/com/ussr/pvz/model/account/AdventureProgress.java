@@ -23,6 +23,7 @@ public class AdventureProgress {
     private final List<String> seenZombies;
     private final Map<String, Integer> seedPackets;
     private final List<Plant> accountPlants;
+    private final List<String> completedLevels; // <--- ADDED FIELD
 
     // A static normalizer so it's fully self-contained and accessible anywhere
     public static String normalizeKey(String rawKey) {
@@ -30,7 +31,8 @@ public class AdventureProgress {
         return rawKey.trim().toUpperCase().replaceAll("[\\s_]", "");
     }
 
-    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> rawPlantLvls) {
+    // UPDATED CONSTRUCTOR to accept completedLevels
+    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels) {
         this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
         this.minigamesWon = minigamesWon;
@@ -39,7 +41,7 @@ public class AdventureProgress {
         this.gem = gem;
         this.plantFoodCount = 0;
 
-        // FIX: Rebuild the map to normalize any raw keys (e.g., converting "Sun Flower" to "SUNFLOWER")
+        // Rebuild the map to normalize any raw keys
         this.plantLvls = new HashMap<>();
         if (rawPlantLvls != null) {
             for (Map.Entry<String, Integer> entry : rawPlantLvls.entrySet()) {
@@ -52,6 +54,13 @@ public class AdventureProgress {
         this.seedPackets = new HashMap<>();
         this.seenZombies = new ArrayList<>();
         this.accountPlants = new ArrayList<>();
+
+        // Initialize completed levels list
+        this.completedLevels = new ArrayList<>();
+        if (completedLevels != null) {
+            this.completedLevels.addAll(completedLevels);
+        }
+
         populateAccountPlants();
     }
 
@@ -147,6 +156,22 @@ public class AdventureProgress {
             populateAccountPlants();
         }
     }
+
+    // --- ADDED HELPERS FOR COMPLETED LEVELS ---
+    public List<String> getCompletedLevels() {
+        return this.completedLevels;
+    }
+
+    public void addCompletedLevel(String levelId) {
+        if (levelId != null && !this.completedLevels.contains(levelId)) {
+            this.completedLevels.add(levelId);
+        }
+    }
+
+    public boolean isLevelCompleted(String levelId) {
+        return levelId != null && this.completedLevels.contains(levelId);
+    }
+    // ------------------------------------------
 
     public List<String> getSeenZombies() {
         return this.seenZombies;
@@ -281,12 +306,7 @@ public class AdventureProgress {
                 Object nameObj = plantData.get("name");
                 if (nameObj != null) {
                     String plantName = normalizeKey(nameObj.toString());
-                    //todo:for now leave it like it but after debugging meke lines not comment
-//                    if (starterPlantNames.contains(plantName)) {
                     defaultPlantLevels.put(plantName, 1);
-//                    } else {
-//                        defaultPlantLevels.put(plantName, 0);
-//                    }
                 }
             }
         }
