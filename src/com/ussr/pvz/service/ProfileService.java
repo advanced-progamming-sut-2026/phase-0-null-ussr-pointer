@@ -7,6 +7,10 @@ import com.ussr.pvz.model.dto.ChangeEmailRequest;
 import com.ussr.pvz.model.dto.ChangeNicknameRequest;
 import com.ussr.pvz.model.dto.ChangePasswordRequest;
 import com.ussr.pvz.model.dto.ChangeUsernameRequest;
+import com.ussr.pvz.model.util.SecurityUtil;
+import com.ussr.pvz.model.util.SessionManager;
+
+import java.util.Objects;
 
 public class ProfileService {
 
@@ -18,7 +22,10 @@ public class ProfileService {
 
         if (App.getAccounts().stream().anyMatch(a -> a.getName().equals(request.username())))
             return "username already exists";
-
+        if (Objects.equals(SessionManager.getAutoLoginUsername(), account.getName())) {
+            SessionManager.saveSession(request.username());
+        }
+        account.setName(request.username());
         account.setName(request.username());
         return "username changed successfully";
     }
@@ -46,7 +53,7 @@ public class ProfileService {
     public String changePassword(ChangePasswordRequest request) {
         Account account = App.getAccount();
 
-        if (!account.getPassword().equals(request.oldPassword()))
+        if (!account.getPassword().equals(SecurityUtil.hashPassword(request.oldPassword())))
             return "old password is incorrect";
 
         if (!ValidationRegex.VALID_PASSWORD_LENGTH.matchToRegex(request.newPassword()).matches())
@@ -60,7 +67,8 @@ public class ProfileService {
         if (!ValidationRegex.VALID_PASSWORD_SPECIFIC_CHARACTER.matchToRegex(request.newPassword()).matches())
             return "password must contain a specific character";
 
-        account.setPassword(request.newPassword());
+        account.setPassword(SecurityUtil.hashPassword(
+                request.newPassword()));
         return "password changed successfully";
     }
 
