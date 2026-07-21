@@ -64,6 +64,9 @@ public class GlobalService {
         }
 
         App.setMenuState(parent);
+        if (App.getGameSession() != null) {
+            App.setGameSession(null);
+        }
         return "menu changed to " + parent.getName();
     }
 
@@ -131,5 +134,13 @@ public class GlobalService {
         }
         System.exit(0);
         return "";
+    }
+
+    public String handleMenuShowAll() {
+        StringBuilder result = new StringBuilder();
+        Arrays.stream(MenuState.values()).toList().forEach(state -> {
+            result.append(state.getName()).append("\n");
+        });
+        return result.toString();
     }
 }

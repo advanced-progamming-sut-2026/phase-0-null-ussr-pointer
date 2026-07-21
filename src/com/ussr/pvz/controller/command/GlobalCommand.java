@@ -9,6 +9,7 @@ public enum GlobalCommand {
     ADVANCE_TIME("^advance\\s+time\\s+-t\\s+(?<count>\\S+)\\s+ticks(?:\\s+.*)?$"),
     MENU_LOGOUT("^menu\\s+logout(?:\\s+.*)?$"),
     MENU_QUIT("^menu\\s+quit(?:\\s+.*)?$"),
+    MENU_SHOW_ALL("^menu\\s+show\\s+all(?:\\s+.*)?$"),
     MENU_EXIT("^menu\\s+exit(?:\\s+.*)?$");
 
     private final String pattern;
