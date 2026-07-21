@@ -59,6 +59,8 @@ public class GameSession {
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
 
+    private List<String> boostedPlants = new ArrayList<>();
+
     public void initClock() {
         clock.reset();
         plants.forEach(clock::addEntity);
@@ -790,4 +792,8 @@ public class GameSession {
     public void setSelectedPlants(List<String> selectedPlants) {
         this.selectedPlants = selectedPlants;
     }
+
+    public List<String> getBoostedPlants() { return this.boostedPlants; }
+
+    public void setBoostedPlants(List<String> boostedPlants) { this.boostedPlants = boostedPlants; }
 }

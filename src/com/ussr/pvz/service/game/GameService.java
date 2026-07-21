@@ -23,6 +23,10 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.quest.QuestRewardApplier;
 import com.ussr.pvz.model.quest.QuestType;
+import com.ussr.pvz.service.ChoosePlantService;
+
+import java.util.List;
+import java.util.Map;
 
 public class GameService {
 
@@ -264,6 +268,10 @@ public class GameService {
                 plant.setBottom(existingLilyPad);
             }
 
+            if(App.getGameSession().getBoostedPlants().contains(ChoosePlantService.normalizePlantKey(plant.getName()))) {
+                plant.setBuffed(true);
+            }
+
             cell.setPlant(plant);
             session.addPlant(plant);
 
@@ -414,8 +422,7 @@ public class GameService {
             }
 
             if (plant.getPlantFoodEffect() != null) {
-                plant.getPlantFoodEffect().triggerSuperpower(plant, session);
-                plant.getPlantFoodEffect().applyStatusModifiers(plant);
+                plant.setBuffed(true);
             }
             session.notifyPlantFoodUsed(plant);
 

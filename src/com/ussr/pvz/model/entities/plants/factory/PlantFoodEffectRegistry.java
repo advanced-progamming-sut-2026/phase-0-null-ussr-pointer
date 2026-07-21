@@ -27,33 +27,8 @@ public final class PlantFoodEffectRegistry {
             String name = (String) data.get("name");
             double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
             double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            return new LocalAttack(duration , strikeRate);
 
-            return switch (name) {
-                case "Peashooter", "Fire Peashooter", "Goo Peashooter", "Cactus", "Rotobaga", "Starfruit", "Cat-tail" ->
-                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, null);
-                case "Repeater" ->
-                        new TimedProjectileBurst(duration, strikeRate, 1, 20.0, false, null, null);
-                case "Mega Gatling Pea" ->
-                        new TimedProjectileBurst(duration, strikeRate, 4, 20.0, false, null, null);
-                case "Threepeater" ->
-                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, Arrays.asList(
-                                Vec2.of(1, -1), Vec2.of(1, 0), Vec2.of(1, 1), Vec2.of(1, -2), Vec2.of(1, 2)
-                        ));
-                case "Split Pea" ->
-                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, null, Arrays.asList(
-                                Vec2.of(1, 0), Vec2.of(-1, 0)
-                        ));
-                case "Snow Pea" ->
-                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, true, null, null);
-                case "Sea-shroom", "Puff-shroom" ->
-                        new TimedProjectileBurst(duration, strikeRate, 0, 1.0, false, Tag.SHROOM, null);
-                case "Pea Pod" ->
-                        new InstantMassiveBlast(20.0, true);
-                case "Torchwood" ->
-                        new ModifierEffect(false, 3);
-                default ->
-                        new InstantMassiveBlast(((Number) data.getOrDefault("plantFoodValue", 10.0)).doubleValue(), false);
-            };
         });
 
         register("REPEATER_ATTACK", data -> {

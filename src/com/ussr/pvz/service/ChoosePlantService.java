@@ -128,6 +128,7 @@ public class ChoosePlantService {
             return "no seed packets available for " + canonicalName;
 
         adv.spendSeedPacket(canonicalName);
+        App.getGameSession().getBoostedPlants().add(canonicalName);
         return "seed packet used for " + canonicalName + " (" + (available - 1) + " remaining)";
     }
 

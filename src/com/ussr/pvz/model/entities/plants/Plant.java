@@ -120,14 +120,16 @@ public class Plant extends GameEntity implements Damageable {
         if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
         if (growthTracker != null) growthTracker.update(GameClock.SECONDS_PER_TICK);
+        if(isBuffed) {
+            if (plantFoodTimer > 0) {
+                plantFoodTimer -= GameClock.SECONDS_PER_TICK;
 
-        if (plantFoodTimer > 0) {
-            plantFoodTimer -= GameClock.SECONDS_PER_TICK;
-
-            if (plantFoodEffect != null) {
-                plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(), GameClock.SECONDS_PER_TICK);
+                if (plantFoodEffect != null) {
+                    plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(), GameClock.SECONDS_PER_TICK);
+                }
+                return;
             }
-            return;
+            else isBuffed = false;
         }
 
         if (actStrategy == null) return;
@@ -429,5 +431,13 @@ public class Plant extends GameEntity implements Damageable {
 
     public boolean isBuffed() { return this.isBuffed; }
 
-    public void setBuffed(boolean isBuffed) { this.isBuffed = isBuffed; }
+    public void setBuffed(boolean isBuffed) {
+        this.isBuffed = isBuffed;
+        if(isBuffed) {
+            if(this.plantFoodEffect != null) {
+                plantFoodEffect.applyStatusModifiers(this);
+                plantFoodEffect.triggerSuperpower(this , App.getGameSession());
+            }
+        }
+    }
 }
