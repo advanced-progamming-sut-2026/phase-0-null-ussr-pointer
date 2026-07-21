@@ -13,8 +13,9 @@
     "recharge": 5.0,
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 50.0,
-    "plantFoodType": "SPAWN_SUN_ITEMS",
+    "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 150.0,
+    "instantMaxGrowth": false,
     "upgrades": [
       {
         "level": 2,
@@ -50,8 +51,9 @@
     "recharge": 15.0,
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 100.0,
-    "plantFoodType": "SPAWN_SUN_ITEMS",
+    "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 250.0,
+    "instantMaxGrowth": false,
     "upgrades": [
       {
         "level": 2,
@@ -82,18 +84,6 @@
       "WRAMP-UP",
       "NIGHT"
     ],
-    "wramp-up": [
-      {
-        "stage": 2,
-        "time": 24,
-        "abilityValue": 50
-      },
-      {
-        "stage": 3,
-        "time": 72,
-        "abilityValue": 75
-      }
-    ],
     "cost": 25,
     "baseHp": 300,
     "damage": 0,
@@ -101,8 +91,21 @@
     "recharge": 5.0,
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 25.0,
-    "plantFoodType": "SPAWN_SUN_ITEMS",
+    "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 225.0,
+    "instantMaxGrowth": true,
+    "wramp-up": [
+      {
+        "stage": 2,
+        "time": 24,
+        "abilityValue": 50.0
+      },
+      {
+        "stage": 3,
+        "time": 72,
+        "abilityValue": 75.0
+      }
+    ],
     "upgrades": [
       {
         "level": 2,
@@ -136,8 +139,9 @@
     "recharge": 5.0,
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 75.0,
-    "plantFoodType": "SPAWN_SUN_ITEMS",
+    "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 225.0,
+    "instantMaxGrowth": false,
     "upgrades": [
       {
         "level": 2,
@@ -173,6 +177,7 @@
     "abilityValue": 375.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "instantMaxGrowth": false,
     "upgrades": [
       {
         "level": 2,
@@ -209,7 +214,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 60.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -246,7 +252,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 2.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 120.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -283,7 +290,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 3.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 180.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -320,8 +328,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 60.0,
+    "plantFoodType": "SNOW_PEA_ATTACK ",
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -356,7 +365,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 4.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 40.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -393,8 +403,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 5.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 100.0,
+    "plantFoodType": "REPEATER_ATTACK",
+    "plantFoodDuration": 0.0,
+    "plantFoodStrikeRate": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -431,7 +442,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 3.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 90.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -467,8 +479,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 2000.0,
+    "plantFoodType": "PLASMA_WIPE",
+    "plantFoodDuration": 0.0,
+    "plantFoodStrikeRate": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -579,8 +592,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 3.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 300.0,
+    "plantFoodType": "BOWLING_BULB_ATTACK",
+    "plantFoodDuration": 0.0,
+    "plantFoodStrikeRate": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -653,7 +667,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 120.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -688,7 +703,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 5.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 100.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -725,7 +741,8 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 80.0,
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -761,8 +778,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 4.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 350.0,
+    "plantFoodType": "REPEATER_ATTACK",
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -799,8 +817,9 @@
     "recharge": 15.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 60.0,
+    "plantFoodType": "GLOBAL_SHROOM_ATTACK",
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,
@@ -836,8 +855,9 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 60.0,
+    "plantFoodType": "GLOBAL_SHROOM_ATTACK",
+    "plantFoodDuration": 4.0,
+    "plantFoodStrikeRate": 0.1,
     "upgrades": [
       {
         "level": 2,

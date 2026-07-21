@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.plants.factory;
 import com.ussr.pvz.model.entities.plants.PlantType;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.plants.plantfood.*;
+import com.ussr.pvz.model.entities.plants.plantfood.localattack.LocalAttack;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Arrays;
@@ -70,7 +71,7 @@ public final class PlantFoodEffectRegistry {
             return new SpawnClones(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
         });
 
-        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5, ((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register(PlantFoodType.LOCAL_AOE_ATTACK, data -> new LocalAttack(5.0, 0.5));
 
         register(PlantFoodType.GRANT_PERMANENT_ARMOR, data -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true));
 

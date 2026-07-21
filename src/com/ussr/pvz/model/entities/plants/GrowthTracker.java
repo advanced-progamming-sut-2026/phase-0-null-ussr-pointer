@@ -12,21 +12,41 @@ public class GrowthTracker {
         this.stages = stages;
     }
 
+    // Copy constructor to prevent state-sharing across cloned plant instances
+    public GrowthTracker(GrowthTracker other) {
+        this.stages = other.stages;
+        this.currentStage = 1;
+        this.ageInSeconds = 0.0;
+    }
+
     public boolean hasStages() {
         return stages != null && !stages.isEmpty();
     }
 
-    public void update(double deltaTimeSeconds) {
-        if (!hasStages()) return;
-        ageInSeconds += deltaTimeSeconds;
-        for (Map<String, Object> stageData : stages) {
-            int stage = ((Number) stageData.get("stage")).intValue();
-            double targetTime = ((Number) stageData.get("time")).doubleValue();
+    /**
+     * Updates growth time.
+     * @return true if the plant progressed to a new stage during this tick.
+     */
+    public boolean update(double deltaTimeSeconds) {
+        if (!hasStages()) return false;
 
-            if (ageInSeconds >= targetTime && stage > currentStage) {
-                currentStage = stage;
+        ageInSeconds += deltaTimeSeconds;
+        int previousStage = currentStage;
+
+        for (Map<String, Object> stageData : stages) {
+            if (stageData.get("stage") instanceof Number stageNum &&
+                    stageData.get("time") instanceof Number timeNum) {
+
+                int stage = stageNum.intValue();
+                double targetTime = timeNum.doubleValue();
+
+                if (ageInSeconds >= targetTime && stage > currentStage) {
+                    currentStage = stage;
+                }
             }
         }
+
+        return currentStage > previousStage;
     }
 
     public void skipToMaxStage() {
@@ -36,15 +56,14 @@ public class GrowthTracker {
         double maxTime = ageInSeconds;
 
         for (Map<String, Object> stageData : stages) {
-            // Safe casting using Number
-            int stage = ((Number) stageData.get("stage")).intValue();
-            double targetTime = ((Number) stageData.get("time")).doubleValue();
+            if (stageData.get("stage") instanceof Number stageNum &&
+                    stageData.get("time") instanceof Number timeNum) {
 
-            if (stage > maxStage) {
-                maxStage = stage;
-            }
-            if (targetTime > maxTime) {
-                maxTime = targetTime;
+                int stage = stageNum.intValue();
+                double targetTime = timeNum.doubleValue();
+
+                if (stage > maxStage) maxStage = stage;
+                if (targetTime > maxTime) maxTime = targetTime;
             }
         }
 
@@ -62,12 +81,12 @@ public class GrowthTracker {
 
     public Double getStageValue(String key) {
         if (!hasStages()) return null;
+
         for (Map<String, Object> stageData : stages) {
-            // Safe casting using Number
-            int stage = ((Number) stageData.get("stage")).intValue();
-            if (stage == currentStage && stageData.containsKey(key)) {
-                // Return as double, safely parsing from Number
-                return ((Number) stageData.get(key)).doubleValue();
+            if (stageData.get("stage") instanceof Number stageNum && stageNum.intValue() == currentStage) {
+                if (stageData.get(key) instanceof Number valNum) {
+                    return valNum.doubleValue();
+                }
             }
         }
         return null;
