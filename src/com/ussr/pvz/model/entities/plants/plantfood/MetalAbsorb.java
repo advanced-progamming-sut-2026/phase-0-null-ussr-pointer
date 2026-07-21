@@ -8,22 +8,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MetalAbsorb implements PlantFoodEffect{
+public class MetalAbsorb implements PlantFoodEffect {
     private final int maxTargets;
 
     public MetalAbsorb(int maxTargets) {
         this.maxTargets = maxTargets;
     }
+
+    public MetalAbsorb() {
+        this(15);
+    }
+
+    @Override
     public void triggerSuperpower(Plant user, GameSession session) {
-        if (session.getZombies() == null || session.getZombies().isEmpty()) return;
+        if (user == null || session == null || session.getZombies() == null || session.getZombies().isEmpty()) return;
 
         List<Zombie> metallicZombies = new ArrayList<>();
 
-
         for (Zombie zombie : session.getZombies()) {
             if (zombie != null && zombie.isAlive() && zombie.getArmor() != null) {
-
-                if (zombie.getArmor().getArmorType().isMetal()) {
+                // Safeguard against unassigned armor types
+                if (zombie.getArmor().getArmorType() != null && zombie.getArmor().getArmorType().isMetal()) {
                     metallicZombies.add(zombie);
                 }
             }
@@ -36,18 +41,17 @@ public class MetalAbsorb implements PlantFoodEffect{
 
         for (int i = 0; i < targetsToStrip; i++) {
             Zombie target = metallicZombies.get(i);
-
             target.setArmor(null);
         }
     }
 
     @Override
     public void applyStatusModifiers(Plant user) {
-        //empty
+        // Instant trigger; no permanent stat modifiers
     }
 
     @Override
     public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
-        //empty
+        // Instant trigger; no duration ticking needed
     }
 }

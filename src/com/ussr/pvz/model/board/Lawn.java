@@ -32,8 +32,8 @@ public class Lawn {
     }
 
     public Tile getTile(int row , int col) {
-        if(row < 1 || row > 5 || col < 1 || col > 9) return  null;
-        return rows.get(row-1).getCell(col - 1).getTile();
+        if(row < 0 || row > 4 || col < 0 || col > 8) return  null;
+        return rows.get(row).getCell(col).getTile();
     }
 
     public int getRows() { return numRows; }

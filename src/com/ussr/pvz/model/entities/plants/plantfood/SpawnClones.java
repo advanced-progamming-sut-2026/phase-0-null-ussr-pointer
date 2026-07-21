@@ -1,17 +1,31 @@
 package com.ussr.pvz.model.entities.plants.plantfood;
 
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
+import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.util.Vec2;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SpawnClones implements PlantFoodEffect {
     private final int cloneCount;
-    private static final Random RAND = new Random();
+    private final boolean waterOnly;
+
+    public SpawnClones(int cloneCount, boolean waterOnly) {
+        this.cloneCount = cloneCount;
+        this.waterOnly = waterOnly;
+    }
 
     public SpawnClones(int cloneCount) {
-        this.cloneCount = cloneCount;
+        this(cloneCount, false);
+    }
+
+    public static SpawnClones forLilyPad(int cloneCount) {
+        return new SpawnClones(cloneCount, true);
     }
 
     @Override
@@ -20,38 +34,21 @@ public class SpawnClones implements PlantFoodEffect {
 
         armPlant(user);
 
-        int clonesSpawned = 0;
-        int maxAttempts = 50;
+        List<Vec2> validPositions = getValidSpawnPositions(user, session);
+        if (validPositions.isEmpty()) return;
 
-        // 2. Find random empty cells and spawn armed clones
-        while (clonesSpawned < this.cloneCount && maxAttempts > 0) {
-            maxAttempts--;
+        Collections.shuffle(validPositions);
 
-            int randomX = RAND.nextInt(9);
-            int randomY = RAND.nextInt(5);
+        int spawned = 0;
+        for (Vec2 pos : validPositions) {
+            if (spawned >= this.cloneCount) break;
 
-            boolean cellOccupied = false;
-            if (session.getPlants() != null) {
-                for (Plant p : session.getPlants()) {
-                    if (p != null && p.isAlive()) {
-                        Plant.Location loc = p.getLocation();
-                        if (loc != null && loc.x() == randomX && loc.y() == randomY) {
-                            cellOccupied = true;
-                            break;
-                        }
-                    }
-                }
-            }
+            Plant clone = PlantFactory.createPlant(user.getId() , user.getLevel());
+            clone.setPosition(pos);
+            armPlant(clone);
 
-            if (!cellOccupied) {
-                Plant clone = new Plant(user);
-                clone.setPosition(Vec2.of(randomX, randomY));
-
-                armPlant(clone);
-
-                session.getPlants().add(clone);
-                clonesSpawned++;
-            }
+            session.addPlant(clone);
+            spawned++;
         }
     }
 
@@ -65,10 +62,53 @@ public class SpawnClones implements PlantFoodEffect {
         // Instant superpower trigger; no continuous tick handling needed
     }
 
+    private List<Vec2> getValidSpawnPositions(Plant user, GameSession session) {
+        List<Vec2> validPositions = new ArrayList<>();
+
+        int minX = 0, maxX = 8;
+        int minY = 0, maxY = 4;
+
+        for (int y = minY; y <= maxY; y++) {
+            for (int x = minX; x <= maxX; x++) {
+                if (!isCellOccupied(session, x, y)) {
+                    if (this.waterOnly && !isWaterTile(session, x , y)) {
+                        continue;
+                    }
+                    validPositions.add(new Vec2(x, y));
+                }
+            }
+        }
+        return validPositions;
+    }
+
+    private boolean isWaterTile(GameSession session, int col , int lane) {
+        return session.getLawn().getTile(lane , col).getType() == TileType.Water;
+    }
+
+    private boolean isCellOccupied(GameSession session, int x, int y) {
+        if (session.getPlants() == null) return false;
+
+        for (Plant p : session.getPlants()) {
+            if (p != null && p.isAlive()) {
+                Plant.Location loc = p.getLocation();
+                if (loc != null && loc.x() - x < 0.2 && loc.y() - y < 0.2) {
+                    // For Lily Pad (waterOnly), a cell is occupied if another Lily Pad / Base plant is present
+                    if (this.waterOnly) {
+                        if (p.getTags().contains(Tag.WATER) || p.getName().equalsIgnoreCase("Lily Pad")) {
+                            return true;
+                        }
+                    } else {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private void armPlant(Plant plant) {
         plant.setState(Plant.PlantState.ACTIVE);
         plant.setInternalTimer(0.0);
-        //todo : if you got a crash first check next line (may be comment it)
-        plant.instantlyMature(); // Skips growth/arming timers if using GrowthTracker
+        plant.instantlyMature();
     }
 }

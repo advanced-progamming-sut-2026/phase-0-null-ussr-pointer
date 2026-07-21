@@ -81,7 +81,7 @@ public final class PlantFoodEffectRegistry {
             if ("Magnet-shroom".equals(data.get("name"))) {
                 return new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 0)).intValue());
             }
-            return new KnockBackBlast(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 2.0);
+            return new KnockBackBlast(3.0);
         });
 
         register(PlantFoodType.PULL_UNDERWATER, data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
