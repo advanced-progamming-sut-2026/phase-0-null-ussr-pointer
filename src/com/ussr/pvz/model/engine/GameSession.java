@@ -54,7 +54,7 @@ public class GameSession {
     private boolean wavesStarted;
     private Lawn lawn;
     private boolean gameOver = false;
-
+    private List<String> selectedPlants = new ArrayList<>();
     private final List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
@@ -765,5 +765,13 @@ public class GameSession {
     }
     public List<LawnMower> getLawnMowers() {
         return lawnMowers;
+    }
+
+    public List<String> getSelectedPlants() {
+        return selectedPlants;
+    }
+
+    public void setSelectedPlants(List<String> selectedPlants) {
+        this.selectedPlants = selectedPlants;
     }
 }

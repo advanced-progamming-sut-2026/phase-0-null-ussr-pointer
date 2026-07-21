@@ -1,10 +1,13 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
@@ -150,6 +153,9 @@ public class Plant extends GameEntity implements Damageable {
 //            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
         if (!isAlive) return;
 
+        if(this.actStrategy instanceof WallNutStrategy strategy)
+            strategy.onDamageAct(this , dealer);
+
         int remainingDamage = damage;
 
         if (this.armor != null && !this.armor.isDestroyed()) {
@@ -165,6 +171,10 @@ public class Plant extends GameEntity implements Damageable {
         if (remainingDamage > 0) {
             int newHp = getHp() - remainingDamage;
             if (newHp <= 0) {
+                if(name.equalsIgnoreCase("Hypno-shroom")) {
+                    if(dealer instanceof Zombie zombie)
+                        zombie.setStatus(Zombie.Status.HYPNOTIZED);
+                }
                 setHp(0);
                 isAlive = false;
             } else {

@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.board.structures;
 
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -27,15 +28,23 @@ public class OctopusWrap extends InteractableStructure implements Damageable {
 
     @Override
     public void onDestroy(GameSession session) {
-        // Free the plant when the octopus is destroyed
         if (boundPlant != null && boundPlant.isAlive()) {
             boundPlant.setState(Plant.PlantState.ACTIVE);
+
+            int targetRow = (int) this.getPosition().y();
+            int targetCol = (int) this.getPosition().x();
+
+            Cell targetCell = session.getLawn().getCell(targetRow, targetCol);
+
+            if (targetCell != null) {
+                targetCell.setPlant(boundPlant);
+            }
+            session.getPlants().add(boundPlant);
         }
     }
 
     @Override
     public void tick() {
-        // If the underlying plant dies (e.g., crushed by a Gargantuar), the wrap should also vanish
         if (boundPlant == null || !boundPlant.isAlive()) {
             this.setAlive(false);
         }

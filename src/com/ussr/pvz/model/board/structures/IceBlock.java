@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.board.structures;
 
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -12,8 +13,6 @@ public class IceBlock extends InteractableStructure implements Damageable {
         this.boundPlant = boundPlant;
         this.hp = initialHp;
         this.setAlive(true);
-        // Automatically disable the plant when applied
-        this.boundPlant.setState(Plant.PlantState.INCAPACITATED);
     }
 
     @Override
@@ -29,7 +28,17 @@ public class IceBlock extends InteractableStructure implements Damageable {
     public void onDestroy(GameSession session) {
         if (boundPlant != null && boundPlant.isAlive()) {
             boundPlant.setState(Plant.PlantState.ACTIVE);
-            boundPlant.setChillLevel(0); // Reset chill level
+            boundPlant.setChillLevel(0);
+
+            int col = (int) this.getPosition().x();
+            int row = (int) this.getPosition().y();
+            Cell cell = session.getLawn().getCell(row, col);
+
+            if (cell != null) {
+                cell.setPlant(boundPlant);
+            }
+
+            session.getPlants().add(boundPlant);
         }
     }
 

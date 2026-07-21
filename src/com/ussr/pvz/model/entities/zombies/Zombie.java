@@ -15,6 +15,7 @@ import com.ussr.pvz.model.entities.zombies.attack.AttackBehavior;
 import com.ussr.pvz.model.entities.zombies.defense.DefenseBehavior;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
+import com.ussr.pvz.model.entities.zombies.move.JumpMove;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
@@ -56,7 +57,6 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive || this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
 
         if (isPoisonous) {
-            // Poison bypasses armor and defense calculations directly
             this.hp -= damage;
 
             if (this.hp <= 0) {
@@ -66,7 +66,6 @@ public class Zombie extends GameEntity implements Damageable {
 
                 GameSession session = App.getGameSession();
 
-                // Handle plant food drops on death
                 if (isGlowing) {
                     com.ussr.pvz.model.entities.items.PlantFoodDrop plantFoodDrop =
                             new com.ussr.pvz.model.entities.items.PlantFoodDrop(1);
@@ -81,7 +80,6 @@ public class Zombie extends GameEntity implements Damageable {
                 }
             }
         } else {
-            // Route standard damage back to the main pipeline
             takeDamage(damage, null);
         }
     }
@@ -127,9 +125,10 @@ public class Zombie extends GameEntity implements Damageable {
             }
         }
 
-        // One single source of truth for targeting!
         Damageable target = acquireTarget(session);
-
+        if(moveBehavior instanceof JumpMove) {
+            moveBehavior.move(this, session);
+        }
         if (target != null && target.isAlive()) {
             state = ZombieActivity.EATING;
             if (attackBehavior != null) {
@@ -198,25 +197,7 @@ public class Zombie extends GameEntity implements Damageable {
         if (!isAlive || this.vulnerabilityState == Vulnerability.INVULNERABLE) return;
 
         if (this.vulnerabilityState == Vulnerability.SUBMERGED) {
-            boolean allowDamage = false;
-
-            if (damageSource instanceof com.ussr.pvz.model.entities.plants.Plant plant) {
-                String plantName = plant.getName().toLowerCase().replace("-", "").replace(" ", "");
-
-                // Check standard submerged damage whitelist (e.g. Tangle Kelp, Ghost Pepper)
-                if (damageWhileSubmerged != null && damageWhileSubmerged.contains(plantName)) {
-                    allowDamage = true;
-                }
-                // Check if the plant is currently using Plant Food and matches the secondary whitelist
-                else if (plant.getPlantFoodTimer() > 0 && damageWhileSubmergedPlantfoodOnly != null && damageWhileSubmergedPlantfoodOnly.contains(plantName)) {
-                    allowDamage = true;
-                }
-            } else if (damageSource instanceof Projectile p) {
-                // As a fallback for projectiles without an explicit Plant origin, Lobbed (ArcMove) shots always hit
-                if (p.getMoveStrategy() instanceof ArcMove) {
-                    allowDamage = true;
-                }
-            }
+            boolean allowDamage = isAllowDamage(damageSource);
 
             if (!allowDamage) return;
         }
@@ -229,6 +210,25 @@ public class Zombie extends GameEntity implements Damageable {
         if (actualDamage > 0) {
             applyDamageCalculations(actualDamage, damageSource);
         }
+    }
+
+    private boolean isAllowDamage(Object damageSource) {
+        boolean allowDamage = false;
+
+        if (damageSource instanceof Plant plant) {
+            String plantName = plant.getName().toLowerCase().replace("-", "").replace(" ", "");
+
+            if (damageWhileSubmerged != null && damageWhileSubmerged.contains(plantName)) {
+                allowDamage = true;
+            } else if (plant.getPlantFoodTimer() > 0 && damageWhileSubmergedPlantfoodOnly != null && damageWhileSubmergedPlantfoodOnly.contains(plantName)) {
+                allowDamage = true;
+            }
+        } else if (damageSource instanceof Projectile p) {
+            if (p.getMoveStrategy() instanceof ArcMove) {
+                allowDamage = true;
+            }
+        }
+        return allowDamage;
     }
 
     private void applyDamageCalculations(int damage, Object damageSource) {
