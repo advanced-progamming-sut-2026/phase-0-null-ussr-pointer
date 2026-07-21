@@ -1,12 +1,18 @@
 package com.ussr.pvz.model.level.behavior;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.NewsObserver;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.ai.ZombieAIManager;
+import com.ussr.pvz.service.SaveService;
+
+import java.util.List;
 
 public abstract class LevelBehavior {
 
@@ -39,6 +45,27 @@ public abstract class LevelBehavior {
         if (this.levelCompleted) return;
         this.levelCompleted = true;
 
+        Account account = App.getAccount();
+        if (account != null && level != null && level.getId() != null) {
+            // Check if the level has NOT been completed before
+            boolean isFirstTimeClear = !account.getAdventureProgress().isLevelCompleted(level.getId());
+
+            if (isFirstTimeClear) {
+                // 1. Record completed level ID
+                account.getAdventureProgress().addCompletedLevel(level.getId());
+
+                // 2. Trigger news item ONLY on first-time completion
+                NewsObserver.triggerNewLevel(level);
+
+                // 3. Save updated accounts state to disk
+                List<AccountState> updatedStates = App.getAccounts().stream()
+                        .map(Account::toState)
+                        .toList();
+                SaveService.saveAccounts(updatedStates);
+            }
+        }
+
+        // 4. Dispatch game completion events to event bus
         GameSession session = App.getGameSession();
         if (session != null) {
             session.getEventBus().publish(new GameEvent.WavesCompleted());

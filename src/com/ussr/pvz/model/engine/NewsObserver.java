@@ -27,8 +27,8 @@ public class NewsObserver {
 
     public static void triggerNewLevel(Level level) {
         int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
-        NewsItem newsItem = new NewsItem("New Level unlocked",
-                level.getId()+" unlocked for you",currentTimestamp);
+        NewsItem newsItem = new NewsItem("New Level passed",
+                level.getId()+" passed ",currentTimestamp);
         App.getAccount().getPersonalNews().add(newsItem);
     }
     //todo use this somewhere and check the above usages and fix them if needed

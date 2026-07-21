@@ -156,8 +156,6 @@ public class LevelManager {
         fresh.setDeliveryStrategy(buildDeliveryStrategy(data.deliveryStrategy,fresh));
 
         currentLevel = fresh;
-
-        NewsObserver.triggerNewLevel(currentLevel);
     }
 
     public boolean hasNextLevel() {
