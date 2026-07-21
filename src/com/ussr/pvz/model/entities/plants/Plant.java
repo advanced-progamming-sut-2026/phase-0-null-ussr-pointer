@@ -8,6 +8,7 @@ import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -104,6 +105,11 @@ public class Plant extends GameEntity implements Damageable {
         //this.isBuffed = blueprint.isBuffed;
         //this.internalTimer = blueprint.internalTimer;
         this.growthTracker = blueprint.growthTracker;
+        if (this.actStrategy instanceof MeleeStrategy) {
+            this.internalTimer = this.actionInterval;
+        } else {
+            this.internalTimer = 0.0;
+        }
     }
 
     @Override

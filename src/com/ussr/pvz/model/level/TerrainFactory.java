@@ -6,6 +6,7 @@ import com.ussr.pvz.model.board.Row;
 import com.ussr.pvz.model.board.structures.Grave;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Random;
 
@@ -50,7 +51,9 @@ public final class TerrainFactory {
             int r = RAND.nextInt(rows);
             int c = RAND.nextInt(cols);
             lawn.getCell(r, c).setTile(new Tile(TileType.Grave));
-            lawn.getCell(r, c).setStructure(new Grave());
+            Grave grave = new Grave();
+            grave.setPosition(Vec2.of(c, r));
+            lawn.getCell(r, c).setStructure(grave);
         }
     }
 

@@ -90,6 +90,7 @@ public class ShootStrategy implements ActStrategy {
             for (InteractableStructure structure : session.getLawn().getAllInteractable()) {
                 if (structure == null || !structure.isAlive() || structure.getPosition() == null) continue;
                 Vec2 sp = structure.getPosition();
+                if (sp == null) continue;
 
                 double relX = sp.x() - origin.x();
                 double relY = sp.y() - origin.y();
