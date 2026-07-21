@@ -1687,7 +1687,7 @@
     "actionInterval": 0.0,
     "recharge": 15.0,
     "abilityType": "PASSIVE_SHIELD",
-    "abilityValue": 20.0,
+    "abilityValue": 1.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 3000.0,
     "upgrades": [
@@ -1724,7 +1724,7 @@
     "actionInterval": 5.0,
     "recharge": 20.0,
     "abilityType": "PASSIVE_SHIELD",
-    "abilityValue": 0.0,
+    "abilityValue": 2.0,
     "plantFoodType": "KNOCKBACK_BLAST",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -1761,7 +1761,7 @@
     "actionInterval": 0.0,
     "recharge": 20.0,
     "abilityType": "PASSIVE_SHIELD",
-    "abilityValue": 0.0,
+    "abilityValue": 3.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 3000.0,
     "upgrades": [
@@ -1798,7 +1798,7 @@
     "actionInterval": 0.0,
     "recharge": 20.0,
     "abilityType": "PASSIVE_SHIELD",
-    "abilityValue": 1800.0,
+    "abilityValue": 4.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 4000.0,
     "upgrades": [
