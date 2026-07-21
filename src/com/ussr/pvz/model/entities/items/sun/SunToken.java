@@ -56,7 +56,7 @@ public class SunToken extends GroundItem {
 
     @Override
     public void applyRewards(GameSession session, Account account) {
-        if (dropType != SunDropType.SPECIAL) {
+        if (dropType != SunDropType.RADIOACTIVE) {
             session.addSun(dropType.getValue());
             App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(), App.getGameSession().getSunCount()));
         } else {
