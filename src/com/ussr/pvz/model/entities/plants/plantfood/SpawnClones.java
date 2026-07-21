@@ -13,34 +13,42 @@ public class SpawnClones implements PlantFoodEffect {
     public SpawnClones(int cloneCount) {
         this.cloneCount = cloneCount;
     }
+
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
-        user.setState(Plant.PlantState.ACTIVE);
+        if (user == null || session == null) return;
+
+        armPlant(user);
 
         int clonesSpawned = 0;
         int maxAttempts = 50;
 
+        // 2. Find random empty cells and spawn armed clones
         while (clonesSpawned < this.cloneCount && maxAttempts > 0) {
             maxAttempts--;
 
-            int randomX = RAND.nextInt(9) + 1;
-            int randomY = RAND.nextInt(5) + 1;
+            int randomX = RAND.nextInt(9);
+            int randomY = RAND.nextInt(5);
 
             boolean cellOccupied = false;
             if (session.getPlants() != null) {
                 for (Plant p : session.getPlants()) {
-                    if (p.isAlive() && (int) p.getPosition().x() == randomX && (int) p.getPosition().y() == randomY) {
-                        cellOccupied = true;
-                        break;
+                    if (p != null && p.isAlive()) {
+                        Plant.Location loc = p.getLocation();
+                        if (loc != null && loc.x() == randomX && loc.y() == randomY) {
+                            cellOccupied = true;
+                            break;
+                        }
                     }
                 }
             }
 
             if (!cellOccupied) {
                 Plant clone = new Plant(user);
-                clone.setPosition(new Vec2(randomX, randomY));
+                clone.setPosition(Vec2.of(randomX, randomY));
 
-                clone.setState(Plant.PlantState.ACTIVE);
+                armPlant(clone);
+
                 session.getPlants().add(clone);
                 clonesSpawned++;
             }
@@ -49,11 +57,18 @@ public class SpawnClones implements PlantFoodEffect {
 
     @Override
     public void applyStatusModifiers(Plant user) {
-
+        // Instant superpower trigger; no continuous stat modifiers
     }
 
     @Override
     public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
+        // Instant superpower trigger; no continuous tick handling needed
+    }
 
+    private void armPlant(Plant plant) {
+        plant.setState(Plant.PlantState.ACTIVE);
+        plant.setInternalTimer(0.0);
+        //todo : if you got a crash first check next line (may be comment it)
+        plant.instantlyMature(); // Skips growth/arming timers if using GrowthTracker
     }
 }

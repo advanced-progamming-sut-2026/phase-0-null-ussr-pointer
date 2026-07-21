@@ -928,8 +928,8 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 200.0,
+    "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -963,8 +963,8 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "MAP_WIDE_FREEZE",
-    "plantFoodValue": 4.0,
+    "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -1000,8 +1000,8 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 400.0,
+    "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -1038,8 +1038,8 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 400.0,
+    "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -1076,8 +1076,8 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodValue": 250.0,
+    "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,
@@ -1224,7 +1224,7 @@
     "recharge": 20.0,
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 5.0,
-    "plantFoodType": "LOCAL_AOE_ATTACK",
+    "plantFoodType": "INSTANT_KILL",
     "plantFoodValue": 2.0,
     "upgrades": [
       {
@@ -1372,7 +1372,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 1.0,
     "plantFoodType": "PULL_UNDERWATER",
-    "plantFoodValue": 4.0,
+    "plantFoodValue": 3.0,
     "upgrades": [
       {
         "level": 2,
@@ -1410,7 +1410,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 1.0,
     "plantFoodType": "MAP_WIDE_FREEZE",
-    "plantFoodValue": 10.0,
+    "plantFoodValue": 0.0,
     "upgrades": [
       {
         "level": 2,

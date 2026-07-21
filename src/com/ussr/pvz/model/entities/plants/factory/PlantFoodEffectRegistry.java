@@ -26,7 +26,7 @@ public final class PlantFoodEffectRegistry {
             String name = (String) data.get("name");
 
             if (category == PlantType.LOBBER) {
-                return new LobberBarrage((int) pfValue, 1.0, -1);
+                return new LobberBarrage();
             }
 
             switch (name) {
@@ -90,7 +90,7 @@ public final class PlantFoodEffectRegistry {
 
         register(PlantFoodType.INSTANT_KILL, data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
 
-        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 1.0, -1));
+        register(PlantFoodType.LOBBER_BARRAGE, data -> new LobberBarrage());
     }
 
     private PlantFoodEffectRegistry() {}

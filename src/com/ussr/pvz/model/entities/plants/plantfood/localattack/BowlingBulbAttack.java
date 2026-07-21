@@ -4,6 +4,8 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
+import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
+import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -21,22 +23,22 @@ public class BowlingBulbAttack extends LocalAttack {
                 new Vec2(4 , 0),
                 null,
                 damage * 10,
-                new StraightMove(),
-                new NormalHit(1)));
+                new BounceMove(),
+                new PierceHit(Integer.MAX_VALUE)));
 
         session.getProjectiles().add(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 15,
-                new StraightMove(),
-                new NormalHit(1)));
+                new BounceMove(),
+                new PierceHit(Integer.MAX_VALUE)));
 
         session.getProjectiles().add(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 20,
-                new StraightMove(),
-                new NormalHit(1)));
+                new BounceMove(),
+                new PierceHit(Integer.MAX_VALUE)));
 
     }
 }
