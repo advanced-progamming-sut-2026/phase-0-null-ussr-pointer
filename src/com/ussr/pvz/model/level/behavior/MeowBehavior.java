@@ -10,7 +10,7 @@ import java.util.Map;
 public class MeowBehavior extends LevelBehavior {
     private int currentScore = 0;
 
-    private double lastKillTime = 0;
+    private double lastKillTime = -1.0;
     private int simultaneousKillCount = 0;
     private final Map<String, Double> zombieSpawnTimes = new HashMap<>();
 
@@ -29,17 +29,24 @@ public class MeowBehavior extends LevelBehavior {
     }
 
     private void onZombieSpawned(GameEvent.ZombieSpawned event) {
-        zombieSpawnTimes.put(event.alias(), App.getGameSession().getElapsedSeconds());
+        GameSession session = App.getGameSession();
+        if (session != null) {
+            zombieSpawnTimes.put(event.alias(), session.getElapsedSeconds());
+        }
     }
 
     private void onZombieDied(GameEvent.ZombieDied event) {
         GameSession session = App.getGameSession();
         if (session == null) return;
 
+        if ("LawnMower".equalsIgnoreCase(event.killerPlantName())) {
+            return;
+        }
+
         double currentTime = session.getElapsedSeconds();
         int pointsEarned = 10;
 
-        if (currentTime == lastKillTime) {
+        if (Math.abs(currentTime - lastKillTime) < 0.05) {
             simultaneousKillCount++;
             pointsEarned += (15 * simultaneousKillCount);
         } else {
@@ -55,28 +62,42 @@ public class MeowBehavior extends LevelBehavior {
             pointsEarned += 25;
         }
 
-        if ("LawnMower".equals(event.killerPlantName())) {
-            pointsEarned = 0;
-        }
-
-        if (event.alias().toLowerCase().contains("gargantuar")) {
+        if (event.alias().toLowerCase().contains("gargantuar") || event.alias().toLowerCase().contains("boss")) {
             pointsEarned += 500;
         }
 
         currentScore += pointsEarned;
         lastKillTime = currentTime;
         zombieSpawnTimes.remove(event.alias());
+
+        syncScoreToProfile();
+    }
+
+    @Override
+    public void tick(GameSession session, double deltaTime) {
+        super.tick(session, deltaTime);
+        if (session.isGameOver()) {
+            syncScoreToProfile();
+        }
     }
 
     @Override
     public void onComplete(Level level) {
         super.onComplete(level);
-        if (App.getAccount() != null) {
+        syncScoreToProfile();
+    }
+
+    private void syncScoreToProfile() {
+        if (App.getAccount() != null && App.getAccount().getScoreRecord() != null) {
             int previousHigh = App.getAccount().getScoreRecord().getScore();
             if (currentScore > previousHigh) {
                 App.getAccount().getScoreRecord().setScore(currentScore);
             }
         }
+    }
+
+    public int getCurrentScore() {
+        return currentScore;
     }
 
     @Override

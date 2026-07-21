@@ -1668,6 +1668,121 @@
           ]
         }
       ]
+    },
+    {
+      "id": "meow_chapter",
+      "name": "Meow Mode",
+      "gameMode": "MEOW",
+      "allowedPlants": [
+        "Sunflower",
+        "Twin Sunflower",
+        "Sun-shroom",
+        "Primal Sunflower",
+        "Gold Bloom",
+        "Peashooter",
+        "Repeater",
+        "Threepeater",
+        "Snow Pea",
+        "Rotobaga",
+        "Pea Pod",
+        "Split Pea",
+        "Citron",
+        "Caulipower",
+        "Electric Blueberry",
+        "Bowling Bulb",
+        "Cactus",
+        "Fire Peashooter",
+        "Starfruit",
+        "Goo Peashooter",
+        "Mega Gatling Pea",
+        "Sea-shroom",
+        "Puff-shroom",
+        "Fume-shroom",
+        "Cabbage-pult",
+        "Kernel-pult",
+        "Melon-pult",
+        "Winter Melon",
+        "Pepper-pult",
+        "Potato Mine",
+        "Primal Potato Mine",
+        "Cherry Bomb",
+        "Squash",
+        "Grapeshot",
+        "Jalapeno",
+        "Doom-shroom",
+        "Tangle Kelp",
+        "Iceberg Lettuce",
+        "Bonk Choy",
+        "Phat Beet",
+        "Chomper",
+        "Wasabi Whip",
+        "Kiwibeast",
+        "Wall-nut",
+        "Tall-nut",
+        "Endurian",
+        "Garlic",
+        "Sweet Potato",
+        "Explode-o-nut",
+        "Pumpkin",
+        "Sun Bean",
+        "Torchwood",
+        "Magnet-shroom",
+        "Hypno-shroom",
+        "Cat-tail",
+        "Imitater",
+        "Ice-shroom",
+        "Lily Pad",
+        "Hot Potato",
+        "Grave Buster",
+        "Enlighten-mint",
+        "Appease-mint",
+        "Arma-mint",
+        "Bombard-mint",
+        "Enforce-mint",
+        "Reinforce-mint",
+        "Enchant-mint",
+        "Pierce-mint",
+        "catTail-mint"
+      ],
+      "allowedTiles": [
+        "GRASS_TILE"
+      ],
+      "levels": [
+        {
+          "id": "meow_1",
+          "order": 1,
+          "deliveryStrategy": "regular",
+          "sunFalling": false,
+          "timeLimitSeconds": 0,
+          "deadlineColumn": -1,
+          "allowedPlantsLost": -1,
+          "environment": "DayEnvironment",
+          "behavior": "MeowBehavior",
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "startingSun": 800,
+          "allowedZombies": [
+            {
+              "id": "ZombieDefault",
+              "weight": 1000
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 500
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 300
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 50
+            }
+          ],
+          "waves": []
+        }
+      ]
     }
   ]
 }

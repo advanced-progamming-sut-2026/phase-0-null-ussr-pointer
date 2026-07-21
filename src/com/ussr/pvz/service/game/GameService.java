@@ -26,6 +26,25 @@ import com.ussr.pvz.model.quest.QuestType;
 
 public class GameService {
 
+    public String menuEnterMeow() {
+        if (App.getGameSession() != null && !App.getGameSession().isGameOver()) {
+            return "Cannot enter Meow mode mid-game. Quit or finish the current game first.";
+        }
+
+        if (App.getLevelManager().findChapter("meow_chapter") == null) {
+            return "Meow mode configuration not found.";
+        }
+
+        try {
+            App.getLevelManager().startChapter("meow_chapter");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return "Could not enter Meow mode: " + e.getMessage();
+        }
+
+        App.setMenuState(MenuState.LEVEL_SELECTION);
+        return "Entered Meow Mode chapter. Type 'show levels' to see available score challenges.";
+    }
+
     public String menuEnterChapter(MenuEnterChapterRequest request) {
         //TODO : in plant plant method some plants like grave buster should can be planted on graves fix it
         String chapterId = request.chapterName();

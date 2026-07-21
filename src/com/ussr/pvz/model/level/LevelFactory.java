@@ -21,6 +21,7 @@ public class LevelFactory {
         BEHAVIOR_REGISTRY.put("ZombotanyBehavior", ZombotanyBehavior::new);
         BEHAVIOR_REGISTRY.put("NormalBehavior", NormalBehavior::new);
         BEHAVIOR_REGISTRY.put("VaseBreakerBehavior", VaseBreakerBehavior::new);
+        BEHAVIOR_REGISTRY.put("MeowBehavior", MeowBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {

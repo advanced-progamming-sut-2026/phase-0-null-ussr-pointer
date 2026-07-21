@@ -18,7 +18,6 @@ import java.util.regex.Matcher;
 public class GameController {
     private final GameService gameService = new GameService();
 
-    // === MINIGAME SERVICES ===
     private final BeghouledService beghouledService = new BeghouledService();
     private final VaseBreakerService vaseBreakerService = new VaseBreakerService();
     private final WallnutBowlingService bowlingService = new WallnutBowlingService();
@@ -42,6 +41,7 @@ public class GameController {
     private String routeMenuAndInformationCommands(GameCommand cmd, Matcher matcher) {
         return switch (cmd) {
             case MENU_ENTER_CHAPTER -> handleMenuEnterChapter(matcher);
+            case MENU_ENTER_MEOW -> handleMenuEnterMeow();
             case MENU_GREENHOUSE -> handleMenuGreenhouse();
             case MENU_TRAVEL_LOG -> handleMenuTravelLog();
             case MENU_LEADERBOARD -> handleMenuLeaderboard();
@@ -88,7 +88,9 @@ public class GameController {
         };
     }
 
-    // === MINIGAME HANDLERS ===
+    private String handleMenuEnterMeow() {
+        return gameService.menuEnterMeow();
+    }
 
     private String handleSwapPlants(Matcher matcher) {
         try {
