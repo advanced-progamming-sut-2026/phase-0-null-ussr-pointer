@@ -1,5 +1,6 @@
 package com.ussr.pvz.service;
 
+import com.ussr.pvz.controller.command.GlobalCommand;
 import com.ussr.pvz.controller.command.LoginCommand;
 import com.ussr.pvz.controller.command.RegisterCommand;
 import com.ussr.pvz.controller.command.maincommand.*;
@@ -143,7 +144,7 @@ public class GlobalService {
         MenuState current = App.getMenuState();
         StringBuilder sb = new StringBuilder();
         sb.append("--- Global Commands ---\n");
-        for (com.ussr.pvz.controller.command.GlobalCommand cmd : com.ussr.pvz.controller.command.GlobalCommand.values()) {
+        for (GlobalCommand cmd : GlobalCommand.values()) {
             sb.append("- ").append(cmd.name().replace('_', ' ').toLowerCase()).append("\n");
         }
 

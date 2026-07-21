@@ -22,7 +22,7 @@ public class TravelLogController {
                 return switch (cmd) {
                     case PAGE -> handlePage(matcher);
                     case PLAY_MINIGAME -> handlePlayMinigame(matcher); // Route it
-                    case SHOW_MINI_GAMES_REGEX -> handleShowMinigames();
+                    case SHOW_MINI_GAMES -> handleShowMinigames();
                 };
             }
         }

@@ -81,7 +81,7 @@ public class ShopService {
         ShopItem item = App.getShopManager().getShopItems().stream()
                 .filter(i -> i.getId().equals(request.itemId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Error: Invalid Item ID!"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Item ID!"));
 
         String validationError = validatePurchaseConditions(item, count, request.plantType());
         if (validationError != null) return validationError;

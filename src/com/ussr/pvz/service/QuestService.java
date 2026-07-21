@@ -13,7 +13,7 @@ public class QuestService {
 
     public String getPage(String pageName) {
         if (App.getAccount() == null) {
-            return "Error: No active account logged in.";
+            return "No active account logged in.";
         }
 
         QuestManager qm = App.getAccount().getQuestManager();
@@ -22,7 +22,7 @@ public class QuestService {
         try {
             requestedType = QuestType.fromString(pageName.toLowerCase());
         } catch (IllegalArgumentException e) {
-            return "Error: Invalid travel log page. Available pages: daily, challenge, epic.";
+            return "Invalid travel log page. Available pages: daily, challenge, epic.";
         }
 
         List<ConfigurableQuest> activeQuests = qm.getByType(requestedType);

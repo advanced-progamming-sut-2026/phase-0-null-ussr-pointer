@@ -153,15 +153,15 @@ public class CollectionService {
         String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
         int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
-        if (currentLevel == 0) return "Error: You do not own this plant yet.";
-        if (currentLevel >= 4) return "Error: Plant is already at max level.";
+        if (currentLevel == 0) return "You do not own this plant yet.";
+        if (currentLevel >= 4) return "Plant is already at max level.";
 
         int coinCost = currentLevel * 1000;
         int packetCost = currentLevel * 10;
 
-        if (progress.getCoin() < coinCost) return "Error: Not enough coins. Need " + coinCost;
+        if (progress.getCoin() < coinCost) return "Not enough coins. Need " + coinCost;
         int currentPackets = progress.getSeedPackets().getOrDefault(canonicalName, 0);
-        if (currentPackets < packetCost) return "Error: Not enough seed packets. Need " + packetCost;
+        if (currentPackets < packetCost) return "Not enough seed packets. Need " + packetCost;
 
         progress.addCoin(-coinCost);
         progress.getSeedPackets().put(canonicalName, currentPackets - packetCost);
@@ -178,8 +178,8 @@ public class CollectionService {
         String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
         int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
-        if (currentLevel > 0) return "Error: You already own this plant.";
-        if (progress.getCoin() < 2000) return "Error: Not enough coins to purchase. Cost is 2,000 coins.";
+        if (currentLevel > 0) return "You already own this plant.";
+        if (progress.getCoin() < 2000) return "Not enough coins to purchase. Cost is 2,000 coins.";
 
         progress.addCoin(-2000);
 
