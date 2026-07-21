@@ -11,22 +11,23 @@ public class SpawnSun implements PlantFoodEffect {
         this.sunAmount = sunAmount;
         this.instantMaxGrowth = instantMaxGrowth;
     }
+
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
-        if (this.sunAmount > 0) {
+        if (this.sunAmount > 0 && session != null) {
             session.addSun(this.sunAmount);
         }
     }
 
     @Override
     public void applyStatusModifiers(Plant user) {
-        if (this.instantMaxGrowth) {
+        if (this.instantMaxGrowth && user != null) {
             user.instantlyMature();
         }
     }
 
     @Override
     public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
-
+        // Instant superpower effect; no duration or per-tick logic required.
     }
 }
