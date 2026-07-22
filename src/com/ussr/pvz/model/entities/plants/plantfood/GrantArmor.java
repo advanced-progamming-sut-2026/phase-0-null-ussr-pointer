@@ -45,6 +45,7 @@ public class GrantArmor implements PlantFoodEffect {
     }
 
     public static GrantArmor forExplodeONut() {
+        System.out.println("explode");
         return new GrantArmor(4000, 0, true, false, false, true);
     }
 
@@ -66,12 +67,12 @@ public class GrantArmor implements PlantFoodEffect {
 
         applyStatusModifiers(user);
 
-        int currentLane = user.getLocation() != null ? user.getLocation().y() : (int) user.getPosition().y();
+        int currentLane = (int) user.getPosition().y();
 
         // 3. Garlic effect: Disperse zombies in the same lane to upper/lower lanes
         if (this.disperseZombies && session.getZombies() != null) {
             for (Zombie zombie : session.getZombies()) {
-                if (zombie != null && zombie.isAlive() && (int) zombie.getPosition().y() == currentLane) {
+                if (zombie != null && zombie.isAlive() && (int) zombie.getPosition().y() - currentLane < 0.5) {
                     int alternateLane = currentLane + (Math.random() > 0.5 ? 1 : -1);
                     if (alternateLane < 1) alternateLane = 2;
                     if (alternateLane > 5) alternateLane = 4;

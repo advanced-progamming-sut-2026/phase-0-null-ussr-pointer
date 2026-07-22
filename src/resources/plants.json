@@ -1750,7 +1750,7 @@
     "recharge": 20.0,
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 2.0,
-    "plantFoodType": "KNOCKBACK_BLAST",
+    "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 0.0,
     "upgrades": [
       {
