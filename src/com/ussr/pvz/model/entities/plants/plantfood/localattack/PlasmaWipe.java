@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.entities.plants.plantfood.localattack;
 
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -16,6 +17,7 @@ public class PlasmaWipe extends LocalAttack implements PlantFoodEffect {
 
         for (Zombie z : session.getZombies()) {
             z.setAlive(false);
+            session.getEventBus().publish(new GameEvent.ZombieDied(z.getAlias() , z.getPosition().x() , z.getPosition().y() , user.getName()));
         }
     }
 }

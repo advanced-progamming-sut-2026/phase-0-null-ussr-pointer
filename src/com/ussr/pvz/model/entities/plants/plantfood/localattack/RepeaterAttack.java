@@ -21,7 +21,7 @@ public class RepeaterAttack extends LocalAttack implements PlantFoodEffect{
         if (user == null || session == null) return;
 
         int giantPeaDamage = user.getDamage() * 20;
-        session.getProjectiles().add(new Projectile(user.getPosition(),
+        session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 giantPeaDamage,

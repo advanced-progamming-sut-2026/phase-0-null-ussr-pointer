@@ -50,7 +50,7 @@ public final class PlantFoodEffectRegistry {
             return new PlasmaWipe(duration, strikeRate);
         });
 
-        register("BOWLING_BULB_ATTACK", data -> new BowlingBulbAttack(10, 15, 20));
+        register("BOWLING_BULB_ATTACK", data -> new BowlingBulbAttack());
 
         register("GLOBAL_SHROOM_ATTACK", data -> {
             double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();

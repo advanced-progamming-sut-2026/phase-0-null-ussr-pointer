@@ -251,7 +251,7 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 2.0,
-    "plantFoodType": "PROJECTILE_BURST",
+    "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
     "upgrades": [
@@ -328,7 +328,7 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "SNOW_PEA_ATTACK ",
+    "plantFoodType": "SNOW_PEA_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
     "upgrades": [
