@@ -232,8 +232,10 @@ public class GameService {
             Plant blueprint;
             try {
                 blueprint = requireUnlockedPlant(request.type());
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 return "Invalid or unknown plant type: " + request.type();
+            } catch (IllegalStateException e) {
+                return e.getMessage();
             }
 
             if (blueprint == null) {
@@ -383,6 +385,16 @@ public class GameService {
         Integer level = progressMap.get(plantKey);
         if (level == null || level == 0) {
             throw new IllegalStateException("You haven't unlocked " + requestedType);
+        }
+
+        GameSession session = App.getGameSession();
+        if (session != null && session.getSelectedPlants() != null && !session.getSelectedPlants().isEmpty()) {
+            String canonical = ChoosePlantService.normalizePlantKey(requestedType);
+            boolean inLoadout = session.getSelectedPlants().stream()
+                    .anyMatch(p -> ChoosePlantService.normalizePlantKey(p).equals(canonical));
+            if (!inLoadout) {
+                throw new IllegalStateException(requestedType + " is not in your selected plants for this level");
+            }
         }
 
         int plantId = PlantFactory.findIdByName(requestedType);

@@ -18,7 +18,7 @@ public enum GameCommand {
     RELEASE_THE_NUKE("^release\\s+the\\s+nuke(?:\\s+.*)?$"),
     CHEAT_REMOVE_COOLDOWN("^cheat\\s+remove-cooldown(?:\\s+.*)?$"),
     PLUCK_PLANT("^pluck\\s+plant\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
-    PLANT_PLANT("^plant\\s+plant\\s+-t\\s+\"(?<type>.+?)\\s*\"\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
+    PLANT_PLANT("^plant\\s+plant\\s+-t\\s+(?<type>.+?)\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
     FEED_PLANT("^feed\\s+plant\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
     CHEAT_ADD_PLANT_FOOD("^cheat\\s+add-plant-food(?:\\s+.*)?$"),
     SHOW_MAP("^show\\s+map(?:\\s+.*)?$"),
