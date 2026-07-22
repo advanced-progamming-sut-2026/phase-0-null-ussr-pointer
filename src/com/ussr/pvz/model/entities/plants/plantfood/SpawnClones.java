@@ -32,6 +32,8 @@ public class SpawnClones implements PlantFoodEffect {
     public void triggerSuperpower(Plant user, GameSession session) {
         if (user == null || session == null) return;
 
+        System.out.println("spawn clones");
+
         armPlant(user);
 
         List<Vec2> validPositions = getValidSpawnPositions(user, session);
@@ -47,6 +49,7 @@ public class SpawnClones implements PlantFoodEffect {
             clone.setPosition(pos);
             armPlant(clone);
 
+            session.getLawn().getCell((int) pos.y() , (int) pos.x()).setPlant(clone);
             session.addPlant(clone);
             spawned++;
         }
