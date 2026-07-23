@@ -47,6 +47,7 @@ public class SpawnClones implements PlantFoodEffect {
             clone.setPosition(pos);
             armPlant(clone);
 
+            session.getLawn().getCell((int) pos.y() , (int) pos.x()).setPlant(clone);
             session.addPlant(clone);
             spawned++;
         }

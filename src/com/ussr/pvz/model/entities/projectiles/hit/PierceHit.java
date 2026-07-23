@@ -15,7 +15,6 @@ public class PierceHit implements HitEffectStrategy {
     public PierceHit(int pierceNumber) {
         this.pierceNumber = pierceNumber;
         hitZombies = new ArrayList<>();
-        System.out.println(this.pierceNumber);
     }
 
     @Override

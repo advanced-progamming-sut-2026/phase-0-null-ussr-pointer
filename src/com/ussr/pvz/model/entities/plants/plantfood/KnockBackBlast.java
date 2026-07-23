@@ -25,7 +25,7 @@ public class KnockBackBlast implements PlantFoodEffect {
         if (user == null || session == null || user.getPosition() == null) return;
 
         Vec2 userPos = user.getPosition();
-        Vec2 vel = new Vec2(20, 0);
+        Vec2 vel = new Vec2(4, 0);
 
         MoveStrategy moveStrategy = new StraightMove();
         HitEffectStrategy hitEffectStrategy = new PierceKnockBackHit(Integer.MAX_VALUE, knockbackDistance);

@@ -11,7 +11,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class BowlingBulbAttack extends LocalAttack {
 
-    public BowlingBulbAttack(int cyanDamage, int blueDamage, int orangeDamage) {
+    public BowlingBulbAttack() {
         super(0.0, 0.0);
     }
 
@@ -19,26 +19,25 @@ public class BowlingBulbAttack extends LocalAttack {
     public void triggerSuperpower(Plant user, GameSession session) {
         super.triggerSuperpower(user, session);
         int damage = user.getDamage();
-        session.getProjectiles().add(new Projectile(user.getPosition(),
+        session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 10,
                 new BounceMove(),
                 new PierceHit(Integer.MAX_VALUE)));
 
-        session.getProjectiles().add(new Projectile(user.getPosition(),
+        session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 15,
                 new BounceMove(),
                 new PierceHit(Integer.MAX_VALUE)));
 
-        session.getProjectiles().add(new Projectile(user.getPosition(),
+        session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 20,
                 new BounceMove(),
                 new PierceHit(Integer.MAX_VALUE)));
-
     }
 }

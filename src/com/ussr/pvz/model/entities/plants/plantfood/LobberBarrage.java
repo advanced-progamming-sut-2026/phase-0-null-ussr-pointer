@@ -3,8 +3,11 @@ package com.ussr.pvz.model.entities.plants.plantfood;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.*;
+import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +30,9 @@ public class LobberBarrage implements PlantFoodEffect {
 
         if (targetsInLine.isEmpty()) return;
 
-        HitEffectStrategy hitEffect = handleHitEffect(user);
-
         for (Zombie target : targetsInLine) {
-            target.takeDamage(user.getDamage());
+            HitEffectStrategy hitEffect = handleHitEffect(user);
+            session.addProjectile(new Projectile(target , user.getPosition() , new Vec2(3 , 5) , user.getDamage() * 5 , new ArcMove(8) , hitEffect));
         }
     }
 

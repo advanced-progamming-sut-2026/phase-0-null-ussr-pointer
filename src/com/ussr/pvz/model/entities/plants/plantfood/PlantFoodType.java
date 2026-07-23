@@ -2,7 +2,13 @@ package com.ussr.pvz.model.entities.plants.plantfood;
 
 public enum PlantFoodType {
     NONE,
-    SPAWN_SUN_ITEMS,
+    REPEATER_ATTACK,
+    SNOW_PEA_ATTACK,
+    PLASMA_WIPE,
+    GLOBAL_SHROOM_ATTACK,
+    BOWLING_BULB_ATTACK,
+    AREA_3X3_ATTACK,
+    SPAWN_SUN,
     PROJECTILE_BURST,
     SPAWN_CLONES,
     LOCAL_AOE_ATTACK,

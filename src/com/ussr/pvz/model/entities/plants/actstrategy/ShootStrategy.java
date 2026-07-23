@@ -22,7 +22,9 @@ public class ShootStrategy implements ActStrategy {
     public void act(Plant user, GameSession session) {
         List<Vec2> vectors = user.getShootingVectors();
 
-        if (vectors == null || vectors.isEmpty()) return;
+        if (vectors == null || vectors.isEmpty()){
+            return;
+        }
 
         boolean anyTarget = vectors.stream()
                 .anyMatch(v -> findTargetAlongVector(user, v, session) != null);

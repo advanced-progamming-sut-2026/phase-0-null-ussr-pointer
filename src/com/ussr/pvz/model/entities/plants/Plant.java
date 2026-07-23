@@ -5,6 +5,7 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
@@ -51,6 +52,8 @@ public class Plant extends GameEntity implements Damageable {
     private int plantFoodValue;
 
     private PlantArmor armor;
+
+    private double lifetime = Double.MAX_VALUE;
 
 
     //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
@@ -116,6 +119,12 @@ public class Plant extends GameEntity implements Damageable {
     @Override
     public void tick() {
         if (!isAlive || state == PlantState.INCAPACITATED) return;
+        lifetime -= GameClock.SECONDS_PER_TICK;
+        if(lifetime < 0) {
+            this.isAlive = false;
+            App.getGameSession().getEventBus().publish(new GameEvent.PlantDied(this.name , (int) getPosition().x() , (int) getPosition().y()));
+            return;
+        }
 
         if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
         if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
@@ -176,7 +185,10 @@ public class Plant extends GameEntity implements Damageable {
             if (newHp <= 0) {
                 if(name.equalsIgnoreCase("Hypno-shroom")) {
                     if(dealer instanceof Zombie zombie)
-                        zombie.setStatus(Zombie.Status.HYPNOTIZED);
+                        zombie.hypnotize();
+                }
+                else if(this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
+                    wallNutStrategy.onDie(this);
                 }
                 setHp(0);
                 isAlive = false;
@@ -440,4 +452,6 @@ public class Plant extends GameEntity implements Damageable {
             }
         }
     }
+
+    public void setLifetime(double lifetime) { this.lifetime = lifetime; }
 }

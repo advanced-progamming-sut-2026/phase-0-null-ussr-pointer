@@ -16,6 +16,7 @@ public class LocalAttack implements PlantFoodEffect {
 
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
+        System.out.println("hello");
         if (user != null) {
             user.setPlantFoodTimer(this.duration);
             this.strikeTimer = 0.0;

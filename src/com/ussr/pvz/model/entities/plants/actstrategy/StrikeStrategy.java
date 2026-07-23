@@ -19,6 +19,7 @@ public class StrikeStrategy implements ActStrategy {
         user.setInternalTimer(0.0);
 
         int pierceCount = (int) user.getAbilityValue();
+        if(user.isBuffed()) pierceCount = Integer.MAX_VALUE;
         session.addProjectile(new Projectile(
                 user.getPosition(),
                 new Vec2(6, 0), target,

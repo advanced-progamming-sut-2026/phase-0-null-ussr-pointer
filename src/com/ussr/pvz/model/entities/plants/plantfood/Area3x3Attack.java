@@ -17,7 +17,8 @@ public class Area3x3Attack implements PlantFoodEffect {
     }
 
     public Area3x3Attack(double duration, double strikeRate) {
-        this(1.5, duration, strikeRate);
+        System.out.println("area");
+        this(1, duration, strikeRate);
     }
 
     @Override
@@ -48,8 +49,8 @@ public class Area3x3Attack implements PlantFoodEffect {
     }
 
     private void performAreaPulse(Plant user, GameSession session) {
-        int userLane = user.getLocation() != null ? user.getLocation().y() : (int) user.getPosition().y();
-        double userX = user.getPosition() != null ? user.getPosition().x() : user.getLocation().x();
+        int userLane = (int) user.getPosition().y();
+        double userX = user.getPosition().x();
 
         int damage = duration < 0.5 ? 1000 : user.getDamage();
 

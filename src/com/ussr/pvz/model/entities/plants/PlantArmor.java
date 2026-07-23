@@ -1,4 +1,5 @@
 package com.ussr.pvz.model.entities.plants;
+
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class PlantArmor {

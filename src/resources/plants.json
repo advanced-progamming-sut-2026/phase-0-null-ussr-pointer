@@ -251,7 +251,7 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 2.0,
-    "plantFoodType": "PROJECTILE_BURST",
+    "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
     "upgrades": [
@@ -328,7 +328,7 @@
     "recharge": 5.0,
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
-    "plantFoodType": "SNOW_PEA_ATTACK ",
+    "plantFoodType": "SNOW_PEA_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
     "upgrades": [
@@ -1750,7 +1750,7 @@
     "recharge": 20.0,
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 2.0,
-    "plantFoodType": "KNOCKBACK_BLAST",
+    "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 0.0,
     "upgrades": [
       {
@@ -2120,7 +2120,7 @@
     "recharge": 50.0,
     "abilityType": "INSTANT_EXPLOSIVE",
     "abilityValue": 4.0,
-    "plantFoodType": "NONE",
+    "plantFoodType": "MAP_WIDE_FREEZE",
     "plantFoodValue": 0.0,
     "upgrades": [
       {

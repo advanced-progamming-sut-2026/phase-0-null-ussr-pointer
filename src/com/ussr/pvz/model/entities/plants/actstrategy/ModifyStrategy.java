@@ -14,7 +14,7 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
 
 public class ModifyStrategy implements ActStrategy {
-    private int damageMultiplier = 1;
+    private int damageMultiplier = 2;
 
     public ModifyStrategy(int damageMultiplier) {
         this.damageMultiplier = damageMultiplier;
@@ -50,18 +50,21 @@ public class ModifyStrategy implements ActStrategy {
     private void modifyTargets(Plant user, ArrayList<Projectile> targets) {
         if (user.getTags().contains(Tag.FIRE)) {
             for (Projectile projectile : targets) {
+                projectile.setDamage(projectile.getDamage() * damageMultiplier);
                 if (projectile.getHitEffectStrategy() instanceof FireHit)
                     continue;
                 projectile.setHitEffectStrategy(new FireHit(1));
             }
         } else if (user.getTags().contains(Tag.ICE)) {
             for (Projectile projectile : targets) {
+                projectile.setDamage(projectile.getDamage() * damageMultiplier);
                 if (projectile.getHitEffectStrategy() instanceof IceHit)
                     continue;
                 projectile.setHitEffectStrategy(new IceHit(1));
             }
         } else if (user.getTags().contains(Tag.POISON)) {
             for (Projectile projectile : targets) {
+                projectile.setDamage(projectile.getDamage() * damageMultiplier);
                 if (projectile.getHitEffectStrategy() instanceof PoisonHit)
                     continue;
                 projectile.setHitEffectStrategy(new PoisonHit(1));
