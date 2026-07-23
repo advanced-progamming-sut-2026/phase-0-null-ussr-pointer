@@ -33,7 +33,6 @@ public class IceHit implements HitEffectStrategy {
         projectile.setAlive(false);
 
         int damageAmount = projectile.getDamage();
-        long projectileLane = Math.round(projectile.getPosition().y());
 
         for (GameEntity target : entities) {
             if (target == null || !target.isAlive()) continue;

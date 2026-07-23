@@ -24,8 +24,6 @@ public class PoisonHit implements HitEffectStrategy {
         projectile.setAlive(false);
 
         int damageAmount = projectile.getDamage();
-        long projectileLane = Math.round(projectile.getPosition().y());
-
         for (GameEntity target : entities) {
             if (target == null || !target.isAlive()) continue;
 
@@ -45,6 +43,10 @@ public class PoisonHit implements HitEffectStrategy {
 
     @Override
     public int getAreaLength() {
-        return 1;
+        return areaLength;
+    }
+
+    public void setAreaLength(int areaLength) {
+        this.areaLength = areaLength;
     }
 }

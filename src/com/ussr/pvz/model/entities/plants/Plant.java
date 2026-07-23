@@ -49,7 +49,6 @@ public class Plant extends GameEntity implements Damageable {
     private GrowthTracker growthTracker;
 
     private double plantFoodTimer = 0.0;
-    private int plantFoodValue;
 
     private PlantArmor armor;
 

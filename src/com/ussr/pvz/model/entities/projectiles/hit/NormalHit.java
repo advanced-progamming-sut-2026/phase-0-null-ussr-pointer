@@ -25,7 +25,7 @@ public class NormalHit implements HitEffectStrategy {
         projectile.setAlive(false);
 
         int damageAmount = projectile.getDamage();
-        long projectileLane = Math.round(projectile.getPosition().y());
+
 
         for (GameEntity target : entities) {
             switch (target) {

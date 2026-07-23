@@ -27,6 +27,14 @@ public class WaveDirector {
     private final double speedMultiplier;
     private final SpawnStrategy spawnStrategy;
 
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public Level.Wave getWaveData() {
+        return waveData;
+    }
+
     // A lightweight functional interface to store our spawning strategies
     @FunctionalInterface
     private interface SpawnStrategy {

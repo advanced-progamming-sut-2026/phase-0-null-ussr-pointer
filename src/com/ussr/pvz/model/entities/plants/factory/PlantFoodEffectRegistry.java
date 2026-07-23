@@ -24,7 +24,7 @@ public final class PlantFoodEffectRegistry {
         });
 
         register("PROJECTILE_BURST", data -> {
-            String name = (String) data.get("name");
+            //String name = (String) data.get("name");
             double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
             double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
             return new LocalAttack(duration , strikeRate);

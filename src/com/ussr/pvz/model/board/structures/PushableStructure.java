@@ -12,7 +12,6 @@ import com.ussr.pvz.model.util.Vec2;
 public class PushableStructure extends InteractableStructure implements Damageable {
     private final PushableType type;
     private int hp;
-    private double spawnTimer = 0.0;
 
     private static final double COLLISION_RADIUS = 0.5;
 

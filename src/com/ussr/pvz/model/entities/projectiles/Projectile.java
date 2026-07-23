@@ -27,7 +27,7 @@ public class Projectile extends GameEntity {
 
     public Projectile(Vec2 position, Vec2 velocity, Zombie zombie, int damage, MoveStrategy moveStrategy,
                       HitEffectStrategy hitEffectStrategy) {
-        this((Damageable) zombie, position, velocity, damage, moveStrategy, hitEffectStrategy);
+        this(zombie, position, velocity, damage, moveStrategy, hitEffectStrategy);
     }
 
     public Projectile(Damageable target, Vec2 position, Vec2 velocity, int damage, MoveStrategy moveStrategy,
@@ -246,4 +246,8 @@ public class Projectile extends GameEntity {
     }
 
     public void setDamage(int damage) { this.damage = damage; }
+
+    public boolean isStunning() {
+        return isStunning;
+    }
 }
