@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.board.structures;
 
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.GameSession;
 
@@ -42,6 +43,7 @@ public class Grave extends InteractableStructure implements Damageable {
         int row = (int) this.getPosition().y();
         int col = (int) this.getPosition().x();
         session.notifyGraveDestroyed(row, col);
+        session.getLawn().getCell(row , col).getTile().setType(TileType.Normal);
 
         switch (content) {
             case SUN -> {
