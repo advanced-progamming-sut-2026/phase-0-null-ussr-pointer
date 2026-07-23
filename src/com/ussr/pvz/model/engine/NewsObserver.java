@@ -31,7 +31,7 @@ public class NewsObserver {
                 level.getId()+" passed ",currentTimestamp);
         App.getAccount().getPersonalNews().add(newsItem);
     }
-    //todo use this somewhere and check the above usages and fix them if needed
+
     public static void triggerNewMiniGame(Level level) {
         int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
         NewsItem newsItem = new NewsItem("New minigame unlocked",

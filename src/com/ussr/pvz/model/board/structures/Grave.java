@@ -42,7 +42,6 @@ public class Grave extends InteractableStructure implements Damageable {
         int row = (int) this.getPosition().y();
         int col = (int) this.getPosition().x();
         session.notifyGraveDestroyed(row, col);
-
         switch (content) {
             case SUN -> {
                 session.addSun(50);
