@@ -60,14 +60,18 @@ public class WallNutStrategy implements ActStrategy {
             case 3 :
                 return;
             case 4 :
-                handleExplode(user);
-                break;
+                return;
             case 5 :
                 App.getGameSession().addSun(5);
 
         }
 
         user.setInternalTimer(0.0);
+    }
+
+    public void onDie(Plant user) {
+        if((int) user.getAbilityValue() == 4)
+            handleExplode(user);
     }
 
     private void handleExplode(Plant user) {

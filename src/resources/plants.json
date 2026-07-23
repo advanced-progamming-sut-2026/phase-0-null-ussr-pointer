@@ -2120,7 +2120,7 @@
     "recharge": 50.0,
     "abilityType": "INSTANT_EXPLOSIVE",
     "abilityValue": 4.0,
-    "plantFoodType": "NONE",
+    "plantFoodType": "MAP_WIDE_FREEZE",
     "plantFoodValue": 0.0,
     "upgrades": [
       {

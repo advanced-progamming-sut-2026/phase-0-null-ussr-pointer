@@ -185,7 +185,10 @@ public class Plant extends GameEntity implements Damageable {
             if (newHp <= 0) {
                 if(name.equalsIgnoreCase("Hypno-shroom")) {
                     if(dealer instanceof Zombie zombie)
-                        zombie.setStatus(Zombie.Status.HYPNOTIZED);
+                        zombie.hypnotize();
+                }
+                else if(this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
+                    wallNutStrategy.onDie(this);
                 }
                 setHp(0);
                 isAlive = false;
