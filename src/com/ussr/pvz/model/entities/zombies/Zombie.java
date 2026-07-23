@@ -17,10 +17,8 @@ import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
 import com.ussr.pvz.model.entities.zombies.move.JumpMove;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
-import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy; // Assumes your ArcMove implements an interface/class like this
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
-import com.ussr.pvz.service.game.ZombieService;
 
 import java.util.Random;
 
