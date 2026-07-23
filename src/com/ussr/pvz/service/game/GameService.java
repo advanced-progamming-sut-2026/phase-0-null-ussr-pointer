@@ -61,7 +61,6 @@ public class GameService {
             return "chapter name cannot be null.";
         }
 
-        // 1. Block Minigames from Adventure access
         if (chapterId.toLowerCase().contains("minigame")) {
             return "Minigames can only be accessed from the Travel Log.";
         }
@@ -227,17 +226,12 @@ public class GameService {
             Plant blueprint = getPlantBlueprint(request.type());
 
             App.getAccount().getAdventureProgress().getAccountPlants().stream()
-                    .filter(p -> p.getName().equals(
+                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(
                             ChoosePlantService.normalizePlantKey(blueprint.getName())))
                     .findFirst()
                     .ifPresent(accountPlant ->
                             blueprint.setRecharge(accountPlant.getRecharge()));
 
-            App.getAccount().getAdventureProgress().getAccountPlants().stream()
-                    .filter(p -> p.getName().equals(blueprint.getName()))
-                    .findFirst()
-                    .ifPresent(accountPlant ->
-                            accountPlant.setRecharge(blueprint.getMaxRecharge()));
             Cell cell = requirePlantableCell(session, x, y, blueprint);
             checkRechargeAndSpendSun(session, blueprint);
 
@@ -246,7 +240,11 @@ public class GameService {
             cell.setPlant(plant);
             session.addPlant(plant);
             blueprint.setRecharge(blueprint.getMaxRecharge());
-
+            App.getAccount().getAdventureProgress().getAccountPlants().stream()
+                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(blueprint.getName()))
+                    .findFirst()
+                    .ifPresent(accountPlant ->
+                            accountPlant.setRecharge(blueprint.getMaxRecharge()));
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
         } catch (IllegalStateException e) {
             return e.getMessage();
