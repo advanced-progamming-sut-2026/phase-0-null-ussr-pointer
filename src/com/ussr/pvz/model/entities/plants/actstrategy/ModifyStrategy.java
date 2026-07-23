@@ -78,27 +78,4 @@ public class ModifyStrategy implements ActStrategy {
     public void setDamageMultiplier(int multiplier) {
         this.damageMultiplier = multiplier;
     }
-
-    private void applyHypnoModification(ArrayList<Projectile> targets) {
-        for (Projectile projectile : targets) {
-            // Intercept and rewrite the projectile hit behavior to trigger hypnosis on contact
-            projectile.setHitEffectStrategy(new com.ussr.pvz.model.entities.projectiles.hit.HitEffectStrategy() {
-                @Override
-                public void apply(ArrayList<com.ussr.pvz.model.engine.GameEntity> entities, Projectile proj) {
-                    proj.setAlive(false);
-                    for (com.ussr.pvz.model.engine.GameEntity entity : entities) {
-                        if (entity instanceof Zombie zombie && zombie.isAlive()) {
-                            zombie.setStatus(Zombie.Status.HYPNOTIZED);
-                            zombie.hypnotize();
-                        }
-                    }
-                }
-
-                @Override
-                public int getAreaLength() {
-                    return 1;
-                }
-            });
-        }
-    }
 }

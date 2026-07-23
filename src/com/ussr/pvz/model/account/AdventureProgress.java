@@ -278,24 +278,6 @@ public class AdventureProgress {
 
     public static Map<String, Integer> initializePlantsLvl() {
         Map<String, Integer> defaultPlantLevels = new HashMap<>();
-        Gson gson = new Gson();
-
-        File defaultUnlockedFile = new File("default_unlocked_plants.json");
-
-        List<String> starterPlantNames = new ArrayList<>();
-        if (defaultUnlockedFile.exists()) {
-            try (FileReader reader = new FileReader(defaultUnlockedFile)) {
-                Type simpleListType = new TypeToken<List<String>>() {}.getType();
-                List<String> loadedStarters = gson.fromJson(reader, simpleListType);
-                if (loadedStarters != null) {
-                    starterPlantNames = loadedStarters.stream()
-                            .map(AdventureProgress::normalizeKey)
-                            .toList();
-                }
-            } catch (IOException e) {
-                System.err.println("Error reading default_unlocked_plants.json: " + e.getMessage());
-            }
-        }
 
         if (App.getCachedPlantsData() == null) {
             App.loadPlantsDataToMemory();
@@ -307,7 +289,7 @@ public class AdventureProgress {
                 Object nameObj = plantData.get("name");
                 if (nameObj != null) {
                     String plantName = normalizeKey(nameObj.toString());
-                    defaultPlantLevels.put(plantName, 1);
+                    defaultPlantLevels.put(plantName, 0);
                 }
             }
         }
