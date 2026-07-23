@@ -5,6 +5,7 @@ import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.dto.CheatAddCurrencyRequest;
 import com.ussr.pvz.model.dto.CheatAddSunsRequest;
 import com.ussr.pvz.model.dto.CheatSpawnZombieRequest;
@@ -50,7 +51,6 @@ public class GameService {
     }
 
     public String menuEnterChapter(MenuEnterChapterRequest request) {
-        //TODO : in plant plant method some plants like grave buster should can be planted on graves fix it
         String chapterId = request.chapterName();
 
         if (App.getGameSession() != null && !App.getGameSession().isGameOver()) {
@@ -233,10 +233,10 @@ public class GameService {
                             blueprint.setRecharge(accountPlant.getRecharge()));
 
             Cell cell = requirePlantableCell(session, x, y, blueprint);
+            String result = isSpecialPlantAllowed(blueprint, x, y);
+            if (result != null) return result;
             checkRechargeAndSpendSun(session, blueprint);
-
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
-
             cell.setPlant(plant);
             session.addPlant(plant);
             blueprint.setRecharge(blueprint.getMaxRecharge());
@@ -253,6 +253,23 @@ public class GameService {
             e.printStackTrace();
             return "An internal system error occurred while planting: " + e.getMessage();
         }
+    }
+
+    private String isSpecialPlantAllowed(Plant blueprint, int x, int y) {
+        if(ChoosePlantService.normalizePlantKey(blueprint.getName())
+                .equals(ChoosePlantService.normalizePlantKey("Grave Buster"))){
+            if(isGraveBusterAllowed(x, y)){
+                return "grave buster is not allowed on this cell";
+            }
+        }
+
+        if(ChoosePlantService.normalizePlantKey(blueprint.getName())
+                .equals(ChoosePlantService.normalizePlantKey("Hot Potato"))){
+            if(isHotPotatoAllowed(x, y)){
+                return "hot potato is not allowed on this cell";
+            }
+        }
+        return null;
     }
 
     private int[] parseLocation(String xStr, String yStr) {
@@ -399,6 +416,22 @@ public class GameService {
             }
         }
         return cell;
+    }
+
+    private boolean isGraveBusterAllowed(int x , int y){
+        if(App.getGameSession().getLawn().getTile(y,x) != null){
+            return App.getGameSession().getLawn().getTile(y, x).getType().equals(TileType.Grave);
+        }
+
+        return false;
+    }
+
+    private boolean isHotPotatoAllowed(int x, int y){
+        if(App.getGameSession().getLawn().getTile(y,x) != null){
+            return App.getGameSession().getLawn().getTile(y,x).getType().equals(TileType.Frozen);
+        }
+
+        return false;
     }
 
     private Plant requireUnlockedPlant(String requestedType) {
