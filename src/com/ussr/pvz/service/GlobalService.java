@@ -70,6 +70,10 @@ public class GlobalService {
             return "bye bye";
         }
 
+        if(App.getGameSession() != null){
+            App.setGameSession(null);
+        }
+
         App.setMenuState(parent);
         return "menu changed to " + parent.getName();
     }
