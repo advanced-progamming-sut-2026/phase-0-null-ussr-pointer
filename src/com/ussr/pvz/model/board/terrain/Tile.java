@@ -4,7 +4,7 @@ public class Tile {
 
     public enum SlipperyDirection { UP, DOWN }
 
-    private final TileType type;
+    private TileType type;
     private final SlipperyDirection slipperyDirection;
 
     public Tile(TileType type) {
@@ -23,6 +23,8 @@ public class Tile {
     public TileType getType() {
         return this.type;
     }
+
+    public void setType(TileType type) { this.type = type; }
 
     public SlipperyDirection getSlipperyDirection() {
         return slipperyDirection;

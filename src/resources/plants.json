@@ -2194,7 +2194,7 @@
     "actionInterval": 0.0,
     "recharge": 5.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 1.0,
+    "abilityValue": 7.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [
@@ -2229,7 +2229,7 @@
     "actionInterval": 0.0,
     "recharge": 10.0,
     "abilityType": "INSTANT_EXPLOSIVE",
-    "abilityValue": 1.0,
+    "abilityValue": 6.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "upgrades": [

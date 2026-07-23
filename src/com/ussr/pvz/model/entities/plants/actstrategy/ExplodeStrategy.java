@@ -1,7 +1,10 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
@@ -50,6 +53,11 @@ public class ExplodeStrategy implements ActStrategy {
             case 5: // Complete the nearest target functionality
                 targets = nearestZombieDetect(user, session);
                 break;
+            case 6:
+                handleGraveDestroy(user , session);
+                break;
+            case 7:
+                handleFreezeTileDestroy(user , session);
         }
 
         if (targets == null || targets.isEmpty()) return;
@@ -155,6 +163,29 @@ public class ExplodeStrategy implements ActStrategy {
                 zombie.setStatus(Zombie.Status.FIRED);
             }
             zombie.takeDamage(userDamage, user);
+        }
+    }
+
+    private void handleGraveDestroy(Plant user , GameSession session) {
+        Vec2 userPos = user.getPosition();
+
+        InteractableStructure structure = session.getLawn().getCell((int) userPos.y() ,
+                (int) userPos.x()).getInteractableStructure();
+        if(structure != null) {
+            structure.setAlive(false);
+            session.getEventBus().publish(new GameEvent.StructureDestroyed(structure.toString() ,
+                    (int) structure.getPosition().y() , (int) structure.getPosition().x()));
+        }
+    }
+
+    private void handleFreezeTileDestroy(Plant user , GameSession session) {
+        Vec2 userPos = user.getPosition();
+
+        boolean isFrozen = session.getLawn().getCell((int) userPos.y() ,
+                (int) userPos.x()).getTile().getType() == TileType.Frozen;
+        if(isFrozen) {
+            session.getLawn().getCell((int) userPos.y() ,
+                    (int) userPos.x()).getTile().setType(TileType.Normal);
         }
     }
 }
