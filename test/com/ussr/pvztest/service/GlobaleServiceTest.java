@@ -57,7 +57,12 @@ class GlobalServiceTest {
     @DisplayName("✅ Should allow LOGIN -> MAIN transition when account is logged in")
     void menuEnter_shouldAllow_LoginToMain_whenLoggedIn() {
         App.setMenuState(MenuState.LOGIN);
-        AccountState dummyState = new AccountState("user", "nick", "pass", "e@mail.com", null, 3, null, null, 1, 1, 0, 0, 0, 0, 0, new HashMap<>(), new ArrayList<>(), new ArrayList<>(), null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>());
+        AccountState dummyState = new AccountState("user", "nick", "pass",
+                "e@mail.com", null, 3, null, null,
+                1, 1, 0, 0, 0, 0, 0,
+                new HashMap<>(), new ArrayList<>(), new ArrayList<>(), null, null,
+                0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),
+                System.currentTimeMillis(),new ArrayList<>());
         App.login(new Account(dummyState, null));
 
         MenuEnterRequest request = new MenuEnterRequest("main");

@@ -41,7 +41,8 @@ public class VaseBreakerService {
         SeedPackDrop targetPack = null;
 
         for (GroundItem item : session.getItems()) {
-            if (item.getItemType() == ItemType.SEED_PACK && item.getLocation().x() == sX && item.getLocation().y() == sY) {
+            if (item.getItemType() == ItemType.SEED_PACK && item.getLocation().x() == sX
+                    && item.getLocation().y() == sY) {
                 targetPack = (SeedPackDrop) item;
                 break;
             }

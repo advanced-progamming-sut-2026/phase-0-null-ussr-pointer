@@ -41,7 +41,7 @@ class LeaderBoardServiceTest {
                 name, name, "pass", name + "@ex.com", Gender.FEMALE, 3,
                 null, null, chapter, 1, minigames, 0, 0, 0, score,
                 new HashMap<>(), new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
     }
 

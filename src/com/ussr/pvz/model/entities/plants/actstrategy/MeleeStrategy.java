@@ -71,7 +71,8 @@ public class MeleeStrategy implements ActStrategy {
             case 2 : //(area damage)
                 for(Zombie zombie : session.getZombies()) {
                     Vec2 zomPos = zombie.getPosition();
-                    if(zombie.isAlive() && Math.abs(zomPos.x() - userPos.x()) < 1 && Math.abs(zomPos.y() - userPos.y()) < 1)
+                    if(zombie.isAlive() && Math.abs(zomPos.x() - userPos.x()) < 1 &&
+                            Math.abs(zomPos.y() - userPos.y()) < 1)
                         return true;
                 }
                 break;

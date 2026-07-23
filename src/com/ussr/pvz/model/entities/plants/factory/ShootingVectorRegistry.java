@@ -21,11 +21,14 @@ public final class ShootingVectorRegistry {
         }
 
         register("Repeater", List.of(Vec2.of(1, 0), Vec2.of(1, 0)));
-        register("Mega Gatling Pea", List.of(Vec2.of(1, 0), Vec2.of(1, 0), Vec2.of(1, 0), Vec2.of(1, 0)));
+        register("Mega Gatling Pea", List.of(Vec2.of(1, 0), Vec2.of(1, 0), Vec2.of(1, 0),
+                Vec2.of(1, 0)));
         register("Threepeater", List.of(Vec2.of(1, -1), Vec2.of(1, 0), Vec2.of(1, 1)));
         register("Split Pea", List.of(Vec2.of(1, 0), Vec2.of(-1, 0), Vec2.of(-1, 0)));
-        register("Rotobaga", List.of(Vec2.of(1, 1), Vec2.of(1, -1), Vec2.of(-1, 1), Vec2.of(-1, -1)));
-        register("Starfruit", List.of(Vec2.of(-1.000, 0.000), Vec2.of(0.000, 1.000), Vec2.of(0.000, -1.000), Vec2.of(0.894, 0.447), Vec2.of(0.894, -0.447)));
+        register("Rotobaga", List.of(Vec2.of(1, 1), Vec2.of(1, -1), Vec2.of(-1, 1),
+                Vec2.of(-1, -1)));
+        register("Starfruit", List.of(Vec2.of(-1.000, 0.000), Vec2.of(0.000, 1.000),
+                Vec2.of(0.000, -1.000), Vec2.of(0.894, 0.447), Vec2.of(0.894, -0.447)));
     }
 
     private ShootingVectorRegistry() {}

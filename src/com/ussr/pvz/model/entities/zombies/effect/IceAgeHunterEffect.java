@@ -64,7 +64,8 @@ public class IceAgeHunterEffect implements EffectStatus {
             double closestDistance = Double.MAX_VALUE;
 
             for (Zombie target : session.getZombies()) {
-                if (target.isAlive() && target.getFaction() == Faction.ZOMBIES && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
+                if (target.isAlive() && target.getFaction() == Faction.ZOMBIES &&
+                        (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
                     double distance = target.getPosition().x() - zCol;
                     if (distance < closestDistance) {
                         closestDistance = distance;

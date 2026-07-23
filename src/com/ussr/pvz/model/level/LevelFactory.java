@@ -71,7 +71,8 @@ public class LevelFactory {
                 yield new SaveOurSeedsBehavior(seeds);
             }
             case "WallnutBowlingBehavior" -> new WallnutBowlingBehavior(data.redLineColumn);
-            case "BeghouledBehavior" -> new BeghouledBehavior(data.targetMatches, data.startingPlants != null ? data.startingPlants : new ArrayList<>());
+            case "BeghouledBehavior" -> new BeghouledBehavior(data.targetMatches,
+                    data.startingPlants != null ? data.startingPlants : new ArrayList<>());
             case "IZombieBehavior" -> new IZombieBehavior(data.redLineColumn, data.startingSun);
             case "PlantWhatYouGetBehavior" -> {
                 PlantWhatYouGetBehavior behavior = new PlantWhatYouGetBehavior();
@@ -121,7 +122,8 @@ public class LevelFactory {
             List<Level.AllowedZombie> allowed = new ArrayList<>();
             for (JsonContainer.JsonZombieEntry entry : data.allowedZombies) {
                 if (entry.id != null) {
-                    allowed.add(new Level.AllowedZombie(resolveZombieAlias(entry.id), entry.weight > 0 ? entry.weight : 1000));
+                    allowed.add(new Level.AllowedZombie(resolveZombieAlias(entry.id),
+                            entry.weight > 0 ? entry.weight : 1000));
                 }
             }
             level.setAllowedZombies(allowed);
@@ -133,7 +135,8 @@ public class LevelFactory {
                 List<Level.SpawnData> spawns = new ArrayList<>();
                 if (waveData.spawnData != null) {
                     for (JsonContainer.JsonSpawnData spawnEntry : waveData.spawnData) {
-                        spawns.add(new Level.SpawnData(resolveZombieAlias(spawnEntry.zombieId), spawnEntry.lane, spawnEntry.delaySeconds));
+                        spawns.add(new Level.SpawnData(resolveZombieAlias(spawnEntry.zombieId), spawnEntry.lane,
+                                spawnEntry.delaySeconds));
                     }
                 }
                 waves.add(new Level.Wave(waveData.waveNumber, waveData.cost, spawns));

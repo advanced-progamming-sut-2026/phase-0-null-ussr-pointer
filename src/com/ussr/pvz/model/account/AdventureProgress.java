@@ -32,7 +32,8 @@ public class AdventureProgress {
     }
 
     // UPDATED CONSTRUCTOR to accept completedLevels
-    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin, int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels) {
+    public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin,
+                             int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels) {
         this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
         this.minigamesWon = minigamesWon;

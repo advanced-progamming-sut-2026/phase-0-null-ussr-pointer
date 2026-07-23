@@ -81,7 +81,8 @@ public class GreenHouseService {
             if (boostAdded) {
                 return "The plant collected successfully and a boost for " + plantName + " has been added.";
             } else {
-                return "The plant collected successfully, but you already have a saved boost for " + plantName + ". Pot emptied.";
+                return "The plant collected successfully, but you already have a saved boost for " + plantName
+                        + ". Pot emptied.";
             }
         }
     }

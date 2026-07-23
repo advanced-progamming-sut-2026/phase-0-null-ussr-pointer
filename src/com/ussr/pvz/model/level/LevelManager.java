@@ -92,10 +92,8 @@ public class LevelManager {
     }
 
     public void nextLevel() {
-
         if (currentChapter == null || currentLevel == null)
             throw new IllegalStateException("No active level.");
-
         List<Level> levels = currentChapter.getLevels();
 
         int currentIndex = -1;

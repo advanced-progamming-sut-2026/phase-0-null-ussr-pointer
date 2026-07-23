@@ -22,13 +22,11 @@ public class DarkAgesEffect implements ChapterEffect {
     public void onWaveStart(GameSession session, Level level, int waveNumber, boolean isFinalWave) {
         Lawn lawn = session.getLawn();
         if (lawn == null) return;
-
-        int gravesToSpawnThisWave = 1; // Or pull from level.getGravesPerWave()
+        int gravesToSpawnThisWave = 1;
         for (int i = 0; i < gravesToSpawnThisWave; i++) {
             int targetCol = RAND.nextInt(5) + 4;
             int targetRow = RAND.nextInt(lawn.getRows());
             Cell cell = lawn.getCell(targetRow, targetCol);
-
             if (cell != null && cell.getInteractableStructure() == null && cell.getPlant() == null) {
                 Grave.Content content = Grave.Content.NONE;
                 if (RAND.nextInt(100) < 20) content = Grave.Content.SUN;
@@ -40,16 +38,12 @@ public class DarkAgesEffect implements ChapterEffect {
                 session.registerStructure(grave);
             }
         }
-
-        // 2. Necromancy: Raise zombies from existing graves
         int perWave = level.getZombiesPerNecromancyWave();
         String zombieAlias = level.getNecromancyZombieAlias();
         if (perWave <= 0 || zombieAlias == null || zombieAlias.isBlank()) return;
-
         List<Grave> activeGraves = new ArrayList<>();
         int rows = lawn.getRows();
         int cols = lawn.getCols();
-
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Cell cell = lawn.getCell(r, c);
@@ -58,7 +52,6 @@ public class DarkAgesEffect implements ChapterEffect {
                 }
             }
         }
-
         Collections.shuffle(activeGraves);
         int spawned = 0;
         for (Grave grave : activeGraves) {

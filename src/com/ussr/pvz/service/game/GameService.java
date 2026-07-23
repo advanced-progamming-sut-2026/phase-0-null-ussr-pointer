@@ -218,82 +218,129 @@ public class GameService {
     }
 
     public String plantPlant(PlantPlantRequest request) {
-        //todo : we should check the plant that if it exist in the list of plants we have chosen in the add plant not the plants in the account
-        int x, y;
         try {
-            x = Integer.parseInt(request.x());
-            y = Integer.parseInt(request.y());
-        } catch (NumberFormatException e) {
-            return "invalid location";
-        }
+            int[] location = parseLocation(request.x(), request.y());
+            int x = location[0];
+            int y = location[1];
 
-        try {
             GameSession session = requireSession();
-            Plant blueprint;
-            try {
-                blueprint = requireUnlockedPlant(request.type());
-            } catch (IllegalArgumentException e) {
-                return "Invalid or unknown plant type: " + request.type();
-            } catch (IllegalStateException e) {
-                return e.getMessage();
-            }
+            Plant blueprint = getPlantBlueprint(request.type());
 
-            if (blueprint == null) {
-                throw new IllegalStateException("Failed to load a valid structural configuration template for " + request.type());
-            }
+            App.getAccount().getAdventureProgress().getAccountPlants().stream()
+                    .filter(p -> p.getName().equals(
+                            ChoosePlantService.normalizePlantKey(blueprint.getName())))
+                    .findFirst()
+                    .ifPresent(accountPlant ->
+                            blueprint.setRecharge(accountPlant.getRecharge()));
 
+            App.getAccount().getAdventureProgress().getAccountPlants().stream()
+                    .filter(p -> p.getName().equals(blueprint.getName()))
+                    .findFirst()
+                    .ifPresent(accountPlant ->
+                            accountPlant.setRecharge(blueprint.getMaxRecharge()));
             Cell cell = requirePlantableCell(session, x, y, blueprint);
+            checkRechargeAndSpendSun(session, blueprint);
 
-            if (blueprint.getRecharge() > 0) {
-                throw new IllegalStateException("Plant is refreshing! Please wait.");
-            }
-
-            if (!session.spendSun(blueprint.getCost())) {
-                throw new IllegalStateException(
-                        "not enough sun to plant " + (blueprint.getName() != null ? blueprint.getName() : "this plant") + " (needs " + blueprint.getCost() + ")");
-            }
-
-            Plant plant = instantiatePlant(blueprint, x, y);
-
-            if (App.getAccount() != null && App.getAccount().getSavedBoosts() != null && blueprint.getName() != null) {
-                if (App.getAccount().getSavedBoosts().useBoost(blueprint.getName())) {
-                    if (plant.getPlantFoodType() != null && plant.getPlantFoodType() != PlantFoodType.NONE && plant.getPlantFoodEffect() != null) {
-                        plant.getPlantFoodEffect().triggerSuperpower(plant, session);
-                        plant.getPlantFoodEffect().applyStatusModifiers(plant);
-                        session.notifyPlantFoodUsed(plant);
-                    }
-                }
-            }
-
-            if (!cell.isEmpty()) {
-                Plant existingLilyPad = cell.getPlant();
-                plant.setBottom(existingLilyPad);
-            }
-
-            if(App.getGameSession().getBoostedPlants().contains(ChoosePlantService.normalizePlantKey(plant.getName()))) {
-                plant.setBuffed(true);
-            }
+            Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
 
             cell.setPlant(plant);
             session.addPlant(plant);
-
-            // TODO: [MINT FAMILY BUFFS]
-            // 1. Check if 'plant' is a Mint (e.g., blueprint.getAbilityType() == MINT_FAMILY_BOOST).
-            // 2. If true, iterate over session.getPlants(), match family tags, and apply a StatModifier
-            //    to their ModifiableStat fields (damage, attack speed, etc.).
-            // 3. Mark the Mint plant to despawn/setAlive(false) after its active duration expires.
-
             blueprint.setRecharge(blueprint.getMaxRecharge());
 
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
         } catch (IllegalStateException e) {
             return e.getMessage();
         } catch (Exception e) {
-            // CRITICAL GLOVE: Intercept any unexpected NullPointerException or runtime anomalies
-            // to print the diagnostic trace while preventing the game process from crashing.
             System.err.println("CRITICAL ERROR inside GameService.plantPlant:");
             e.printStackTrace();
             return "An internal system error occurred while planting: " + e.getMessage();
+        }
+    }
+
+    private int[] parseLocation(String xStr, String yStr) {
+        try {
+            return new int[]{
+                    Integer.parseInt(xStr),
+                    Integer.parseInt(yStr)
+            };
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("invalid location");
+        }
+    }
+
+    private Plant getPlantBlueprint(String type) {
+        try {
+            return requireUnlockedPlant(type);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Invalid or unknown plant type: " + type);
+        }
+    }
+
+    private void checkRechargeAndSpendSun(GameSession session, Plant blueprint) {
+        if (blueprint.getRecharge() > 0) {
+            throw new IllegalStateException("Plant is refreshing! Please wait.");
+        }
+
+        if (!session.spendSun(blueprint.getCost())) {
+            throw new IllegalStateException(
+                    "not enough sun to plant "
+                            + (blueprint.getName() != null ? blueprint.getName() : "this plant")
+                            + " (needs "
+                            + blueprint.getCost()
+                            + ")"
+            );
+        }
+    }
+
+    private Plant createPreparedPlant(GameSession session,
+                                      Plant blueprint,
+                                      Cell cell,
+                                      int x,
+                                      int y) {
+
+        Plant plant = instantiatePlant(blueprint, x, y);
+
+        applySavedBoost(plant, blueprint, session);
+
+        if (!cell.isEmpty()) {
+            plant.setBottom(cell.getPlant());
+        }
+
+        applyLevelBoost(plant);
+
+        return plant;
+    }
+
+    private void applySavedBoost(Plant plant,
+                                 Plant blueprint,
+                                 GameSession session) {
+
+        Account account = App.getAccount();
+
+        if (account == null
+                || account.getSavedBoosts() == null
+                || blueprint.getName() == null) {
+            return;
+        }
+
+        if (!account.getSavedBoosts().useBoost(blueprint.getName())) {
+            return;
+        }
+
+        if (plant.getPlantFoodType() != null
+                && plant.getPlantFoodType() != PlantFoodType.NONE
+                && plant.getPlantFoodEffect() != null) {
+
+            plant.getPlantFoodEffect().triggerSuperpower(plant, session);
+            plant.getPlantFoodEffect().applyStatusModifiers(plant);
+            session.notifyPlantFoodUsed(plant);
+        }
+    }
+
+    private void applyLevelBoost(Plant plant) {
+        if (App.getGameSession().getBoostedPlants().contains(
+                ChoosePlantService.normalizePlantKey(plant.getName()))) {
+            plant.setBuffed(true);
         }
     }
 
@@ -309,20 +356,16 @@ public class GameService {
         if (blueprint == null) {
             throw new IllegalStateException("Plant profile template is completely missing.");
         }
-
         Lawn lawn = session.getLawn();
         if (lawn == null || y < 0 || y >= lawn.getRows() || x < 0 || x >= lawn.getCols()) {
             throw new IllegalStateException("invalid location");
         }
-
         Cell cell = lawn.getCell(y, x);
         if (cell == null) {
             throw new IllegalStateException("invalid location");
         }
-
-        boolean isWaterTile = cell.getTile() != null && cell.getTile().getType() == com.ussr.pvz.model.board.terrain.TileType.Water;
-
-        // Null-safe Tag & Name evaluations
+        boolean isWaterTile = cell.getTile() != null
+                && cell.getTile().getType() == com.ussr.pvz.model.board.terrain.TileType.Water;
         boolean isAquaticPlant = false;
         if (blueprint.getTags() != null) {
             isAquaticPlant = blueprint.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.WATER);
@@ -332,7 +375,6 @@ public class GameService {
                     blueprint.getName().equalsIgnoreCase("Lily Pad") ||
                     blueprint.getName().equalsIgnoreCase("LilyPad");
         }
-
         boolean hasLilyPadUnderneath = false;
         if (!cell.isEmpty()) {
             Plant existingPlant = cell.getPlant();
@@ -341,9 +383,7 @@ public class GameService {
                         existingPlant.getName().equalsIgnoreCase("LilyPad");
             }
         }
-
         String displayName = blueprint.getName() != null ? blueprint.getName() : "this plant";
-
         if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
             if (!(isWaterTile && (isAquaticPlant || hasLilyPadUnderneath))) {
                 throw new IllegalStateException("cannot plant " + displayName + " on this tile (" + x + ", " + y + ")");
@@ -351,11 +391,9 @@ public class GameService {
         } else if (isWaterTile && !isAquaticPlant && cell.isEmpty()) {
             throw new IllegalStateException(displayName + " must be planted on a Lily Pad!");
         }
-
         if(cell.getPlant() != null) {
             throw new IllegalStateException("can not plant plant here cause there is an interactible structure here");
         }
-
         if (!cell.isEmpty()) {
             if (hasLilyPadUnderneath && !isAquaticPlant) {
             } else {
@@ -398,11 +436,7 @@ public class GameService {
         }
 
         int plantId = PlantFactory.findIdByName(requestedType);
-        Plant blueprint = PlantFactory.createPlant(plantId, level);
-        if (blueprint == null) {
-            throw new IllegalStateException("Database query error: template for ID " + plantId + " was not resolved by Factory.");
-        }
-        return blueprint;
+        return PlantFactory.createPlant(plantId, level);
     }
 
     private Plant instantiatePlant(Plant blueprint, int x, int y) {
@@ -463,10 +497,12 @@ public class GameService {
         if (plant.getPlantFoodType() == null
                 || plant.getPlantFoodType() == PlantFoodType.NONE
                 || plant.getPlantFoodEffect() == null) {
-            throw new IllegalStateException((plant.getName() != null ? plant.getName() : "this plant") + " has no plant food effect");
+            throw new IllegalStateException((plant.getName() != null ? plant.getName() : "this plant")
+                    + " has no plant food effect");
         }
         if (plant.getPlantFoodTimer() > 0) {
-            throw new IllegalStateException((plant.getName() != null ? plant.getName() : "this plant") + " is already under a plant food effect");
+            throw new IllegalStateException((plant.getName() != null ? plant.getName() : "this plant")
+                    + " is already under a plant food effect");
         }
         return plant;
     }
@@ -499,7 +535,8 @@ public class GameService {
             return "no active game session";
         }
 
-        if (session.getLevel().getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy conveyor) {
+        if (session.getLevel().getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery
+                .ConveyorDeliveryStrategy conveyor) {
             if (conveyor.getConveyorBelt() == null || conveyor.getConveyorBelt().isEmpty()) {
                 return "conveyor is empty";
             }
@@ -649,7 +686,8 @@ public class GameService {
         // Apply reward automatically
         QuestRewardApplier.applyReward(quest.getReward(), quest.getTitle());
 
-        return "quest completed: " + quest.getTitle() + " | Reward: " + quest.getReward().amount() + " " + quest.getReward().rewardType();
+        return "quest completed: " + quest.getTitle() + " | Reward: " + quest.getReward().amount() + " "
+                + quest.getReward().rewardType();
     }
 
     public String startZombieWaves() {

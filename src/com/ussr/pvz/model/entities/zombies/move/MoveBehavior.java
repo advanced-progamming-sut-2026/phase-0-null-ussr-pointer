@@ -17,11 +17,13 @@ public interface MoveBehavior {
         if (cell == null || cell.getTile() == null) return pos;
 
         com.ussr.pvz.model.board.terrain.Tile tile = cell.getTile();
-        if (tile.getType() != com.ussr.pvz.model.board.terrain.TileType.Slippery || tile.getSlipperyDirection() == null) {
+        if (tile.getType() != com.ussr.pvz.model.board.terrain.TileType.Slippery
+                || tile.getSlipperyDirection() == null) {
             return pos;
         }
 
-        double rowDelta = tile.getSlipperyDirection() == com.ussr.pvz.model.board.terrain.Tile.SlipperyDirection.UP ? -1.0 : 1.0;
+        double rowDelta = tile.getSlipperyDirection() == com.ussr.pvz.model.board.terrain.Tile.SlipperyDirection.UP
+                ? -1.0 : 1.0;
         double newRow = row + rowDelta;
 
         // Prevent sliding off the map bounds

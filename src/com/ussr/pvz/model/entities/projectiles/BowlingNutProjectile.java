@@ -132,7 +132,8 @@ public class BowlingNutProjectile extends Projectile {
         double currentY = getPosition().y();
 
         for (Zombie z : session.getZombies()) {
-            if (z.isAlive() && Math.abs(z.getPosition().x() - currentX) <= 1.5 && Math.abs(z.getPosition().y() - currentY) <= 1.5) {
+            if (z.isAlive() && Math.abs(z.getPosition().x() - currentX) <= 1.5 &&
+                    Math.abs(z.getPosition().y() - currentY) <= 1.5) {
                 z.takeDamage(getDamage(), this);
             }
         }

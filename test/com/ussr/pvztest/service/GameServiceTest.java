@@ -44,7 +44,7 @@ class GameServiceTest {
                 "game-user", "Gamer", "pass", "gamer@example.com", Gender.MALE, 3,
                 null, null, 1, 1, 0, 0, 1000, 50, 0,
                 plantLevels, new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         activeAccount = new Account(state, null);
         App.addAccount(activeAccount);

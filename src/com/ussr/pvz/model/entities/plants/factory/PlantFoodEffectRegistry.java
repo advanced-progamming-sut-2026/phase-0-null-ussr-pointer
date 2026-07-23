@@ -83,11 +83,13 @@ public final class PlantFoodEffectRegistry {
                 case "Explode-o-nut" -> GrantArmor.forExplodeONut();
                 case "Pumpkin" -> GrantArmor.forPumpkin();
                 case "Sun Bean" -> GrantArmor.forSunBean();
-                default -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(), 0, false, false, false, true);
+                default -> new GrantArmor(((Number) data.getOrDefault("plantFoodValue", 0)).intValue(),
+                        0, false, false, false, true);
             };
         });
 
-        register("RANDOM_HYPNOTIZE", data -> new RandomHypnotize(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register("RANDOM_HYPNOTIZE", data -> new RandomHypnotize(((Number)
+                data.getOrDefault("plantFoodValue", 0)).intValue()));
 
         register("KNOCKBACK_BLAST", data -> {
             if ("Magnet-shroom".equals(data.get("name"))) {
@@ -96,13 +98,16 @@ public final class PlantFoodEffectRegistry {
             return new KnockBackBlast(3.0);
         });
 
-        register("METAL_ABSORB", data -> new MetalAbsorb(((Number) data.getOrDefault("plantFoodValue", 15)).intValue()));
+        register("METAL_ABSORB", data -> new MetalAbsorb(((Number)
+                data.getOrDefault("plantFoodValue", 15)).intValue()));
 
-        register("PULL_UNDERWATER", data -> new PullUnderWater(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register("PULL_UNDERWATER", data -> new PullUnderWater(((Number)
+                data.getOrDefault("plantFoodValue", 0)).intValue()));
 
         register("MAP_WIDE_FREEZE", data -> new MapWideFreeze());
 
-        register("INSTANT_KILL", data -> new InstantKill(((Number) data.getOrDefault("plantFoodValue", 0)).intValue()));
+        register("INSTANT_KILL", data -> new InstantKill(((Number)
+                data.getOrDefault("plantFoodValue", 0)).intValue()));
 
         register("LOBBER_BARRAGE", data -> new LobberBarrage());
     }

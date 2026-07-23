@@ -30,7 +30,8 @@ public class SunThief implements EffectStatus {
     private GroundItem currentTarget;
     private double targetTimer = 0;
 
-    public SunThief(boolean isBankThief, int maxSunsToSteal, double dropRatioOnDeath, double chargingTime, int laserDamage) {
+    public SunThief(boolean isBankThief, int maxSunsToSteal, double dropRatioOnDeath, double chargingTime,
+                    int laserDamage) {
         this.isBankThief = isBankThief;
         this.maxSunsToSteal = maxSunsToSteal;
         this.dropRatioOnDeath = dropRatioOnDeath;

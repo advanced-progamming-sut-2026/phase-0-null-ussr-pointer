@@ -33,7 +33,8 @@ public class SunProduceStrategy implements ActStrategy {
         ProducedSun sun = null;
         if(isInstantBurst) {
             sun = new ProducedSun(x , y , sunValue , user.getName());
-            //todo : we may should make the plant of the sell null when a plant dies ( we can do it somewhere elkse like in the set alive method)
+            //todo : we may should make the plant of the sell null
+            // when a plant dies ( we can do it somewhere else like in the set alive method)
             user.setAlive(false);
         }
         else {

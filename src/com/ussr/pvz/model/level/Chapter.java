@@ -72,7 +72,8 @@ public class Chapter {
             if (type != null) {
                 parsedTypes.add(type);
             } else {
-                System.err.println("[Chapter Warning] Skipping invalid TileType entry configured in JSON: '" + name + "'");
+                System.err.println("[Chapter Warning] Skipping invalid TileType entry configured in JSON: '"
+                        + name + "'");
             }
         }
         this.allowedTiles = parsedTypes;

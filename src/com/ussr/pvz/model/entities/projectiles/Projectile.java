@@ -25,11 +25,13 @@ public class Projectile extends GameEntity {
     private MoveStrategy moveStrategy;
     private HitEffectStrategy hitEffectStrategy;
 
-    public Projectile(Vec2 position, Vec2 velocity, Zombie zombie, int damage, MoveStrategy moveStrategy, HitEffectStrategy hitEffectStrategy) {
+    public Projectile(Vec2 position, Vec2 velocity, Zombie zombie, int damage, MoveStrategy moveStrategy,
+                      HitEffectStrategy hitEffectStrategy) {
         this((Damageable) zombie, position, velocity, damage, moveStrategy, hitEffectStrategy);
     }
 
-    public Projectile(Damageable target, Vec2 position, Vec2 velocity, int damage, MoveStrategy moveStrategy, HitEffectStrategy hitEffectStrategy) {
+    public Projectile(Damageable target, Vec2 position, Vec2 velocity, int damage, MoveStrategy moveStrategy,
+                      HitEffectStrategy hitEffectStrategy) {
         this.setPosition(position);
         this.setSpeed(velocity);
         this.target = target;
@@ -109,8 +111,10 @@ public class Projectile extends GameEntity {
             for (Zombie zombie : zombies) {
                 if (!zombie.isAlive()) continue;
                 if (this.getPosition().distanceTo(zombie.getPosition()) < 0.2) {
-                    if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense.JesterDefense jester) {
-                        if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy() instanceof ArcMove) {
+                    if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense
+                            .JesterDefense jester) {
+                        if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy()
+                                instanceof ArcMove) {
                             this.setSpeed(this.getSpeed().scale(-1));
                             this.target = jester.findNearestPlantInLane(zombie, session);
                             jester.triggerSpin(zombie);
@@ -170,7 +174,8 @@ public class Projectile extends GameEntity {
         return targets;
     }
 
-    public ArrayList<GameEntity> targetFinder(ArrayList<InteractableStructure> interactableStructures, GameSession session) {
+    public ArrayList<GameEntity> targetFinder(ArrayList<InteractableStructure> interactableStructures,
+                                              GameSession session) {
         ArrayList<GameEntity> targets = new ArrayList<>();
 
         int areaLength = hitEffectStrategy.getAreaLength();
@@ -184,7 +189,8 @@ public class Projectile extends GameEntity {
             if (!structure.isAlive()) continue;
             Vec2 pos = structure.getPosition();
             if (pos == null) continue;
-            if (Math.abs(explosionEpicenter.y() - pos.y()) < straightDist && Math.abs(explosionEpicenter.x() - pos.x()) < straightDist) {
+            if (Math.abs(explosionEpicenter.y() - pos.y()) < straightDist
+                    && Math.abs(explosionEpicenter.x() - pos.x()) < straightDist) {
                 targets.add(structure);
             }
         }
@@ -193,7 +199,8 @@ public class Projectile extends GameEntity {
         for (Zombie zombie : zombies) {
             if (!zombie.isAlive()) continue;
             Vec2 pos = zombie.getPosition();
-            if (Math.abs(explosionEpicenter.y() - pos.y()) < straightDist && Math.abs(explosionEpicenter.x() - pos.x()) < straightDist) {
+            if (Math.abs(explosionEpicenter.y() - pos.y()) < straightDist
+                    && Math.abs(explosionEpicenter.x() - pos.x()) < straightDist) {
                 targets.add(zombie);
             }
         }

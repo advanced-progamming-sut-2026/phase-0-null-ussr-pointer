@@ -26,7 +26,8 @@ public class ModifierEffect implements PlantFoodEffect{
                         boolean isTileOccupied = false;
                         if (session.getPlants() != null) {
                             for (Plant plant : session.getPlants()) {
-                                if (plant.isAlive() && (int) plant.getPosition().x() == col && (int) plant.getPosition().y() == row) {
+                                if (plant.isAlive() && (int) plant.getPosition().x() == col &&
+                                        (int) plant.getPosition().y() == row) {
                                     isTileOccupied = true;
                                     break;
                                 }

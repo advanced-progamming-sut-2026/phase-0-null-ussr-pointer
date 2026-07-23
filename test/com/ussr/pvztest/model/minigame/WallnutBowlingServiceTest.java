@@ -38,6 +38,7 @@ class WallnutBowlingServiceTest {
         String result = bowlingService.rollWallnut("NORMAL", 1, 2);
 
         // Assert
+        //todo should initialize the belt first
         assertEquals("Rolled a NORMAL!", result);
         assertEquals(1, session.getProjectiles().size());
     }

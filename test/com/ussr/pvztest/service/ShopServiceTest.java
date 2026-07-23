@@ -35,7 +35,7 @@ class ShopServiceTest {
                 50,   // 50 Gems
                 0,
                 new HashMap<>(), new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         activeAccount = new Account(state, null);
 

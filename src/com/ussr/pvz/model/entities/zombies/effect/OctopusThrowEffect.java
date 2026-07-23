@@ -48,7 +48,8 @@ public class OctopusThrowEffect implements EffectStatus {
             }
         } else {
             for (Zombie target : session.getZombies()) {
-                if (target.isAlive() && target.getFaction() == Faction.ZOMBIES && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
+                if (target.isAlive() && target.getFaction() == Faction.ZOMBIES
+                        && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
                     session.addZombieProjectile(new OctopusProjectile(startPos, target.getPosition(), 1.5));
                     return true;
                 }

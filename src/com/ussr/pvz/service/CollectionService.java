@@ -59,7 +59,8 @@ public class CollectionService {
         String targetName = ChoosePlantService.normalizePlantKey(plantName);
 
         for (Map<String, Object> plant : allPlants) {
-            if (plant.get("name").toString().replaceAll("[\\s_\\-]", "").toUpperCase().equals(targetName.replaceAll("[\\s_\\-]", ""))) {
+            if (plant.get("name").toString().replaceAll("[\\s_\\-]", "").toUpperCase()
+                    .equals(targetName.replaceAll("[\\s_\\-]", ""))) {
                 String sb = "Plant Name: " + plant.get("name") + "\n" +
                         "HP: " + plant.get("baseHp") + "\n" +
                         "Sun Cost: " + plant.get("cost") + "\n" +

@@ -32,7 +32,8 @@ public class LeaderBoardService {
 
             int minigames = acc.getAdventureProgress().getMinigamesWon();
             int dailyQuests = getCompletedQuestCount(acc, QuestType.DAILY);
-            int nonDailyQuests = getCompletedQuestCount(acc, QuestType.CHALLENGE) + getCompletedQuestCount(acc, QuestType.EPIC);
+            int nonDailyQuests = getCompletedQuestCount(acc, QuestType.CHALLENGE)
+                    + getCompletedQuestCount(acc, QuestType.EPIC);
             int score = acc.getScoreRecord().getScore();
 
             sb.append(String.format("%-15s | %-15s | %-10d | %-12d | %-12d | %-10d\n",
@@ -79,9 +80,12 @@ public class LeaderBoardService {
             case "daily", "daily quests" ->
                     Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.DAILY));
             case "non-daily", "other quests", "epic", "challenge" ->
-                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.CHALLENGE) + getCompletedQuestCount(a, QuestType.EPIC));
+                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.CHALLENGE)
+                            + getCompletedQuestCount(a, QuestType.EPIC));
             case "quests", "quest" ->
-                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.DAILY) + getCompletedQuestCount(a, QuestType.CHALLENGE) + getCompletedQuestCount(a, QuestType.EPIC));
+                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.DAILY)
+                            + getCompletedQuestCount(a, QuestType.CHALLENGE) +
+                            getCompletedQuestCount(a, QuestType.EPIC));
             default ->
                     Comparator.comparingInt(a -> a.getScoreRecord().getScore());
         };

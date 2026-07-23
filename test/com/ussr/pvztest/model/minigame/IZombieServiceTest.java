@@ -48,7 +48,7 @@ class IZombieServiceTest {
     @Test
     @DisplayName("❌ Should prevent placing a zombie behind the red line (Plant territory)")
     void placeZombie_shouldFail_whenBehindRedLine() {
-        String result = iZombieService.placeZombie("ZombieDefault", 2, 2); // col 2 < red line 4
+        String result = iZombieService.placeZombie("ZombieDefault", 1, 1); // col 2 < red line 4
         assertTrue(result.contains("You can only spawn zombies to the right of the red line"));
     }
 

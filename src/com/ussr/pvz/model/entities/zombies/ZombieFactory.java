@@ -145,7 +145,8 @@ public class ZombieFactory {
             default -> ZombieSize.DEFAULT;
         };
 
-        boolean canSpawnPlantFood = data.containsKey("CanSpawnPlantFood") ? (Boolean) data.get("CanSpawnPlantFood") : true;
+        boolean canSpawnPlantFood = data.containsKey("CanSpawnPlantFood") ? (Boolean) data.get("CanSpawnPlantFood")
+                : true;
 
         Armor armor = resolveArmor(data);
 
@@ -189,7 +190,8 @@ public class ZombieFactory {
                         zombie.setHp(zombie.getMaxHp());
                     } else if ("EatDPS".equals(prop.get("Key"))) {
                         zombie.setEatDps(zombie.getEatDps() * scale);
-                    } else if ("SmashDamage".equals(prop.get("Key")) && data.get("SmashDamage") instanceof Number smashBase) {
+                    } else if ("SmashDamage".equals(prop.get("Key")) && data.get("SmashDamage")
+                            instanceof Number smashBase) {
                         data.put("SmashDamage", (int) (smashBase.doubleValue() * scale));
                     }
                 }

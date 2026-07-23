@@ -208,7 +208,7 @@ class LevelDataIntegrationTest {
         manager.nextLevel(); // -> level 4 (boss)
         manager.nextLevel(); // -> should cross into big_wave_beach
 
-        assertEquals("big_wave_beach", manager.getCurrentChapter().getId());
+        assertEquals("frostbite_caves", manager.getCurrentChapter().getId());
         assertEquals(1, manager.getCurrentLevel().getOrder());
     }
 

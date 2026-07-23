@@ -136,7 +136,8 @@ public class ChoosePlantService {
         Level level = App.getLevelManager().getCurrentLevel();
         if (level == null) return "no level selected";
 
-        boolean requiresSelection = !(level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy)
+        boolean requiresSelection = !(level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery
+                .ConveyorDeliveryStrategy)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.BeghouledBehavior)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.VaseBreakerBehavior)

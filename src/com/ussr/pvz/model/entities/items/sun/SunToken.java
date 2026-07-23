@@ -58,7 +58,8 @@ public class SunToken extends GroundItem {
     public void applyRewards(GameSession session, Account account) {
         if (dropType != SunDropType.RADIOACTIVE) {
             session.addSun(dropType.getValue());
-            App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(), App.getGameSession().getSunCount()));
+            App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(),
+                    App.getGameSession().getSunCount()));
         } else {
             if (falling) {
                 explodeRadioactive(session);
@@ -67,7 +68,8 @@ public class SunToken extends GroundItem {
                 return;
             }
             session.addSun(dropType.getValue());
-            App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(), App.getGameSession().getSunCount()));
+            App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(dropType.getValue(),
+                    App.getGameSession().getSunCount()));
         }
         this.isAlive = false;
         this.setCollected(true);

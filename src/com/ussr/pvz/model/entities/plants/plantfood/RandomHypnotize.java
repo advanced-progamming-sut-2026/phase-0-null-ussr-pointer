@@ -61,7 +61,8 @@ public class RandomHypnotize implements PlantFoodEffect {
             if(counter >= maxTargets) break;
             if(z.getPosition().distanceTo(user.getPosition()) < 0.5) {
                 zombies.remove(z);
-                Zombie newZomb = ZombieFactory.create("ZombieGargantuar" ,(int)user.getPosition().y() ,(int) user.getPosition().x());
+                Zombie newZomb = ZombieFactory.create("ZombieGargantuar" ,(int)user.getPosition().y() ,
+                        (int) user.getPosition().x());
                 newZomb.hypnotize();
                 session.getZombies().add(newZomb);
                 counter ++;

@@ -15,6 +15,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantArmor;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.service.game.GameService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +63,7 @@ class PlantLifecycleIntegrationTest {
                 "lifecycle-user", "Lifecycle", "pass", "life@example.com", Gender.MALE, 3,
                 null, null, 1, 1, 0, 0, 0, 0, 0,
                 plantLevels, new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         account = new Account(state, null);
         App.addAccount(account);
@@ -226,7 +227,7 @@ class PlantLifecycleIntegrationTest {
     @Test
     @DisplayName("✅ Plant dies exactly when HP reaches zero, not before")
     void takeDamage_killsPlant_atExactlyZeroHp() {
-        Plant plant = new Plant();
+        Plant plant = PlantFactory.createPlantByName("peashooter",1);
         plant.setHp(50);
         plant.setAlive(true);
 
@@ -240,11 +241,11 @@ class PlantLifecycleIntegrationTest {
     @Test
     @DisplayName("✅ Overkill damage does not go negative or resurrect the plant")
     void takeDamage_overkill_doesNotGoNegative() {
-        Plant plant = new Plant();
+        Plant plant = PlantFactory.createPlantByName("peashooter",1);
         plant.setHp(50);
         plant.setAlive(true);
 
-        plant.takeDamage(999, (Zombie) null);
+        plant.takeDamage(999, ZombieFactory.create("ZombieDefault",1,1));
 
         assertEquals(0, plant.getHp());
         assertFalse(plant.isAlive());

@@ -26,7 +26,8 @@ public class ProducedSun extends GroundItem {
         session.addSun(value);
         this.isAlive = false;
         this.setCollected(true);
-        App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(value, App.getGameSession().getSunCount()));
+        App.getGameSession().getEventBus().publish(new GameEvent.SunCollected(value, App.getGameSession()
+                .getSunCount()));
     }
 
     public int getValue() {

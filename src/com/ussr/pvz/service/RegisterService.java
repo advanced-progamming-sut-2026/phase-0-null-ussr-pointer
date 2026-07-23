@@ -73,7 +73,8 @@ public class RegisterService {
         if (!validPasswordUpper(request.password())) return "password must contain an uppercase character";
         if (!validPasswordNumber(request.password())) return "password must contain a number";
         if (!validPasswordSpecific(request.password())) return "password must contain a specific character";
-        if (!request.password().equals(request.passwordConfirm())) return "password confirm does not match to the password";
+        if (!request.password().equals(request.passwordConfirm())) return "password confirm does not match to " +
+                "the password";
         if (!validEmail(request.email())) return "invalid email format";
         if (!validNickname(request.nickname())) return "invalid nickname length";
         if (!validGender(request.gender())) return "invalid gender";

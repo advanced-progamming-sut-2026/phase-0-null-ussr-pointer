@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum GlobalCommand {
-    MENU_ENTER("^menu\\s+enter\\s+(?!chapter|greenhouse|travel-log|leaderboard|coin-wallet|gem-wallet|switch|logout)(?<menuName>\\S+)(?:\\s+.*)?$"),
+    MENU_ENTER("^menu\\s+enter\\s+(?!chapter|greenhouse|travel-log|leaderboard|coin-wallet|gem-wallet|switch" +
+            "|logout)(?<menuName>\\S+)(?:\\s+.*)?$"),
     MENU_SHOW_CURRENT("^menu\\s+show\\s+current(?:\\s+.*)?$"),
     ADVANCE_TIME("^advance\\s+time\\s+-t\\s+(?<count>\\S+)\\s+ticks(?:\\s+.*)?$"),
     MENU_LOGOUT("^menu\\s+logout(?:\\s+.*)?$"),

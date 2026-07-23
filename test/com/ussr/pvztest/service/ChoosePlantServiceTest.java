@@ -38,7 +38,7 @@ class ChoosePlantServiceTest {
                 "plant-chooser", "Chooser", "pass", "chooser@example.com", Gender.FEMALE, 3,
                 null, null, 1, 1, 0, 0, 0, 0, 0,
                 plantLevels, new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         activeAccount = new Account(state, null);
         App.addAccount(activeAccount);

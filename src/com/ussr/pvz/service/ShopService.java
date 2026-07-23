@@ -16,7 +16,8 @@ public class ShopService {
         rotateDailyOffersIfNeeded();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount", "Description"));
+        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount",
+                "Description"));
         sb.append("-".repeat(100)).append("\n");
 
         App.getShopManager().getShopItems().forEach(item -> {
@@ -29,7 +30,8 @@ public class ShopService {
         rotateDailyOffersIfNeeded();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount", "Description"));
+        sb.append(String.format("%-4s | %-20s | %-12s | %-10s | %s\n", "ID", "Name", "Cost", "Discount",
+                "Description"));
         sb.append("-".repeat(100)).append("\n");
 
         App.getShopManager().getShopItems().forEach(item -> {
@@ -57,7 +59,8 @@ public class ShopService {
 
     private String makeItem(ShopItem item) {
         String costStr = item.getCost() + " " + item.getType().getCostType();
-        String discountStr = (item.getDiscountPercent() != null && item.getDiscountPercent() > 0) ? item.getDiscountPercent() + "%" : "None";
+        String discountStr = (item.getDiscountPercent() != null && item.getDiscountPercent() > 0) ?
+                item.getDiscountPercent() + "%" : "None";
 
         return String.format("%-4s | %-20s | %-12s | %-10s | %s\n",
                 item.getId(),
@@ -120,11 +123,13 @@ public class ShopService {
 
         switch (item.getType().getCostType()) {
             case "coin" -> {
-                if (adv.getCoin() < totalCost) return "insufficient coins (need " + totalCost + ", have " + adv.getCoin() + ")";
+                if (adv.getCoin() < totalCost) return "insufficient coins (need " + totalCost + ", have "
+                        + adv.getCoin() + ")";
                 adv.addCoin(-totalCost);
             }
             case "gem" -> {
-                if (adv.getGem() < totalCost) return "insufficient gems (need " + totalCost + ", have " + adv.getGem() + ")";
+                if (adv.getGem() < totalCost) return "insufficient gems (need " + totalCost + ", have "
+                        + adv.getGem() + ")";
                 adv.addGem(-totalCost);
             }
             default -> { return "unknown currency type"; }

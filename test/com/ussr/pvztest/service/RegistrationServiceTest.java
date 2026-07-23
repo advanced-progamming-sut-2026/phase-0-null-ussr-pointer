@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,7 +124,8 @@ class RegisterServiceTest {
                         0,                                       // 21. plant food count
                         new java.util.HashMap<>(),               // 22. seed packets
                         new java.util.ArrayList<>(),             // 23. active quests
-                        new java.util.HashMap<>()                // 24. completed quests
+                        new java.util.HashMap<>(),          // 24. completed quests
+                        System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
                 ),
                 null
         );

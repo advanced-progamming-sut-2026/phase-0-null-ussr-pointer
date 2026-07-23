@@ -41,15 +41,11 @@ public class PlantFactory {
         if (data == null) {
             throw new IllegalArgumentException("Plant name not found in registry: " + name);
         }
-
         Plant plant = new Plant();
         plant.setId(((Number) data.getOrDefault("id", 0)).intValue());
         plant.setName((String) data.get("name"));
-
         String catStr = (String) data.get("category");
         if (catStr != null) plant.setType(PlantType.valueOf(catStr));
-
-        @SuppressWarnings("unchecked")
         List<String> tagsList = (List<String>) data.get("tags");
         if (tagsList != null) {
             for (String tagStr : tagsList) {
@@ -57,7 +53,39 @@ public class PlantFactory {
                 if (t != null) plant.getTags().add(t);
             }
         }
+        Result result = getResult(level, data, plant);
+        plant.setHp(Math.max(0, result.runtimeHp()));
+        plant.setCost(Math.max(0, result.runtimeCost()));
+        plant.setActionInterval(Math.max(0.05, result.runtimeInterval()));
+        plant.setDamage(result.runtimeDamage());
+        try {
+            plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
+                    Math.max(0.0, result.runtimeRecharge()));
+            plant.getClass().getMethod("setRecharge", double.class).invoke(plant, 0.0);
+        } catch (Exception e) {
+            plant.setRecharge((int) Math.max(0.0, result.runtimeRecharge()));
+        }
+        plant.setAbilityValue(result.runtimeAbility());
+        plant.setLevel(level);
+        String pfType = (String) data.get("plantFoodType");
+        if (pfType != null && !pfType.trim().isEmpty() && !pfType.trim().equalsIgnoreCase("NONE")) {
+            try {
+                plant.setPlantFoodType(PlantFoodType.valueOf(pfType.trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                plant.setPlantFoodType(PlantFoodType.NONE);
+            }
+        } else {
+            plant.setPlantFoodType(PlantFoodType.NONE);
+        }
+        List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
+        plant.setWrampUp(wrampUp);
+        plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
+        plant.setActStrategy(ActStrategyRegistry.create(data));
+        plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
+        return plant;
+    }
 
+    private static Result getResult(int level, Map<String, Object> data, Plant plant) {
         int runtimeHp = ((Number) data.getOrDefault("baseHp", 0)).intValue();
         int runtimeCost = ((Number) data.getOrDefault("cost", 0)).intValue();
         double runtimeInterval = ((Number) data.getOrDefault("actionInterval", 0.0)).doubleValue();
@@ -92,44 +120,13 @@ public class PlantFactory {
                 }
             }
         }
+        Result result = new Result(runtimeHp, runtimeCost, runtimeInterval, runtimeDamage, runtimeRecharge,
+                runtimeAbility);
+        return result;
+    }
 
-        plant.setHp(Math.max(0, runtimeHp));
-        plant.setCost(Math.max(0, runtimeCost));
-        plant.setActionInterval(Math.max(0.05, runtimeInterval));
-        plant.setDamage(runtimeDamage);
-
-        // Adjusted to maintain your setMaxRecharge logic
-        try {
-            plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant, Math.max(0.0, runtimeRecharge));
-            plant.getClass().getMethod("setRecharge", double.class).invoke(plant, 0.0);
-        } catch (Exception e) {
-            plant.setRecharge((int) Math.max(0.0, runtimeRecharge)); // Fallback if setMaxRecharge doesn't exist yet
-        }
-
-        plant.setAbilityValue(runtimeAbility);
-        plant.setLevel(level);
-
-        String pfType = (String) data.get("plantFoodType");
-        if (pfType != null && !pfType.trim().isEmpty() && !pfType.trim().equalsIgnoreCase("NONE")) {
-            try {
-                plant.setPlantFoodType(PlantFoodType.valueOf(pfType.trim().toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                plant.setPlantFoodType(PlantFoodType.NONE);
-            }
-        } else {
-            plant.setPlantFoodType(PlantFoodType.NONE);
-        }
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
-        plant.setWrampUp(wrampUp);
-
-        plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
-        plant.setActStrategy(ActStrategyRegistry.create(data));
-
-        plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
-
-        return plant;
+    private record Result(int runtimeHp, int runtimeCost, double runtimeInterval, int runtimeDamage,
+                          double runtimeRecharge, double runtimeAbility) {
     }
 
     public static Plant createPlant(int id, int level) {

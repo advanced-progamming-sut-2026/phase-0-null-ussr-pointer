@@ -3,6 +3,7 @@ package com.ussr.pvztest.model.game;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.service.game.PlantService;
@@ -29,7 +30,7 @@ class PlantServiceTest {
         session.setItems(new ArrayList<>());
         App.setGameSession(session);
 
-        testPlant = new Plant();
+        testPlant =  PlantFactory.createPlantByName("peashooter",1);
         testPlant.setLocation(new Plant.Location(2, 2)); // Col 2, Row 2
         testPlant.setHp(300);
         testPlant.setAlive(true);

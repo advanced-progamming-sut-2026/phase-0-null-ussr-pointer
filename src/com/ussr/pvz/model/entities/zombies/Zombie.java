@@ -224,7 +224,8 @@ public class Zombie extends GameEntity implements Damageable {
 
             if (damageWhileSubmerged != null && damageWhileSubmerged.contains(plantName)) {
                 allowDamage = true;
-            } else if (plant.getPlantFoodTimer() > 0 && damageWhileSubmergedPlantfoodOnly != null && damageWhileSubmergedPlantfoodOnly.contains(plantName)) {
+            } else if (plant.getPlantFoodTimer() > 0 && damageWhileSubmergedPlantfoodOnly != null &&
+                    damageWhileSubmergedPlantfoodOnly.contains(plantName)) {
                 allowDamage = true;
             }
         } else if (damageSource instanceof Projectile p) {

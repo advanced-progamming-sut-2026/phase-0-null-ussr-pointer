@@ -76,10 +76,12 @@ public class VaseBreakerBehavior extends LevelBehavior {
         } else if (type == VaseType.NORMAL) {
             int roll = rand.nextInt(3);
             if (roll == 0) {
-                vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory.create("ZombieDefault", r, c));
+                vase.setContainedZombie(com.ussr.pvz.model.entities.zombies.ZombieFactory
+                        .create("ZombieDefault", r, c));
             } else if (roll == 1) {
                 // FIX: Uses correct parameters
-                vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f, rand.nextInt(50) + 1));
+                vase.setSeedPackDrop(new SeedPackDrop(ItemType.SEED_PACK, 40f, 20f,
+                        rand.nextInt(50) + 1));
             }
         }
     }

@@ -122,8 +122,8 @@ public class ShootStrategy implements ActStrategy {
         double cross = relX * dy - relY * dx;
 
         // Use an epsilon because of floating-point precision
-        double EPSILON = 0.3;
-        if (Math.abs(cross) > EPSILON) {
+        double epsilon = 0.3;
+        if (Math.abs(cross) > epsilon) {
             return false;
         }
 

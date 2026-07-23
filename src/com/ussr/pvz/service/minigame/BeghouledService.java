@@ -63,7 +63,8 @@ public class BeghouledService {
         }
 
         // Verify the plant is actually on the board before allowing the upgrade
-        if (!beghouledBehavior.getActivePlantTypes().containsValue(key) && !beghouledBehavior.getActivePlantTypes().containsKey(key)) {
+        if (!beghouledBehavior.getActivePlantTypes().containsValue(key) && !beghouledBehavior.getActivePlantTypes()
+                .containsKey(key)) {
             return currentPlantType + " is not currently active in this level.";
         }
 

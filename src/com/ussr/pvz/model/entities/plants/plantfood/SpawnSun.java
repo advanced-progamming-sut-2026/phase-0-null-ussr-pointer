@@ -18,7 +18,8 @@ public class SpawnSun implements PlantFoodEffect {
     @Override
     public void triggerSuperpower(Plant user, GameSession session) {
         if (this.sunAmount > 0 && session != null) {
-            ProducedSun sun = new ProducedSun((int) user.getPosition().x() , (int) user.getPosition().y() , sunAmount , user.getName());
+            ProducedSun sun = new ProducedSun((int) user.getPosition().x() ,
+                    (int) user.getPosition().y() , sunAmount , user.getName());
             session.addItem(sun);
         }
         user.setPlantFoodTimer(duration);

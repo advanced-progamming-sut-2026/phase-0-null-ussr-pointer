@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    id 'checkstyle'
+    id 'pmd'
 }
 
 group = 'com.team'
@@ -13,6 +15,33 @@ repositories {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+checkstyle {
+    toolVersion = '10.26.1'
+    configFile = file('config/checkstyle/checkstyle.xml')
+}
+
+pmd {
+    toolVersion = '7.16.0'
+    ruleSets = []
+    ruleSetFiles = files(
+            'config/pmd/pmd.xml'
+    )
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+tasks.withType(Pmd).configureEach {
+    reports {
+        html.required = true
+        xml.required = true
     }
 }
 
@@ -32,7 +61,6 @@ sourceSets {
 dependencies {
     implementation 'com.google.code.gson:gson:2.14.0'
 
-    // Upgraded testing framework to fully support JDK 25 features
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
 }
@@ -47,12 +75,22 @@ run {
 
 test {
     useJUnitPlatform()
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
-    }
-    // Show standard test output streams
-    testLogging {
         showStandardStreams = true
     }
+}
+
+/*
+ * check now only runs static analysis.
+ * Unit tests are completely independent.
+ */
+tasks.named("check") {
+    dependsOn.clear()
+    dependsOn(
+            tasks.named("checkstyleMain"),
+            tasks.named("pmdMain")
+    )
 }

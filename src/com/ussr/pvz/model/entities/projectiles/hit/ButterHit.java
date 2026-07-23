@@ -34,8 +34,10 @@ public class ButterHit implements HitEffectStrategy{
                     zombie.setStatus(Zombie.Status.BUTTER);
 
                     // Wrap the current move behavior to stun them for a duration (e.g., 4 seconds)
-                    if (!(zombie.getMoveBehavior() instanceof com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior)) {
-                        zombie.setMoveBehavior(new com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior(zombie.getMoveBehavior(), 4.0));
+                    if (!(zombie.getMoveBehavior() instanceof com.ussr.pvz.model.entities.zombies.move
+                            .StunnedMoveBehavior)) {
+                        zombie.setMoveBehavior(new com.ussr.pvz.model.entities.zombies.move
+                                .StunnedMoveBehavior(zombie.getMoveBehavior(), 4.0));
                     }
                 }
                 case Plant plant -> plant.takeDamage(damageAmount);

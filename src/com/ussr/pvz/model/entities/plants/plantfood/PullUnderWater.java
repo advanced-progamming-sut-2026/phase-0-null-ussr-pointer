@@ -23,7 +23,8 @@ public class PullUnderWater implements PlantFoodEffect {
         List<Zombie> activeZombies = new ArrayList<>();
         for (Zombie zombie : session.getZombies()) {
             if (zombie != null && zombie.isAlive()) {
-                if(session.getLawn().getCell((int) zombie.getPosition().y() , (int) zombie.getPosition().x()).getTile().getType() == TileType.Water)
+                if(session.getLawn().getCell((int) zombie.getPosition().y() ,
+                        (int) zombie.getPosition().x()).getTile().getType() == TileType.Water)
                     activeZombies.add(zombie);
             }
         }

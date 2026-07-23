@@ -11,7 +11,8 @@ public class SproutPlant {
     private long plantedAtMillis;
     private long growthDurationMillis;
 
-    public SproutPlant(String plantKey, boolean isMarigold, PlantState state, String type, long plantedAtMillis, long growthDurationMillis) {
+    public SproutPlant(String plantKey, boolean isMarigold, PlantState state, String type, long plantedAtMillis,
+                       long growthDurationMillis) {
         this.plantKey = plantKey;
         this.isMarigold = isMarigold;
         this.state = state;

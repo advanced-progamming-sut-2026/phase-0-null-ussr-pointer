@@ -35,7 +35,7 @@ class ZombieBehaviorSweepTest {
                 "zombie-user", "ZTest", "pass", "z@example.com", Gender.MALE, 3,
                 null, null, 1, 1, 0, 0, 0, 0, 0,
                 new HashMap<>(), new ArrayList<>(), new ArrayList<>(),
-                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>()
+                null, null, 0, new HashMap<>(), new ArrayList<>(), new HashMap<>(),System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         Account account = new Account(state, null);
         App.addAccount(account);

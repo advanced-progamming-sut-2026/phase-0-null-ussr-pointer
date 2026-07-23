@@ -1,6 +1,13 @@
 package com.ussr.pvz.model.engine.event;
 
-public sealed interface GameEvent permits GameEvent.GameOver, GameEvent.GameWon, GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked, GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned, GameEvent.GlowingZombieDroppedPlantFood {
+public sealed interface GameEvent permits GameEvent.GameOver, GameEvent.GameWon, GameEvent.GraveDestroyed,
+        GameEvent.LawnMowerTriggered, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped,
+        GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked,
+        GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie,
+        GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced,
+        GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane,
+        GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned,
+        GameEvent.GlowingZombieDroppedPlantFood {
 
 
     record ZombieSpawned(String alias, int lane, int col, boolean isGlowing) implements GameEvent {

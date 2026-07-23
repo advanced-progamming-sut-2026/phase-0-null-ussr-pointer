@@ -34,7 +34,8 @@ public class IZombieService {
 
         // 2. Validate placement area (must be to the right of the red line)
         if (x < iZombieBehavior.getRedLineColumn()) {
-            return "You can only spawn zombies to the right of the red line (column " + iZombieBehavior.getRedLineColumn() + " or greater).";
+            return "You can only spawn zombies to the right of the red line (column " +
+                    iZombieBehavior.getRedLineColumn() + " or greater).";
         }
 
         // 3. Validate Cost

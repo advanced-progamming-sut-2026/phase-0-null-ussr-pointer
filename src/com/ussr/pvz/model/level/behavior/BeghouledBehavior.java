@@ -287,7 +287,8 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private boolean isValidMatch(Cell c1, Cell c2, Cell c3) {
         Plant p1 = c1.getPlant(), p2 = c2.getPlant(), p3 = c3.getPlant();
-        return p1 != null && p2 != null && p3 != null && p1.getName().equals(p2.getName()) && p2.getName().equals(p3.getName());
+        return p1 != null && p2 != null && p3 != null && p1.getName().equals(p2.getName()) && p2.getName()
+                .equals(p3.getName());
     }
 
     private void ensurePossibleMoves(GameSession session) {

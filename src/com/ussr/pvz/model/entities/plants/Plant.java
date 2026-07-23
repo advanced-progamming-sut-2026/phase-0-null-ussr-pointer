@@ -54,12 +54,6 @@ public class Plant extends GameEntity implements Damageable {
     private PlantArmor armor;
 
     private double lifetime = Double.MAX_VALUE;
-
-
-    //for now incapacitated is for all cat/sheep/sctopus, but we can change it in the future
-    //note: this approach was a bit wrong for octopus and frozen cause they should take damage and get destroyed
-    // by other plants, so I added two classes that wrap the plants and take damage and then take this back but
-    // for the can it is still the good way
     public enum PlantState {
         ACTIVE,
         INCAPACITATED,
@@ -69,15 +63,12 @@ public class Plant extends GameEntity implements Damageable {
 
     private PlantState state;
 
-    // Kept to track applied upgrades
     private final List<String> rawUpgrades = new ArrayList<>();
-    //avoid hardcode
     private List<Vec2> shootingVectors = new ArrayList<>();
 
     public Plant() {
     }
 
-    // Deep copy constructor used by the factory to clone blueprints
     public Plant(Plant blueprint) {
         this.id = blueprint.id;
         this.name = blueprint.name;
@@ -122,7 +113,8 @@ public class Plant extends GameEntity implements Damageable {
         lifetime -= GameClock.SECONDS_PER_TICK;
         if(lifetime < 0) {
             this.isAlive = false;
-            App.getGameSession().getEventBus().publish(new GameEvent.PlantDied(this.name , (int) getPosition().x() , (int) getPosition().y()));
+            App.getGameSession().getEventBus().publish(new GameEvent.PlantDied(this.name , (int) getPosition().x()
+                    , (int) getPosition().y()));
             return;
         }
 
@@ -134,7 +126,8 @@ public class Plant extends GameEntity implements Damageable {
                 plantFoodTimer -= GameClock.SECONDS_PER_TICK;
 
                 if (plantFoodEffect != null) {
-                    plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(), GameClock.SECONDS_PER_TICK);
+                    plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(),
+                            GameClock.SECONDS_PER_TICK);
                 }
                 return;
             }

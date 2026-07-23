@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LoginServiceTest {
@@ -47,7 +49,8 @@ class LoginServiceTest {
                 null, null, 0,
                 new java.util.HashMap<>(),
                 new java.util.ArrayList<>(),
-                new java.util.HashMap<>()
+                new java.util.HashMap<>(),
+                System.currentTimeMillis(),System.currentTimeMillis(),new ArrayList<>()
         );
         testAccount = new Account(state, null);
         App.addAccount(testAccount);

@@ -60,7 +60,8 @@ public class FishermanEffect implements EffectStatus {
                 }
 
                 Cell targetCell = session.getLawn().getCell(zRow, targetX);
-                if (targetCell != null && targetCell.getPlant() == null && targetCell.getInteractableStructure() == null) {
+                if (targetCell != null && targetCell.getPlant() == null
+                        && targetCell.getInteractableStructure() == null) {
                     currentCell.setPlant(null);
                     targetCell.setPlant(hookedPlant);
                     hookedPlant.setLocation(new Plant.Location(targetX, zRow));
@@ -75,7 +76,8 @@ public class FishermanEffect implements EffectStatus {
 
     private boolean hookEnemyZombie(GameSession session, int zRow, int zCol) {
         for (Zombie target : session.getZombies()) {
-            if (target.isAlive() && target.getFaction() == Faction.ZOMBIES && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
+            if (target.isAlive() && target.getFaction() == Faction.ZOMBIES
+                    && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
                 target.takeDamage(target.getHp());
                 return true;
             }

@@ -118,7 +118,21 @@ public class GameSession {
                 p.tickRecharge(GameClock.SECONDS_PER_TICK);
             }
         }
+        plantDeath();
+        cleanupDeadGridStructures();
+        checkZombieBreaches();
+        if (!gameOver && level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
+            gameOver = true;
+            App.setMenuState(MenuState.MAIN);
+        }
+        if (!gameOver && areWavesDone()) {
+            gameOver = true;
+            applyReward();
+            App.setMenuState(MenuState.GAME);
+        }
+    }
 
+    private void plantDeath() {
         for (Plant p : plants) {
             if (!p.isAlive() && lawn != null && p.getLocation() != null) {
                 Cell cell = lawn.getCell(p.getLocation().y(), p.getLocation().x());
@@ -128,55 +142,44 @@ public class GameSession {
                 notifyPlantDied(p);
             }
         }
+    }
 
+    private void applyReward(){
+        if (this.progressTracked) {
+            Account account = App.getAccount();
+            App.getLevelManager().completeCurrentLevel();
+            if (account != null) {
+                account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
+
+                for (String plantAlias : level.getRewardPlantAliases()) {
+                    account.getAdventureProgress().upgradePlant(plantAlias);
+                    NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
+                }
+            }
+
+            try {
+                App.getLevelManager().nextLevel();
+            } catch (IllegalStateException e) {
+                System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
+            }
+            if (App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
+                NewsObserver.triggerNewMiniGame(this.level);
+            }
+
+            List<AccountState> updatedStates = App.getAccounts().stream()
+                    .map(Account::toState)
+                    .toList();
+            SaveService.saveAccounts(updatedStates);
+        }
+    }
+
+    private void cleanupDeadGridStructures() {
         plants.removeIf(p -> !p.isAlive());
         zombies.removeIf(z -> !z.isAlive());
         items.removeIf(i -> !i.isAlive());
         projectiles.removeIf(p -> !p.isAlive());
         lawnMowers.removeIf(m -> !m.isAlive());
         zombieProjectiles.removeIf(p -> !p.isAlive());
-        cleanupDeadGridStructures();
-        checkZombieBreaches();
-
-        if (!gameOver && level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
-            gameOver = true;
-            App.setMenuState(MenuState.MAIN);
-        }
-
-        if (!gameOver && areWavesDone()) {
-            gameOver = true;
-
-            if (this.progressTracked) {
-                Account account = App.getAccount();
-                App.getLevelManager().completeCurrentLevel();
-                if (account != null) {
-                    account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
-
-                    for (String plantAlias : level.getRewardPlantAliases()) {
-                        account.getAdventureProgress().upgradePlant(plantAlias);
-                        NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
-                    }
-                }
-
-                try {
-                    App.getLevelManager().nextLevel();
-                } catch (IllegalStateException e) {
-                    System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
-                }
-                if (App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
-                    NewsObserver.triggerNewMiniGame(this.level);
-                }
-
-                List<AccountState> updatedStates = App.getAccounts().stream()
-                        .map(Account::toState)
-                        .toList();
-                SaveService.saveAccounts(updatedStates);
-            }
-            App.setMenuState(MenuState.GAME);
-        }
-    }
-
-    private void cleanupDeadGridStructures() {
         if (lawn == null) return;
 
         int rows = lawn.getRows();
@@ -442,124 +445,200 @@ public class GameSession {
     }
 
     public String renderMap() {
-        if (lawn == null) return "map not initialized";
-        StringBuilder sb = new StringBuilder();
-        int rows = lawn.getRows();
-        int cols = lawn.getCols();
-
-        for (int r = 0; r < rows; r++) {
-            StringBuilder tileSide = new StringBuilder();
-            for (int c = 0; c < cols; c++) {
-                var cell = lawn.getCell(r, c);
-                if (cell == null || cell.getTile() == null) {
-                    tileSide.append('?');
-                } else {
-                    tileSide.append(tileSymbol(cell.getTile().getType()));
-                }
-            }
-
-            StringBuilder leftSide = new StringBuilder();
-            for (int c = 0; c < cols; c++) {
-                var cell = lawn.getCell(r, c);
-
-                boolean hasSun = false;
-                boolean hasSeedPack = false;
-                if (items != null) {
-                    for (GroundItem item : items) {
-                        if (item.isAlive() && item.getItemType() == ItemType.SUN && item.getLocation() != null) {
-                            if (item.getLocation().x() == c && item.getLocation().y() == r) {
-                                hasSun = true;
-                                break;
-                            }
-                        }
-                        if (item.isAlive && item.getItemType() == ItemType.SEED_PACK && item.getLocation() != null) {
-                            if (item.getLocation().x() == c && item.getLocation().y() == r) {
-                                hasSeedPack = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (cell == null) {
-                    if (hasSun)
-                        leftSide.append('*');
-                    else if (hasSeedPack)
-                        leftSide.append('@');
-                    else
-                        leftSide.append('.');
-                } else if (cell.getPlant() != null) {
-                    leftSide.append("P");
-                } else if (cell.getInteractableStructure() instanceof com.ussr.pvz.model.board.structures.Grave grave) {
-                    if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.SUN) {
-                        leftSide.append("S");
-                    } else if (grave.getContent() == com.ussr.pvz.model.board.structures.Grave.Content.PLANT_FOOD) {
-                        leftSide.append("F");
-                    } else {
-                        leftSide.append("G");
-                    }
-                } else if (cell.getInteractableStructure() != null) {
-                    if (cell.getInteractableStructure() instanceof Vase) {
-                        leftSide.append("V");
-                    } else
-                        leftSide.append("I");
-                } else if (hasSun) {
-                    leftSide.append("*");
-                } else {
-                    leftSide.append(".");
-                }
-            }
-
-            StringBuilder rightSide = new StringBuilder();
-            for (int c = 0; c < cols; c++) {
-                int zCount = 0;
-                if (zombies != null) {
-                    for (Zombie z : zombies) {
-                        if (z.isAlive() && z.getPosition() != null) {
-                            int zRow = (int) z.getPosition().y();
-                            int zCol = (int) Math.floor(z.getPosition().x());
-                            if (zRow == r && zCol == c) {
-                                zCount++;
-                            }
-                        }
-                    }
-                }
-                rightSide.append(zCount == 0 ? "." : Math.min(zCount, 9));
-            }
-
-            StringBuilder projSide = new StringBuilder();
-            for (int c = 0; c < cols; c++) {
-                int pCount = 0;
-
-                for (Projectile p : projectiles) {
-                    if (p.isAlive() && p.getPosition() != null) {
-                        int pRow = (int) p.getPosition().y();
-                        int pCol = (int) Math.floor(p.getPosition().x());
-                        if (pRow == r && pCol == c) {
-                            pCount++;
-                        }
-                    }
-                }
-
-                for (ZombieProjectile zp : zombieProjectiles) {
-                    if (zp.isAlive() && zp.getPosition() != null) {
-                        int zpRow = (int) zp.getPosition().y();
-                        int zpCol = (int) Math.floor(zp.getPosition().x());
-                        if (zpRow == r && zpCol == c) {
-                            pCount++;
-                        }
-                    }
-                }
-
-                projSide.append(pCount == 0 ? "." : Math.min(pCount, 9));
-            }
-
-            // Combine all four grids: tiles | plants/structures | zombies | projectiles
-            sb.append(tileSide).append("   ||   ").append(leftSide).append("   ||   ").append(rightSide).append("   ||   ").append(projSide).append("\n");
+        if (lawn == null) {
+            return "map not initialized";
         }
 
-        String legend = "Tiles: _ normal, W water, C shallow coast, G grave, N necromancy, I frozen, L slippery, X crater, B beghouled\n";
+        StringBuilder sb = new StringBuilder();
+        int rows = lawn.getRows();
+
+        for (int r = 0; r < rows; r++) {
+            sb.append(renderTileRow(r))
+                    .append("   ||   ")
+                    .append(renderLeftRow(r))
+                    .append("   ||   ")
+                    .append(renderZombieRow(r))
+                    .append("   ||   ")
+                    .append(renderProjectileRow(r))
+                    .append("\n");
+        }
+
+        String legend =
+                "Tiles: _ normal, W water, C shallow coast, G grave, " +
+                        "N necromancy, I frozen, L slippery, X crater, B beghouled\n";
+
         return legend + sb.toString().trim();
+    }
+
+    private String renderTileRow(int row) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int c = 0; c < lawn.getCols(); c++) {
+            var cell = lawn.getCell(row, c);
+
+            if (cell == null || cell.getTile() == null) {
+                sb.append('?');
+            } else {
+                sb.append(tileSymbol(cell.getTile().getType()));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String renderLeftRow(int row) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int c = 0; c < lawn.getCols(); c++) {
+            sb.append(renderLeftCell(row, c));
+        }
+
+        return sb.toString();
+    }
+
+    private String renderLeftCell(int row, int col) {
+        var cell = lawn.getCell(row, col);
+
+        boolean hasSun = hasGroundItem(row, col, ItemType.SUN);
+        boolean hasSeedPack = hasGroundItem(row, col, ItemType.SEED_PACK);
+
+        if (cell == null) {
+            if (hasSun) {
+                return "*";
+            }
+            if (hasSeedPack) {
+                return "@";
+            }
+            return ".";
+        }
+
+        if (cell.getPlant() != null) {
+            return "P";
+        }
+
+        if (cell.getInteractableStructure()
+                instanceof com.ussr.pvz.model.board.structures.Grave grave) {
+
+            if (grave.getContent()
+                    == com.ussr.pvz.model.board.structures.Grave.Content.SUN) {
+                return "S";
+            }
+
+            if (grave.getContent()
+                    == com.ussr.pvz.model.board.structures.Grave.Content.PLANT_FOOD) {
+                return "F";
+            }
+
+            return "G";
+        }
+
+        if (cell.getInteractableStructure() != null) {
+            return cell.getInteractableStructure() instanceof Vase ? "V" : "I";
+        }
+
+        if (hasSun) {
+            return "*";
+        }
+
+        return ".";
+    }
+
+    private boolean hasGroundItem(int row, int col, ItemType type) {
+        if (items == null) {
+            return false;
+        }
+
+        for (GroundItem item : items) {
+            if (!item.isAlive()) {
+                continue;
+            }
+
+            if (item.getItemType() != type) {
+                continue;
+            }
+
+            if (item.getLocation() == null) {
+                continue;
+            }
+
+            if (item.getLocation().x() == col
+                    && item.getLocation().y() == row) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private String renderZombieRow(int row) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int c = 0; c < lawn.getCols(); c++) {
+            int count = countZombies(row, c);
+            sb.append(count == 0 ? "." : Math.min(count, 9));
+        }
+
+        return sb.toString();
+    }
+
+    private int countZombies(int row, int col) {
+        if (zombies == null) {
+            return 0;
+        }
+
+        int count = 0;
+
+        for (Zombie zombie : zombies) {
+            if (zombie.isAlive() && zombie.getPosition() != null) {
+                int zRow = (int) zombie.getPosition().y();
+                int zCol = (int) Math.floor(zombie.getPosition().x());
+
+                if (zRow == row && zCol == col) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    private String renderProjectileRow(int row) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int c = 0; c < lawn.getCols(); c++) {
+            int count = countProjectiles(row, c);
+            sb.append(count == 0 ? "." : Math.min(count, 9));
+        }
+
+        return sb.toString();
+    }
+
+    private int countProjectiles(int row, int col) {
+        int count = 0;
+
+        for (Projectile projectile : projectiles) {
+            if (projectile.isAlive() && projectile.getPosition() != null) {
+                int pRow = (int) projectile.getPosition().y();
+                int pCol = (int) Math.floor(projectile.getPosition().x());
+
+                if (pRow == row && pCol == col) {
+                    count++;
+                }
+            }
+        }
+
+        for (ZombieProjectile projectile : zombieProjectiles) {
+            if (projectile.isAlive() && projectile.getPosition() != null) {
+                int pRow = (int) projectile.getPosition().y();
+                int pCol = (int) Math.floor(projectile.getPosition().x());
+
+                if (pRow == row && pCol == col) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
     private char tileSymbol(com.ussr.pvz.model.board.terrain.TileType type) {
