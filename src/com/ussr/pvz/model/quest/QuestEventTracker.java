@@ -4,6 +4,8 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
+import com.ussr.pvz.model.level.Chapter;
 
 public class QuestEventTracker {
 
@@ -11,6 +13,7 @@ public class QuestEventTracker {
 
     private int sessionPlantsLost = 0;
     private boolean lawnmowerTriggered = false;
+    private final java.util.Set<String> sessionFamiliesUsed = new java.util.HashSet<>();
 
     public QuestEventTracker(QuestManager questManager) {
         this.questManager = questManager;
@@ -40,10 +43,14 @@ public class QuestEventTracker {
             ctx.plantKey = event.killerPlantName();
             ctx.hadLawnmower = lawnmowerTriggered;
             ctx.elapsedSeconds = (int) session.getElapsedSeconds();
-            if (App.getAccount() != null) {
-                ctx.chapterId = String.valueOf(App.getAccount().getAdventureProgress().getCurrentChapter());
-            } else {
-                ctx.chapterId = "any";
+            Chapter activeChapter = App.getLevelManager().getCurrentChapter();
+            ctx.chapterId = activeChapter != null ? activeChapter.getId() : "any";
+            java.util.Map<String, Object> plantData =
+                    PlantFactory.getPlantData(event.killerPlantName());
+            String family = plantData != null ? (String) plantData.get("category") : null;
+            if (family != null) sessionFamiliesUsed.add(family);
+            if ("LawnMower".equalsIgnoreCase(event.killerPlantName())) {
+                questManager.onGameEvent("KILL_ZOMBIES_WITH_LAWNMOWER", 1, ctx);
             }
             questManager.onGameEvent("KILL_ZOMBIES_WITH_SPECIFIC_PLANT", 1, ctx);
             questManager.onGameEvent("KILL_ZOMBIES_IN_CHAPTER", 1, ctx);
@@ -62,6 +69,7 @@ public class QuestEventTracker {
             ctx.gardenAsymmetric = !ctx.gardenSymmetric;
             ctx.emptyColumns = findEmptyColumns(session);
             ctx.emptyRows = findEmptyRows(session);
+            ctx.familiesUsed = new java.util.HashSet<>(sessionFamiliesUsed);
             questManager.onLevelEnd(ctx);
             callGameEvent(ctx);
         });
@@ -77,6 +85,8 @@ public class QuestEventTracker {
         questManager.onGameEvent("WIN_LEVEL_EMPTY_COLUMN", 1, ctx);
         questManager.onGameEvent("WIN_LEVEL_EMPTY_ROW", 1, ctx);
         questManager.onGameEvent("WIN_LEVEL_EMPTY_ROW_AND_COLUMN", 1, ctx);
+        questManager.onGameEvent("KILL_ZOMBIES_EXCLUSIVE_FAMILY", 1, ctx);
+        questManager.onGameEvent("WIN_LEVEL_FORBIDDEN_FAMILY", 1, ctx);
     }
 
     private int countSunProducers(GameSession session) {

@@ -75,12 +75,16 @@ public class ConfigurableQuest implements Quest {
             case "KILL_ZOMBIES_FIRST_COLUMN_NO_LAWNMOWER":
                 return !ctx.hadLawnmower && ctx.columnIndex == 0;
             case "WIN_LEVEL_EMPTY_COLUMN":
-                return ctx.emptyColumns != null && !ctx.emptyColumns.isEmpty();
+                int targetCol = c.getInt("targetColumnIndex", -1);
+                return ctx.emptyColumns != null && ctx.emptyColumns.contains(targetCol);
             case "WIN_LEVEL_EMPTY_ROW":
-                return ctx.emptyRows != null && !ctx.emptyRows.isEmpty();
+                int targetRow = c.getInt("targetRowIndex", -1);
+                return ctx.emptyRows != null && ctx.emptyRows.contains(targetRow);
             case "WIN_LEVEL_EMPTY_ROW_AND_COLUMN":
-                return (ctx.emptyColumns != null && !ctx.emptyColumns.isEmpty()) &&
-                       (ctx.emptyRows != null && !ctx.emptyRows.isEmpty());
+                int rowIdx = c.getInt("targetRowIndex", -1);
+                int colIdx = c.getInt("targetColumnIndex", -1);
+                return ctx.emptyRows != null && ctx.emptyRows.contains(rowIdx) &&
+                        ctx.emptyColumns != null && ctx.emptyColumns.contains(colIdx);
             case "KILL_ZOMBIES_IN_CHAPTER":
                 String chapter = c.getString("chapter");
                 return chapter == null || chapter.equals("any") || chapter.equals(ctx.chapterId);
@@ -92,7 +96,14 @@ public class ConfigurableQuest implements Quest {
                 int timeLimit = c.getInt("timeLimitSeconds", Integer.MAX_VALUE);
                 return ctx.elapsedSeconds <= timeLimit;
             case "KILL_ZOMBIES_EXCLUSIVE_FAMILY":
-                return true; // Additional logic can be implemented
+                String reqFamily = c.getString("familyType");
+                return reqFamily != null && ctx.familiesUsed != null
+                        && ctx.familiesUsed.size() == 1
+                        && ctx.familiesUsed.contains(reqFamily);
+            case "WIN_LEVEL_FORBIDDEN_FAMILY":
+                String forbidden = c.getString("forbiddenFamilyType");
+                return forbidden == null || ctx.familiesUsed == null
+                        || !ctx.familiesUsed.contains(forbidden);
             case "WIN_DAY_LEVEL_WITH_NIGHT_PLANTS":
                 return true; // Additional logic for mushrooms can be implemented
             case "WIN_CONSECUTIVE_LEVELS_MAX_DIFFICULTY":

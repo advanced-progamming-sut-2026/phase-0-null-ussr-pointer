@@ -42,7 +42,7 @@ public class GameService {
 
         try {
             App.getLevelManager().startChapter("meow_chapter");
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (RuntimeException e) {
             return "Could not enter Meow mode: " + e.getMessage();
         }
 

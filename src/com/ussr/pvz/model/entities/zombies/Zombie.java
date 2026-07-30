@@ -73,6 +73,8 @@ public class Zombie extends GameEntity implements Damageable {
                     }
                 }
 
+                handleDeathEffect(session);
+
                 if (session != null) {
                     session.notifyZombieDied(this);
                 }
@@ -128,8 +130,11 @@ public class Zombie extends GameEntity implements Damageable {
         }
 
         Damageable target = acquireTarget(session);
-        if(moveBehavior instanceof JumpMove) {
+        if (moveBehavior instanceof JumpMove jumpMove
+                && target instanceof Plant targetPlant
+                && jumpMove.canFlyOver(targetPlant)) {
             moveBehavior.move(this, session);
+            target = acquireTarget(session);
         }
         if (target != null && target.isAlive()) {
             state = ZombieActivity.EATING;
@@ -141,6 +146,12 @@ public class Zombie extends GameEntity implements Damageable {
             if (moveBehavior != null) {
                 moveBehavior.move(this, session);
             }
+        }
+    }
+
+    private void handleDeathEffect(GameSession session) {
+        if (effectStatus != null && session != null) {
+            effectStatus.effect(this, session);
         }
     }
 
@@ -257,6 +268,7 @@ public class Zombie extends GameEntity implements Damageable {
                         session.addItem(plantFoodDrop);
                     }
                 }
+                handleDeathEffect(session);
 
                 if (session != null) {
                     String killerName = resolveKillerName(damageSource);

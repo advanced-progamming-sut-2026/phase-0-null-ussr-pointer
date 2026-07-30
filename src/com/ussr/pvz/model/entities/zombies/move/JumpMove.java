@@ -73,4 +73,11 @@ public class JumpMove implements MoveBehavior {
             zombie.setPosition(newPos);
         }
     }
+
+    public boolean canFlyOver(Plant plant) {
+        if (plant == null || plantsToFlyOver == null) return false;
+        String pName = plant.getName().toLowerCase().replace("-", "").replace(" ", "");
+        if (pName.contains("iceberg")) pName = "iceburg";
+        return plantsToFlyOver.contains(pName);
+    }
 }

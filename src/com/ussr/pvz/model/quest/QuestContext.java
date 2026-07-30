@@ -23,6 +23,7 @@ public class QuestContext {
     public int consecutiveWins = 0;
     public List<Integer> emptyColumns = new ArrayList<>();
     public List<Integer> emptyRows = new ArrayList<>();
+    public java.util.Set<String> familiesUsed = new java.util.HashSet<>();
 
     public Map<String, Object> extra = new HashMap<>();
 }

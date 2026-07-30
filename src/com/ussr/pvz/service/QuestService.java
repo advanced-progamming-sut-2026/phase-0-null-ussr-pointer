@@ -7,7 +7,9 @@ import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
 import com.ussr.pvz.model.quest.QuestType;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QuestService {
 
@@ -25,7 +27,9 @@ public class QuestService {
             return "Invalid travel log page. Available pages: daily, challenge, epic.";
         }
 
-        List<ConfigurableQuest> activeQuests = qm.getByType(requestedType);
+        List<ConfigurableQuest> activeQuests = qm.getByType(requestedType).stream()
+                .sorted(Comparator.comparing(ConfigurableQuest::getPriority).reversed())
+                .collect(Collectors.toList());
 
         if (activeQuests.isEmpty()) {
             return "No active " + pageName + " quests available.";
@@ -39,9 +43,16 @@ public class QuestService {
                     q.getTitle(),
                     q.getPriority()));
 
-            q.getCriteria().forEach(c ->
-                    sb.append(String.format("   Progress: %d / %d\n", c.getCurrent(), c.getTarget()))
-            );
+            q.getCriteria().forEach(c -> {
+                sb.append(String.format("   Progress: %d / %d\n", c.getCurrent(), c.getTarget()));
+                if (c.getParams() != null && !c.getParams().isEmpty()) {
+                    c.getParams().forEach((key, value) -> {
+                        if (!key.equals("variableOptions")) {
+                            sb.append(String.format("     - %s: %s\n", key, value));
+                        }
+                    });
+                }
+            });
         }
         return sb.toString();
     }

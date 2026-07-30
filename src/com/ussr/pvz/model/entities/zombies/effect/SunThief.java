@@ -147,7 +147,7 @@ public class SunThief implements EffectStatus {
     private boolean canSeePlant(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 0; i <= 3; i++) {
             int targetCol = zCol - i;
             if (targetCol >= 0) {
                 Cell cell = session.getLawn().getCell(zRow, targetCol);
@@ -160,7 +160,7 @@ public class SunThief implements EffectStatus {
     private void fireLaser(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 0; i <= 3; i++) {
             int targetCol = zCol - i;
             if (targetCol >= 0) {
                 Cell cell = session.getLawn().getCell(zRow, targetCol);

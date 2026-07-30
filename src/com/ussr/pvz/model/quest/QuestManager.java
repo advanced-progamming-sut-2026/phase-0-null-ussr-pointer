@@ -30,6 +30,7 @@ public class QuestManager {
                 long now = System.currentTimeMillis();
                 for (ConfigurableQuest q : loadedQuests) {
                     q.initCreatedAt(now);
+                    q.getCriteria().forEach(CriterionProgress::resolveVariableOptions);
                 }
                 allQuests.addAll(loadedQuests);
             }

@@ -266,8 +266,8 @@ public class ZombieFactory {
         if (session == null || session.getLawn() == null) return;
 
         int row = (int) zombie.getPosition().y();
-        int lastCol = session.getLawn().getCols() - 1;
-        Cell cell = session.getLawn().getCell(row, lastCol);
+        int col = (int) zombie.getPosition().x();
+        Cell cell = session.getLawn().getCell(row, col);
 
         if (cell != null && cell.getInteractableStructure() == null) {
             cell.setStructure(structure);

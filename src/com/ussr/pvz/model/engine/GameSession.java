@@ -125,7 +125,9 @@ public class GameSession {
             gameOver = true;
             App.setMenuState(MenuState.MAIN);
         }
-        if (!gameOver && areWavesDone()) {
+        boolean behaviorAllowsAutoWin = level != null && level.getBehavior() != null
+                && level.getBehavior().isAutoWinOnWavesClear();
+        if (!gameOver && behaviorAllowsAutoWin && areWavesDone()) {
             gameOver = true;
             applyReward();
             App.setMenuState(MenuState.GAME);
@@ -534,6 +536,10 @@ public class GameSession {
 
         if (cell.getInteractableStructure() != null) {
             return cell.getInteractableStructure() instanceof Vase ? "V" : "I";
+        }
+
+        if (hasSeedPack) {
+            return "@";
         }
 
         if (hasSun) {

@@ -77,6 +77,10 @@ public abstract class LevelBehavior {
         return false;
     }
 
+    public boolean isAutoWinOnWavesClear() {
+        return autoWinOnWavesClear;
+    }
+
     public void tick(GameSession session, double deltaTime) {
         if (levelCompleted) return;
 

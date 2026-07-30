@@ -366,6 +366,8 @@ public class BeghouledBehavior extends LevelBehavior {
         Plant p = PlantFactory.createPlantByName(alias, 1);
         p.setLocation(new Plant.Location(col, row));
         p.setPosition(Vec2.of(col, row));
+        p.setState(Plant.PlantState.ACTIVE);
+        p.setAlive(true);
         return p;
     }
 

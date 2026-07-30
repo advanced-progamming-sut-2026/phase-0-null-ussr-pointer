@@ -6,6 +6,8 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
+import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
+import com.ussr.pvz.model.entities.zombies.move.NormalWalk;
 
 public class KingBuffEffect implements EffectStatus {
     private final double delayBetweenKnighting;
@@ -38,7 +40,9 @@ public class KingBuffEffect implements EffectStatus {
                 .filter(zombie -> !zombie.getName().contains("King"))
                 .filter(zombie -> (int) zombie.getPosition().y() == kingRow)
                 .filter(zombie -> Math.abs(zombie.getPosition().x() - kingCol) <= 4.0)
-                .filter(zombie -> zombie.getArmor() == null || zombie.getArmor().isDestroyed())
+                .filter(zombie -> zombie.getEffectStatus() == null)
+                .filter(zombie -> zombie.getMoveBehavior() instanceof NormalWalk)
+                .filter(zombie -> zombie.getAttackBehavior() instanceof ChompAttack)
                 .findFirst()
                 .map(targetZombie -> {
                     Armor knightArmor = ZombieFactory.createKnightArmor();

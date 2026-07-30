@@ -396,5 +396,26 @@
       "amount": 25,
       "formula": ""
     }
+  },
+  {
+    "id": "q_lawnmower_time",
+    "title": "Lawnmower Time",
+    "type": "EPIC",
+    "priority": "MEDIUM",
+    "expiresAfterSeconds": null,
+    "criteria": [
+      {
+        "type": "KILL_ZOMBIES_WITH_LAWNMOWER",
+        "target": 10,
+        "params": {
+          "variableOptions": [10, 20, 30, 40, 50]
+        }
+      }
+    ],
+    "reward": {
+      "rewardType": "GEM",
+      "amount": 10,
+      "formula": "n"
+    }
   }
 ]
