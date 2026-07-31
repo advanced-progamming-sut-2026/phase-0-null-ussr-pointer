@@ -19,7 +19,7 @@ import com.ussr.pvz.notification.NotificationCenter;
 import java.util.Arrays;
 
 
-public final class RegisterMenu extends Table {
+public final class RegisterMenu extends FadingMenu {
     private final RegisterController controller;
     private final Skin skin;
 
@@ -205,7 +205,7 @@ public final class RegisterMenu extends Table {
         switch (result.status()) {
             case DETAILS_ACCEPTED -> {
                 NotificationCenter.success(result.message());
-                buildSecurityQuestionForm();
+                transitionContent(this::buildSecurityQuestionForm);
             }
 
             case ERROR ->
@@ -316,7 +316,7 @@ public final class RegisterMenu extends Table {
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                buildRegistrationForm();
+                transitionContent(RegisterMenu.this::buildRegistrationForm);
             }
         });
 

@@ -23,6 +23,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class AppView implements ApplicationListener {
     private Stage stage;
@@ -31,6 +35,9 @@ public class AppView implements ApplicationListener {
 
     private Table screenRoot;
     private MenuState displayedMenu;
+
+    private static final float HALF_TRANSITION_DURATION = 0.25f;
+    private boolean transitioning;
 
     public AppView() {
         App.initShop();
@@ -161,8 +168,9 @@ public class AppView implements ApplicationListener {
         Gdx.gl.glClearColor(0.08f, 0.1f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (App.getMenuState() != displayedMenu) {
-            showMenu(App.getMenuState());
+        if (!transitioning
+                && App.getMenuState() != displayedMenu) {
+            transitionTo(App.getMenuState());
         }
 
         stage.act(delta);
@@ -180,6 +188,12 @@ public class AppView implements ApplicationListener {
     }
 
     private void showMenu(MenuState state) {
+        rebuildMenu(state);
+        screenRoot.getColor().a = 1f;
+        displayedMenu = state;
+    }
+
+    private void rebuildMenu(MenuState state) {
         screenRoot.clearChildren();
 
         switch (state) {
@@ -187,9 +201,7 @@ public class AppView implements ApplicationListener {
                     screenRoot.add(new RegisterMenu(skin)).grow();
 
             case LOGIN ->
-                    screenRoot.add(
-                            new Label("Login", skin, "big_outline")
-                    );
+                    screenRoot.add(new LoginMenu(skin)).grow();
 
             default ->
                     screenRoot.add(
@@ -200,8 +212,26 @@ public class AppView implements ApplicationListener {
                             )
                     );
         }
+    }
 
-        displayedMenu = state;
+    private void transitionTo(MenuState targetMenu) {
+        transitioning = true;
+        displayedMenu = targetMenu;
+
+        screenRoot.clearActions();
+
+        screenRoot.addAction(sequence(
+                fadeOut(HALF_TRANSITION_DURATION),
+
+                run(() -> {
+                    rebuildMenu(targetMenu);
+                    screenRoot.getColor().a = 0f;
+                }),
+
+                fadeIn(HALF_TRANSITION_DURATION),
+
+                run(() -> transitioning = false)
+        ));
     }
 
     @Override
