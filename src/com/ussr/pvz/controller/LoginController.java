@@ -27,12 +27,10 @@ public class LoginController {
                         return handleAnswer(matcher);
                     case MENU_CHANGE_REGISTER:
                         return handle_change_menu();
-                    default:
-                        return handleResetPassword(command);
                 }
             }
         }
-        return "";
+         return handleResetPassword(command);
     }
 
     private String handle_change_menu() {
