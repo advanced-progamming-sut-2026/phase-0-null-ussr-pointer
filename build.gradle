@@ -8,11 +8,14 @@ plugins {
 group = 'com.team'
 version = '1.0-SNAPSHOT'
 
+ext {
+    gdxVersion = '1.12.1'
+}
+
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
-
 
 java {
     toolchain {
@@ -28,9 +31,11 @@ checkstyle {
 pmd {
     toolVersion = '7.16.0'
     ruleSets = []
-    ruleSetFiles = files(
-            'config/pmd/pmd.xml'
-    )
+    ruleSetFiles = files('config/pmd/pmd.xml')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 tasks.withType(Checkstyle).configureEach {
@@ -61,13 +66,26 @@ sourceSets {
 }
 
 dependencies {
+
+    // ---------- Your existing libraries ----------
     implementation 'com.google.code.gson:gson:2.14.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
     implementation 'com.github.pizpizi:libPVZ:v0.1.3'
     implementation 'com.github.pizpizi:pvz-skin:v0.1.0'
     implementation 'com.github.raeleus.TenPatch:tenpatch:5.2.3'
+
+    // ---------- LibGDX ----------
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+    // Desktop backend (LWJGL3)
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+
+    // Desktop natives
+    runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+    // ---------- Tests ----------
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
 }
 
 application {
@@ -76,6 +94,14 @@ application {
 
 run {
     standardInput = System.in
+
+    // Same JVM args libPVZ uses
+    jvmArgs(
+            '--enable-native-access=ALL-UNNAMED',
+            '-Dorg.lwjgl.system.JNINativeInterfaceSize=233'
+    )
+
+    systemProperties System.getProperties()
 }
 
 test {
@@ -88,10 +114,6 @@ test {
     }
 }
 
-/*
- * check now only runs static analysis.
- * Unit tests are completely independent.
- */
 tasks.named("check") {
     dependsOn.clear()
     dependsOn(

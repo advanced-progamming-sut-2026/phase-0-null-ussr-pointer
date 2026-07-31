@@ -1,5 +1,7 @@
 package com.ussr.pvz.view;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.ApplicationListener;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
@@ -13,7 +15,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class AppView {
+public class AppView implements ApplicationListener {
     private AppMenu currentMenu;
     private final Map<MenuState, AppMenu> menus = new EnumMap<>(MenuState.class);
 
@@ -79,7 +81,33 @@ public class AppView {
         currentMenu = menuState != null ? menus.get(menuState) : null;
     }
 
-    public void exit() {
-        currentMenu = null;
+    @Override
+    public void create() {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void render() {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }
