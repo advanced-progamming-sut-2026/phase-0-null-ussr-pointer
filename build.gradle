@@ -86,6 +86,10 @@ dependencies {
     // ---------- Tests ----------
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
+
+    // ---------- Freetype ----------
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    runtimeOnly "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
 
 application {

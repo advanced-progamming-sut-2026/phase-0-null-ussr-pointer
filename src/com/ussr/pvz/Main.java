@@ -7,13 +7,14 @@ import java.util.Scanner;
 
 void main() {
     App.registerShutdownHook();
-    Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-    config.setTitle("pvz-2 ussr");
+
+    Lwjgl3ApplicationConfiguration config =
+            new Lwjgl3ApplicationConfiguration();
+
+    config.setTitle("PvZ 2 USSR");
     config.setWindowedMode(1280, 720);
     config.useVsync(true);
     config.setForegroundFPS(60);
+
     new Lwjgl3Application(new AppView(), config);
-    AppView app = new AppView();
-    Scanner sc = new Scanner(System.in);
-    app.run(sc);
 }
