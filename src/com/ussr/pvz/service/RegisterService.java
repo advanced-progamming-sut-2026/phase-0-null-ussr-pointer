@@ -6,7 +6,7 @@ import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.*;
 import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
-
+import com.ussr.pvz.model.dto.RegistrationResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +16,11 @@ public class RegisterService {
 
     private AccountState pendingAccount;
 
-    public String register(RegisterRequest request) {
+    public RegistrationResult register(RegisterRequest request) {
         String validationError = validateRegistration(request);
-        if (validationError != null) return validationError;
+        if (validationError != null) {
+            return RegistrationResult.error(validationError);
+        }
 
         Map<String, Integer> initialPlantMap = AdventureProgress.initializePlantsLvl();
         initialPlantMap.put("PEASHOOTER", 1);
@@ -58,11 +60,9 @@ public class RegisterService {
                 new ArrayList<>()// lastDailyResetTime
         );
 
-        StringBuilder sb = new StringBuilder("pick a security question:\n");
-        for (SecurityQuestion q : SecurityQuestion.values()) {
-            sb.append(q.ordinal() + 1).append(". ").append(q.getText()).append("\n");
-        }
-        return sb.toString().trim();
+        return RegistrationResult.detailsAccepted(
+                "Account details accepted. Choose a security question."
+        );
     }
 
     private String validateRegistration(RegisterRequest request) {
@@ -81,19 +81,25 @@ public class RegisterService {
         return null;
     }
 
-    public String pickQuestion(PickQuestionRequest request) {
-        if (pendingAccount == null) return "no pending registration";
+    public RegistrationResult pickQuestion(
+            PickQuestionRequest request
+    ) {
+        if (pendingAccount == null) return RegistrationResult.error("no pending registration");
 
         int questionNumber;
         try {
             questionNumber = Integer.parseInt(request.questionNumber());
         } catch (NumberFormatException e) {
-            return "invalid question number";
+            return RegistrationResult.error("invalid question number");
         }
 
         SecurityQuestion[] questions = SecurityQuestion.values();
-        if (questionNumber < 1 || questionNumber > questions.length) return "invalid question number";
-        if (!request.answer().equals(request.answerConfirm())) return "answers are not identical";
+        if (questionNumber < 1 || questionNumber > questions.length)
+            return RegistrationResult.error("invalid question number");
+        if (!request.answer().equals(request.answerConfirm()))
+            return RegistrationResult.error(
+                "Security answers do not match."
+        );
 
         SecurityQuestion chosenQuestion = questions[questionNumber - 1];
         AccountState finalState = pendingAccount.finalizeRegistration(chosenQuestion, request.answer());
@@ -104,7 +110,9 @@ public class RegisterService {
 
         pendingAccount = null;
         App.setMenuState(MenuState.LOGIN);
-        return "registered successfully";
+        return RegistrationResult.completed(
+                "Registered successfully."
+        );
     }
 
     private boolean usernameExists(String username) {

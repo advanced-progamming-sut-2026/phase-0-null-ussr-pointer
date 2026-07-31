@@ -1,19 +1,16 @@
 package com.ussr.pvz.view;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
-import com.ussr.pvz.notification.NotificationType;
 import com.ussr.pvz.view.mainmenu.*;
-import com.ussr.pvz.view.mainmenu.gamemenu.ChoosePlantMenu;
-import com.ussr.pvz.view.mainmenu.gamemenu.CollectionMenu;
-import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,36 +18,21 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
 import pvz.skin.PvzSkin;
-
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Scanner;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
 
 public class AppView implements ApplicationListener {
-    private AppMenu currentMenu;
-    private final Map<MenuState, AppMenu> menus = new EnumMap<>(MenuState.class);
-
     private Stage stage;
     private Skin skin;
     private NotificationOverlay notificationOverlay;
 
-    public AppView() {
-        menus.put(MenuState.MAIN, new MainMenu());
-        menus.put(MenuState.REGISTER, new RegisterMenu());
-        menus.put(MenuState.LOGIN, new LoginMenu());
-        menus.put(MenuState.GAME, new GameMenu());
-        menus.put(MenuState.NEWS, new NewsMenu());
-        menus.put(MenuState.NETWORK, new NetworkMenu());
-        menus.put(MenuState.PROFILE, new ProfileMenu());
-        menus.put(MenuState.SETTING, new SettingMenu());
-        menus.put(MenuState.COLLECTION, new CollectionMenu());
-        menus.put(MenuState.GREENHOUSE, new GreenHouseMenu());
-        menus.put(MenuState.TRAVEL_LOG, new TravelLogMenu());
-        menus.put(MenuState.LEADERBOARD, new LeaderBoardMenu());
-        menus.put(MenuState.CHOOSE_PLANT, new ChoosePlantMenu());
-        menus.put(MenuState.SHOP, new ShopMenu());
-        menus.put(MenuState.LEVEL_SELECTION, new LevelSelectionMenu());
+    private Table screenRoot;
+    private MenuState displayedMenu;
 
+    public AppView() {
         App.initShop();
         App.getLevelManager().loadFromJson();
 
@@ -81,56 +63,84 @@ public class AppView implements ApplicationListener {
         }
     }
 
-    public void run(Scanner scanner) {
-        while (true) {
-            setCurrentMenu(App.getMenuState());
-            if (currentMenu != null) {
-                currentMenu.run(scanner);
-            } else {
-                break;
-            }
-        }
-    }
-
-    public void setCurrentMenu(MenuState menuState) {
-        currentMenu = menuState != null ? menus.get(menuState) : null;
-    }
-
     @Override
     public void create() {
         Viewport viewport = new ExtendViewport(1280f, 720f);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
+        installMissingSkinStyles();
+
+        screenRoot = new Table();
+        screenRoot.setFillParent(true);
+        stage.addActor(screenRoot);
+
+        showMenu(App.getMenuState());
 
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
 
         Gdx.input.setInputProcessor(stage);
+    }
 
-        NotificationCenter.publish(
-                "This is an information notification.",
-                NotificationType.INFO,
-                5f
+    private void installMissingSkinStyles() {
+        if (skin.has("default", SelectBoxStyle.class)) {
+            return;
+        }
+
+        SelectBoxStyle style = createSelectBoxStyle();
+        style.listStyle = createPopupListStyle();
+        style.scrollStyle = createPopupScrollStyle();
+
+        skin.add("default", style, SelectBoxStyle.class);
+    }
+
+    private SelectBoxStyle createSelectBoxStyle() {
+        LabelStyle labelStyle =
+                skin.get("default", LabelStyle.class);
+
+        SelectBoxStyle style = new SelectBoxStyle();
+        style.font = labelStyle.font;
+        style.fontColor = Color.BLACK;
+
+        style.background = skin.getDrawable(
+                "image_ui_mainmenu_name_field_10"
         );
 
-        NotificationCenter.publish(
-                "This is a success notification.",
-                NotificationType.SUCCESS,
-                5f
+        style.backgroundOpen = skin.getDrawable(
+                "image_ui_mainmenu_name_field_hover_10"
         );
 
-        NotificationCenter.publish(
-                "This is a warning notification.",
-                NotificationType.WARNING,
-                7f
+        style.backgroundOver = style.backgroundOpen;
+
+        return style;
+    }
+
+    private ListStyle createPopupListStyle() {
+        ListStyle style = new ListStyle(
+                skin.get("default", ListStyle.class)
         );
 
-        NotificationCenter.publish(
-                "This is an error notification.",
-                NotificationType.ERROR,
-                9f
+        style.background = skin.getDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10"
         );
+
+        style.fontColorSelected = Color.WHITE;
+        style.fontColorUnselected = Color.WHITE;
+
+        return style;
+    }
+
+    private ScrollPaneStyle createPopupScrollStyle() {
+        ScrollPaneStyle style = new ScrollPaneStyle(
+                skin.get("default", ScrollPaneStyle.class)
+        );
+
+        style.background = skin.getDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10"
+        );
+
+        return style;
     }
 
 
@@ -151,6 +161,10 @@ public class AppView implements ApplicationListener {
         Gdx.gl.glClearColor(0.08f, 0.1f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (App.getMenuState() != displayedMenu) {
+            showMenu(App.getMenuState());
+        }
+
         stage.act(delta);
         stage.draw();
     }
@@ -163,6 +177,31 @@ public class AppView implements ApplicationListener {
     @Override
     public void resume() {
 
+    }
+
+    private void showMenu(MenuState state) {
+        screenRoot.clearChildren();
+
+        switch (state) {
+            case REGISTER ->
+                    screenRoot.add(new RegisterMenu(skin)).grow();
+
+            case LOGIN ->
+                    screenRoot.add(
+                            new Label("Login", skin, "big_outline")
+                    );
+
+            default ->
+                    screenRoot.add(
+                            new Label(
+                                    state.getName(),
+                                    skin,
+                                    "big_outline"
+                            )
+                    );
+        }
+
+        displayedMenu = state;
     }
 
     @Override
