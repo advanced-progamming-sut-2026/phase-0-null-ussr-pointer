@@ -5,11 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
@@ -29,11 +31,13 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class AppView implements ApplicationListener {
+    private final GlobalController globalController = new GlobalController();
     private Stage stage;
     private Skin skin;
     private NotificationOverlay notificationOverlay;
 
     private Table screenRoot;
+    private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
@@ -82,10 +86,13 @@ public class AppView implements ApplicationListener {
         screenRoot.setFillParent(true);
         stage.addActor(screenRoot);
 
-        showMenu(App.getMenuState());
+        globalMenuHud = new GlobalMenuHud(skin);
+        stage.addActor(globalMenuHud);
 
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
+
+        showMenu(App.getMenuState());
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -172,6 +179,7 @@ public class AppView implements ApplicationListener {
                 && App.getMenuState() != displayedMenu) {
             transitionTo(App.getMenuState());
         }
+        refreshGlobalHudCurrencies();
 
         stage.act(delta);
         stage.draw();
@@ -205,13 +213,11 @@ public class AppView implements ApplicationListener {
 
             default ->
                     screenRoot.add(
-                            new Label(
-                                    state.getName(),
-                                    skin,
-                                    "big_outline"
-                            )
+                            new Label(state.getName(), skin, "big_outline")
                     );
         }
+
+        configureGlobalHud(state);
     }
 
     private void transitionTo(MenuState targetMenu) {
@@ -245,5 +251,56 @@ public class AppView implements ApplicationListener {
         if (skin instanceof Disposable disposable) {
             disposable.dispose();
         }
+    }
+
+    private void configureGlobalHud(MenuState state) {
+        Account account = App.getAccount();
+
+        if (!state.showsGlobalHud() || account == null) {
+            globalMenuHud.configure(false, 0, 0, null);
+            return;
+        }
+
+        int coins = account.getAdventureProgress().getCoin();
+        int diamonds = account.getAdventureProgress().getGem();
+
+        boolean mainMenu = state == MenuState.MAIN;
+
+        Runnable navigationAction = mainMenu
+                ? globalController::handMenuQuit
+                : this::exitCurrentMenu;
+
+        globalMenuHud.setExitMode(mainMenu);
+
+        globalMenuHud.configure(
+                true,
+                coins,
+                diamonds,
+                navigationAction
+        );
+    }
+
+    private void exitCurrentMenu() {
+        String result = globalController.exitCurrentMenu();
+        if (result != null && !result.isBlank()) {
+            NotificationCenter.info(result);
+        }
+    }
+
+    private void refreshGlobalHudCurrencies() {
+        if (!globalMenuHud.isVisible()) {
+            return;
+        }
+
+        Account account = App.getAccount();
+        if (account == null) {
+            globalMenuHud.configure(false, 0, 0, null);
+            return;
+        }
+
+        globalMenuHud.updateCurrencies(
+                account.getAdventureProgress().getCoin(),
+                account.getAdventureProgress().getGem()
+        );
     }
 }

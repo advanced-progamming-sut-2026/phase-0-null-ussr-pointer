@@ -41,7 +41,7 @@ public class GlobalController {
        return globalService.handleMenuShowAll();
     }
 
-    private String handMenuQuit() {
+    public String handMenuQuit() {
         return globalService.handleQuit();
     }
 
@@ -64,6 +64,10 @@ public class GlobalController {
     }
 
     private String handleMenuExit() {
+        return exitCurrentMenu();
+    }
+
+    public String exitCurrentMenu() {
         return globalService.menuExit();
     }
 

@@ -26,4 +26,22 @@ public enum MenuState {
     public String getName() {
         return this.name;
     }
+
+    public boolean showsGlobalHud() {
+        return switch (this) {
+            case LOGIN, REGISTER, GAME -> false;
+            default -> true;
+        };
+    }
+
+    public MenuState getParent() {
+        return switch (this) {
+            case LOGIN -> REGISTER;
+            case GAME, SETTING, NETWORK, NEWS, PROFILE -> MAIN;
+            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG,
+                 CHOOSE_PLANT, LEVEL_SELECTION -> GAME;
+            case SHOP -> GREENHOUSE;
+            case REGISTER, MAIN -> null;
+        };
+    }
 }

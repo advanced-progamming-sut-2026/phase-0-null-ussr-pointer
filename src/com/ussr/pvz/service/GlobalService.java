@@ -1,5 +1,6 @@
 package com.ussr.pvz.service;
 
+import com.badlogic.gdx.Gdx;
 import com.ussr.pvz.controller.command.GlobalCommand;
 import com.ussr.pvz.controller.command.LoginCommand;
 import com.ussr.pvz.controller.command.RegisterCommand;
@@ -63,14 +64,14 @@ public class GlobalService {
             return "please use logout command to exit main menu";
         }
 
-        MenuState parent = parentOf(current);
+        MenuState parent = current.getParent();
 
         if (parent == null) {
             App.setMenuState(null);
             return "bye bye";
         }
 
-        if(App.getGameSession() != null){
+        if (current == MenuState.GAME && App.getGameSession() != null) {
             App.setGameSession(null);
         }
 
@@ -98,17 +99,6 @@ public class GlobalService {
         return "logged out successfully";
     }
 
-    private MenuState parentOf(MenuState current) {
-        return switch (current) {
-            case REGISTER -> null;
-            case LOGIN -> MenuState.REGISTER;
-            case GAME, SETTING, NETWORK, NEWS, PROFILE -> MenuState.MAIN;
-            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG, CHOOSE_PLANT, LEVEL_SELECTION -> MenuState.GAME;
-            case SHOP -> MenuState.GREENHOUSE;
-            default -> null;
-        };
-    }
-
     public String advanceTime(AdvanceTimeRequest request) {
         int count;
         try {
@@ -134,13 +124,7 @@ public class GlobalService {
     }
 
     public String handleQuit() {
-        if (App.getAccount() != null) {
-            List<AccountState> updatedStates = App.getAccounts().stream()
-                    .map(Account::toState)
-                    .toList();
-            SaveService.saveAccounts(updatedStates);
-        }
-        System.exit(0);
+        Gdx.app.exit();
         return "";
     }
 
