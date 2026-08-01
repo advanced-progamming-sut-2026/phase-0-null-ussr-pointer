@@ -42,13 +42,16 @@ public class GlobalMenuHud extends Table {
         );
         backButton = createBackButton(skin);
 
-        add(backButton).size(61f).left().pad(12f);
+        Table currencyLayer = createCurrencyLayer(
+                coinCounter,
+                gemCounter
+        );
+        Table navigationLayer = createNavigationLayer();
 
-        add().expandX();
-
-        add(coinCounter).height(48f).pad(8f);
-
-        add(gemCounter).height(48f).pad(8f);
+        Stack layers = new Stack();
+        layers.add(currencyLayer);
+        layers.add(navigationLayer);
+        add(layers).grow();
 
         backButton.addListener(new ChangeListener() {
             @Override
@@ -60,6 +63,24 @@ public class GlobalMenuHud extends Table {
         });
 
         setVisible(false);
+    }
+
+    private Table createCurrencyLayer(
+            Table coinCounter,
+            Table gemCounter
+    ) {
+        Table layer = new Table();
+        layer.top().left();
+        layer.add(coinCounter).height(48f).pad(8f);
+        layer.add(gemCounter).height(48f).pad(8f);
+        return layer;
+    }
+
+    private Table createNavigationLayer() {
+        Table layer = new Table();
+        layer.bottom().left();
+        layer.add(backButton).size(61f).pad(12f);
+        return layer;
     }
 
     private ImageButton createBackButton(Skin skin) {

@@ -16,22 +16,36 @@ public class ProfileService {
 
     public String changeUsername(ChangeUsernameRequest request) {
         Account account = App.getAccount();
+        if (account == null) {
+            return "you are not logged in";
+        }
 
         if (!ValidationRegex.VALID_USERNAME.matchToRegex(request.username()).matches())
             return "invalid username";
 
-        if (App.getAccounts().stream().anyMatch(a -> a.getName().equals(request.username())))
+        boolean usernameExists = App.getAccounts().stream()
+                .anyMatch(other ->
+                        other != account
+                                && other.getName().equalsIgnoreCase(
+                                request.username()
+                        )
+                );
+
+        if (usernameExists) {
             return "username already exists";
+        }
         if (Objects.equals(SessionManager.getAutoLoginUsername(), account.getName())) {
             SessionManager.saveSession(request.username());
         }
-        account.setName(request.username());
         account.setName(request.username());
         return "username changed successfully";
     }
 
     public String changeNickname(ChangeNicknameRequest request) {
         Account account = App.getAccount();
+        if (account == null) {
+            return "you are not logged in";
+        }
 
         if (!ValidationRegex.VALID_NICKNAME.matchToRegex(request.nickname()).matches())
             return "invalid nickname length";
@@ -42,6 +56,9 @@ public class ProfileService {
 
     public String changeEmail(ChangeEmailRequest request) {
         Account account = App.getAccount();
+        if (account == null) {
+            return "you are not logged in";
+        }
 
         if (!ValidationRegex.VALID_EMAIL.matchToRegex(request.email()).matches())
             return "invalid email format";
@@ -52,6 +69,9 @@ public class ProfileService {
 
     public String changePassword(ChangePasswordRequest request) {
         Account account = App.getAccount();
+        if (account == null) {
+            return "you are not logged in";
+        }
 
         if (!account.getPassword().equals(SecurityUtil.hashPassword(request.oldPassword())))
             return "old password is incorrect";
@@ -74,13 +94,17 @@ public class ProfileService {
 
     public String showInfo() {
         Account account = App.getAccount();
+        if (account == null) {
+            return "you are not logged in";
+        }
+
         return "username: " + account.getName() + "\n" +
                 "nickname: " + account.getNickname() + "\n" +
                 "email: " + account.getEmail() + "\n" +
                 "gender: " + account.getGender().name().toLowerCase() + "\n" +
                 "coin: " + account.getAdventureProgress().getCoin() + "\n" +
                 "gems: " + account.getAdventureProgress().getGem() + "\n" +
-                "mewo points: " + account.getScoreRecord().getScore() + "\n" +
+                "meow points: " + account.getScoreRecord().getScore() + "\n" +
                 "current chapter: " + account.getAdventureProgress().getCurrentChapter() + "\n" +
                 "current level: " + account.getAdventureProgress().getCurrentLvl();
     }

@@ -33,29 +33,59 @@ public class ProfileController {
     }
 
     private String handleChangeUsername(Matcher matcher) {
-        ChangeUsernameRequest request = new ChangeUsernameRequest(matcher.group("username"));
-        return profileService.changeUsername(request);
+        return changeUsername(matcher.group("username"));
     }
 
     private String handleChangeNickname(Matcher matcher) {
-        ChangeNicknameRequest request = new ChangeNicknameRequest(matcher.group("nickname"));
-        return profileService.changeNickname(request);
+        return changeNickname(matcher.group("nickname"));
     }
 
     private String handleChangeEmail(Matcher matcher) {
-        ChangeEmailRequest request = new ChangeEmailRequest(matcher.group("email"));
-        return profileService.changeEmail(request);
+        return changeEmail(matcher.group("email"));
     }
 
     private String handleChangePassword(Matcher matcher) {
-        ChangePasswordRequest request = new ChangePasswordRequest(
-                matcher.group("newPassword"),
-                matcher.group("oldPassword")
+        return changePassword(
+                matcher.group("oldPassword"),
+                matcher.group("newPassword")
         );
-        return profileService.changePassword(request);
     }
 
     private String handleShowInfo() {
         return profileService.showInfo();
+    }
+
+    public String changeUsername(String username) {
+        ChangeUsernameRequest request =
+                new ChangeUsernameRequest(username.trim());
+
+        return profileService.changeUsername(request);
+    }
+
+    public String changeNickname(String nickname) {
+        ChangeNicknameRequest request =
+                new ChangeNicknameRequest(nickname.trim());
+
+        return profileService.changeNickname(request);
+    }
+
+    public String changeEmail(String email) {
+        ChangeEmailRequest request =
+                new ChangeEmailRequest(email.trim());
+
+        return profileService.changeEmail(request);
+    }
+
+    public String changePassword(
+            String oldPassword,
+            String newPassword
+    ) {
+        ChangePasswordRequest request =
+                new ChangePasswordRequest(
+                        newPassword,
+                        oldPassword
+                );
+
+        return profileService.changePassword(request);
     }
 }

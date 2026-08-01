@@ -211,6 +211,12 @@ public class AppView implements ApplicationListener {
             case LOGIN ->
                     screenRoot.add(new LoginMenu(skin)).grow();
 
+            case PROFILE ->
+                    screenRoot.add(new ProfileMenu(skin)).grow();
+
+            case MAIN ->
+                    screenRoot.add(new MainMenu(skin)).grow();
+
             default ->
                     screenRoot.add(
                             new Label(state.getName(), skin, "big_outline")
