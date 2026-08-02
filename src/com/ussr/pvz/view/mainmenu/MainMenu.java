@@ -94,12 +94,21 @@ public class MainMenu extends Table {
         TextButton newsButton =
                 createDrawerButton("News");
 
+        TextButton settingsButton =
+                createDrawerButton("Settings");
+
         drawer.add(profileButton)
                 .growX()
                 .height(52f)
                 .row();
 
         drawer.add(newsButton)
+                .growX()
+                .height(52f)
+                .padTop(6f)
+                .row();
+
+        drawer.add(settingsButton)
                 .growX()
                 .height(52f)
                 .padTop(6f)
@@ -113,6 +122,10 @@ public class MainMenu extends Table {
                 listener(this::openNews)
         );
 
+        settingsButton.addListener(
+                listener(this::openSettings)
+        );
+
         setDrawerVisible(false);
     }
 
@@ -122,6 +135,10 @@ public class MainMenu extends Table {
 
     private void openNews() {
         App.setMenuState(MenuState.NEWS);
+    }
+
+    private void openSettings() {
+        App.setMenuState(MenuState.SETTING);
     }
 
     private void configureMenuButton(TextButton menuButton) {

@@ -28,4 +28,11 @@ public class SettingController {
         ChangeDifficultyRequest request = new ChangeDifficultyRequest(matcher.group("level"));
         return settingService.changeDifficulty(request);
     }
+
+    public String changeDifficulty(int level) {
+        ChangeDifficultyRequest request =
+                new ChangeDifficultyRequest(String.valueOf(level));
+
+        return settingService.changeDifficulty(request);
+    }
 }

@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox.CheckBoxStyle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -103,15 +104,38 @@ public class AppView implements ApplicationListener {
     }
 
     private void installMissingSkinStyles() {
-        if (skin.has("default", SelectBoxStyle.class)) {
-            return;
+        if (!skin.has("default", SelectBoxStyle.class)) {
+            SelectBoxStyle style = createSelectBoxStyle();
+            style.listStyle = createPopupListStyle();
+            style.scrollStyle = createPopupScrollStyle();
+
+            skin.add("default", style, SelectBoxStyle.class);
         }
 
-        SelectBoxStyle style = createSelectBoxStyle();
-        style.listStyle = createPopupListStyle();
-        style.scrollStyle = createPopupScrollStyle();
+        if (!skin.has("default", CheckBoxStyle.class)) {
+            skin.add(
+                    "default",
+                    createCheckBoxStyle(),
+                    CheckBoxStyle.class
+            );
+        }
+    }
 
-        skin.add("default", style, SelectBoxStyle.class);
+    private CheckBoxStyle createCheckBoxStyle() {
+        LabelStyle labelStyle =
+                skin.get("default", LabelStyle.class);
+
+        CheckBoxStyle style = new CheckBoxStyle();
+        style.checkboxOff = skin.getDrawable("checkbox_off");
+        style.checkboxOn = skin.getDrawable("checkbox_on");
+        style.checkboxOver = style.checkboxOff;
+        style.checkboxOnOver = style.checkboxOn;
+        style.font = labelStyle.font;
+        style.fontColor = Color.WHITE;
+        style.overFontColor = Color.WHITE;
+        style.downFontColor = Color.WHITE;
+
+        return style;
     }
 
     private SelectBoxStyle createSelectBoxStyle() {
@@ -224,6 +248,9 @@ public class AppView implements ApplicationListener {
 
             case NEWS ->
                     screenRoot.add(createNewsScreen()).grow();
+
+            case SETTING ->
+                    screenRoot.add(new SettingMenu(skin)).grow();
 
             default ->
                     screenRoot.add(
