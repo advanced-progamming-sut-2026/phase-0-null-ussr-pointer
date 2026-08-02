@@ -3,13 +3,20 @@ package com.ussr.pvz.view.mainmenu;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 
@@ -32,7 +39,18 @@ public class MainMenu extends Table {
     }
 
     private void buildUi() {
+        Stack layers = new Stack();
+
+        layers.add(createCenterActions());
+        layers.add(createBottomActions());
+        layers.add(createNavigation());
+
+        add(layers).grow();
+    }
+
+    private Table createNavigation() {
         Table navigation = new Table();
+        navigation.top().right();
 
         TextButton menuButton = createMenuButton();
 
@@ -50,11 +68,118 @@ public class MainMenu extends Table {
                 .padTop(6f)
                 .row();
 
-        add(navigation)
-                .top()
-                .right()
-                .padTop(15f)
-                .padRight(15f);
+        navigation.padTop(15f).padRight(15f);
+        return navigation;
+    }
+
+    private Table createCenterActions() {
+        Table layer = new Table();
+        ImageButton gameButton = createBannerButton(
+                "image_ui_mainmenu_mainmenu_content_offline"
+        );
+        gameButton.addListener(listener(this::openGame));
+        layer.add(createLabeledBanner(gameButton, "Game"))
+                .size(270f, 108f);
+        return layer;
+    }
+
+    private Table createBottomActions() {
+        Table layer = new Table();
+        layer.bottom();
+
+        ImageButton travelLogButton = createBannerButton(
+                "image_ui_mainmenu_mainmenu_content_downloading"
+        );
+        travelLogButton.addListener(listener(this::openTravelLog));
+
+        layer.add(createLabeledBanner(travelLogButton, "Travel Log"))
+                .size(270f, 108f)
+                .padBottom(24f);
+        return layer;
+    }
+
+    private Stack createLabeledBanner(
+            ImageButton button,
+            String caption
+    ) {
+        Stack banner = new Stack();
+        banner.add(button);
+
+        Label label = new Label(caption, skin, "medium_outline");
+        label.setTouchable(Touchable.disabled);
+
+        Table captionLayer = new Table();
+        captionLayer.bottom();
+        captionLayer.add(label).padBottom(7f);
+        captionLayer.setTouchable(Touchable.disabled);
+        banner.add(captionLayer);
+        return banner;
+    }
+
+    private ImageButton createBannerButton(String drawableName) {
+        ImageButtonStyle style = new ImageButtonStyle();
+        style.imageUp = skin.getDrawable(drawableName);
+        style.imageDown = skin.newDrawable(
+                drawableName,
+                new Color(0.82f, 0.82f, 0.82f, 1f)
+        );
+        ImageButton button = new ImageButton(style);
+        addHoverEffect(button);
+        return button;
+    }
+
+    private void addHoverEffect(ImageButton button) {
+        button.addListener(new ClickListener() {
+            @Override
+            public void enter(
+                    InputEvent event,
+                    float x,
+                    float y,
+                    int pointer,
+                    Actor fromActor
+            ) {
+                button.clearActions();
+                button.setTransform(true);
+                button.setOrigin(Align.center);
+                button.addAction(parallel(
+                        color(
+                                new Color(1f, 1f, 0.78f, 1f),
+                                0.16f,
+                                Interpolation.fade
+                        ),
+                        scaleTo(
+                                1.06f,
+                                1.06f,
+                                0.16f,
+                                Interpolation.smooth
+                        )
+                ));
+            }
+
+            @Override
+            public void exit(
+                    InputEvent event,
+                    float x,
+                    float y,
+                    int pointer,
+                    Actor toActor
+            ) {
+                button.clearActions();
+                button.addAction(parallel(
+                        color(
+                                Color.WHITE,
+                                0.16f,
+                                Interpolation.fade
+                        ),
+                        scaleTo(
+                                1f,
+                                1f,
+                                0.16f,
+                                Interpolation.smooth
+                        )
+                ));
+            }
+        });
     }
 
     private TextButton createMenuButton() {
@@ -162,6 +287,14 @@ public class MainMenu extends Table {
 
     private void openSettings() {
         App.setMenuState(MenuState.SETTING);
+    }
+
+    private void openGame() {
+        App.setMenuState(MenuState.GAME);
+    }
+
+    private void openTravelLog() {
+        App.setMenuState(MenuState.TRAVEL_LOG);
     }
 
     private void configureMenuButton(TextButton menuButton) {

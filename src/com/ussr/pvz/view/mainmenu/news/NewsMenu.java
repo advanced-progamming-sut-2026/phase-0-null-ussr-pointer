@@ -1,9 +1,13 @@
 package com.ussr.pvz.view.mainmenu.news;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.ussr.pvz.controller.maincontroller.NewsController;
@@ -28,6 +32,7 @@ public final class NewsMenu extends Table {
     private final Skin skin;
     private final NewsController controller;
     private final Runnable onClose;
+    private final Table contentPanel;
     private final Table newsList;
 
     private TextButton unreadTab;
@@ -38,6 +43,7 @@ public final class NewsMenu extends Table {
         this.skin = skin;
         this.onClose = onClose;
         this.controller = new NewsController();
+        this.contentPanel = new Table();
         this.newsList = new Table();
         this.selectedTab = NewsTab.UNREAD;
 
@@ -48,16 +54,33 @@ public final class NewsMenu extends Table {
 
     private void buildUi() {
         setTransform(true);
-
-        setBackground(skin.getDrawable(
-                "image_ui_dialog_asset_dialogborder_10"
-        ));
-
-        pad(28f);
+        configureContentPanel();
 
         addHeader();
         addTabs();
         addNewsScrollPane();
+
+        add(createPanelLayers()).grow();
+    }
+
+    private Stack createPanelLayers() {
+        Stack layers = new Stack();
+        layers.add(contentPanel);
+
+        Image border = new Image(skin.getDrawable(
+                "image_ui_dialog_asset_dialogborder_10"
+        ));
+        border.setTouchable(Touchable.disabled);
+        layers.add(border);
+        return layers;
+    }
+
+    private void configureContentPanel() {
+        contentPanel.setBackground(skin.newDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10",
+                new Color(0.68f, 0.71f, 0.72f, 1f)
+        ));
+        contentPanel.pad(28f);
     }
 
     private void addHeader() {
@@ -67,7 +90,7 @@ public final class NewsMenu extends Table {
                 "big_outline"
         );
 
-        add(title)
+        contentPanel.add(title)
                 .colspan(2)
                 .growX()
                 .left()
@@ -111,7 +134,7 @@ public final class NewsMenu extends Table {
                 .width(220f)
                 .height(52f);
 
-        add(tabBar)
+        contentPanel.add(tabBar)
                 .colspan(2)
                 .center()
                 .padBottom(12f)
@@ -129,7 +152,7 @@ public final class NewsMenu extends Table {
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setOverscroll(false, false);
 
-        add(scrollPane)
+        contentPanel.add(scrollPane)
                 .colspan(2)
                 .grow()
                 .minHeight(400f)

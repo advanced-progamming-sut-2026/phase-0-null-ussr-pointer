@@ -1,5 +1,6 @@
 package com.ussr.pvz.view.mainmenu.news;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -27,8 +28,9 @@ public final class NewsCard extends Table {
             Skin skin,
             NewsItem item
     ) {
-        setBackground(skin.getDrawable(
-                "image_ui_dialog_asset_inner_bkgd_10"
+        setBackground(skin.newDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10",
+                cardColor(item)
         ));
 
         pad(18f);
@@ -50,6 +52,13 @@ public final class NewsCard extends Table {
                 .left()
                 .padTop(12f)
                 .row();
+    }
+
+    private Color cardColor(NewsItem item) {
+        if (!item.isRead()) {
+            return new Color(0.88f, 0.56f, 0.48f, 1f);
+        }
+        return new Color(0.72f, 0.48f, 0.43f, 1f);
     }
 
     private Table createHeader(

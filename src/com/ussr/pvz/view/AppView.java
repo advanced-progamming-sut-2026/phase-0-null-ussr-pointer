@@ -3,6 +3,7 @@ package com.ussr.pvz.view;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ussr.pvz.controller.GlobalController;
@@ -269,6 +270,7 @@ public class AppView implements ApplicationListener {
         Stack screen = new Stack();
 
         screen.add(new MainMenu(skin));
+        screen.add(createNewsDimLayer());
 
         Table overlay = createNewsOverlay();
         screen.add(overlay);
@@ -276,15 +278,21 @@ public class AppView implements ApplicationListener {
         return screen;
     }
 
+    private Image createNewsDimLayer() {
+        Image dimLayer = new Image(skin.newDrawable(
+                "white-pixel",
+                new Color(0f, 0f, 0f, 0.48f)
+        ));
+        dimLayer.setTouchable(Touchable.disabled);
+        dimLayer.getColor().a = 0f;
+        dimLayer.addAction(fadeIn(0.2f));
+        return dimLayer;
+    }
+
     private Table createNewsOverlay() {
         Table overlay = new Table();
 
         overlay.setTouchable(Touchable.enabled);
-
-        overlay.setBackground(skin.newDrawable(
-                "white-pixel",
-                new Color(0f, 0f, 0f, 0.38f)
-        ));
 
         NewsMenu newsMenu = new NewsMenu(
                 skin,
@@ -337,8 +345,10 @@ public class AppView implements ApplicationListener {
 
     private void configureGlobalHud(MenuState state) {
         Account account = App.getAccount();
+        boolean activeGameplay = state == MenuState.GAME
+                && App.getGameSession() != null;
 
-        if (!state.showsGlobalHud() || account == null) {
+        if (!state.showsGlobalHud() || activeGameplay || account == null) {
             globalMenuHud.configure(false, 0, 0, null);
             return;
         }

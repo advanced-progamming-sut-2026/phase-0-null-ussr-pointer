@@ -29,7 +29,7 @@ public enum MenuState {
 
     public boolean showsGlobalHud() {
         return switch (this) {
-            case LOGIN, REGISTER, GAME -> false;
+            case LOGIN, REGISTER -> false;
             default -> true;
         };
     }
@@ -37,8 +37,8 @@ public enum MenuState {
     public MenuState getParent() {
         return switch (this) {
             case LOGIN -> REGISTER;
-            case GAME, SETTING, NETWORK, NEWS, PROFILE -> MAIN;
-            case COLLECTION, GREENHOUSE, LEADERBOARD, TRAVEL_LOG,
+            case GAME, SETTING, NETWORK, NEWS, PROFILE, TRAVEL_LOG -> MAIN;
+            case COLLECTION, GREENHOUSE, LEADERBOARD,
                  CHOOSE_PLANT, LEVEL_SELECTION -> GAME;
             case SHOP -> GREENHOUSE;
             case REGISTER, MAIN -> null;
