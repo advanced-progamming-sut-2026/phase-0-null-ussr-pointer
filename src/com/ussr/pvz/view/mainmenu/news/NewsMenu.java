@@ -67,24 +67,10 @@ public final class NewsMenu extends Table {
                 "big_outline"
         );
 
-        TextButton closeButton = new TextButton(
-                "X",
-                skin,
-                "brown"
-        );
-
-        closeButton.addListener(
-                NewsUiFactory.listener(this::close)
-        );
-
         add(title)
+                .colspan(2)
                 .growX()
                 .left()
-                .padBottom(18f);
-
-        add(closeButton)
-                .size(52f)
-                .right()
                 .padBottom(18f)
                 .row();
     }
@@ -114,14 +100,20 @@ public final class NewsMenu extends Table {
                 )
         );
 
-        add(unreadTab)
+        Table tabBar = new Table();
+
+        tabBar.add(unreadTab)
                 .width(220f)
                 .height(52f)
                 .padRight(8f);
 
-        add(allTab)
+        tabBar.add(allTab)
                 .width(220f)
-                .height(52f)
+                .height(52f);
+
+        add(tabBar)
+                .colspan(2)
+                .center()
                 .padBottom(12f)
                 .row();
     }

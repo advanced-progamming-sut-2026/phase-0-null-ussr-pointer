@@ -43,18 +43,23 @@ public final class ProfileInformationTab extends Table {
     private void buildUi() {
         Table identityCard = createIdentityCard();
         Table progressCard = createProgressCard();
+        Table progressColumn = new Table();
+
+        progressColumn.add(progressCard)
+                .width(300f)
+                .top()
+                .row();
+
+        addLogoutButton(progressColumn);
 
         add(identityCard)
                 .width(360f)
                 .top()
                 .padRight(15f);
 
-        add(progressCard)
+        add(progressColumn)
                 .width(300f)
-                .top()
-                .row();
-
-        addLogoutButton();
+                .top();
     }
 
     private Table createIdentityCard() {
@@ -92,7 +97,7 @@ public final class ProfileInformationTab extends Table {
         return card;
     }
 
-    private void addLogoutButton() {
+    private void addLogoutButton(Table container) {
         TextButton logoutButton = new TextButton(
                 "Logout",
                 skin,
@@ -103,11 +108,11 @@ public final class ProfileInformationTab extends Table {
                 ProfileUiFactory.listener(onLogout)
         );
 
-        add(logoutButton)
-                .colspan(2)
-                .width(220f)
+        container.add(logoutButton)
+                .width(300f)
                 .height(52f)
-                .padTop(18f)
+                .padTop(4f)
+                .top()
                 .row();
     }
 
