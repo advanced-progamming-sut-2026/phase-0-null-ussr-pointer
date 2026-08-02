@@ -26,6 +26,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.ussr.pvz.view.mainmenu.news.NewsMenu;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
@@ -218,13 +222,57 @@ public class AppView implements ApplicationListener {
             case MAIN ->
                     screenRoot.add(new MainMenu(skin)).grow();
 
+            case NEWS ->
+                    screenRoot.add(createNewsScreen()).grow();
+
             default ->
                     screenRoot.add(
-                            new Label(state.getName(), skin, "big_outline")
+                            new Label(
+                                    state.getName(),
+                                    skin,
+                                    "big_outline"
+                            )
                     );
         }
 
         configureGlobalHud(state);
+    }
+
+    private Actor createNewsScreen() {
+        Stack screen = new Stack();
+
+        screen.add(new MainMenu(skin));
+
+        Table overlay = createNewsOverlay();
+        screen.add(overlay);
+
+        return screen;
+    }
+
+    private Table createNewsOverlay() {
+        Table overlay = new Table();
+
+        overlay.setTouchable(Touchable.enabled);
+
+        overlay.setBackground(skin.newDrawable(
+                "white-pixel",
+                new Color(0f, 0f, 0f, 0.38f)
+        ));
+
+        NewsMenu newsMenu = new NewsMenu(
+                skin,
+                this::closeNews
+        );
+
+        overlay.add(newsMenu)
+                .width(760f)
+                .height(590f);
+
+        return overlay;
+    }
+
+    private void closeNews() {
+        App.setMenuState(MenuState.MAIN);
     }
 
     private void transitionTo(MenuState targetMenu) {

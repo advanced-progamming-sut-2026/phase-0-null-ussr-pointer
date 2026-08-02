@@ -89,18 +89,39 @@ public class MainMenu extends Table {
         drawer.pad(10f);
 
         TextButton profileButton =
-                new TextButton("Profile", skin, "green");
+                createDrawerButton("Profile");
+
+        TextButton newsButton =
+                createDrawerButton("News");
 
         drawer.add(profileButton)
                 .growX()
                 .height(52f)
                 .row();
 
+        drawer.add(newsButton)
+                .growX()
+                .height(52f)
+                .padTop(6f)
+                .row();
+
         profileButton.addListener(
                 listener(this::openProfile)
         );
 
+        newsButton.addListener(
+                listener(this::openNews)
+        );
+
         setDrawerVisible(false);
+    }
+
+    private TextButton createDrawerButton(String text) {
+        return new TextButton(text, skin, "green");
+    }
+
+    private void openNews() {
+        App.setMenuState(MenuState.NEWS);
     }
 
     private void configureMenuButton(TextButton menuButton) {

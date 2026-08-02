@@ -23,7 +23,7 @@ public class GlobalController {
                     case MENU_ENTER -> handleMenuEnter(matcher);
                     case MENU_SHOW_CURRENT -> handleMenuShowCurrent();
                     case ADVANCE_TIME -> handleAdvanceTime(matcher);
-                    case MENU_LOGOUT -> handleMenuLogout();
+                    case MENU_LOGOUT -> logout();
                     case MENU_QUIT -> handMenuQuit();
                     case MENU_SHOW_ALL -> handleMenuShowAll();
                     case MENU_EXIT -> handleMenuExit();
@@ -45,7 +45,7 @@ public class GlobalController {
         return globalService.handleQuit();
     }
 
-    private String handleMenuLogout() {
+    public String logout() {
         return globalService.handleLogout();
     }
 

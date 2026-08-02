@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.controller.maincontroller.ProfileController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
@@ -24,6 +25,7 @@ public final class ProfileMenu extends Table {
 
     private final Skin skin;
     private final ProfileController controller;
+    private final GlobalController globalController;
 
     private Table contentRoot;
     private Table tabBar;
@@ -37,6 +39,7 @@ public final class ProfileMenu extends Table {
     public ProfileMenu(Skin skin) {
         this.skin = skin;
         this.controller = new ProfileController();
+        this.globalController = new GlobalController();
 
         setFillParent(true);
         buildUi();
@@ -74,8 +77,10 @@ public final class ProfileMenu extends Table {
     }
 
     private void initializeTabContent(Account account) {
-        informationContent =
-                new ProfileInformationTab(skin);
+        informationContent = new ProfileInformationTab(
+                skin,
+                this::logout
+        );
 
         informationContent.refresh(account);
 
@@ -209,6 +214,12 @@ public final class ProfileMenu extends Table {
     private void profileChanged() {
         informationContent.refresh(App.getAccount());
         switchTab(ProfileTab.INFORMATION);
+    }
+
+    private void logout() {
+        ProfileUiFactory.showResult(
+                globalController.logout()
+        );
     }
 
     private void showPasswordPanel() {

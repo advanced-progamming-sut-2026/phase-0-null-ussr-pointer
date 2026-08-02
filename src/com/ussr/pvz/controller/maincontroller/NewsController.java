@@ -1,33 +1,21 @@
 package com.ussr.pvz.controller.maincontroller;
 
-import com.ussr.pvz.controller.command.maincommand.NewsCommand;
+import com.ussr.pvz.model.account.NewsItem;
 import com.ussr.pvz.service.NewsService;
 
-import java.util.regex.Matcher;
+import java.util.List;
 
-public class NewsController {
+public final class NewsController {
 
-    public NewsController() {
+    public List<NewsItem> getAllNews() {
+        return NewsService.getAllNews();
     }
 
-    public String handleCommand(String command) {
-        for (NewsCommand cmd : NewsCommand.values()) {
-            Matcher matcher = cmd.getMatcher(command);
-            if (matcher.matches()) {
-                return switch (cmd) {
-                    case SHOW_UNREAD -> handleShowUnread();
-                    case SHOW_ALL -> handleShowAll();
-                };
-            }
-        }
-        return "";
+    public List<NewsItem> getUnreadNews() {
+        return NewsService.getUnreadNews();
     }
 
-    private String handleShowUnread() {
-        return NewsService.showUnread();
-    }
-
-    private String handleShowAll() {
-        return NewsService.showAll();
+    public void markAsRead(NewsItem item) {
+        NewsService.markAsRead(item);
     }
 }

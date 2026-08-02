@@ -151,7 +151,6 @@ public class GlobalService {
             case SHOP -> ShopCommand.values();
             case LEVEL_SELECTION -> LevelSelectionCommand.values();
             case TRAVEL_LOG -> TravelLogCommand.values();
-            case NEWS -> NewsCommand.values();
             default -> new Enum<?>[0];
         };
 

@@ -3,10 +3,12 @@ package com.ussr.pvz.view.mainmenu.profile;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.ussr.pvz.model.account.Account;
 
 public final class ProfileInformationTab extends Table {
     private final Skin skin;
+    private final Runnable onLogout;
 
     private final Label usernameValue;
     private final Label nicknameValue;
@@ -15,8 +17,12 @@ public final class ProfileInformationTab extends Table {
     private final Label completedLevelsValue;
     private final Label scoreValue;
 
-    public ProfileInformationTab(Skin skin) {
+    public ProfileInformationTab(
+            Skin skin,
+            Runnable onLogout
+    ) {
         this.skin = skin;
+        this.onLogout = onLogout;
 
         usernameValue = createValueLabel();
         nicknameValue = createValueLabel();
@@ -45,7 +51,10 @@ public final class ProfileInformationTab extends Table {
 
         add(progressCard)
                 .width(300f)
-                .top();
+                .top()
+                .row();
+
+        addLogoutButton();
     }
 
     private Table createIdentityCard() {
@@ -81,6 +90,25 @@ public final class ProfileInformationTab extends Table {
         );
 
         return card;
+    }
+
+    private void addLogoutButton() {
+        TextButton logoutButton = new TextButton(
+                "Logout",
+                skin,
+                "brown"
+        );
+
+        logoutButton.addListener(
+                ProfileUiFactory.listener(onLogout)
+        );
+
+        add(logoutButton)
+                .colspan(2)
+                .width(220f)
+                .height(52f)
+                .padTop(18f)
+                .row();
     }
 
     private void addInformationRow(

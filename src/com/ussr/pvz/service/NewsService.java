@@ -1,47 +1,34 @@
 package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.NewsItem;
 
-public class NewsService {
+import java.util.List;
 
-    public static String showUnread() {
-        StringBuilder output = new StringBuilder();
-        App.getAccount().getPersonalNews().forEach(newsItem -> {
-            if (!newsItem.isRead()) {
-                output.append(formatNewsCard(newsItem));
-                newsItem.markAsRead();
-            }
-        });
-        if (output.isEmpty()) {
-            return """
-                    ============================================================
-                                      No unread news right now.                \s
-                    ============================================================
-                    """;
-        }
-        return output.toString();
+public final class NewsService {
+    private NewsService() {
     }
 
-    public static String showAll() {
-        StringBuilder output = new StringBuilder();
-        App.getAccount().getPersonalNews().forEach(newsItem -> output.append(formatNewsCard(newsItem)));
+    public static List<NewsItem> getAllNews() {
+        Account account = App.getAccount();
 
-        if (output.isEmpty()) {
-            return """
-                    ============================================================
-                                         Your inbox is empty.                  \s
-                    ============================================================
-                    """;
+        if (account == null) {
+            return List.of();
         }
-        return output.toString();
+
+        return List.copyOf(account.getPersonalNews());
     }
 
-    private static String formatNewsCard(NewsItem item) {
-        return "============================================================\n" +
-                String.format(" %-35s | %s\n", item.getTitle(), item.getFormattedDate()) +
-                "------------------------------------------------------------\n" +
-                item.getContent() + "\n" +
-                "============================================================\n\n";
+    public static List<NewsItem> getUnreadNews() {
+        return getAllNews().stream()
+                .filter(item -> !item.isRead())
+                .toList();
+    }
+
+    public static void markAsRead(NewsItem item) {
+        if (item != null) {
+            item.markAsRead();
+        }
     }
 }
