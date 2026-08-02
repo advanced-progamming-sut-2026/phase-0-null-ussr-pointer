@@ -1,14 +1,12 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.FireHit;
 import com.ussr.pvz.model.entities.projectiles.hit.IceHit;
 import com.ussr.pvz.model.entities.projectiles.hit.PoisonHit;
-import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.entities.zombies.effect.FireEffect;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;

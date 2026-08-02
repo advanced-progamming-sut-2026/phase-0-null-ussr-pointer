@@ -2,7 +2,7 @@ package com.ussr.pvz.model.entities.items.sun;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;

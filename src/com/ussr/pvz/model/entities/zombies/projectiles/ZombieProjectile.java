@@ -1,8 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
-import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.util.Vec2;
 
 public abstract class ZombieProjectile extends GameEntity {

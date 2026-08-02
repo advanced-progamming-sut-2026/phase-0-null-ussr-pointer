@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.plants;
 
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class PlantArmor {
@@ -43,7 +44,7 @@ public class PlantArmor {
     }
 
     private void executeArmorExplosion(Plant user) {
-        com.ussr.pvz.model.engine.GameSession session = com.ussr.pvz.model.App.getGameSession();
+        GameSession session = com.ussr.pvz.model.App.getGameSession();
         if (session == null || session.getZombies() == null) return;
 
         com.ussr.pvz.model.util.Vec2 plantPos = user.getPosition();

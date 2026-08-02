@@ -2,7 +2,7 @@ package com.ussr.pvz.model.board.structures;
 
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.Damageable;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 
 public class Grave extends InteractableStructure implements Damageable {
 

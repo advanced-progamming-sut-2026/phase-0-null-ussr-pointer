@@ -13,7 +13,7 @@ import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.MenuEnterChapterRequest;
 import com.ussr.pvz.model.dto.MenuSwitchWorldRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -25,9 +25,6 @@ import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.quest.QuestRewardApplier;
 import com.ussr.pvz.model.quest.QuestType;
 import com.ussr.pvz.service.ChoosePlantService;
-
-import java.util.List;
-import java.util.Map;
 
 public class GameService {
 
@@ -546,20 +543,6 @@ public class GameService {
         return "plant food added";
     }
 
-    public String showMap() {
-        if (App.getGameSession() == null) {
-            return "no active game session";
-        }
-        return App.getGameSession().renderMap();
-    }
-
-    public String showPlantsStatus() {
-        if (App.getGameSession() == null) {
-            return "no active game session";
-        }
-        return App.getGameSession().renderPlantsStatus();
-    }
-
     public String showConveyor() {
         GameSession session = App.getGameSession();
         if (session == null || session.getLevel() == null) {
@@ -575,27 +558,6 @@ public class GameService {
         }
 
         return "this level does not use a conveyor belt";
-    }
-
-    public String showTileStatus(LocationRequest request) {
-        int x, y;
-        try {
-            x = Integer.parseInt(request.x());
-            y = Integer.parseInt(request.y());
-        } catch (NumberFormatException e) {
-            return "invalid location";
-        }
-        if (App.getGameSession() == null) {
-            return "no active game session";
-        }
-        return App.getGameSession().renderTileStatus(x, y);
-    }
-
-    public String zombiesInfo() {
-        if (App.getGameSession() == null) {
-            return "no active game session";
-        }
-        return App.getGameSession().renderZombiesInfo();
     }
 
     public String cheatSpawnZombie(CheatSpawnZombieRequest request) {

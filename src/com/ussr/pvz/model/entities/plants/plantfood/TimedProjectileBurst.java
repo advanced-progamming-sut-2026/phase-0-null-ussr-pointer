@@ -1,6 +1,6 @@
 package com.ussr.pvz.model.entities.plants.plantfood;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
@@ -9,7 +9,6 @@ import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TimedProjectileBurst implements PlantFoodEffect {

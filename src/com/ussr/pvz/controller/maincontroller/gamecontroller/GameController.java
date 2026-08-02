@@ -49,10 +49,6 @@ public class GameController {
             case MENU_GEM_WALLET -> handleMenuGemWallet();
             case MENU_SWITCH_WORLD -> handleMenuSwitchWorld(matcher);
             case SHOW_SUN_AMOUNT -> handleShowSunAmount();
-            case SHOW_MAP -> handleShowMap();
-            case SHOW_PLANTS_STATUS -> handleShowPlantsStatus();
-            case SHOW_TILE_STATUS -> handleShowTileStatus(matcher);
-            case ZOMBIES_INFO -> handleZombiesInfo();
             case SHOW_CONVEYOR -> handleShowConveyor();
             case SHOW_PLANT_FOOD -> handleShowPlantFood();
             default -> "";
@@ -216,23 +212,6 @@ public class GameController {
 
     private String handleCheatAddPlantFood() {
         return gameService.cheatAddPlantFood();
-    }
-
-    private String handleShowMap() {
-        return gameService.showMap();
-    }
-
-    private String handleShowPlantsStatus() {
-        return gameService.showPlantsStatus();
-    }
-
-    private String handleShowTileStatus(Matcher matcher) {
-        LocationRequest request = new LocationRequest(matcher.group("x"), matcher.group("y"));
-        return gameService.showTileStatus(request);
-    }
-
-    private String handleZombiesInfo() {
-        return gameService.zombiesInfo();
     }
 
     private String handleCheatSpawnZombie(Matcher matcher) {

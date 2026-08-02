@@ -10,7 +10,7 @@ import com.ussr.pvz.model.board.Row;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantArmor;
 import com.ussr.pvz.model.entities.plants.PlantFactory;

@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.board.structures;
 
 import com.ussr.pvz.model.engine.Damageable;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 
 public class Container extends InteractableStructure implements Damageable {
     private int hp = 500; //temp

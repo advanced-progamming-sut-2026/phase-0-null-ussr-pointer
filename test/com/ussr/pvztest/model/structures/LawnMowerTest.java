@@ -3,7 +3,7 @@ package com.ussr.pvztest.model.structures;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 import org.junit.jupiter.api.BeforeEach;

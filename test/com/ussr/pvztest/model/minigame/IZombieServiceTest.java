@@ -2,7 +2,7 @@ package com.ussr.pvztest.model.minigame;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.Lawn;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.service.minigame.IZombieService;

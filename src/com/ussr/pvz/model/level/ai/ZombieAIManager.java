@@ -1,6 +1,6 @@
 package com.ussr.pvz.model.level.ai;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Level;
 import java.util.ArrayList;
 import java.util.List;

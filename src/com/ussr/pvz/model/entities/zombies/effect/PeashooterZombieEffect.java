@@ -1,8 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.engine.Damageable;
-import com.ussr.pvz.model.engine.GameClock;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;

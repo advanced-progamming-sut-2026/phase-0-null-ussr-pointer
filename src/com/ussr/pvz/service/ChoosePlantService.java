@@ -6,7 +6,7 @@ import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.level.TerrainFactory;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;

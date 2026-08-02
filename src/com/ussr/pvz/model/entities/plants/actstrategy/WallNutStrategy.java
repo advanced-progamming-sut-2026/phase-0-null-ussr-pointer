@@ -2,7 +2,7 @@ package com.ussr.pvz.model.entities.plants.actstrategy;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.zombies.Zombie;

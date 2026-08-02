@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.entities.zombies;
 
 import com.ussr.pvz.model.engine.Damageable;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.targeting.PlantSideTargetFinder;
 import com.ussr.pvz.model.entities.zombies.targeting.TargetFinder;
 import com.ussr.pvz.model.entities.zombies.targeting.ZombieSideTargetFinder;

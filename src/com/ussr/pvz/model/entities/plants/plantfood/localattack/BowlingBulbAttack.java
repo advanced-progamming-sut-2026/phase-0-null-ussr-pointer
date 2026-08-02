@@ -1,12 +1,10 @@
 package com.ussr.pvz.model.entities.plants.plantfood.localattack;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
-import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
 import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
 import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
-import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.util.Vec2;
 
 public class BowlingBulbAttack extends LocalAttack {

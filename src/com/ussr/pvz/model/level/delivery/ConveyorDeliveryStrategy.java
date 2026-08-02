@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.level.delivery;
 
-import com.ussr.pvz.model.engine.GameSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

@@ -22,11 +22,7 @@ public enum GameCommand {
             "(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
     FEED_PLANT("^feed\\s+plant\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
     CHEAT_ADD_PLANT_FOOD("^cheat\\s+add-plant-food(?:\\s+.*)?$"),
-    SHOW_MAP("^show\\s+map(?:\\s+.*)?$"),
-    SHOW_PLANTS_STATUS("^show\\s+plants\\s+status(?:\\s+.*)?$"),
     SHOW_CONVEYOR("^show\\s+conveyor(?:\\s+.*)?$"),
-    SHOW_TILE_STATUS("^show\\s+tile\\s+status\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*,\\s*(?<y>\\d+)\\s*\\)(?:\\s+.*)?$"),
-    ZOMBIES_INFO("^zombies\\s+info(?:\\s+.*)?$"),
     SHOW_PLANT_FOOD("^show\\s+plant\\s+foods?(?:\\s+.*)?$"),
     CHEAT_SPAWN_ZOMBIE("^cheat\\s+spawn-zombie\\s+-t\\s+(?<type>.+?)\\s+-l\\s*\\(\\s*(?<x>\\d+)\\s*," +
             "\\s*(?<y>\\d+)\\s*\\)(?:\\s+(?<glowing>-g))?(?:\\s+.*)?$"),

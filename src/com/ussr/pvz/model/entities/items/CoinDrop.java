@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.entities.items;
 
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 
 public class CoinDrop extends GroundItem {
     public CoinDrop(CoinTier tier) {

@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.quest;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.plants.PlantFactory;

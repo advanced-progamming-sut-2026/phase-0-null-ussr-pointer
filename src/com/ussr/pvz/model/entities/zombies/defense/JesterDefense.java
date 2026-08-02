@@ -1,10 +1,9 @@
 package com.ussr.pvz.model.entities.zombies.defense;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.effect.SpinEffect;
-import com.ussr.pvz.model.util.Vec2;
 
 public class JesterDefense implements DefenseBehavior {
     public static final double SPIN_DURATION_ON_DEFLECT = 1.0;

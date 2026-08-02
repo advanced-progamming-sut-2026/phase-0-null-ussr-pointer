@@ -1,6 +1,6 @@
 package com.ussr.pvz.model.entities.plants.plantfood.localattack;
 
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 

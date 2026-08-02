@@ -6,7 +6,7 @@ import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.Vase;
 import com.ussr.pvz.model.board.structures.VaseType;
 import com.ussr.pvz.model.engine.GameEntity;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.level.Level;

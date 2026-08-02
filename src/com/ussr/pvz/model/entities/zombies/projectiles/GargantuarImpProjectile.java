@@ -1,7 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
 import com.ussr.pvz.model.board.Cell;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.util.Vec2;

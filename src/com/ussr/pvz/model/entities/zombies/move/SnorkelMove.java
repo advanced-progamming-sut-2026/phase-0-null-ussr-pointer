@@ -1,7 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.move;
 
-import com.ussr.pvz.model.engine.GameClock;
-import com.ussr.pvz.model.engine.GameSession;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.Vulnerability;
