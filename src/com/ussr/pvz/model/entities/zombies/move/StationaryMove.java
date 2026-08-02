@@ -5,7 +5,11 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class StationaryMove implements MoveBehavior {
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         // Intentionally does nothing - the zombie holds its position.
     }
 }

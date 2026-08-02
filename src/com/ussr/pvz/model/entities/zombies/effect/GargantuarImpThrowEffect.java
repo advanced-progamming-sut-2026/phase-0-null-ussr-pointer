@@ -32,7 +32,11 @@ public class GargantuarImpThrowEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie gargantuar, GameSession session) {
+    public void effect(
+            Zombie gargantuar,
+            GameSession session,
+            float delta
+    ) {
         if (impThrown || !gargantuar.isAlive()) return;
         if (gargantuar.getMaxHp() <= 0) return;
 

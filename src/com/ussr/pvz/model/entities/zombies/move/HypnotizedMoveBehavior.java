@@ -12,8 +12,12 @@ public class HypnotizedMoveBehavior implements MoveBehavior {
     }
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
-        delegate.move(zombie, session);
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
+        delegate.move(zombie, session , delta);
 
         if (hasWalkedOffTheRightEdge(zombie, session)) {
             zombie.setAlive(false);

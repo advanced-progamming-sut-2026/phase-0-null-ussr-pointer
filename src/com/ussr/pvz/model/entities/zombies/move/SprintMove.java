@@ -25,11 +25,15 @@ public class SprintMove implements MoveBehavior {
     }
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         Vec2 pos = zombie.getPosition();
         if (pos == null) return;
 
-        double deltaX = getActiveSpeedX(zombie) * GameClock.SECONDS_PER_TICK;
+        double deltaX = getActiveSpeedX(zombie) * delta;
         Vec2 newPos = Vec2.of(pos.x() + deltaX, pos.y());
 
         int oldCol = (int) pos.x();

@@ -54,7 +54,7 @@ public class PushableStructure extends InteractableStructure implements Damageab
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!this.isAlive()) return;
 
         GameSession session = App.getGameSession();

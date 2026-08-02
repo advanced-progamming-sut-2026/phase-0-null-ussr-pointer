@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameClock {
-    public static final double SECONDS_PER_TICK = 0.1;
+    private double elapsedSeconds;
 
-    private int tick = 0;
-    private final List<Tickable> entities = new ArrayList<>();
+    private final List<Tickable> entities =
+            new ArrayList<>();
 
     public void addEntity(Tickable entity) {
         if (!entities.contains(entity)) {
@@ -19,39 +19,40 @@ public class GameClock {
         entities.remove(entity);
     }
 
-    public void tick() {
-        tick++;
+    public void update(float delta) {
+        if (!Float.isFinite(delta) || delta <= 0f) {
+            return;
+        }
 
-        // 1. Remove dead entities to prevent memory leaks and ghost ticks
-        entities.removeIf(e -> {
-            if (e instanceof GameEntity ge) {
-                return !ge.isAlive();
-            }
-            return false;
-        });
+        elapsedSeconds += delta;
+        removeDeadEntities();
 
-        // 2. Iterate over a copy of the list to prevent ConcurrentModificationException
-        // when new entities (like projectiles or dropped loot) are spawned during a tick.
-        List<Tickable> currentEntities = new ArrayList<>(entities);
+        List<Tickable> currentEntities =
+                new ArrayList<>(entities);
+
         for (Tickable entity : currentEntities) {
-            // Only tick if it didn't die earlier in this exact same tick loop
-            if (entity instanceof GameEntity ge && !ge.isAlive()) {
+            if (entity instanceof GameEntity gameEntity
+                    && !gameEntity.isAlive()) {
                 continue;
             }
-            entity.tick();
+
+            entity.update(delta);
         }
     }
 
-    public int getTicks() {
-        return tick;
+    private void removeDeadEntities() {
+        entities.removeIf(entity ->
+                entity instanceof GameEntity gameEntity
+                        && !gameEntity.isAlive()
+        );
     }
 
     public double getElapsedSeconds() {
-        return tick * SECONDS_PER_TICK;
+        return elapsedSeconds;
     }
 
     public void reset() {
-        tick = 0;
+        elapsedSeconds = 0.0;
         entities.clear();
     }
 }

@@ -14,7 +14,11 @@ public class CrushAttack implements AttackBehavior {
     }
 
     @Override
-    public void attack(Zombie zombie, GameSession session) {
+    public void attack(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    )  {
         Damageable target = zombie.acquireTarget(session);
         if (target == null || !target.isAlive()) return;
 

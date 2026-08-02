@@ -19,10 +19,14 @@ public class KingBuffEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie king, GameSession session) {
+    public void effect(
+            Zombie king,
+            GameSession session,
+            float delta
+    ) {
         if (!king.isAlive()) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= delayBetweenKnighting) {
             if (applyBuff(king, session)) {
                 timer = 0;

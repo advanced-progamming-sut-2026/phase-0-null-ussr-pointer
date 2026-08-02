@@ -28,14 +28,18 @@ public class JumpMove implements MoveBehavior {
     }
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (cooldownTimer > 0) {
-            cooldownTimer -= GameClock.SECONDS_PER_TICK;
+            cooldownTimer -= delta;
             if (cooldownTimer < 0) cooldownTimer = 0;
         }
         Vec2 pos = zombie.getPosition();
         Vec2 vel = zombie.getSpeed();
-        double dx = Math.abs(vel.x() * GameClock.SECONDS_PER_TICK);
+        double dx = Math.abs(vel.x() * delta);
         gridAccumulator += dx;
         if (gridAccumulator >= 1.0) {
             currentChance += addChancePerGrid;
@@ -64,7 +68,7 @@ public class JumpMove implements MoveBehavior {
             cooldownTimer = cooldownSeconds;
             gridAccumulator = 0;
         } else {
-            Vec2 newPos = pos.add(vel.scale(GameClock.SECONDS_PER_TICK));
+            Vec2 newPos = pos.add(vel.scale(delta));
             int oldCol = (int) pos.x();
             int newCol = (int) newPos.x();
             if (newCol != oldCol) {

@@ -35,9 +35,13 @@ public class ProspectorMove implements MoveBehavior {
     }
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (dynamiteExtinguished) {
-            new NormalWalk().move(zombie, session);
+            new NormalWalk().move(zombie, session , delta);
             return;
         }
 
@@ -47,10 +51,10 @@ public class ProspectorMove implements MoveBehavior {
         switch (currentPhase) {
             case WALKING_LEFT -> {
                 Vec2 vel = zombie.getSpeed();
-                Vec2 newPos = pos.add(vel.scale(GameClock.SECONDS_PER_TICK));
+                Vec2 newPos = pos.add(vel.scale(delta));
                 zombie.setPosition(newPos);
 
-                launchCountdown -= GameClock.SECONDS_PER_TICK;
+                launchCountdown -= delta;
                 if (launchCountdown <= 0) {
                     currentPhase = ProspectorPhase.AIRBORNE_LAUNCH;
 
@@ -61,10 +65,10 @@ public class ProspectorMove implements MoveBehavior {
             }
 
             case AIRBORNE_LAUNCH -> {
-                double newX = pos.x() - (airborneSpeedX * GameClock.SECONDS_PER_TICK);
+                double newX = pos.x() - (airborneSpeedX * delta);
                 zombie.setPosition(Vec2.of(Math.max(0, newX), pos.y()));
 
-                timeToTravel -= GameClock.SECONDS_PER_TICK;
+                timeToTravel -= delta;
                 if (timeToTravel <= 0 || zombie.getPosition().x() <= 0) {
                     zombie.setPosition(Vec2.of(0, pos.y()));
                     currentPhase = ProspectorPhase.REVERSE_WALK;
@@ -76,7 +80,7 @@ public class ProspectorMove implements MoveBehavior {
 
             case REVERSE_WALK -> {
                 Vec2 vel = zombie.getSpeed();
-                Vec2 newPos = pos.add(vel.scale(GameClock.SECONDS_PER_TICK));
+                Vec2 newPos = pos.add(vel.scale(delta));
                 zombie.setPosition(newPos);
             }
         }

@@ -15,11 +15,15 @@ public class PusherMove implements MoveBehavior {
     private static final double PUSH_RANGE = 1.1;
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         Vec2 pos = zombie.getPosition();
         if (pos == null || session.getLawn() == null) return;
 
-        double deltaX = zombie.getSpeed().x() * GameClock.SECONDS_PER_TICK;
+        double deltaX = zombie.getSpeed().x() * delta;
         double targetZombieX = pos.x() + deltaX;
         int currentRow = (int) pos.y();
 

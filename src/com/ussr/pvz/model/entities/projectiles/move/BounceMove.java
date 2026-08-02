@@ -19,12 +19,15 @@ public class BounceMove implements MoveStrategy {
     public BounceMove() {};
 
     @Override
-    public void move(Projectile projectile) {
+    public void move(
+            Projectile projectile,
+            float delta
+    ) {
         Vec2 pos = projectile.getPosition();
         Vec2 speed = projectile.getSpeed();
 
         if (pos != null && speed != null) {
-            Vec2 newPos = pos.add(speed.scale(GameClock.SECONDS_PER_TICK));
+            Vec2 newPos = pos.add(speed.scale(delta));
 
             if (newPos.x() < MIN_X || newPos.x() > MAX_X) {
                 projectile.setPosition(newPos);

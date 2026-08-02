@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 
@@ -89,13 +90,19 @@ public class MainMenu extends Table {
         drawer.pad(10f);
 
         TextButton profileButton =
-                createDrawerButton("Profile");
+                createDrawerButton(
+                        "image_ui_mainmenu_mm_playericon"
+                );
 
         TextButton newsButton =
-                createDrawerButton("News");
+                createDrawerButton(
+                        "image_ui_mainmenu_mm_newsicon"
+                );
 
         TextButton settingsButton =
-                createDrawerButton("Settings");
+                createDrawerButton(
+                        "image_ui_mainmenu_mm_settings"
+                );
 
         drawer.add(profileButton)
                 .growX()
@@ -129,8 +136,24 @@ public class MainMenu extends Table {
         setDrawerVisible(false);
     }
 
-    private TextButton createDrawerButton(String text) {
-        return new TextButton(text, skin, "green");
+    private TextButton createDrawerButton(String drawableName) {
+        TextButton button = new TextButton(
+                "",
+                skin,
+                "green"
+        );
+
+        button.clearChildren();
+
+        Image icon = new Image(
+                skin.getDrawable(drawableName)
+        );
+
+        icon.setScaling(Scaling.fit);
+        icon.setTouchable(Touchable.disabled);
+
+        button.add(icon).size(44f, 40f);
+        return button;
     }
 
     private void openNews() {

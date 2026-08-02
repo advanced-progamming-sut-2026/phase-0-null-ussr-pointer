@@ -8,18 +8,24 @@ import com.ussr.pvz.model.util.Vec2;
 public class NormalWalk implements MoveBehavior {
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
-        Vec2 pos = zombie.getPosition();
-        Vec2 vel = zombie.getSpeed();
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
+        Vec2 position = zombie.getPosition();
+        Vec2 velocity = zombie.getSpeed();
 
-        Vec2 newPos = pos.add(vel.scale(GameClock.SECONDS_PER_TICK));
-
-        int oldCol = (int) pos.x();
-        int newCol = (int) newPos.x();
-        if (newCol != oldCol) {
-            newPos = applySlipperyShift(newPos, session);
+        if (position == null || velocity == null) {
+            return;
         }
 
-        zombie.setPosition(newPos);
+        Vec2 newPosition = position.add(
+                velocity.scale(delta)
+        );
+
+        zombie.setPosition(
+                applySlipperyShift(newPosition, session)
+        );
     }
 }

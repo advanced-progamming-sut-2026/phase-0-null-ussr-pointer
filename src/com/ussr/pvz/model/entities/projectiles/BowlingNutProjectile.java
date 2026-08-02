@@ -1,7 +1,6 @@
 package com.ussr.pvz.model.entities.projectiles;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
@@ -48,13 +47,13 @@ public class BowlingNutProjectile extends Projectile {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!isAlive()) return;
         GameSession session = App.getGameSession();
         if (session == null) return;
 
         Vec2 prevPos = getPosition();
-        Vec2 step = getSpeed().scale(GameClock.SECONDS_PER_TICK);
+        Vec2 step = getSpeed().scale(delta);
         setPosition(prevPos.add(step));
 
         // Fix: Proper Wall Bounce Logic

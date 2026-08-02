@@ -16,10 +16,14 @@ public class PianistEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie pianist, GameSession session) {
+    public void effect(
+            Zombie pianist,
+            GameSession session,
+            float delta
+    ) {
         if (!pianist.isAlive()) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
 
         if (timer >= danceInterval) {
             timer = 0;

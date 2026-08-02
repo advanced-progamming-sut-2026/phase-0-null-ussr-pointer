@@ -12,7 +12,6 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
-import com.ussr.pvz.model.dto.AdvanceTimeRequest;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
 import com.ussr.pvz.model.util.SessionManager;
 
@@ -97,30 +96,6 @@ public class GlobalService {
         App.login(null);
         App.setMenuState(MenuState.LOGIN);
         return "logged out successfully";
-    }
-
-    public String advanceTime(AdvanceTimeRequest request) {
-        int count;
-        try {
-            count = Integer.parseInt(request.count());
-        } catch (NumberFormatException e) {
-            return "invalid count";
-        }
-
-        if (count <= 0) return "count must be positive";
-
-        if (App.getGameSession() == null) return "no active game session";
-
-        for (int i = 0; i < count; i++) {
-            App.getGameSession().tick();
-            if (App.getGameSession().isGameOver()) {
-                return "advanced " + (i + 1) + " tick(s) — game ended.";
-            }
-        }
-
-        return "advanced " + count + " tick(s) | elapsed: "
-                + String.format("%.1f", App.getGameSession().getElapsedSeconds()) + "s"
-                + " | zombies: " + App.getGameSession().getZombies().size();
     }
 
     public String handleQuit() {

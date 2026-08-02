@@ -35,4 +35,12 @@ public class SettingController {
 
         return settingService.changeDifficulty(request);
     }
+
+    public float getGameSpeed() {
+        return settingService.getGameSpeed();
+    }
+
+    public String changeGameSpeed(float speed) {
+        return settingService.changeGameSpeed(speed);
+    }
 }

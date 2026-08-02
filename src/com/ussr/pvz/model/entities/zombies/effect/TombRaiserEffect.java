@@ -24,11 +24,15 @@ public class TombRaiserEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         // Hypnotized tomb raisers shouldn't block the player's plants!
         if (!zombie.isAlive() || zombie.getFaction() == Faction.PLANTS) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= cooldown) {
             timer = 0;
             throwBones(zombie, session);

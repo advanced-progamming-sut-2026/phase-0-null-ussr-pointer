@@ -7,17 +7,32 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class ChompAttack implements AttackBehavior {
+    private double pendingDamage;
 
     @Override
-    public void attack(Zombie zombie, GameSession session) {
-        Damageable target = zombie.acquireTarget(session);
-        if (target == null || !target.isAlive()) return;
+    public void attack(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
+        Damageable target =
+                zombie.acquireTarget(session);
 
-        int damage = (int) (zombie.getEatDps() * GameClock.SECONDS_PER_TICK);
-        damage = Math.max(1, damage);
-        if(target instanceof Plant plant)
-            plant.takeDamage(damage , zombie);
-        else
-            target.takeDamage(damage);
+        if (target == null || !target.isAlive()) {
+            pendingDamage = 0;
+            return;
+        }
+
+        pendingDamage +=
+                zombie.getEatDps() * delta;
+
+        int damage = (int) pendingDamage;
+
+        if (damage <= 0) {
+            return;
+        }
+
+        target.takeDamage(damage);
+        pendingDamage -= damage;
     }
 }

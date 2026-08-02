@@ -26,7 +26,7 @@ public class Brain extends InteractableStructure implements Damageable {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         // Static target, does nothing
     }
 

@@ -9,7 +9,7 @@ public abstract class GameEntity implements Tickable {
     protected boolean isAlive = true;
 
     @Override
-    public abstract void tick();
+    public abstract void update(float delta);
 
     public Vec2 getPosition() {
         return this.position;

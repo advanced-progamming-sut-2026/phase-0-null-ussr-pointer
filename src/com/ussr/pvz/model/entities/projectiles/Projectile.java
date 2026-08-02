@@ -57,11 +57,11 @@ public class Projectile extends GameEntity {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!isAlive) return;
 
         if (moveStrategy != null) {
-            moveStrategy.move(this);
+            moveStrategy.move(this , delta);
         }
         else {
             this.isAlive = false;

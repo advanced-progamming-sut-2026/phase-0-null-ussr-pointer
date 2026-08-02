@@ -22,7 +22,11 @@ public class FishermanEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) return;
 
         if (zombie.getFaction() == Faction.ZOMBIES) {
@@ -32,7 +36,7 @@ public class FishermanEffect implements EffectStatus {
             }
         }
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= delayBetweenCasting) {
             if (castHook(zombie, session)) {
                 timer = 0;

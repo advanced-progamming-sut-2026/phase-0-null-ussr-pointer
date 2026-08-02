@@ -23,7 +23,7 @@ public class Container extends InteractableStructure implements Damageable {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
     }
 
     public int getHp() {

@@ -40,7 +40,11 @@ public class SunThief implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) {
             if (!deathHandled) {
                 int returnAmount = (int) (stolenSuns * dropRatioOnDeath);
@@ -60,13 +64,13 @@ public class SunThief implements EffectStatus {
         }
 
         if (isBankThief) {
-            processBankThief(zombie, session);
+            processBankThief(zombie, session , delta);
         } else {
-            processGroundThief(zombie, session);
+            processGroundThief(zombie, session , delta);
         }
     }
 
-    private void processGroundThief(Zombie zombie, GameSession session) {
+    private void processGroundThief(Zombie zombie, GameSession session , float delta) {
         if (stolenSuns >= maxSunsToSteal) return;
 
         if (currentTarget != null && (!currentTarget.isAlive() || currentTarget.getItemType() != ItemType.SUN)) {
@@ -80,7 +84,7 @@ public class SunThief implements EffectStatus {
             if (currentTarget == null) return;
         }
 
-        targetTimer += GameClock.SECONDS_PER_TICK;
+        targetTimer += delta;
 
         if (targetTimer >= STEAL_DURATION_SECONDS) {
             stealSun(zombie, session, currentTarget);
@@ -118,14 +122,14 @@ public class SunThief implements EffectStatus {
         item.setAlive(false);
     }
 
-    private void processBankThief(Zombie zombie, GameSession session) {
+    private void processBankThief(Zombie zombie, GameSession session , float delta) {
         if (laserFired) return;
 
         if (!isStealing) {
             if (canSeePlant(zombie, session)) isStealing = true;
         } else {
-            stateTimer += GameClock.SECONDS_PER_TICK;
-            oneSecondAccumulator += GameClock.SECONDS_PER_TICK;
+            stateTimer += delta;
+            oneSecondAccumulator += delta;
 
             if (oneSecondAccumulator >= 1.0 && stateTimer <= chargingTime) {
                 oneSecondAccumulator = 0;

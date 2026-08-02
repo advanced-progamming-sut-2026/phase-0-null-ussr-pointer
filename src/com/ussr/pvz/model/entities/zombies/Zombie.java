@@ -106,52 +106,92 @@ public class Zombie extends GameEntity implements Damageable {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         GameSession session = App.getGameSession();
-        if (session == null) return;
+
+        if (session == null) {
+            return;
+        }
 
         if (!isAlive) {
-            if (effectStatus != null) effectStatus.effect(this, session);
+            applyEffect(session, delta);
             return;
         }
 
         ZombieFactory.respawnPushedStructureIfNeeded(this);
 
-        if (effectStatus != null) effectStatus.effect(this, session);
+        applyEffect(session, delta);
+        updateStatus(delta);
+        updateActivity(session, delta);
+    }
 
-        if (statusTimeRemaining > 0) {
-            statusTimeRemaining -= com.ussr.pvz.model.engine.GameClock.SECONDS_PER_TICK;
-            if (statusTimeRemaining <= 0) {
-                statusTimeRemaining = 0;
-                if (status == Status.FREEZE || status == Status.BUTTER) {
-                    status = Status.NORMAL;
-                }
-            }
+    private void applyEffect(
+            GameSession session,
+            float delta
+    ) {
+        if (effectStatus != null) {
+            effectStatus.effect(this, session, delta);
+        }
+    }
+
+    private void updateStatus(float delta) {
+        if (statusTimeRemaining <= 0) {
+            return;
         }
 
-        Damageable target = acquireTarget(session);
-        if (moveBehavior instanceof JumpMove jumpMove
-                && target instanceof Plant targetPlant
-                && jumpMove.canFlyOver(targetPlant)) {
-            moveBehavior.move(this, session);
-            target = acquireTarget(session);
-        }
-        if (target != null && target.isAlive()) {
-            state = ZombieActivity.EATING;
-            if (attackBehavior != null) {
-                attackBehavior.attack(this, session);
-            }
-        } else {
-            state = ZombieActivity.WALKING;
-            if (moveBehavior != null) {
-                moveBehavior.move(this, session);
+        statusTimeRemaining -= delta;
+
+        if (statusTimeRemaining <= 0) {
+            statusTimeRemaining = 0;
+
+            if (status == Status.FREEZE
+                    || status == Status.BUTTER) {
+                status = Status.NORMAL;
             }
         }
     }
 
+    private void updateActivity(
+            GameSession session,
+            float delta
+    ) {
+        Damageable target = acquireTarget(session);
+
+        if (canJumpOver(target)) {
+            moveBehavior.move(this, session, delta);
+            target = acquireTarget(session);
+        }
+
+        if (target != null && target.isAlive()) {
+            state = ZombieActivity.EATING;
+
+            if (attackBehavior != null) {
+                attackBehavior.attack(
+                        this,
+                        session,
+                        delta
+                );
+            }
+
+            return;
+        }
+
+        state = ZombieActivity.WALKING;
+
+        if (moveBehavior != null) {
+            moveBehavior.move(this, session, delta);
+        }
+    }
+
+    private boolean canJumpOver(Damageable target) {
+        return moveBehavior instanceof JumpMove jumpMove
+                && target instanceof Plant plant
+                && jumpMove.canFlyOver(plant);
+    }
+
     private void handleDeathEffect(GameSession session) {
         if (effectStatus != null && session != null) {
-            effectStatus.effect(this, session);
+            effectStatus.onDeath(this, session);
         }
     }
 

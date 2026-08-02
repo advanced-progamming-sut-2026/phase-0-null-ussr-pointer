@@ -21,10 +21,14 @@ public class PeashooterZombieEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= fireRate) {
 
             // Find a target plant in the same lane

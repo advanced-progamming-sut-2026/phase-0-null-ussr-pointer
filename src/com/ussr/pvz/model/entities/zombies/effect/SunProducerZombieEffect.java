@@ -13,10 +13,14 @@ public class SunProducerZombieEffect implements EffectStatus {
     private double timer = currentInterval;
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) return;
 
-        timer -= GameClock.SECONDS_PER_TICK;
+        timer -= delta;
         if (timer <= 0) {
             int zRow = (int) zombie.getPosition().y();
             int zCol = (int) zombie.getPosition().x();

@@ -14,8 +14,12 @@ public class StunnedMoveBehavior implements MoveBehavior {
     }
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
-        stunTimer -= GameClock.SECONDS_PER_TICK;
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
+        stunTimer -= delta;
 
         if (stunTimer <= 0) {
             // Restore the original behavior when the stun wears off

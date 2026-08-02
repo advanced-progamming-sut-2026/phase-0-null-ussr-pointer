@@ -23,10 +23,14 @@ public class IceAgeHunterEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= throwCooldown) {
             if (throwSnowball(zombie, session)) {
                 timer = 0;

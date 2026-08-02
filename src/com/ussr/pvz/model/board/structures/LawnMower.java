@@ -36,7 +36,7 @@ public class LawnMower extends InteractableStructure {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!isAlive()) return;
         if (!activated) return;
 

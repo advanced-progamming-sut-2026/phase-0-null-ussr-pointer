@@ -10,11 +10,15 @@ import com.ussr.pvz.model.util.Vec2;
 public class SnorkelMove implements MoveBehavior {
 
     @Override
-    public void move(Zombie zombie, GameSession session) {
+    public void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         Vec2 pos = zombie.getPosition();
         if (pos == null) return;
 
-        double deltaX = zombie.getSpeed().x() * GameClock.SECONDS_PER_TICK;
+        double deltaX = zombie.getSpeed().x() * delta;
         double targetX = pos.x() + deltaX;
         zombie.setPosition(Vec2.of(targetX, pos.y()));
 

@@ -10,7 +10,6 @@ import com.ussr.pvz.model.engine.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
-import com.ussr.pvz.view.CliGameEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -158,9 +157,6 @@ public class ChoosePlantService {
         session.addSun(INITIAL_SUN);
         session.setProgressTracked(!App.isCheatedLevel());
         App.setGameSession(session);
-
-        // Register the CLI View layer to listen to engine events
-        new CliGameEventListener(session);
 
         ZombieFactory.init();
         level.onStart();

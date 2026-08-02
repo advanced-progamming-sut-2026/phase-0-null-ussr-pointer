@@ -19,29 +19,35 @@ public class ArcMove implements MoveStrategy {
     }
 
 
-    public void move(Projectile projectile) {
-        if (landed) return;
-
-        Vec2 pos = projectile.getPosition();
+    @Override
+    public void move(
+            Projectile projectile,
+            float delta
+    ) {
+        Vec2 position = projectile.getPosition();
         Vec2 speed = projectile.getSpeed();
 
-        if (pos != null && speed != null) {
-            double newSpeedY = speed.y() + (gravity * GameClock.SECONDS_PER_TICK);
-            Vec2 newSpeed = Vec2.of(speed.x(), newSpeedY);
+        if (position == null || speed == null) {
+            return;
+        }
 
-            Vec2 newPos = pos.add(newSpeed.scale(GameClock.SECONDS_PER_TICK));
+        double newSpeedY =
+                speed.y() + gravity * delta;
 
-            boolean isFalling = newSpeedY > 0;
-            boolean hitTheGroundLevel = newPos.y() - groundY > -0.15;
+        Vec2 newSpeed = new Vec2(
+                speed.x(),
+                newSpeedY
+        );
 
-            if (isFalling && hitTheGroundLevel) {
-                newPos = Vec2.of(newPos.x(), groundY);
-                newSpeed = Vec2.of(newSpeed.x(), 0);
-                this.landed = true;
-            }
+        Vec2 newPosition = position.add(
+                newSpeed.scale(delta)
+        );
 
-            projectile.setSpeed(newSpeed);
-            projectile.setPosition(newPos);
+        projectile.setSpeed(newSpeed);
+        projectile.setPosition(newPosition);
+
+        if (newPosition.y() >= groundY) {
+            landed = true;
         }
     }
 

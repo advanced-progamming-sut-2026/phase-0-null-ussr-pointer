@@ -105,42 +105,86 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     @Override
-    public void tick() {
-        if (!isAlive || state == PlantState.INCAPACITATED) return;
-        lifetime -= GameClock.SECONDS_PER_TICK;
-        if(lifetime < 0) {
-            this.isAlive = false;
-            App.getGameSession().getEventBus().publish(new GameEvent.PlantDied(this.name , (int) getPosition().x()
-                    , (int) getPosition().y()));
+    public void update(float delta) {
+        if (!isAlive
+                || state == PlantState.INCAPACITATED) {
             return;
         }
 
-        if (hpStat != null) hpStat.update((float) GameClock.SECONDS_PER_TICK);
-        if (actionIntervalStat != null) actionIntervalStat.update((float) GameClock.SECONDS_PER_TICK);
-        if (growthTracker != null) growthTracker.update(GameClock.SECONDS_PER_TICK);
-        if(isBuffed) {
-            if (plantFoodTimer > 0) {
-                plantFoodTimer -= GameClock.SECONDS_PER_TICK;
+        lifetime -= delta;
 
-                if (plantFoodEffect != null) {
-                    plantFoodEffect.tickDurationEffect(this, com.ussr.pvz.model.App.getGameSession(),
-                            GameClock.SECONDS_PER_TICK);
-                }
-                return;
-            }
-            else isBuffed = false;
+        if (lifetime < 0) {
+            killPlant();
+            return;
         }
 
-        if (actStrategy == null) return;
+        updateStats(delta);
+        updatePlantFood(delta);
 
-        internalTimer += GameClock.SECONDS_PER_TICK;
+        if (isBuffed || actStrategy == null) {
+            return;
+        }
+
+        updateAction(delta);
+    }
+
+    private void killPlant() {
+        isAlive = false;
+
+        App.getGameSession()
+                .getEventBus()
+                .publish(new GameEvent.PlantDied(
+                        name,
+                        (int) getPosition().x(),
+                        (int) getPosition().y()
+                ));
+    }
+
+    private void updateStats(float delta) {
+        if (hpStat != null) {
+            hpStat.update(delta);
+        }
+
+        if (actionIntervalStat != null) {
+            actionIntervalStat.update(delta);
+        }
+
+        if (growthTracker != null) {
+            growthTracker.update(delta);
+        }
+    }
+
+    private void updatePlantFood(float delta) {
+        if (!isBuffed) {
+            return;
+        }
+
+        plantFoodTimer -= delta;
+
+        if (plantFoodTimer <= 0f) {
+            isBuffed = false;
+            return;
+        }
+
+        if (plantFoodEffect != null) {
+            plantFoodEffect.tickDurationEffect(
+                    this,
+                    App.getGameSession(),
+                    delta
+            );
+        }
+    }
+
+    private void updateAction(float delta) {
+        internalTimer += delta;
 
         double interval = actionIntervalStat != null
                 ? actionIntervalStat.getValue()
                 : actionInterval;
 
         if (internalTimer >= interval) {
-            actStrategy.act(this, com.ussr.pvz.model.App.getGameSession());
+            actStrategy.act(this, App.getGameSession());
+            internalTimer -= interval;
         }
     }
 

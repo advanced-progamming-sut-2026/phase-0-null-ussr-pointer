@@ -28,7 +28,11 @@ public class SmashAttack implements AttackBehavior {
     }
 
     @Override
-    public void attack(Zombie zombie, GameSession session) {
+    public void attack(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    )  {
         Damageable target = zombie.acquireTarget(session);
 
         // If the target dies before the windup finishes (e.g., shot by a peashooter), reset the swing.
@@ -37,7 +41,7 @@ public class SmashAttack implements AttackBehavior {
             return;
         }
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
 
         if (timer >= windupDuration) {
             // Apply the massive smash damage

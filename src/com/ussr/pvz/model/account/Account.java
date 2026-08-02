@@ -24,6 +24,7 @@ public class Account {
     private Collection collection;
     private Greenhouse greenhouse;
     private int difficultyLvl;
+    private float gameSpeed;
     private SavedBoosts savedBoosts;
     private QuestManager questManager;
     private long lastLoginTime;
@@ -39,6 +40,9 @@ public class Account {
         this.securityQuestion = state.securityQuestion();
         this.securityAnswer = state.securityAnswer();
         this.difficultyLvl = state.difficultyLvl();
+        this.gameSpeed = normalizeGameSpeed(
+                state.gameSpeed()
+        );
 
         this.adventureProgress = new AdventureProgress(
                 state.currentChapter(),
@@ -77,6 +81,24 @@ public class Account {
         checkAndResetDailyQuests();
     }
 
+    public float getGameSpeed() {
+        return gameSpeed;
+    }
+
+    public void setGameSpeed(float gameSpeed) {
+        this.gameSpeed = normalizeGameSpeed(gameSpeed);
+    }
+
+    private float normalizeGameSpeed(float speed) {
+        if (!Float.isFinite(speed)
+                || speed < 1f
+                || speed > 3f) {
+            return 1f;
+        }
+
+        return speed;
+    }
+
     public AccountState toState() {
         List<String> completedIds = this.questManager.getCompleted().stream()
                 .map(ConfigurableQuest::getId)
@@ -88,6 +110,7 @@ public class Account {
                 this.email,
                 this.gender,
                 this.difficultyLvl,
+                this.gameSpeed,
                 this.securityQuestion,
                 this.securityAnswer,
                 adventureProgress.getCurrentChapter(),

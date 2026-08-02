@@ -192,7 +192,7 @@ public final class SettingMenu extends Table {
                 "default-horizontal"
         );
 
-        slider.setValue(1f);
+        slider.setValue(controller.getGameSpeed());
         slider.setAnimateDuration(0.08f);
         slider.setVisualInterpolation(
                 Interpolation.smooth
@@ -305,11 +305,12 @@ public final class SettingMenu extends Table {
             Slider slider,
             Label valueLabel
     ) {
-        return ProfileUiFactory.listener(() ->
-                valueLabel.setText(
-                        formatSpeed(slider.getValue())
-                )
-        );
+        return ProfileUiFactory.listener(() -> {
+            float speed = slider.getValue();
+
+            valueLabel.setText(formatSpeed(speed));
+            controller.changeGameSpeed(speed);
+        });
     }
 
     private String formatSpeed(float value) {

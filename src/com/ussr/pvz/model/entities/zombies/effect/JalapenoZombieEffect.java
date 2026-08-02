@@ -11,10 +11,14 @@ public class JalapenoZombieEffect implements EffectStatus {
     private final double fuseTime = 10.0;
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) return;
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
 
         if (timer >= fuseTime) {
             int row = (int) zombie.getPosition().y();

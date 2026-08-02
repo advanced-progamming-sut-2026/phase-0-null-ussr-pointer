@@ -43,7 +43,7 @@ public class IceBlock extends InteractableStructure implements Damageable {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (boundPlant == null || !boundPlant.isAlive()) {
             this.setAlive(false);
         }

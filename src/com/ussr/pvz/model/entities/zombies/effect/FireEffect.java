@@ -19,7 +19,11 @@ public class FireEffect implements EffectStatus {
     public void setLit(boolean lit) { this.isLit = lit; }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive() || !isLit) return;
 
         int zRow = (int) zombie.getPosition().y();

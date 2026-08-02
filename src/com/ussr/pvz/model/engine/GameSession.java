@@ -82,56 +82,135 @@ public class GameSession {
         }
     }
 
-    public void tick() {
-        if (gameOver) {
+    public void update(float delta) {
+        if (gameOver
+                || !Float.isFinite(delta)
+                || delta <= 0f) {
             return;
         }
 
-        clock.tick();
-        if (level != null && level.isSunFalling() && lawn != null) {
-            double elapsed = clock.getElapsedSeconds();
-            double baseInterval = Math.max(6.0, 12.0 - 0.05 * elapsed);
+        clock.update(delta);
+        updateFallingSun(delta);
+        updateChapterEffect(delta);
+        updateLevelBehavior(delta);
+        updatePlantRecharge(delta);
+        updateGameState();
+    }
 
-            int diff = App.getAccount() != null ? App.getAccount().getDifficultyLvl() : 3;
-            double diffMultiplier = diff / 3.0;
-            double actualInterval = baseInterval * diffMultiplier;
-
-            skySunTimer += GameClock.SECONDS_PER_TICK;
-            if (skySunTimer >= actualInterval) {
-                addItem(new SunToken(lawn.getRows(), lawn.getCols()));
-                skySunTimer = 0.0;
-            }
+    private void updateChapterEffect(float delta) {
+        if (level == null) {
+            return;
         }
 
-        if (level != null) {
-            ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
-            if (effect != null) {
-                effect.onTick(this, level, GameClock.SECONDS_PER_TICK);
-            }
+        ChapterEffect effect =
+                ChapterEffectRegistry.get(level.getChapter());
+
+        if (effect != null) {
+            effect.onTick(this, level, delta);
         }
-        if (level != null && level.getBehavior() != null) {
-            level.getBehavior().tick(this, GameClock.SECONDS_PER_TICK);
+    }
+
+    private void updateLevelBehavior(float delta) {
+        if (level != null
+                && level.getBehavior() != null) {
+            level.getBehavior().tick(this, delta);
+        }
+    }
+
+    private void updatePlantRecharge(float delta) {
+        if (App.getAccount() == null) {
+            return;
         }
 
-        if (App.getAccount() != null) {
-            for (Plant p : App.getAccount().getAdventureProgress().getAccountPlants()) {
-                p.tickRecharge(GameClock.SECONDS_PER_TICK);
-            }
+        for (Plant plant
+                : App.getAccount()
+                .getAdventureProgress()
+                .getAccountPlants()) {
+            plant.tickRecharge(delta);
         }
+    }
+
+    private void updateFallingSun(float delta) {
+        if (level == null
+                || !level.isSunFalling()
+                || lawn == null) {
+            return;
+        }
+
+        double elapsed = clock.getElapsedSeconds();
+
+        double baseInterval = Math.max(
+                6.0,
+                12.0 - 0.05 * elapsed
+        );
+
+        int difficulty = App.getAccount() == null
+                ? 3
+                : App.getAccount().getDifficultyLvl();
+
+        double difficultyMultiplier =
+                difficulty / 3.0;
+
+        double actualInterval =
+                baseInterval * difficultyMultiplier;
+
+        skySunTimer += delta;
+
+        if (skySunTimer >= actualInterval) {
+            addItem(new SunToken(
+                    lawn.getRows(),
+                    lawn.getCols()
+            ));
+
+            skySunTimer -= actualInterval;
+        }
+    }
+
+    private void updateGameState() {
         plantDeath();
         cleanupDeadGridStructures();
         checkZombieBreaches();
-        if (!gameOver && level != null && level.getBehavior() != null && level.getBehavior().isFailed(level)) {
-            gameOver = true;
-            App.setMenuState(MenuState.MAIN);
+
+        if (shouldFailLevel()) {
+            failLevel();
+            return;
         }
-        boolean behaviorAllowsAutoWin = level != null && level.getBehavior() != null
-                && level.getBehavior().isAutoWinOnWavesClear();
-        if (!gameOver && behaviorAllowsAutoWin && areWavesDone()) {
-            gameOver = true;
-            applyReward();
-            App.setMenuState(MenuState.GAME);
+
+        if (shouldCompleteLevel()) {
+            completeLevel();
         }
+    }
+
+    private boolean shouldFailLevel() {
+        return !gameOver
+                && level != null
+                && level.getBehavior() != null
+                && level.getBehavior().isFailed(level);
+    }
+
+    private void failLevel() {
+        gameOver = true;
+        App.setMenuState(MenuState.MAIN);
+    }
+
+    private boolean shouldCompleteLevel() {
+        if (gameOver
+                || level == null
+                || level.getBehavior() == null) {
+            return false;
+        }
+
+        boolean allowsAutoWin =
+                level.getBehavior()
+                        .isAutoWinOnWavesClear();
+
+        return allowsAutoWin && areWavesDone();
+    }
+
+    private void completeLevel() {
+        gameOver = true;
+        applyReward();
+        App.setMenuState(MenuState.GAME);
     }
 
     private void plantDeath() {
@@ -845,10 +924,6 @@ public class GameSession {
 
     public double getElapsedSeconds() {
         return clock.getElapsedSeconds();
-    }
-
-    public int getTicks() {
-        return clock.getTicks();
     }
 
     public void notifyPlantDied(Plant plant) {

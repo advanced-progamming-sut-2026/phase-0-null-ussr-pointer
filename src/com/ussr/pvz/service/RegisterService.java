@@ -36,8 +36,9 @@ public class RegisterService {
                 request.password(),
                 request.email(),
                 Gender.from(request.gender()),
-                3,         // default difficulty level
-                null,  // securityQuestion — not picked yet
+                3,      // difficulty
+                1f,     // game speed
+                null,   // security question
                 null,  // securityAnswer — not picked yet
                 1,     // starting chapter
                 1,     // starting level

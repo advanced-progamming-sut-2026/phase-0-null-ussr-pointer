@@ -22,4 +22,27 @@ public class SettingService {
         App.getAccount().setDifficultyLvl(newDifficulty);
         return "new difficulty lvl applied successfully.";
     }
+
+    public float getGameSpeed() {
+        if (App.getAccount() == null) {
+            return 1f;
+        }
+
+        return App.getAccount().getGameSpeed();
+    }
+
+    public String changeGameSpeed(float speed) {
+        if (App.getAccount() == null) {
+            return "you are not logged in";
+        }
+
+        if (!Float.isFinite(speed)
+                || speed < 1f
+                || speed > 3f) {
+            return "invalid game speed";
+        }
+
+        App.getAccount().setGameSpeed(speed);
+        return "game speed applied successfully.";
+    }
 }

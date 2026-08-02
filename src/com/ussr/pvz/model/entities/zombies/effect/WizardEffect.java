@@ -23,7 +23,11 @@ public class WizardEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie wizard, GameSession session) {
+    public void effect(
+            Zombie wizard,
+            GameSession session,
+            float delta
+    ) {
         if (!wizard.isAlive()) {
             if (!deathHandled) {
                 for (Damageable cursed : cursedEntities) {
@@ -41,7 +45,7 @@ public class WizardEffect implements EffectStatus {
             return;
         }
 
-        timer += GameClock.SECONDS_PER_TICK;
+        timer += delta;
         if (timer >= transformInterval) {
             timer = 0;
             transformRandomTarget(wizard, session);

@@ -22,10 +22,10 @@ public abstract class ZombieProjectile extends GameEntity {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!isAlive) return;
 
-        elapsedTimer += GameClock.SECONDS_PER_TICK;
+        elapsedTimer += delta;
         double progress = elapsedTimer / flightTime;
 
         if (progress >= 1.0) {

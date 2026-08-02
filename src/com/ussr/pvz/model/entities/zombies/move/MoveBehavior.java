@@ -5,7 +5,11 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 public interface MoveBehavior {
-    void move(Zombie zombie, GameSession session);
+    void move(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    );
 
     default Vec2 applySlipperyShift(Vec2 pos, GameSession session) {
         com.ussr.pvz.model.board.Lawn lawn = session.getLawn();

@@ -107,7 +107,7 @@ public class SunToken extends GroundItem {
     }
 
     @Override
-    public void tick() {
+    public void update(float delta) {
         if (!this.isAlive) return;
 
         if (falling) {

@@ -25,7 +25,11 @@ public class SpinEffect implements EffectStatus {
     }
 
     @Override
-    public void effect(Zombie zombie, GameSession session) {
+    public void effect(
+            Zombie zombie,
+            GameSession session,
+            float delta
+    ) {
         if (!zombie.isAlive()) {
             if (currentlyBoosted) {
                 revertSpeed(zombie);
@@ -45,7 +49,7 @@ public class SpinEffect implements EffectStatus {
         }
 
         if (spinTimeRemaining > 0) {
-            spinTimeRemaining -= GameClock.SECONDS_PER_TICK;
+            spinTimeRemaining -= delta;
         }
     }
 

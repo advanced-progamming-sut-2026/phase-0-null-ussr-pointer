@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +32,7 @@ class LawnMowerTest {
     @Test
     @DisplayName("✅ Should not move if not activated")
     void tick_shouldNotMove_whenNotActivated() {
-        mower.tick();
+        mower.update();
         assertEquals(-0.5, mower.getPosition().x(), 0.001);
     }
 
@@ -51,7 +50,7 @@ class LawnMowerTest {
         // Act - Simulate multiple ticks to move mower past the zombie
         // Mower speed is 0.15 per tick
         for (int i = 0; i < 5; i++) {
-            mower.tick();
+            mower.update();
         }
 
         // Assert
@@ -68,7 +67,7 @@ class LawnMowerTest {
         mower.setPosition(Vec2.of(9.4, 2)); // Just before the edge
 
         // Act
-        mower.tick(); // Moves to 9.55
+        mower.update(); // Moves to 9.55
 
         // Assert
         assertFalse(mower.isAlive());

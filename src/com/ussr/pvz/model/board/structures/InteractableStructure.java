@@ -9,7 +9,7 @@ public abstract class InteractableStructure extends GameEntity implements Damage
     public abstract void onDestroy(GameSession session);
 
     @Override
-    public void tick() {
+    public void update(float delta) {
     }
 
     public abstract void takeDamage(int damage);
