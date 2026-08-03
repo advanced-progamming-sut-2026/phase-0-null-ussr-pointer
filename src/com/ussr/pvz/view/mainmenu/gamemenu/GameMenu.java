@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.level.Chapter;
+import com.ussr.pvz.model.level.GameMode;
 import com.ussr.pvz.view.loading.LoadingCenter;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.color;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
@@ -20,6 +22,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameController;
 import com.ussr.pvz.notification.NotificationCenter;
 import pvz.libpvz.textures.TextureBank;
+
+import java.util.List;
 
 
 public class GameMenu extends Table {
@@ -59,9 +63,18 @@ public class GameMenu extends Table {
                 "big_outline"
         );
 
+        List<Chapter> chapters = App.getLevelManager()
+                .getChapters()
+                .stream()
+                .filter(chapter -> chapter.getGameMode() == GameMode.ADVENTURE)
+                .filter(chapter -> chapter.getMenuRegion() != null)
+                .filter(chapter -> !chapter.getMenuRegion().isBlank())
+                .toList();
+
         ChapterCarousel carousel = new ChapterCarousel(
                 skin,
                 textures,
+                chapters,
                 this::enterChapter
         );
 

@@ -12,6 +12,7 @@ public class JsonContainer {
         public String id;
         public String name;
         public String gameMode;
+        public String menuRegion;
         public List<String> allowedPlants;
         public List<JsonLevelData> levels;
         public List<String> allowedTiles;
@@ -20,6 +21,7 @@ public class JsonContainer {
     public static class JsonLevelData {
         public String id;
         public int order;
+        public String menuRegion;
         public String deliveryStrategy;
 
         public boolean sunFalling = true;

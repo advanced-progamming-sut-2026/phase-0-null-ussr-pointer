@@ -17,6 +17,7 @@ import com.ussr.pvz.view.loading.LoadingCenter;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
+import com.ussr.pvz.view.mainmenu.gamemenu.GraphicalLevelSelectionMenu;
 import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
@@ -262,6 +263,11 @@ public class AppView implements ApplicationListener {
 
             case GAME ->
                     screenRoot.add(new GameMenu(skin)).grow();
+
+            case LEVEL_SELECTION ->
+                    screenRoot.add(
+                            new GraphicalLevelSelectionMenu(skin)
+                    ).grow();
 
             case GREENHOUSE ->
                 screenRoot.add(new GreenHouseMenu(skin)).grow();
