@@ -39,6 +39,28 @@ public class GreenHouseService {
         }
     }
 
+    public String unlock(GreenhousePotRequest request) {
+        int[] coords = parseCoordinates(request);
+        int x = coords[0];
+        int y = coords[1];
+
+        if (App.getAccount().getGreenhouse().isPotUnlocked(x, y)) {
+            return "Pot is already unlocked!";
+        }
+
+        int unlockCostGems = 20; // Default unlock cost in gems
+        int currentGems = App.getAccount().getAdventureProgress().getGem();
+
+        if (currentGems < unlockCostGems) {
+            throw new IllegalStateException("Not enough gems to unlock! Need " + unlockCostGems + " gems.");
+        }
+
+        App.getAccount().getAdventureProgress().addGem(-unlockCostGems);
+        App.getAccount().getGreenhouse().unlockPot(x, y);
+
+        return "Pot (" + x + ", " + y + ") unlocked for " + unlockCostGems + " gems!";
+    }
+
     public String plant(GreenhousePotRequest request) {
         int[] coords = parseCoordinates(request);
         int x = coords[0];
@@ -46,6 +68,7 @@ public class GreenHouseService {
 
         validatePotUnlocked(x, y);
         validatePotNotOccupied(x, y);
+
         List<Plant> plants = new ArrayList<>();
         for (Plant plant : App.getAccount().getAdventureProgress().getAccountPlants()) {
             if (plant.getLevel() > 0) {
@@ -163,6 +186,7 @@ public class GreenHouseService {
             return "[EMPTY]";
         }
 
+        @SuppressWarnings("unchecked")
         java.util.Map<String, Object> plant =
                 (java.util.Map<String, Object>) pot.get("plant");
 

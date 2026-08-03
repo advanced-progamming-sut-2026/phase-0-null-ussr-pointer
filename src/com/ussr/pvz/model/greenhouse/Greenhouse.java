@@ -8,15 +8,11 @@ import java.util.*;
 
 public class Greenhouse {
 
-    public static final int MAX_COLS = 5;
-    public static final int MAX_ROWS = 4;
+    public static final int MAX_COLS = 4;
+    public static final int MAX_ROWS = 3;
     private static final long SECOND = 1000L;
     private static final long MINUTE = 60 * SECOND;
     private static final long HOUR = 60 * MINUTE;
-    public static final int MAX_POTS = 20;
-    public static final int MARIGOLD_GROW_HOURS = 2;
-    public static final int PLANT_GROW_HOURS = 8;
-    public static final int MARIGOLD_COIN_REWARD = 500;
 
     private static final Random RAND = new Random();
 
