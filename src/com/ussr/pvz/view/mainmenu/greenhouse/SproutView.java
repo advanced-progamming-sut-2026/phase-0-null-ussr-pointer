@@ -1,0 +1,39 @@
+package com.ussr.pvz.view.mainmenu.greenhouse;
+
+import pvz.libpvz.pam.PamPlayer;
+
+public class SproutView extends PamActor {
+
+    public static final String SPROUT_PAM = "768/INITIAL/ZEN_GARDEN/PLANT_ANIMATIONS/SPROUT/SPROUT.PAM";
+    public static final String MARIGOLD_PAM = "768/INITIAL/PLANT/MARIGOLD/MARIGOLD.PAM";
+
+    public SproutView(PamPlayer player, String plantType) {
+        super(player, resolvePamPath(plantType), resolveClipName(plantType));
+
+        if ("MARIGOLD".equalsIgnoreCase(plantType)) {
+            // Marigold specific bounds & offset above soil
+            setSize(80f, 70f);
+            setPamScale(0.32f);
+            setOffsetY(18f); // Lift higher so the flower sits nicely above the pot rim
+        } else {
+            // Default Sprout bounds & offset
+            setSize(80f, 70f);
+            setPamScale(0.35f);
+            setOffsetY(8f);
+        }
+    }
+
+    private static String resolvePamPath(String plantType) {
+        if ("MARIGOLD".equalsIgnoreCase(plantType)) {
+            return MARIGOLD_PAM;
+        }
+        return SPROUT_PAM;
+    }
+
+    private static String resolveClipName(String plantType) {
+        if ("MARIGOLD".equalsIgnoreCase(plantType)) {
+            return "idle"; // PamActor will fallback to "anim" or "main" automatically if "idle" isn't found
+        }
+        return "sprout";
+    }
+}

@@ -1,28 +1,17 @@
 package com.ussr.pvz.view.mainmenu;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.controller.maincontroller.TravelLogController;
 import com.ussr.pvz.view.AppMenu;
+import com.ussr.pvz.view.FadingMenu;
 
 import java.util.Scanner;
 
-public class TravelLogMenu implements AppMenu {
-    TravelLogController controller;
-    GlobalController controllerGlobal;
+public class TravelLogMenu extends FadingMenu {
+    private final Skin skin;
 
-    public TravelLogMenu() {
-        this.controller = new TravelLogController();
-        this.controllerGlobal = new GlobalController();
-    }
-
-    @Override
-    public void run(Scanner scanner) {
-        String input = scanner.nextLine();
-        String output = controllerGlobal.handleCommand(input);
-        if (output.isEmpty()) {
-            System.out.println(controller.handleCommand(input));
-        } else {
-            System.out.println(output);
-        }
+    public TravelLogMenu(Skin skin) {
+        this.skin = skin;
     }
 }
