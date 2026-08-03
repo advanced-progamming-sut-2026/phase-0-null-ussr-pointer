@@ -1,10 +1,9 @@
-package com.ussr.pvz.view.mainmenu.gamemenu;
+package com.ussr.pvz.view.mainmenu.gamemenu.collection;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
 import com.ussr.pvz.service.CollectionService;
 import com.ussr.pvz.service.CollectionService.PlantData;
