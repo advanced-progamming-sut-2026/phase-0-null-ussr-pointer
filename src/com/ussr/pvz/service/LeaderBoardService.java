@@ -3,9 +3,12 @@ package com.ussr.pvz.service;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.dto.LeaderBoardSortRequest;
+import com.ussr.pvz.model.leaderboard.LeaderboardColumn;
+import com.ussr.pvz.model.leaderboard.LeaderboardEntry;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestType;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,6 +44,100 @@ public class LeaderBoardService {
         }
 
         return sb.toString();
+    }
+
+    public List<LeaderboardEntry> getEntries(
+            LeaderboardColumn column,
+            boolean ascending
+    ) {
+        List<Account> accounts =
+                new ArrayList<>(App.getAccounts());
+
+        Comparator<Account> comparator =
+                comparatorFor(column);
+
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+
+        accounts.sort(comparator.thenComparing(
+                Account::getName,
+                String.CASE_INSENSITIVE_ORDER
+        ));
+
+        return accounts.stream()
+                .map(this::toEntry)
+                .toList();
+    }
+
+    private LeaderboardEntry toEntry(Account account) {
+        int daily = getCompletedQuestCount(
+                account,
+                QuestType.DAILY
+        );
+
+        int other = getCompletedQuestCount(
+                account,
+                QuestType.CHALLENGE
+        ) + getCompletedQuestCount(
+                account,
+                QuestType.EPIC
+        );
+
+        return new LeaderboardEntry(
+                account.getName(),
+                account.getAdventureProgress().getCurrentChapter(),
+                account.getAdventureProgress().getCurrentLvl(),
+                account.getAdventureProgress().getMinigamesWon(),
+                daily,
+                other,
+                account.getScoreRecord().getScore()
+        );
+    }
+
+    private Comparator<Account> comparatorFor(
+            LeaderboardColumn column
+    ) {
+        return switch (column) {
+            case USERNAME -> Comparator.comparing(
+                    Account::getName,
+                    String.CASE_INSENSITIVE_ORDER
+            );
+
+            case PROGRESS -> Comparator
+                    .comparingInt((Account account) ->
+                            account.getAdventureProgress()
+                                    .getCurrentChapter())
+                    .thenComparingInt(account ->
+                            account.getAdventureProgress()
+                                    .getCurrentLvl());
+
+            case MINIGAMES -> Comparator.comparingInt(
+                    account -> account.getAdventureProgress()
+                            .getMinigamesWon()
+            );
+
+            case DAILY_QUESTS -> Comparator.comparingInt(
+                    account -> getCompletedQuestCount(
+                            account,
+                            QuestType.DAILY
+                    )
+            );
+
+            case OTHER_QUESTS -> Comparator.comparingInt(
+                    account -> getCompletedQuestCount(
+                            account,
+                            QuestType.CHALLENGE
+                    ) + getCompletedQuestCount(
+                            account,
+                            QuestType.EPIC
+                    )
+            );
+
+            case SCORE -> Comparator.comparingInt(
+                    account -> account.getScoreRecord().getScore()
+            );
+        };
     }
 
     public String sort(LeaderBoardSortRequest request) {
