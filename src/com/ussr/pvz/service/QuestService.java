@@ -3,10 +3,13 @@ package com.ussr.pvz.service;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.level.GameMode;
+import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
 import com.ussr.pvz.model.quest.QuestType;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,5 +101,31 @@ public class QuestService {
                 });
 
         return sb.toString();
+    }
+
+    public List<ConfigurableQuest> getActiveQuestsAsList(String pageName) {
+        if (App.getAccount() == null) {
+            return Collections.emptyList();
+        }
+
+        QuestManager qm = App.getAccount().getQuestManager();
+        QuestType requestedType;
+
+        try {
+            requestedType = QuestType.fromString(pageName.toLowerCase());
+        } catch (IllegalArgumentException e) {
+            return Collections.emptyList();
+        }
+
+        return qm.getByType(requestedType).stream()
+                .sorted(Comparator.comparing(ConfigurableQuest::getPriority).reversed())
+                .collect(Collectors.toList());
+    }
+    public List<Level> getMinigamesAsList() {
+        List<Level> minigames = new ArrayList<>();
+        App.getLevelManager().getChapters().stream()
+                .filter(chapter -> chapter.getGameMode().equals(GameMode.MINIGAME))
+                .forEach(chapter -> minigames.addAll(chapter.getLevels()));
+        return minigames;
     }
 }
