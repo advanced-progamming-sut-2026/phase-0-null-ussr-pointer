@@ -16,6 +16,7 @@ import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.loading.LoadingCenter;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
+import com.ussr.pvz.view.mainmenu.gamemenu.CollectionMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
@@ -276,10 +277,8 @@ public class AppView implements ApplicationListener {
                     screenRoot.add(new LeaderBoardMenu(skin)).grow();
 
             case COLLECTION ->
-                    screenRoot.add(new Label(
-                            "Collection",
-                            skin,
-                            "big_outline"
+                    screenRoot.add(new CollectionMenu(
+                            skin
                     ));
 
             default ->
