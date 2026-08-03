@@ -3,6 +3,7 @@ package com.ussr.pvz.service;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.dto.ShopBuyRequest;
+import com.ussr.pvz.model.greenhouse.Greenhouse;
 import com.ussr.pvz.model.shop.ShopItem;
 import com.ussr.pvz.model.shop.ShopItemType;
 
@@ -113,6 +114,11 @@ public class ShopService {
             String pType = plantType.trim().toUpperCase();
             boolean plantExists = App.getAccount().getAdventureProgress().getPlantLvls().containsKey(pType);
             if (!plantExists) return "plant not found: " + plantType;
+        }
+        if(item.getType().equals(ShopItemType.POT)) {
+            if(App.getAccount().getGreenhouse().getUnlockedPots() >= Greenhouse.MAX_POTS){
+                return "no locked pots found";
+            }
         }
         return null;
     }

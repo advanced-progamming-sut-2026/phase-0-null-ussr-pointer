@@ -13,6 +13,7 @@ public class Greenhouse {
     private static final long SECOND = 1000L;
     private static final long MINUTE = 60 * SECOND;
     private static final long HOUR = 60 * MINUTE;
+    public static final long MAX_POTS = 12;
 
     private static final Random RAND = new Random();
 

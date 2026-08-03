@@ -258,6 +258,11 @@ public class AppView implements ApplicationListener {
                     screenRoot.add(new GameMenu(skin)).grow();
             case GREENHOUSE ->
                 screenRoot.add(new GreenHouseMenu(skin)).grow();
+            case SHOP ->
+                screenRoot.add(new ShopMenu(skin)).grow();
+            case TRAVEL_LOG ->
+                screenRoot.add(new TravelLogMenu(skin)).grow();
+
             default ->
                     screenRoot.add(
                             new Label(
