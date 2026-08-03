@@ -275,6 +275,13 @@ public class AppView implements ApplicationListener {
             case LEADERBOARD ->
                     screenRoot.add(new LeaderBoardMenu(skin)).grow();
 
+            case COLLECTION ->
+                    screenRoot.add(new Label(
+                            "Collection",
+                            skin,
+                            "big_outline"
+                    ));
+
             default ->
                     screenRoot.add(
                             new Label(
