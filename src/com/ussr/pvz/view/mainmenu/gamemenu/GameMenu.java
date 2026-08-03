@@ -9,19 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.ussr.pvz.controller.GlobalController;
-import com.ussr.pvz.controller.maincontroller.gamecontroller.GameController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
-import com.ussr.pvz.view.AppMenu;
-
-import java.util.Scanner;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+import com.ussr.pvz.view.loading.LoadingCenter;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.color;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
-
 public class GameMenu extends Table {
     private final Skin skin;
 
@@ -39,6 +32,7 @@ public class GameMenu extends Table {
 
         layers.add(createCenterActions());
         layers.add(createBottomActions());
+        layers.add(createTopActions());
 
         add(layers).grow();
     }
@@ -49,13 +43,13 @@ public class GameMenu extends Table {
                 "image_ui_mainmenu_mainmenu_content_offline"
         );
         gameButton.addListener(listener(this::openGreenhouse));
-        addHoverEffect(gameButton);
         layer.add(createLabeledBanner(gameButton, "Green house"))
                 .size(270f, 108f);
         return layer;
     }
 
     private void openGreenhouse() {
+        LoadingCenter.requestFor(MenuState.GREENHOUSE);
         App.setMenuState(MenuState.GREENHOUSE);
     }
 
@@ -72,6 +66,73 @@ public class GameMenu extends Table {
                 .size(270f, 108f)
                 .padBottom(24f);
         return layer;
+    }
+
+    private Table createTopActions() {
+        Table layer = new Table();
+        layer.top().right();
+
+        TextButton leaderboardButton =
+                createLeaderboardButton();
+
+        leaderboardButton.addListener(
+                listener(this::openLeaderboard)
+        );
+
+        layer.add(leaderboardButton)
+                .size(72f, 72f)
+                .padTop(18f)
+                .padRight(18f);
+
+        return layer;
+    }
+
+    private TextButton createLeaderboardButton() {
+        TextButton button = new TextButton(
+                "",
+                skin,
+                "brown"
+        );
+
+        button.clearChildren();
+
+        Table podium = new Table();
+        podium.bottom();
+
+        addPodiumStep(podium, 14f);
+        addPodiumStep(podium, 28f);
+        addPodiumStep(podium, 20f);
+
+        podium.setTouchable(Touchable.disabled);
+
+        button.add(podium)
+                .width(48f)
+                .height(36f)
+                .bottom();
+
+        return button;
+    }
+
+    private void addPodiumStep(
+            Table podium,
+            float height
+    ) {
+        Image step = new Image(skin.newDrawable(
+                "image_ui_dialog_asset_tint_rounded_box_9slice",
+                new Color(0.96f, 0.72f, 0.14f, 1f)
+        ));
+
+        step.setTouchable(Touchable.disabled);
+
+        podium.add(step)
+                .width(14f)
+                .height(height)
+                .padRight(2f)
+                .bottom();
+    }
+
+    private void openLeaderboard() {
+        App.setMenuState(MenuState.LEADERBOARD);
     }
 
     private void openShop() {
@@ -100,22 +161,7 @@ public class GameMenu extends Table {
                     int pointer,
                     Actor fromActor
             ) {
-                button.clearActions();
-                button.setTransform(true);
-                button.setOrigin(Align.center);
-                button.addAction(parallel(
-                        color(
-                                new Color(1f, 1f, 0.78f, 1f),
-                                0.16f,
-                                Interpolation.fade
-                        ),
-                        scaleTo(
-                                1.06f,
-                                1.06f,
-                                0.16f,
-                                Interpolation.smooth
-                        )
-                ));
+                animateHoverIn(button);
             }
 
             @Override
@@ -126,22 +172,47 @@ public class GameMenu extends Table {
                     int pointer,
                     Actor toActor
             ) {
-                button.clearActions();
-                button.addAction(parallel(
-                        color(
-                                Color.WHITE,
-                                0.16f,
-                                Interpolation.fade
-                        ),
-                        scaleTo(
-                                1f,
-                                1f,
-                                0.16f,
-                                Interpolation.smooth
-                        )
-                ));
+                animateHoverOut(button);
             }
         });
+    }
+
+    private void animateHoverIn(ImageButton button) {
+        button.clearActions();
+        button.setTransform(true);
+        button.setOrigin(Align.center);
+
+        button.addAction(parallel(
+                color(
+                        new Color(1f, 1f, 0.78f, 1f),
+                        0.16f,
+                        Interpolation.fade
+                ),
+                scaleTo(
+                        1.06f,
+                        1.06f,
+                        0.16f,
+                        Interpolation.smooth
+                )
+        ));
+    }
+
+    private void animateHoverOut(ImageButton button) {
+        button.clearActions();
+
+        button.addAction(parallel(
+                color(
+                        Color.WHITE,
+                        0.16f,
+                        Interpolation.fade
+                ),
+                scaleTo(
+                        1f,
+                        1f,
+                        0.16f,
+                        Interpolation.smooth
+                )
+        ));
     }
 
     private Stack createLabeledBanner(

@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.view.loading.LoadingCenter;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
@@ -290,6 +291,7 @@ public class MainMenu extends Table {
     }
 
     private void openGame() {
+        LoadingCenter.requestFor(MenuState.GAME);
         App.setMenuState(MenuState.GAME);
     }
 
