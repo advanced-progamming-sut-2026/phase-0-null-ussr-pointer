@@ -275,4 +275,10 @@ public class GameController {
     private String handleShowPlantFood() {
         return gameService.showPlantFood();
     }
+
+    public String enterChapter(String chapterId) {
+        return gameService.menuEnterChapter(
+                new MenuEnterChapterRequest(chapterId)
+        );
+    }
 }

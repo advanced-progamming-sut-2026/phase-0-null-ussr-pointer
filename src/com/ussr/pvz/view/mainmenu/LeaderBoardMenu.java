@@ -1,19 +1,33 @@
 package com.ussr.pvz.view.mainmenu;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.LeaderBoardController;
 import com.ussr.pvz.model.leaderboard.LeaderboardColumn;
 import com.ussr.pvz.model.leaderboard.LeaderboardEntry;
 import com.ussr.pvz.model.leaderboard.SortDirection;
+import pvz.libpvz.textures.TextureBank;
 import java.util.List;
 
 public final class LeaderBoardMenu extends Table {
+    private static final String SCROLL_TOP =
+            "IMAGE_UI_JOUST_LEADERBOARD_LEADERBOARD_SCROLL_TOP";
+    private static final String SCROLL_MID =
+            "IMAGE_UI_JOUST_LEADERBOARD_LEADERBOARD_SCROLL_MID";
+    private static final String SCROLL_BOTTOM =
+            "IMAGE_UI_JOUST_LEADERBOARD_LEADERBOARD_SCROLL_BOTTOM";
+
     private final Skin skin;
     private final LeaderBoardController controller;
     private final Table rows;
+    private final TextureBank textures;
 
     private SelectBox<LeaderboardColumn> columnSelect;
     private SelectBox<SortDirection> directionSelect;
@@ -22,6 +36,8 @@ public final class LeaderBoardMenu extends Table {
         this.skin = skin;
         this.controller = new LeaderBoardController();
         this.rows = new Table();
+        FileHandle assetsFolder = Gdx.files.local("pvz-assets");
+        this.textures = new TextureBank("768", assetsFolder);
 
         setFillParent(true);
 
@@ -31,11 +47,6 @@ public final class LeaderBoardMenu extends Table {
 
     private void buildUi() {
         Table panel = new Table();
-
-        panel.setBackground(skin.getDrawable(
-                "image_ui_dialog_asset_dialogborder_10"
-        ));
-
         panel.pad(28f);
 
         Label title = new Label(
@@ -67,9 +78,38 @@ public final class LeaderBoardMenu extends Table {
                 .height(470f)
                 .grow();
 
-        add(panel)
+        Stack panelLayers = new Stack();
+        panelLayers.add(createScrollBackground());
+        panelLayers.add(panel);
+
+        add(panelLayers)
                 .width(1000f)
                 .height(620f);
+    }
+
+    private Table createScrollBackground() {
+        Table background = new Table();
+        background.setTouchable(Touchable.disabled);
+
+        background.add(createRegionImage(SCROLL_TOP))
+                .growX()
+                .height(100f)
+                .row();
+        background.add(createRegionImage(SCROLL_MID))
+                .grow()
+                .row();
+        background.add(createRegionImage(SCROLL_BOTTOM))
+                .growX()
+                .height(126f);
+        return background;
+    }
+
+    private Image createRegionImage(String regionName) {
+        TextureRegion region = textures.region(regionName);
+        Image image = region == null ? new Image() : new Image(region);
+        image.setScaling(Scaling.stretch);
+        image.setTouchable(Touchable.disabled);
+        return image;
     }
 
     private Table createSortControls() {
