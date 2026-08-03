@@ -72,12 +72,20 @@ public class GameMenu extends Table {
         Table layer = new Table();
         layer.top().right();
 
+        ImageButton collectionButton = new ImageButton(skin, "almanac");
+        collectionButton.addListener(listener(this::openCollection));
+
         TextButton leaderboardButton =
                 createLeaderboardButton();
 
         leaderboardButton.addListener(
                 listener(this::openLeaderboard)
         );
+
+        layer.add(collectionButton)
+                .size(72f, 72f)
+                .padTop(18f)
+                .padRight(10f);
 
         layer.add(leaderboardButton)
                 .size(72f, 72f)
@@ -133,6 +141,10 @@ public class GameMenu extends Table {
 
     private void openLeaderboard() {
         App.setMenuState(MenuState.LEADERBOARD);
+    }
+
+    private void openCollection() {
+        App.setMenuState(MenuState.COLLECTION);
     }
 
     private void openShop() {
