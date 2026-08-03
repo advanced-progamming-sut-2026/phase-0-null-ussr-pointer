@@ -16,6 +16,7 @@
     "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 150.0,
     "instantMaxGrowth": false,
+    "pamLocation": "768/INITIAL/PLANT/SUNFLOWER/SUNFLOWER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -54,6 +55,7 @@
     "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 250.0,
     "instantMaxGrowth": false,
+    "pamLocation": "768/INITIAL/PLANT/SUNFLOWER_TWIN/SUNFLOWER_TWIN.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -94,6 +96,7 @@
     "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 225.0,
     "instantMaxGrowth": true,
+    "pamLocation": "768/FULL/PLANT/SUNSHROOM/SUNSHROOM.PAM",
     "wramp-up": [
       {
         "stage": 2,
@@ -142,6 +145,7 @@
     "plantFoodType": "SPAWN_SUN",
     "plantFoodValue": 225.0,
     "instantMaxGrowth": false,
+    "pamLocation": "768/FULL/PLANT/PRIMAL_SUNFLOWER/PRIMAL_SUNFLOWER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -178,6 +182,7 @@
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "instantMaxGrowth": false,
+    "pamLocation": "768/INITIAL/PLANT/GOLDBLOOM/GOLDBLOOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -216,6 +221,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/PEASHOOTER/PEASHOOTER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -254,6 +260,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/REPEATER/REPEATER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -292,6 +299,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/THREEPEATER/THREEPEATER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -331,6 +339,7 @@
     "plantFoodType": "SNOW_PEA_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -367,6 +376,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/FULL/PLANT/ROTORUTABAGA/ROTORUTABAGA.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -406,6 +416,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 0.0,
     "plantFoodStrikeRate": 0.0,
+    "pamLocation": "768/FULL/PLANT/PEAPOD/PEAPOD.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -444,6 +455,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/FULL/PLANT/SPLITPEA/SPLITPEA.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -482,6 +494,7 @@
     "plantFoodType": "PLASMA_WIPE",
     "plantFoodDuration": 0.0,
     "plantFoodStrikeRate": 0.0,
+    "pamLocation": "768/FULL/PLANT/CITRON/CITRON.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -520,6 +533,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "RANDOM_HYPNOTIZE",
     "plantFoodValue": 3.0,
+    "pamLocation": "768/INITIAL/PLANT/CAULIPOWER/CAULIPOWER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -557,6 +571,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "INSTANT_KILL",
     "plantFoodValue": 3.0,
+    "pamLocation": "768/INITIAL/PLANT/ELECTRICBLUEBERRY/ELECTRICBLUEBERRY.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -595,6 +610,7 @@
     "plantFoodType": "BOWLING_BULB_ATTACK",
     "plantFoodDuration": 0.0,
     "plantFoodStrikeRate": 0.0,
+    "pamLocation": "768/FULL/PLANT/BOWLINGBULB/BOWLINGBULB.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -631,6 +647,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/CACTUS/CACTUS.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -670,6 +687,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/FIREPEASHOOTER/FIREPEASHOOTER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -706,6 +724,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/STARFRUIT/STARFRUIT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -744,6 +763,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/GOOPEASHOOTER/GOOPEASHOOTER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -782,6 +802,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/MEGAGATLING/MEGAGATLING.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -821,6 +842,7 @@
     "plantFoodType": "GLOBAL_SHROOM_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/FULL/PLANT/SEASHROOM/SEASHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -859,6 +881,7 @@
     "plantFoodType": "GLOBAL_SHROOM_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/PUFFSHROOM/PUFFSHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -896,6 +919,7 @@
     "abilityValue": 3.0,
     "plantFoodType": "KNOCKBACK_BLAST",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/FUMESHROOM/FUMESHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -931,6 +955,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/CABBAGEPULT/CABBAGEPULT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -966,6 +991,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/KERNALPULT/KERNALPULT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1003,6 +1029,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/MELONPULT/MELONPULT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1041,6 +1068,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/WINTERMELON/WINTERMELON.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1079,6 +1107,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/PEPPERPULT/PEPPERPULT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1117,6 +1146,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "SPAWN_CLONES",
     "plantFoodValue": 2.0,
+    "pamLocation": "768/INITIAL/PLANT/POTATOMINE/POTATOMINE.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1155,6 +1185,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "SPAWN_CLONES",
     "plantFoodValue": 2.0,
+    "pamLocation": "768/FULL/PLANT/PRIMAL_POTATOMINE/PRIMAL_POTATOMINE.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1190,6 +1221,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/CHERRYBOMB/CHERRYBOMB.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1227,6 +1259,7 @@
     "abilityValue": 5.0,
     "plantFoodType": "INSTANT_KILL",
     "plantFoodValue": 2.0,
+    "pamLocation": "768/INITIAL/PLANT/SQUASH/SQUASH.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1262,6 +1295,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/GRAPESHOT/GRAPESHOT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1299,6 +1333,7 @@
     "abilityValue": 3.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/JALAPENO/JALAPENO.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1336,6 +1371,7 @@
     "abilityValue": 4.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/DOOMSHROOM/DOOMSHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1374,6 +1410,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "PULL_UNDERWATER",
     "plantFoodValue": 3.0,
+    "pamLocation": "768/FULL/PLANT/TANGLEKELP/TANGLEKELP.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1412,6 +1449,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "MAP_WIDE_FREEZE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/ICEBURG/ICEBURG.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1448,6 +1486,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/BONKCHOY/BONKCHOY.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1486,6 +1525,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 0.1,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/FULL/PLANT/PHATBEETS/PHATBEETS.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1521,6 +1561,7 @@
     "abilityValue": 4.0,
     "plantFoodType": "INSTANT_KILL",
     "plantFoodValue": 3.0,
+    "pamLocation": "768/INITIAL/PLANT/CHOMPER/CHOMPER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1559,6 +1600,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/WASABIWHIP/WASABIWHIP.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1598,6 +1640,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 0.1,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/INITIAL/PLANT/KIWIBEAST/KIWIBEAST.PAM",
     "wramp-up": [
       {
         "stage": 2,
@@ -1645,6 +1688,7 @@
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 4000.0,
+    "pamLocation": "768/INITIAL/PLANT/WALLNUT/WALLNUT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1680,6 +1724,7 @@
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 8000.0,
+    "pamLocation": "768/FULL/PLANT/TALLNUT/TALLNUT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1715,6 +1760,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 3000.0,
+    "pamLocation": "768/FULL/PLANT/ENDURIAN/ENDURIAN.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1752,6 +1798,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/GARLIC/GARLIC.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1789,6 +1836,7 @@
     "abilityValue": 3.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 3000.0,
+    "pamLocation": "768/INITIAL/PLANT/SWEETPOTATO/SWEETPOTATO.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1826,6 +1874,7 @@
     "abilityValue": 4.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 4000.0,
+    "pamLocation": "768/INITIAL/PLANT/EXPLODEONUT/EXPLODEONUT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1863,6 +1912,7 @@
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 4000.0,
+    "pamLocation": "768/INITIAL/PLANT/PUMPKIN/PUMPKIN.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1900,6 +1950,7 @@
     "abilityValue": 5.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
     "plantFoodValue": 1000.0,
+    "pamLocation": "768/FULL/PLANT/SUNBEAN/SUNBEAN.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1937,6 +1988,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodValue": 3.0,
+    "pamLocation": "768/INITIAL/PLANT/TORCHWOOD/TORCHWOOD.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1975,6 +2027,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "METAL_ABSORB",
     "plantFoodValue": 10.0,
+    "pamLocation": "768/FULL/PLANT/MAGNETSHROOM/MAGNETSHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2013,6 +2066,7 @@
     "abilityValue": 3.0,
     "plantFoodType": "RANDOM_HYPNOTIZE",
     "plantFoodValue": 1.0,
+    "pamLocation": "768/INITIAL/PLANT/HYPNOSHROOM/HYPNOSHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2049,6 +2103,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "pamLocation": "768/FULL/PLANT/ELECTRICPEEL/ELECTRICPEEL.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2084,6 +2139,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/IMITATER/IMITATER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2122,6 +2178,7 @@
     "abilityValue": 4.0,
     "plantFoodType": "MAP_WIDE_FREEZE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/ICESHROOM/ICESHROOM.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2160,6 +2217,7 @@
     "abilityValue": 1.0,
     "plantFoodType": "SPAWN_CLONES",
     "plantFoodValue": 4.0,
+    "pamLocation": "768/FULL/PLANT/LILYPAD/LILYPAD.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2197,6 +2255,7 @@
     "abilityValue": 7.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/FULL/PLANT/HOTPOTATO/HOTPOTATO.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2232,6 +2291,7 @@
     "abilityValue": 6.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/PLANT/GRAVEBUSTER/GRAVEBUSTER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2267,6 +2327,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/ENLIGHTENMINT/ENLIGHTENMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2302,6 +2363,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/APPEASEMINT/APPEASEMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2337,6 +2399,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/ARMAMINT/ARMAMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2372,6 +2435,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/BOMBARDMINT/BOMBARDMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2407,6 +2471,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/ENFORCEMINT/ENFORCEMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2442,6 +2507,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/REINFORCEMINT/REINFORCEMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2477,6 +2543,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/ENCHANTMINT/ENCHANTMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2512,6 +2579,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/FILAMINT/FILAMINT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -2547,6 +2615,7 @@
     "abilityValue": 10.0,
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
+    "pamLocation": "768/INITIAL/EMPOWERMINTS/PLANT/CONCEALMINT/CONCEALMINT.PAM",
     "upgrades": [
       {
         "level": 2,

@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AdventureProgress;
-import com.ussr.pvz.model.dto.CollectionShowZombieRequest;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
 
 import java.io.File;
@@ -21,129 +20,102 @@ public class CollectionService {
     private static final String PLANTS_PATH = "src/resources/plants.json";
     private static final String ZOMBIES_PATH = "src/resources/zombies.json";
 
-    public String showPlants() {
+    public static class PlantData {
+        public String id;
+        public String name;
+        public String category;
+        public int level;
+        public int ownedPackets;
+        public int cost;
+        public int damage;
+        public int baseHp;
+        public int recharge;
+        public String pamPath;
+    }
+
+    public static class ZombieData {
+        public String name;
+        public boolean encountered;
+        public int hitpoints;
+        public double speed;
+        public int eatDPS;
+        public String pamPath;
+    }
+
+    public List<PlantData> getPlantDataForGUI() {
         Account current = App.getAccount();
-        if (current == null)
-            return "Please login first";
+        Map<String, Integer> userPlants = current != null ? current.getAdventureProgress().getPlantLvls() : null;
+        Map<String, Integer> userPackets = current != null ? current.getAdventureProgress().getSeedPackets() : null;
 
-        Map<String, Integer> userPlants = current.getAdventureProgress().getPlantLvls();
         List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
+        List<PlantData> result = new ArrayList<>();
 
-        StringBuilder sb = new StringBuilder("--- Earned Plants ---\n");
-        boolean foundAny = false;
+        for (Map<String, Object> plantMap : allPlants) {
+            PlantData data = new PlantData();
+            data.name = plantMap.get("name").toString();
+            data.id = ChoosePlantService.normalizePlantKey(data.name);
+            data.category = plantMap.getOrDefault("category", "UNKNOWN").toString();
 
-        for (Map<String, Object> plant : allPlants) {
-            String name = plant.get("name").toString().toUpperCase();
-            if (userPlants.containsKey(name) && userPlants.get(name) > 0) {
-                sb.append("- ").append(plant.get("name"))
-                        .append(" (Lvl: ").append(userPlants.get(name)).append(")\n");
-                foundAny = true;
+            if (userPlants != null && userPlants.containsKey(data.id) && userPlants.get(data.id) > 0) {
+                data.level = userPlants.get(data.id);
+            } else {
+                data.level = 0;
             }
-        }
-        if (!foundAny) return "You haven't unlocked any plants yet!";
-        return sb.toString().trim();
-    }
 
-    public String showAllPlants() {
-        List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
-        StringBuilder sb = new StringBuilder("--- All Game Plants ---\n");
+            data.ownedPackets = (userPackets != null) ? userPackets.getOrDefault(data.id, 0) : 0;
+            data.cost = ((Double) plantMap.getOrDefault("cost", 0.0)).intValue();
+            data.damage = ((Double) plantMap.getOrDefault("damage", 0.0)).intValue();
+            data.baseHp = ((Double) plantMap.getOrDefault("baseHp", 0.0)).intValue();
+            data.recharge = ((Double) plantMap.getOrDefault("recharge", 0.0)).intValue();
 
-        for (Map<String, Object> plant : allPlants) {
-            sb.append("- ").append(plant.get("name")).append("\n");
-        }
-        return sb.toString().trim();
-    }
-
-    public String showPlant(String plantName) {
-        List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
-        String targetName = ChoosePlantService.normalizePlantKey(plantName);
-
-        for (Map<String, Object> plant : allPlants) {
-            if (plant.get("name").toString().replaceAll("[\\s_\\-]", "").toUpperCase()
-                    .equals(targetName.replaceAll("[\\s_\\-]", ""))) {
-                String sb = "Plant Name: " + plant.get("name") + "\n" +
-                        "HP: " + plant.get("baseHp") + "\n" +
-                        "Sun Cost: " + plant.get("cost") + "\n" +
-                        "Cool Down: " + plant.get("recharge") + "\n" +
-                        "Damage: " + plant.get("damage") + "\n";
-                return sb.trim();
+            if (plantMap.containsKey("pamLocation")) {
+                data.pamPath = plantMap.get("pamLocation").toString();
+            } else {
+                String sanitizedName = data.name.toUpperCase().replace(" ", "_").replace("-", "");
+                data.pamPath = "768/INITIAL/PLANTS/" + sanitizedName + "/" + sanitizedName + ".PAM";
             }
+
+            result.add(data);
         }
-        return "Plant not found in game data.";
+        return result;
     }
 
     @SuppressWarnings("unchecked")
-    public String showZombies() {
-        Account currentUser = App.getAccount();
-        if (currentUser == null) return "Please login first.";
+    public List<ZombieData> getZombieDataForGUI() {
+        Account current = App.getAccount();
+        List<String> seenZombies = current != null ?
+                current.getAdventureProgress().getSeenZombies().stream().map(String::toUpperCase).toList() : new ArrayList<>();
 
-        List<String> seenZombies = currentUser.getAdventureProgress().getSeenZombies().stream()
-                .map(String::toUpperCase)
-                .toList();
         List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
+        List<ZombieData> result = new ArrayList<>();
 
-        StringBuilder sb = new StringBuilder("--- Encountered Zombies ---\n");
-        boolean foundAny = false;
-
-        for (Map<String, Object> zombie : allZombies) {
-            List<String> aliases = (List<String>) zombie.get("aliases");
+        for (Map<String, Object> zombieMap : allZombies) {
+            List<String> aliases = (List<String>) zombieMap.get("aliases");
             if (aliases == null || aliases.isEmpty()) continue;
 
-            String name = aliases.getFirst();
-            if (seenZombies.contains(name.toUpperCase())) {
-                sb.append("- ").append(name).append("\n");
-                foundAny = true;
+            ZombieData data = new ZombieData();
+            data.name = aliases.getFirst();
+            data.encountered = seenZombies.contains(data.name.toUpperCase());
+
+            Map<String, Object> objData = (Map<String, Object>) zombieMap.get("objdata");
+            if (objData != null) {
+                data.hitpoints = ((Double) objData.getOrDefault("Hitpoints", 0.0)).intValue();
+                data.speed = (Double) objData.getOrDefault("Speed", 0.0);
+                data.eatDPS = ((Double) objData.getOrDefault("EatDPS", 0.0)).intValue();
+            }
+
+            if (zombieMap.containsKey("pamLocation")) {
+                data.pamPath = zombieMap.get("pamLocation").toString();
+            } else if (zombieMap.containsKey("pamPath")) {
+                data.pamPath = zombieMap.get("pamPath").toString();
             } else {
-                sb.append("- [ Empty Frame / Unseen Zombie ]\n");
+                String sanitizedName = data.name.toUpperCase().replace(" ", "_");
+                data.pamPath = "768/INITIAL/ZOMBIE/" + sanitizedName + "/" + sanitizedName + ".PAM";
             }
+
+            result.add(data);
         }
-        if (!foundAny) return "--- Encountered Zombies ---\nYou haven't met any zombies in combat yet!";
-        return sb.toString().trim();
-    }
-
-    @SuppressWarnings("unchecked")
-    public String showAllZombies() {
-        List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
-        if (allZombies.isEmpty()) return "No game configuration found for zombies.";
-
-        StringBuilder sb = new StringBuilder("--- Encyclopedia of All Zombies ---\n");
-        for (Map<String, Object> zombie : allZombies) {
-            List<String> aliases = (List<String>) zombie.get("aliases");
-            if (aliases != null && !aliases.isEmpty()) {
-                sb.append("- ").append(aliases.getFirst()).append("\n");
-            }
-        }
-        return sb.toString().trim();
-    }
-
-    @SuppressWarnings("unchecked")
-    public String showZombie(CollectionShowZombieRequest request) {
-        Account currentUser = App.getAccount();
-        if (currentUser == null) return "Please login first.";
-
-        String targetName = request.zombieName().trim().toUpperCase();
-        List<String> seenUpper = currentUser.getAdventureProgress().getSeenZombies().stream()
-                .map(String::toUpperCase)
-                .toList();
-
-        if (!seenUpper.contains(targetName)) {
-            return "You cannot view details for a zombie you haven't encountered yet!";
-        }
-
-        List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
-        for (Map<String, Object> zombie : allZombies) {
-            List<String> aliases = (List<String>) zombie.get("aliases");
-            if (aliases != null && !aliases.isEmpty() && aliases.getFirst().toUpperCase().equals(targetName)) {
-                Map<String, Object> objdata = (Map<String, Object>) zombie.get("objdata");
-
-                String sb = "=== " + aliases.getFirst() + " ===\n" +
-                        "HP: " + objdata.get("Hitpoints") + "\n" +
-                        "Speed: " + objdata.get("Speed") + "\n" +
-                        "Attack Power (DPS): " + objdata.get("EatDPS") + "\n";
-                return sb.trim();
-            }
-        }
-        return "Zombie type not registered in game parameters.";
+        return result;
     }
 
     public String upgradePlant(PlantTypeRequest request) {
@@ -154,21 +126,20 @@ public class CollectionService {
         String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
         int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
-        if (currentLevel == 0) return "You do not own this plant yet.";
-        if (currentLevel >= 4) return "Plant is already at max level.";
+        if (currentLevel == 0 || currentLevel >= 4) return "Cannot upgrade.";
 
         int coinCost = currentLevel * 1000;
         int packetCost = currentLevel * 10;
 
-        if (progress.getCoin() < coinCost) return "Not enough coins. Need " + coinCost;
-        int currentPackets = progress.getSeedPackets().getOrDefault(canonicalName, 0);
-        if (currentPackets < packetCost) return "Not enough seed packets. Need " + packetCost;
+        if (progress.getCoin() < coinCost || progress.getSeedPackets().getOrDefault(canonicalName, 0) < packetCost) {
+            return "Not enough resources.";
+        }
 
         progress.addCoin(-coinCost);
-        progress.getSeedPackets().put(canonicalName, currentPackets - packetCost);
+        progress.getSeedPackets().put(canonicalName, progress.getSeedPackets().get(canonicalName) - packetCost);
         progress.upgradePlant(canonicalName);
 
-        return "Success! " + canonicalName + " upgraded to level " + (currentLevel + 1) + ".";
+        return "Upgraded!";
     }
 
     public String purchasePlant(PlantTypeRequest request) {
@@ -177,25 +148,22 @@ public class CollectionService {
         AdventureProgress progress = account.getAdventureProgress();
 
         String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
-        int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
 
-        if (currentLevel > 0) return "You already own this plant.";
-        if (progress.getCoin() < 2000) return "Not enough coins to purchase. Cost is 2,000 coins.";
+        if (progress.getPlantLvls().getOrDefault(canonicalName, 0) > 0) return "Already owned.";
+        if (progress.getCoin() < 2000) return "Not enough coins.";
 
         progress.addCoin(-2000);
-
         progress.getPlantLvls().put(canonicalName, 0);
         progress.upgradePlant(canonicalName);
 
-        return "Success! " + canonicalName + " purchased and added to your collection.";
+        return "Purchased!";
     }
 
     private List<Map<String, Object>> loadConfigFromDisk(String path) {
         File file = new File(path);
         if (!file.exists()) return new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
-            Type listType = new TypeToken<List<Map<String, Object>>>() {
-            }.getType();
+            Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
             List<Map<String, Object>> data = gson.fromJson(reader, listType);
             return data != null ? data : new ArrayList<>();
         } catch (IOException e) {
