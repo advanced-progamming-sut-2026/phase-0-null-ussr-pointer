@@ -51,14 +51,12 @@ public class CollectionMenu extends FadingMenu {
 
     private void buildUI() {
         mainLayout = new Table();
-        mainLayout.setFillParent(true);
 
-        // Header Background
-        TextureRegion bgRegion = textures.region("IMAGE_UI_QUESTS_TRAVEL_LOG_FINAL");
-        if (bgRegion == null) bgRegion = textures.region("IMAGE_UI_QUESTS_TRAVEL_LOG_CORNER");
+        // FIX: Lowercase texture keys matching the atlas
+        TextureRegion bgRegion = textures.region("image_ui_quests_travel_log_final");
+        if (bgRegion == null) bgRegion = textures.region("image_ui_quests_travel_log_corner");
         if (bgRegion != null) mainLayout.setBackground(new TextureRegionDrawable(bgRegion));
 
-        // Header Tabs
         Table tabsTable = new Table();
         TextButton btnPlants = new TextButton("Plants", skin, "green");
         TextButton btnZombies = new TextButton("Zombies", skin, "purple");
@@ -76,6 +74,8 @@ public class CollectionMenu extends FadingMenu {
         mainLayout.add(tabsTable).top().expandX().fillX().padTop(10).row();
         mainLayout.add(scrollPane).expand().fill().pad(20);
 
+        this.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        mainLayout.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.addActor(mainLayout);
 
         btnPlants.addListener(new ClickListener() {
@@ -84,8 +84,7 @@ public class CollectionMenu extends FadingMenu {
         btnZombies.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) { loadZombiesTab(); }
         });
-
-        loadPlantsTab();
+// After building the layout, in buildUI():
     }
 
     private void loadPlantsTab() {
@@ -99,31 +98,33 @@ public class CollectionMenu extends FadingMenu {
             Table card = new Table();
             card.setTouchable(Touchable.enabled);
 
-            TextureRegion cardBg = textures.region("IMAGE_UI_CARDS_ALMANAC_PLANT_CARD");
+            // FIX: Lowercase texture key
+            TextureRegion cardBg = textures.region("image_ui_cards_almanac_plant_card");
             if (cardBg != null) {
                 card.setBackground(new TextureRegionDrawable(cardBg));
             } else if (skin.has("image_ui_cards_almanac_plant_card_10", com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {
                 card.setBackground(skin.getDrawable("image_ui_cards_almanac_plant_card_10"));
             }
 
-            // Animation Actor (Scaled down for the card)
             PamActor pamActor = new PamActor(pamPlayer, plant.pamPath, "idle");
             pamActor.setPamScale(0.3f);
             card.add(pamActor).size(80, 80).padTop(10).row();
 
-            // Level / Lock Status
             Label statusLbl = new Label(plant.level > 0 ? "Lvl " + plant.level : "Locked", skin, "secondary");
             statusLbl.setAlignment(Align.center);
             card.add(statusLbl).bottom().pad(5);
 
             if (plant.level == 0) {
-                card.setColor(Color.DARK_GRAY);
+                card.setColor(Color.GRAY); // Changed to GRAY so the text remains readable
             }
 
             card.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    showPlantDetailsOverlay(plant);
+                    PlantCardOverlay overlay = new PlantCardOverlay(
+                            plant, skin, textures, pamPlayer, dimBackground, collectionService
+                    );
+                    overlay.show(getStage());
                 }
             });
 
@@ -147,7 +148,8 @@ public class CollectionMenu extends FadingMenu {
             Table card = new Table();
             card.setTouchable(Touchable.enabled);
 
-            TextureRegion cardBg = textures.region("IMAGE_UI_CARDS_ALMANAC_ZOMBIE_CARD");
+            // FIX: Lowercase texture key
+            TextureRegion cardBg = textures.region("image_ui_cards_almanac_zombie_card");
             if (cardBg != null) {
                 card.setBackground(new TextureRegionDrawable(cardBg));
             }
@@ -184,53 +186,6 @@ public class CollectionMenu extends FadingMenu {
         }
     }
 
-    private void showPlantDetailsOverlay(PlantData plant) {
-        Window.WindowStyle dialogStyle = new Window.WindowStyle();
-        dialogStyle.titleFont = skin.get("default", Label.LabelStyle.class).font;
-        if (skin.has("image_ui_dialog_asset_dialogborder", com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {
-            dialogStyle.background = skin.getDrawable("image_ui_dialog_asset_dialogborder");
-        }
-        dialogStyle.stageBackground = dimBackground;
-
-        Dialog dialog = new Dialog("", dialogStyle);
-        Table content = dialog.getContentTable();
-
-        Table leftSide = new Table();
-        Table rightSide = new Table();
-
-        PamActor pamActor = new PamActor(pamPlayer, plant.pamPath, "idle");
-        pamActor.setPamScale(0.8f);
-        leftSide.add(pamActor).size(200, 200);
-
-        rightSide.add(new Label(plant.name, skin, "big_outline")).left().padBottom(15).row();
-        rightSide.add(new Label("Level: " + (plant.level > 0 ? plant.level : "Not Owned"), skin, "medium")).left().row();
-
-        Table statsTable = new Table();
-        statsTable.add(new Label("Sun Cost:\n" + plant.cost, skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Recharge:\n" + plant.recharge + "s", skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Toughness:\n" + plant.baseHp, skin, "secondary"));
-        rightSide.add(statsTable).left().padTop(10).row();
-
-        rightSide.add(new Label("Damage: " + plant.damage, skin, "secondary")).left().padTop(10).row();
-
-        content.add(leftSide).pad(20);
-        content.add(rightSide).pad(20).top().left();
-
-        dialog.getButtonTable().pad(20);
-        if (plant.level > 0) {
-            TextButton upgradeBtn = new TextButton("Upgrade", skin, "green");
-            dialog.button(upgradeBtn, true);
-        } else {
-            TextButton buyBtn = new TextButton("Buy (2000)", skin, "green");
-            dialog.button(buyBtn, true);
-        }
-
-        TextButton closeBtn = new TextButton("Close", skin, "brown");
-        dialog.button(closeBtn, false);
-
-        dialog.show(getStage());
-    }
-
     private void showZombieDetailsOverlay(ZombieData zombie) {
         Window.WindowStyle dialogStyle = new Window.WindowStyle();
         dialogStyle.titleFont = skin.get("default", Label.LabelStyle.class).font;
@@ -253,11 +208,12 @@ public class CollectionMenu extends FadingMenu {
 
         Table statsTable = new Table();
 
-        TextureRegion toughIcon = textures.region("IMAGE_UI_ALMANAC_ZOMBIES_ZOMBIETOUGHNESS_ICON");
+        // FIX: Lowercase texture keys
+        TextureRegion toughIcon = textures.region("image_ui_almanac_zombies_zombietoughness_icon");
         if (toughIcon != null) statsTable.add(new Image(new TextureRegionDrawable(toughIcon))).size(40,40);
         statsTable.add(new Label("Toughness:\n" + zombie.hitpoints, skin, "medium")).padRight(30);
 
-        TextureRegion speedIcon = textures.region("IMAGE_UI_ALMANAC_ZOMBIES_ZOMBIESPEED_ICON");
+        TextureRegion speedIcon = textures.region("image_ui_almanac_zombies_zombiespeed_icon");
         if (speedIcon != null) statsTable.add(new Image(new TextureRegionDrawable(speedIcon))).size(40,40);
         statsTable.add(new Label("Speed:\n" + String.format("%.2f", zombie.speed), skin, "medium"));
 

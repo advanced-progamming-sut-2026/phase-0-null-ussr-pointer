@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AdventureProgress;
+import com.ussr.pvz.model.dto.PlantTypeRequest;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +23,9 @@ public class CollectionService {
     public static class PlantData {
         public String id;
         public String name;
+        public String category;
         public int level;
+        public int ownedPackets;
         public int cost;
         public int damage;
         public int baseHp;
@@ -42,6 +45,8 @@ public class CollectionService {
     public List<PlantData> getPlantDataForGUI() {
         Account current = App.getAccount();
         Map<String, Integer> userPlants = current != null ? current.getAdventureProgress().getPlantLvls() : null;
+        Map<String, Integer> userPackets = current != null ? current.getAdventureProgress().getSeedPackets() : null;
+
         List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
         List<PlantData> result = new ArrayList<>();
 
@@ -49,22 +54,22 @@ public class CollectionService {
             PlantData data = new PlantData();
             data.name = plantMap.get("name").toString();
             data.id = ChoosePlantService.normalizePlantKey(data.name);
+            data.category = plantMap.getOrDefault("category", "UNKNOWN").toString();
 
-            // Determine unlock/level state
             if (userPlants != null && userPlants.containsKey(data.id) && userPlants.get(data.id) > 0) {
                 data.level = userPlants.get(data.id);
             } else {
-                data.level = 0; // Locked
+                data.level = 0;
             }
 
+            data.ownedPackets = (userPackets != null) ? userPackets.getOrDefault(data.id, 0) : 0;
             data.cost = ((Double) plantMap.getOrDefault("cost", 0.0)).intValue();
             data.damage = ((Double) plantMap.getOrDefault("damage", 0.0)).intValue();
             data.baseHp = ((Double) plantMap.getOrDefault("baseHp", 0.0)).intValue();
             data.recharge = ((Double) plantMap.getOrDefault("recharge", 0.0)).intValue();
 
-            // Support direct pamPath in JSON, fallback to standard path generation
-            if (plantMap.containsKey("pamPath")) {
-                data.pamPath = plantMap.get("pamPath").toString();
+            if (plantMap.containsKey("pamLocation")) {
+                data.pamPath = plantMap.get("pamLocation").toString();
             } else {
                 String sanitizedName = data.name.toUpperCase().replace(" ", "_").replace("-", "");
                 data.pamPath = "768/INITIAL/PLANTS/" + sanitizedName + "/" + sanitizedName + ".PAM";
@@ -99,7 +104,9 @@ public class CollectionService {
                 data.eatDPS = ((Double) objData.getOrDefault("EatDPS", 0.0)).intValue();
             }
 
-            if (zombieMap.containsKey("pamPath")) {
+            if (zombieMap.containsKey("pamLocation")) {
+                data.pamPath = zombieMap.get("pamLocation").toString();
+            } else if (zombieMap.containsKey("pamPath")) {
                 data.pamPath = zombieMap.get("pamPath").toString();
             } else {
                 String sanitizedName = data.name.toUpperCase().replace(" ", "_");
@@ -109,6 +116,47 @@ public class CollectionService {
             result.add(data);
         }
         return result;
+    }
+
+    public String upgradePlant(PlantTypeRequest request) {
+        Account account = App.getAccount();
+        if (account == null) return "Please login first.";
+        AdventureProgress progress = account.getAdventureProgress();
+
+        String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
+        int currentLevel = progress.getPlantLvls().getOrDefault(canonicalName, 0);
+
+        if (currentLevel == 0 || currentLevel >= 4) return "Cannot upgrade.";
+
+        int coinCost = currentLevel * 1000;
+        int packetCost = currentLevel * 10;
+
+        if (progress.getCoin() < coinCost || progress.getSeedPackets().getOrDefault(canonicalName, 0) < packetCost) {
+            return "Not enough resources.";
+        }
+
+        progress.addCoin(-coinCost);
+        progress.getSeedPackets().put(canonicalName, progress.getSeedPackets().get(canonicalName) - packetCost);
+        progress.upgradePlant(canonicalName);
+
+        return "Upgraded!";
+    }
+
+    public String purchasePlant(PlantTypeRequest request) {
+        Account account = App.getAccount();
+        if (account == null) return "Please login first.";
+        AdventureProgress progress = account.getAdventureProgress();
+
+        String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
+
+        if (progress.getPlantLvls().getOrDefault(canonicalName, 0) > 0) return "Already owned.";
+        if (progress.getCoin() < 2000) return "Not enough coins.";
+
+        progress.addCoin(-2000);
+        progress.getPlantLvls().put(canonicalName, 0);
+        progress.upgradePlant(canonicalName);
+
+        return "Purchased!";
     }
 
     private List<Map<String, Object>> loadConfigFromDisk(String path) {

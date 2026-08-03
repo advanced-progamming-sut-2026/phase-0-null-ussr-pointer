@@ -279,7 +279,7 @@ public class AppView implements ApplicationListener {
             case COLLECTION ->
                     screenRoot.add(new CollectionMenu(
                             skin
-                    ));
+                    )).grow();
 
             default ->
                     screenRoot.add(
