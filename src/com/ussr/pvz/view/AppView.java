@@ -13,6 +13,8 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
+import com.ussr.pvz.view.loading.LoadingCenter;
+import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
@@ -34,22 +36,22 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.ussr.pvz.view.mainmenu.news.NewsMenu;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class AppView implements ApplicationListener {
     private final GlobalController globalController = new GlobalController();
     private Stage stage;
     private Skin skin;
     private NotificationOverlay notificationOverlay;
+    private LoadingOverlay loadingOverlay;
 
     private Table screenRoot;
     private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
+    private static final float MINIMUM_LOADING_TIME = 2.5f;
     private boolean transitioning;
 
     public AppView() {
@@ -97,6 +99,9 @@ public class AppView implements ApplicationListener {
 
         globalMenuHud = new GlobalMenuHud(skin);
         stage.addActor(globalMenuHud);
+
+        loadingOverlay = new LoadingOverlay(skin);
+        stage.addActor(loadingOverlay);
 
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
@@ -324,20 +329,64 @@ public class AppView implements ApplicationListener {
         transitioning = true;
         displayedMenu = targetMenu;
 
+        boolean showLoading =
+                LoadingCenter.consumeFor(targetMenu);
+
         screenRoot.clearActions();
+        screenRoot.setTouchable(Touchable.disabled);
 
         screenRoot.addAction(sequence(
                 fadeOut(HALF_TRANSITION_DURATION),
+                run(() -> completeMenuChange(
+                        targetMenu,
+                        showLoading
+                ))
+        ));
+    }
 
+    private void completeMenuChange(
+            MenuState targetMenu,
+            boolean showLoading
+    ) {
+        if (showLoading) {
+            showLoadingAndRebuild(targetMenu);
+            return;
+        }
+
+        rebuildAndFadeIn(targetMenu);
+    }
+
+    private void rebuildAndFadeIn(MenuState targetMenu) {
+        rebuildMenu(targetMenu);
+        screenRoot.getColor().a = 0f;
+
+        screenRoot.addAction(sequence(
+                fadeIn(HALF_TRANSITION_DURATION),
+                run(this::finishTransition)
+        ));
+    }
+
+    private void showLoadingAndRebuild(MenuState targetMenu) {
+        loadingOverlay.show();
+
+        loadingOverlay.addAction(sequence(
+                delay(MINIMUM_LOADING_TIME),
                 run(() -> {
                     rebuildMenu(targetMenu);
                     screenRoot.getColor().a = 0f;
-                }),
+                    loadingOverlay.hide();
 
-                fadeIn(HALF_TRANSITION_DURATION),
-
-                run(() -> transitioning = false)
+                    screenRoot.addAction(sequence(
+                            fadeIn(HALF_TRANSITION_DURATION),
+                            run(this::finishTransition)
+                    ));
+                })
         ));
+    }
+
+    private void finishTransition() {
+        transitioning = false;
+        screenRoot.setTouchable(Touchable.childrenOnly);
     }
 
     @Override

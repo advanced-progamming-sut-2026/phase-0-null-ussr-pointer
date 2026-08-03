@@ -14,6 +14,7 @@ import com.ussr.pvz.controller.maincontroller.gamecontroller.GameController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.view.AppMenu;
+import com.ussr.pvz.view.loading.LoadingCenter;
 
 import java.util.Scanner;
 
@@ -56,6 +57,7 @@ public class GameMenu extends Table {
     }
 
     private void openGreenhouse() {
+        LoadingCenter.requestFor(MenuState.GREENHOUSE);
         App.setMenuState(MenuState.GREENHOUSE);
     }
 
