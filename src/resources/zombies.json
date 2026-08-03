@@ -4,6 +4,8 @@
       "ZombieDefault"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_TUTORIAL",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -73,6 +75,8 @@
       "ZombieArmor1"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -146,6 +150,8 @@
       "ZombieArmor2"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -219,6 +225,8 @@
       "ZombieArmor4"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -292,6 +300,8 @@
       "ZombieDarkArmor3"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -366,6 +376,8 @@
       "ZombieGargantuar"
     ],
     "objclass": "ZombieGargantuarProps",
+    "pamLocation": "768/INITIAL/ZOMBIE/TUTORIAL_GARGANTUAR/TUTORIAL_GARGANTUAR.PAM",
+    "textureRegion":"",
     "objdata": {
       "AlmanacOffset": {
         "x": -10,
@@ -508,6 +520,8 @@
       "ZombieImp"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL_IMP/ZOMBIE_TUTORIAL_IMP.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 102,
@@ -582,6 +596,8 @@
       "ZombieRa"
     ],
     "objclass": "ZombieRaProps",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EGYPT_RA/ZOMBIE_EGYPT_RA.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -653,6 +669,8 @@
       "ZombieExplorer"
     ],
     "objclass": "ZombieExplorerProps",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EXPLORER/ZOMBIE_EXPLORER.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -731,6 +749,8 @@
       "ZombieTombRaiser"
     ],
     "objclass": "ZombieTombRaiserProps",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EGYPT_TOMBRAISER/ZOMBIE_EGYPT_TOMBRAISER.PAM",
+    "textureRegion":"",
     "objdata": {
       "# TombRaiser specific properties ": 0,
       "Ammo": 5,
@@ -807,6 +827,8 @@
       "ZombieIceAgeDodo"
     ],
     "objclass": "ZombieIceAgeDodoProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_DODORIDER/ZOMBIE_ICEAGE_DODORIDER.PAM",
+    "textureRegion":"",
     "objdata": {
       "AddRandomChanceForJumpPerGridWalked": 0.1,
       "ArmDropFraction": -1,
@@ -919,6 +941,8 @@
       "ZombieIceAgeHunter"
     ],
     "objclass": "ZombieIceAgeHunterProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_HUNTER/ZOMBIE_ICEAGE_HUNTER.PAM",
+    "textureRegion":"",
     "objdata": {
       "Actions": [
         "RTID(ZombieIceAgeProjectileAction@ZombieActions)"
@@ -996,6 +1020,8 @@
       "ZombieIceAgeTroglobite"
     ],
     "objclass": "ZombieIceAgeTroglobiteProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_TROGLOBITE/ZOMBIE_ICEAGE_TROGLOBITE.PAM",
+    "textureRegion":"",
     "objdata": {
       "Actions": [
         "RTID(ZombiePushGridItemAction@ZombieActions)"
@@ -1072,6 +1098,8 @@
       "ZombieBeachFisherman"
     ],
     "objclass": "ZombieBeachFishermanProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_FISHERMAN/ZOMBIE_BEACH_FISHERMAN.PAM",
+    "textureRegion":"",
     "objdata": {
       "AllowedLowPlants": [],
       "ArtCenter": {
@@ -1158,6 +1186,8 @@
       "ZombieBeachOctopus"
     ],
     "objclass": "ZombieBeachOctopusProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_OCTOPUS/ZOMBIE_BEACH_OCTOPUS.PAM",
+    "textureRegion":"",
     "objdata": {
       "Actions": [
         "RTID(ZombieOctopusProjectileAction@ZombieActions)"
@@ -1231,6 +1261,8 @@
       "ZombieBeachSnorkel"
     ],
     "objclass": "ZombieBeachSnorkelProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_SNORKELER/ZOMBIE_BEACH_SNORKELER.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -1431,6 +1463,8 @@
       "ZombieDarkJuggler"
     ],
     "objclass": "ZombieDarkJugglerProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_JESTER/ZOMBIE_DARK_JESTER.PAM",
+    "textureRegion":"",
     "objdata": {
       "AngleAgnosticProjectiles": [
         "HomingThistleDefault",
@@ -1615,6 +1649,8 @@
       "ZombieWizard"
     ],
     "objclass": "ZombieDarkWizardProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_WIZARD/ZOMBIE_DARK_WIZARD.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_WIZARD",
     "objdata": {
       "Actions": [
         "RTID(ZombieDarkWizardZap@ZombieActions)"
@@ -1688,6 +1724,8 @@
       "ZombieDarkKing"
     ],
     "objclass": "ZombieDarkKingProps",
+    "pamLocation": "",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_KING",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -1781,6 +1819,8 @@
       "ZombieDarkImpDragon"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_IMP_DRAGON/ZOMBIE_DARK_IMP_DRAGON.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_IMP_DRAGON",
     "objdata": {
       "ArtCenter": {
         "x": 96,
@@ -1857,6 +1897,8 @@
       "ZombieModernAllStar"
     ],
     "objclass": "ZombieModernAllStarProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_MODERN_ALLSTAR/ZOMBIE_MODERN_ALLSTAR.PAM",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -1939,6 +1981,8 @@
       "ZombieLostCityJane"
     ],
     "objclass": "ZombieLostCityJaneProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_LOSTCITY_JANE/ZOMBIE_LOSTCITY_JANE.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_JANE",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -2045,6 +2089,8 @@
       "ZombieCrystalSkull"
     ],
     "objclass": "ZombieCrystalSkullProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_LOSTCITY_CRYSTALSKULL/ZOMBIE_LOSTCITY_CRYSTALSKULL.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_CRYSTALSKULL",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -2130,6 +2176,8 @@
       "ZombieProspector"
     ],
     "objclass": "ZombieProspectorProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PROSPECTOR/ZOMBIE_PROSPECTOR.PAM",
+    "textureRegion":"",
     "objdata": {
       "Apex": 250,
       "ArtCenter": {
@@ -2204,6 +2252,8 @@
       "ZombiePiano"
     ],
     "objclass": "ZombiePianoProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PIANO/ZOMBIE_PIANO.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_PIANO",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -2298,6 +2348,8 @@
       "ZombieNewspaper"
     ],
     "objclass": "ZombieNewspaperProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_MODERN_NEWSPAPER/ZOMBIE_MODERN_NEWSPAPER.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_MODERN_NEWSPAPER",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -2374,6 +2426,8 @@
       "ZombieBarrelRoller"
     ],
     "objclass": "ZombieBarrelRollerProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PIRATE_BARREL_PUSHER/ZOMBIE_PIRATE_BARREL_PUSHER.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_BARRELROLLER",
     "objdata": {
       "Actions": [
         "RTID(ZombiePushGridItemAction@ZombieActions)"
@@ -2408,6 +2462,8 @@
       "ZombieArcade"
     ],
     "objclass": "ZombieArcadeProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_80S_ARCADE/ZOMBIE_80S_ARCADE.PAM",
+    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_EIGHTIES_ARCADE",
     "objdata": {
       "Actions": [
         "RTID(ZombieArcadePushAction@ZombieActions)"
@@ -2482,6 +2538,8 @@
       "ZombiePeashooter"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": { "x": 90, "y": 125 },
       "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
@@ -2517,6 +2575,8 @@
       "ZombieWallnut"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": { "x": 90, "y": 125 },
       "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
@@ -2547,6 +2607,8 @@
       "ZombieJalapeno"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": { "x": 90, "y": 125 },
       "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
@@ -2578,6 +2640,8 @@
       "ZombieSquash"
     ],
     "objclass": "ZombiePropertySheet",
+    "pamLocation": "",
+    "textureRegion":"",
     "objdata": {
       "ArtCenter": { "x": 90, "y": 125 },
       "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },

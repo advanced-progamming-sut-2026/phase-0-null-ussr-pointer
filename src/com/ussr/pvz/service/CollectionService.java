@@ -40,6 +40,51 @@ public class CollectionService {
         public double speed;
         public int eatDPS;
         public String pamPath;
+        public String textureRegion; // Added property
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ZombieData> getZombieDataForGUI() {
+        Account current = App.getAccount();
+        List<String> seenZombies = current != null ?
+                current.getAdventureProgress().getSeenZombies().stream().map(String::toUpperCase).toList() : new ArrayList<>();
+
+        List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
+        List<ZombieData> result = new ArrayList<>();
+
+        for (Map<String, Object> zombieMap : allZombies) {
+            List<String> aliases = (List<String>) zombieMap.get("aliases");
+            if (aliases == null || aliases.isEmpty()) continue;
+
+            ZombieData data = new ZombieData();
+            data.name = aliases.getFirst();
+            data.encountered = seenZombies.contains(data.name.toUpperCase());
+
+            // Check for Texture Region
+            if (zombieMap.containsKey("textureRegion")) {
+                data.textureRegion = zombieMap.get("textureRegion").toString();
+            }
+
+            // Check for PAM Location with fallback
+            if (zombieMap.containsKey("pamLocation") && !zombieMap.get("pamLocation").toString().isEmpty()) {
+                data.pamPath = zombieMap.get("pamLocation").toString();
+            } else if (zombieMap.containsKey("pamPath") && !zombieMap.get("pamPath").toString().isEmpty()) {
+                data.pamPath = zombieMap.get("pamPath").toString();
+            } else {
+                String sanitizedName = data.name.toUpperCase().replace(" ", "_");
+                data.pamPath = "768/INITIAL/ZOMBIE/" + sanitizedName + "/" + sanitizedName + ".PAM";
+            }
+
+            Map<String, Object> objData = (Map<String, Object>) zombieMap.get("objdata");
+            if (objData != null) {
+                data.hitpoints = ((Double) objData.getOrDefault("Hitpoints", 0.0)).intValue();
+                data.speed = (Double) objData.getOrDefault("Speed", 0.0);
+                data.eatDPS = ((Double) objData.getOrDefault("EatDPS", 0.0)).intValue();
+            }
+
+            result.add(data);
+        }
+        return result;
     }
 
     public List<PlantData> getPlantDataForGUI() {
@@ -73,44 +118,6 @@ public class CollectionService {
             } else {
                 String sanitizedName = data.name.toUpperCase().replace(" ", "_").replace("-", "");
                 data.pamPath = "768/INITIAL/PLANTS/" + sanitizedName + "/" + sanitizedName + ".PAM";
-            }
-
-            result.add(data);
-        }
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<ZombieData> getZombieDataForGUI() {
-        Account current = App.getAccount();
-        List<String> seenZombies = current != null ?
-                current.getAdventureProgress().getSeenZombies().stream().map(String::toUpperCase).toList() : new ArrayList<>();
-
-        List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
-        List<ZombieData> result = new ArrayList<>();
-
-        for (Map<String, Object> zombieMap : allZombies) {
-            List<String> aliases = (List<String>) zombieMap.get("aliases");
-            if (aliases == null || aliases.isEmpty()) continue;
-
-            ZombieData data = new ZombieData();
-            data.name = aliases.getFirst();
-            data.encountered = seenZombies.contains(data.name.toUpperCase());
-
-            Map<String, Object> objData = (Map<String, Object>) zombieMap.get("objdata");
-            if (objData != null) {
-                data.hitpoints = ((Double) objData.getOrDefault("Hitpoints", 0.0)).intValue();
-                data.speed = (Double) objData.getOrDefault("Speed", 0.0);
-                data.eatDPS = ((Double) objData.getOrDefault("EatDPS", 0.0)).intValue();
-            }
-
-            if (zombieMap.containsKey("pamLocation")) {
-                data.pamPath = zombieMap.get("pamLocation").toString();
-            } else if (zombieMap.containsKey("pamPath")) {
-                data.pamPath = zombieMap.get("pamPath").toString();
-            } else {
-                String sanitizedName = data.name.toUpperCase().replace(" ", "_");
-                data.pamPath = "768/INITIAL/ZOMBIE/" + sanitizedName + "/" + sanitizedName + ".PAM";
             }
 
             result.add(data);
