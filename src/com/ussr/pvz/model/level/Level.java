@@ -11,6 +11,7 @@ public class Level {
 
     private String id;
     private int order;
+    private String menuRegion;
     private String chapter;
     private boolean sunFalling = true;
     private int timeLimitSeconds = 0;
@@ -77,6 +78,14 @@ public class Level {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public String getMenuRegion() {
+        return menuRegion;
+    }
+
+    public void setMenuRegion(String menuRegion) {
+        this.menuRegion = menuRegion;
     }
 
     public String getChapter() {

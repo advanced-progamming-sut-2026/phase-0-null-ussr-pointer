@@ -39,6 +39,7 @@ public class LevelFactory {
     private static void parseBaseAttributes(Level level, JsonContainer.JsonLevelData data) {
         level.setId(data.id);
         level.setOrder(data.order);
+        level.setMenuRegion(data.menuRegion);
         level.setSunFalling(data.sunFalling);
         level.setTimeLimitSeconds(data.timeLimitSeconds);
         level.setDeadlineColumn(data.deadlineColumn);

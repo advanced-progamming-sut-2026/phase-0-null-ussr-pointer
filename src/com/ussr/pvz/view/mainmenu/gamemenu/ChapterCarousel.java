@@ -19,9 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
+import com.ussr.pvz.model.level.Chapter;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -35,15 +37,20 @@ public class ChapterCarousel extends Group {
     private final Skin skin;
     private final TextureBank textures;
     private final Consumer<String> selectionHandler;
-    private final ChapterData[] chapters = createChapters();
+    private final List<Chapter> chapters;
     private final Map<Integer, Table> visibleCards = new HashMap<>();
     private int selectedIndex;
     private boolean turning;
 
     public ChapterCarousel(Skin skin, TextureBank textures,
+                           List<Chapter> chapters,
                            Consumer<String> selectionHandler) {
         this.skin = skin;
         this.textures = textures;
+        if (chapters == null || chapters.isEmpty()) {
+            throw new IllegalArgumentException("At least one chapter is required");
+        }
+        this.chapters = List.copyOf(chapters);
         this.selectionHandler = selectionHandler;
         setSize(720f, 285f);
         addNavigationButtons();
@@ -150,14 +157,14 @@ public class ChapterCarousel extends Group {
     }
 
     private Table createCard(int index) {
-        ChapterData chapter = chapters[index];
+        Chapter chapter = chapters.get(index);
         Table card = new Table();
         card.setSize(CARD_WIDTH, CARD_HEIGHT);
         card.setTransform(true);
         card.setOrigin(Align.center);
-        ImageButton image = createImageButton(chapter.regionName());
+        ImageButton image = createImageButton(chapter.getMenuRegion());
         image.addListener(listener(() -> clickCard(index)));
-        Label title = new Label(chapter.title(), skin, "medium_outline");
+        Label title = new Label(chapter.getName(), skin, "medium_outline");
         title.setAlignment(Align.center);
         title.setWrap(true);
         title.setTouchable(Touchable.disabled);
@@ -183,7 +190,7 @@ public class ChapterCarousel extends Group {
 
     private void clickCard(int index) {
         if (index == selectedIndex) {
-            selectionHandler.accept(chapters[index].id());
+            selectionHandler.accept(chapters.get(index).getId());
         } else if (index == wrap(selectedIndex - 1)) {
             turn(-1);
         } else if (index == wrap(selectedIndex + 1)) {
@@ -206,7 +213,7 @@ public class ChapterCarousel extends Group {
     }
 
     private int wrap(int index) {
-        return (index + chapters.length) % chapters.length;
+        return (index + chapters.size()) % chapters.size();
     }
 
     private ChangeListener listener(Runnable action) {
@@ -218,19 +225,4 @@ public class ChapterCarousel extends Group {
         };
     }
 
-    private ChapterData[] createChapters() {
-        return new ChapterData[]{
-                new ChapterData("ancient_egypt", "Ancient Egypt",
-                        "IMAGE_UI_UNIVERSE_WORLDS_EGYPT"),
-                new ChapterData("frostbite_caves", "Frostbite Caves",
-                        "IMAGE_UI_UNIVERSE_WORLDS_ICEAGE"),
-                new ChapterData("dark_ages", "Dark Ages",
-                        "IMAGE_UI_UNIVERSE_WORLDS_DARK"),
-                new ChapterData("big_wave_beach", "Big Wave Beach",
-                        "IMAGE_UI_UNIVERSE_WORLDS_BEACH")
-        };
-    }
-
-    private record ChapterData(String id, String title, String regionName) {
-    }
 }

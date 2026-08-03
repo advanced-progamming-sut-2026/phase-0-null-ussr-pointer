@@ -11,14 +11,17 @@ public class Chapter {
     private final String id;
     private final String name;
     private final GameMode gameMode;
+    private final String menuRegion;
     private List<String> allowedPlants;
     private final List<Level> levels;
     private List<TileType> allowedTiles;
 
-    public Chapter(String id, String name, GameMode gameMode, List<TileType> allowedTiles) {
+    public Chapter(String id, String name, GameMode gameMode,
+                   String menuRegion, List<TileType> allowedTiles) {
         this.id = id;
         this.name = name;
         this.gameMode = gameMode;
+        this.menuRegion = menuRegion;
         this.allowedTiles = allowedTiles != null ? allowedTiles : new ArrayList<>();
         this.levels = new ArrayList<>();
         this.allowedPlants = new ArrayList<>();
@@ -91,6 +94,10 @@ public class Chapter {
 
     public GameMode getGameMode() {
         return gameMode;
+    }
+
+    public String getMenuRegion() {
+        return menuRegion;
     }
 
     public List<String> getAllowedPlants() {

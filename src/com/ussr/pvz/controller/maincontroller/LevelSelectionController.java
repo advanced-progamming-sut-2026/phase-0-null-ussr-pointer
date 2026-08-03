@@ -8,6 +8,10 @@ import java.util.regex.Matcher;
 public class LevelSelectionController {
     private final LevelSelectionService service = new LevelSelectionService();
 
+    public String selectLevel(String levelId) {
+        return service.selectLevel(levelId);
+    }
+
     public String handleCommand(String command) {
         for (LevelSelectionCommand cmd : LevelSelectionCommand.values()) {
             Matcher matcher = cmd.getMatcher(command);

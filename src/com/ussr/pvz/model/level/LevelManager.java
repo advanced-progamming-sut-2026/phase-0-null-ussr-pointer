@@ -38,7 +38,13 @@ public class LevelManager {
 
         for (JsonContainer.JsonChapterData chapterData : world.chapters) {
             GameMode mode = parseGameMode(chapterData.gameMode);
-            Chapter chapter = new Chapter(chapterData.id, chapterData.name, mode, new ArrayList<>());
+            Chapter chapter = new Chapter(
+                    chapterData.id,
+                    chapterData.name,
+                    mode,
+                    chapterData.menuRegion,
+                    new ArrayList<>()
+            );
 
             if (chapterData.allowedPlants != null) {
                 chapter.setAllowedPlants(chapterData.allowedPlants);
