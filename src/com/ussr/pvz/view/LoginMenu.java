@@ -1,12 +1,20 @@
 package com.ussr.pvz.view;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.LoginController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
@@ -16,9 +24,14 @@ import com.ussr.pvz.model.dto.LoginRequest;
 import com.ussr.pvz.model.dto.LoginResult;
 import com.ussr.pvz.model.dto.enums.LoginStatus;
 import com.ussr.pvz.notification.NotificationCenter;
+import pvz.libpvz.textures.TextureBank;
 
 public final class LoginMenu extends FadingMenu {
+    private static final String BACKGROUND_REGION =
+            "IMAGE_TITLEBACKGROUNDS_BACKDROP_J";
+
     private final Skin skin;
+    private final TextureBank textures;
     private final LoginController controller = new LoginController();
     private TextField usernameField;
     private TextField passwordField;
@@ -26,6 +39,8 @@ public final class LoginMenu extends FadingMenu {
 
     public LoginMenu(Skin skin) {
         this.skin = skin;
+        FileHandle assetsFolder = Gdx.files.local("pvz-assets");
+        this.textures = new TextureBank("768", assetsFolder);
         buildLoginForm();
     }
 
@@ -39,7 +54,39 @@ public final class LoginMenu extends FadingMenu {
         addWideField(form, "Username", usernameField);
         addWideField(form, "Password", passwordField);
         addLoginButtons(form);
-        add(form);
+        showForm(form);
+    }
+
+    private void showForm(Table form) {
+        Stack screen = new Stack();
+        Image background = createBackground();
+        background.setScaling(Scaling.fill);
+        background.setTouchable(Touchable.disabled);
+
+        Stack panelLayers = new Stack();
+
+        Table panelInterior = new Table();
+        panelInterior.pad(12f);
+        panelInterior.add(form).grow();
+        panelLayers.add(panelInterior);
+
+        Image border = new Image(skin.getDrawable(
+                "image_ui_dialog_asset_dialogborder_10"
+        ));
+        border.setTouchable(Touchable.disabled);
+        panelLayers.add(border);
+
+        Table formLayer = new Table();
+        formLayer.add(panelLayers);
+
+        screen.add(background);
+        screen.add(formLayer);
+        add(screen).grow();
+    }
+
+    private Image createBackground() {
+        TextureRegion region = textures.region(BACKGROUND_REGION);
+        return region == null ? new Image() : new Image(region);
     }
 
     private TextField createPasswordField() {
@@ -51,7 +98,10 @@ public final class LoginMenu extends FadingMenu {
 
     private Table createPanel(String title) {
         Table form = new Table();
-        form.setBackground(skin.getDrawable("image_ui_dialog_asset_dialogborder_10"));
+        form.setBackground(skin.newDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10",
+                new Color(0.34f, 0.4f, 0.46f, 0.97f)
+        ));
         form.pad(30f);
         form.add(new Label(title, skin, "big_outline"))
                 .colspan(2).padBottom(20f).row();
@@ -127,7 +177,7 @@ public final class LoginMenu extends FadingMenu {
                 () -> transitionContent(this::buildLoginForm)
         ));
         continueButton.addListener(listener(() -> submitIdentity(resetUsername, resetEmail)));
-        add(form);
+        showForm(form);
     }
 
     private void addButtonPair(Table form, TextButton left, TextButton right) {
@@ -160,7 +210,7 @@ public final class LoginMenu extends FadingMenu {
                 () -> transitionContent(this::buildLoginForm)
         ));
         continueButton.addListener(listener(() -> submitAnswer(answerField)));
-        add(form);
+        showForm(form);
     }
 
     private void submitAnswer(TextField answerField) {
@@ -184,7 +234,7 @@ public final class LoginMenu extends FadingMenu {
         TextButton saveButton = new TextButton("Save Password", skin, "green");
         form.add(saveButton).colspan(2).width(240f).height(52f).row();
         saveButton.addListener(listener(() -> submitNewPassword(newPassword, confirmPassword)));
-        add(form);
+        showForm(form);
     }
 
     private void submitNewPassword(TextField password, TextField confirmation) {

@@ -1,6 +1,8 @@
 package com.ussr.pvz.view.mainmenu;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
@@ -24,6 +28,18 @@ import com.ussr.pvz.view.loading.LoadingCenter;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class MainMenu extends Table {
+    private static final String BACKGROUND_DRAWABLE =
+            "exported-main-menu-background";
+    private static final String BACKGROUND_PATH =
+            "pvz-assets/Exports/MainMenu_Background/"
+                    + "mainmenu_background.png";
+    private static final String LOGO_DRAWABLE =
+            "exported-main-menu-logo";
+
+    private static final String LOGO_PATH =
+            "pvz-assets/Exports/UI_MainMenuLogo/"
+                    + "pvz2_logo_horizontal.png";
+
     private final Skin skin;
     private final Table drawer;
     private boolean drawerOpen;
@@ -33,6 +49,15 @@ public class MainMenu extends Table {
         this.drawer = new Table();
         this.drawerOpen = false;
 
+        installExportedDrawable(
+                BACKGROUND_DRAWABLE,
+                BACKGROUND_PATH
+        );
+
+        installExportedDrawable(
+                LOGO_DRAWABLE,
+                LOGO_PATH
+        );
         setFillParent(true);
         top().right();
 
@@ -42,11 +67,65 @@ public class MainMenu extends Table {
     private void buildUi() {
         Stack layers = new Stack();
 
+        layers.add(createBackground());
+        layers.add(createLogoLayer());
         layers.add(createCenterActions());
         layers.add(createBottomActions());
         layers.add(createNavigation());
 
         add(layers).grow();
+    }
+
+    private Table createLogoLayer() {
+        Table layer = new Table();
+        layer.top();
+
+        Image logo = new Image(
+                skin.getDrawable(LOGO_DRAWABLE)
+        );
+
+        logo.setScaling(Scaling.fit);
+        logo.setTouchable(Touchable.disabled);
+
+        layer.add(logo)
+                .size(390f, 145f)
+                .padTop(45f);
+
+        return layer;
+    }
+
+    private Image createBackground() {
+        Image background = new Image(
+                skin.getDrawable(BACKGROUND_DRAWABLE)
+        );
+        background.setScaling(Scaling.fill);
+        background.setTouchable(Touchable.disabled);
+        return background;
+    }
+
+    private void installExportedDrawable(
+            String drawableName,
+            String filePath
+    ) {
+        if (skin.has(drawableName, Drawable.class)) {
+            return;
+        }
+
+        Texture texture = new Texture(
+                Gdx.files.local(filePath)
+        );
+
+        texture.setFilter(
+                Texture.TextureFilter.Linear,
+                Texture.TextureFilter.Linear
+        );
+
+        skin.add(drawableName, texture, Texture.class);
+        skin.add(
+                drawableName,
+                new TextureRegionDrawable(texture),
+                Drawable.class
+        );
     }
 
     private Table createNavigation() {

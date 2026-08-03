@@ -15,15 +15,27 @@ import com.ussr.pvz.view.loading.LoadingCenter;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.color;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.ussr.pvz.controller.maincontroller.gamecontroller.GameController;
+import com.ussr.pvz.notification.NotificationCenter;
+import pvz.libpvz.textures.TextureBank;
+
+
 public class GameMenu extends Table {
     private final Skin skin;
 
+    private final GameController controller;
+    private final TextureBank textures;
 
     public GameMenu(Skin skin) {
         this.skin = skin;
-        setFillParent(true);
-        top().right();
+        this.controller = new GameController();
 
+        FileHandle assetsFolder = Gdx.files.local("pvz-assets");
+        this.textures = new TextureBank("ATLASES", assetsFolder);
+
+        setFillParent(true);
         buildUi();
     }
 
@@ -39,12 +51,88 @@ public class GameMenu extends Table {
 
     private Table createCenterActions() {
         Table layer = new Table();
-        ImageButton gameButton = createBannerButton(
-                "image_ui_mainmenu_mainmenu_content_offline"
+        layer.center();
+
+        Label title = new Label(
+                "Choose Chapter",
+                skin,
+                "big_outline"
         );
-        gameButton.addListener(listener(this::openGreenhouse));
-        layer.add(createLabeledBanner(gameButton, "Green house"))
-                .size(270f, 108f);
+
+        ChapterCarousel carousel = new ChapterCarousel(
+                skin,
+                textures,
+                this::enterChapter
+        );
+
+        layer.add(title)
+                .padTop(30f)
+                .padBottom(10f)
+                .row();
+
+        layer.add(carousel)
+                .width(720f)
+                .height(285f);
+
+        return layer;
+    }
+
+    private void enterChapter(String chapterId) {
+        MenuState previousState = App.getMenuState();
+
+        String result = controller.enterChapter(chapterId);
+
+        if (App.getMenuState() == MenuState.LEVEL_SELECTION) {
+            return;
+        }
+
+        if (App.getMenuState() == previousState
+                && result != null
+                && !result.isBlank()) {
+            NotificationCenter.error(result);
+        }
+    }
+
+    private Table createTopActions() {
+        Table layer = new Table();
+        layer.top().right();
+
+        ImageButton greenhouseButton =
+                new ImageButton(skin, "hud_zg");
+
+        greenhouseButton.addListener(
+                listener(this::openGreenhouse)
+        );
+
+        ImageButton collectionButton =
+                new ImageButton(skin, "almanac");
+
+        collectionButton.addListener(
+                listener(this::openCollection)
+        );
+
+        TextButton leaderboardButton =
+                createLeaderboardButton();
+
+        leaderboardButton.addListener(
+                listener(this::openLeaderboard)
+        );
+
+        layer.add(greenhouseButton)
+                .size(72f, 72f)
+                .padTop(18f)
+                .padRight(10f);
+
+        layer.add(collectionButton)
+                .size(72f, 72f)
+                .padTop(18f)
+                .padRight(10f);
+
+        layer.add(leaderboardButton)
+                .size(72f, 72f)
+                .padTop(18f)
+                .padRight(18f);
+
         return layer;
     }
 
@@ -65,33 +153,6 @@ public class GameMenu extends Table {
         layer.add(createLabeledBanner(travelLogButton, "Shop"))
                 .size(270f, 108f)
                 .padBottom(24f);
-        return layer;
-    }
-
-    private Table createTopActions() {
-        Table layer = new Table();
-        layer.top().right();
-
-        ImageButton collectionButton = new ImageButton(skin, "almanac");
-        collectionButton.addListener(listener(this::openCollection));
-
-        TextButton leaderboardButton =
-                createLeaderboardButton();
-
-        leaderboardButton.addListener(
-                listener(this::openLeaderboard)
-        );
-
-        layer.add(collectionButton)
-                .size(72f, 72f)
-                .padTop(18f)
-                .padRight(10f);
-
-        layer.add(leaderboardButton)
-                .size(72f, 72f)
-                .padTop(18f)
-                .padRight(18f);
-
         return layer;
     }
 
@@ -253,4 +314,5 @@ public class GameMenu extends Table {
             }
         };
     }
+
 }

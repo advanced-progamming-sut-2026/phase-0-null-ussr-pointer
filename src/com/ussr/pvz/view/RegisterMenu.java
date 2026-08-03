@@ -1,13 +1,21 @@
 package com.ussr.pvz.view;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.RegisterController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
@@ -16,12 +24,17 @@ import com.ussr.pvz.model.dto.PickQuestionRequest;
 import com.ussr.pvz.model.dto.RegisterRequest;
 import com.ussr.pvz.model.dto.RegistrationResult;
 import com.ussr.pvz.notification.NotificationCenter;
+import pvz.libpvz.textures.TextureBank;
 import java.util.Arrays;
 
 
 public final class RegisterMenu extends FadingMenu {
+    private static final String BACKGROUND_REGION =
+            "IMAGE_TITLEBACKGROUNDS_BACKDROP_C";
+
     private final RegisterController controller;
     private final Skin skin;
+    private final TextureBank textures;
 
     private TextField usernameField;
     private TextField nicknameField;
@@ -36,6 +49,8 @@ public final class RegisterMenu extends FadingMenu {
     public RegisterMenu(Skin skin) {
         this.skin = skin;
         this.controller = new RegisterController();
+        FileHandle assetsFolder = Gdx.files.local("pvz-assets");
+        this.textures = new TextureBank("768", assetsFolder);
 
         buildRegistrationForm();
     }
@@ -48,7 +63,37 @@ public final class RegisterMenu extends FadingMenu {
         addRegistrationFields(form);
         addRegistrationButtons(form);
 
-        add(form);
+        showForm(form);
+    }
+
+    private void showForm(Table form) {
+        Stack screen = new Stack();
+        Image background = createBackground();
+        background.setScaling(Scaling.fill);
+        background.setTouchable(Touchable.disabled);
+
+        Stack panelLayers = new Stack();
+        Table panelInterior = new Table();
+        panelInterior.pad(12f);
+        panelInterior.add(form).grow();
+        panelLayers.add(panelInterior);
+
+        Image border = new Image(skin.getDrawable(
+                "image_ui_dialog_asset_dialogborder_10"
+        ));
+        border.setTouchable(Touchable.disabled);
+        panelLayers.add(border);
+
+        Table formLayer = new Table();
+        formLayer.add(panelLayers);
+        screen.add(background);
+        screen.add(formLayer);
+        add(screen).grow();
+    }
+
+    private Image createBackground() {
+        TextureRegion region = textures.region(BACKGROUND_REGION);
+        return region == null ? new Image() : new Image(region);
     }
 
     private void initializeRegistrationFields() {
@@ -72,11 +117,10 @@ public final class RegisterMenu extends FadingMenu {
     private Table createRegistrationForm() {
         Table form = new Table();
 
-        form.setBackground(
-                skin.getDrawable(
-                        "image_ui_dialog_asset_dialogborder_10"
-                )
-        );
+        form.setBackground(skin.newDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10",
+                new Color(0.34f, 0.4f, 0.46f, 0.97f)
+        ));
 
         form.pad(30f);
 
@@ -225,7 +269,7 @@ public final class RegisterMenu extends FadingMenu {
         addSecurityInputs(form);
         addSecurityButtons(form);
 
-        add(form);
+        showForm(form);
     }
 
     private void initializeSecurityFields() {
@@ -244,11 +288,10 @@ public final class RegisterMenu extends FadingMenu {
     private Table createSecurityForm() {
         Table form = new Table();
 
-        form.setBackground(
-                skin.getDrawable(
-                        "image_ui_dialog_asset_dialogborder_10"
-                )
-        );
+        form.setBackground(skin.newDrawable(
+                "image_ui_dialog_asset_inner_bkgd_10",
+                new Color(0.34f, 0.4f, 0.46f, 0.97f)
+        ));
 
         form.pad(30f);
 
