@@ -14,6 +14,7 @@ import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.mainmenu.*;
+import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -252,7 +253,8 @@ public class AppView implements ApplicationListener {
 
             case SETTING ->
                     screenRoot.add(new SettingMenu(skin)).grow();
-
+            case GAME ->
+                    screenRoot.add(new GameMenu(skin)).grow();
             default ->
                     screenRoot.add(
                             new Label(
