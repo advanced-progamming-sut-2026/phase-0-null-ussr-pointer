@@ -52,7 +52,9 @@ public class Account {
                 state.coin(),
                 state.gem(),
                 state.plantLvl(),
-                state.completedLevels() != null ? state.completedLevels() : new ArrayList<>() // <--- PASS HERE
+                state.completedLevels() != null ? state.completedLevels() : new ArrayList<>(),
+                state.seedPackets(),
+                state.seenZombies()// <--- PASS HERE
         );
 
         this.scoreRecord = new ScoreRecord(state.score());

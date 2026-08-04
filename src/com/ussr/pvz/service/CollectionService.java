@@ -19,7 +19,6 @@ public class CollectionService {
     private final Gson gson = new Gson();
     private static final String PLANTS_PATH = "src/resources/plants.json";
     private static final String ZOMBIES_PATH = "src/resources/zombies.json";
-
     public static class PlantData {
         public String id;
         public String name;
@@ -31,8 +30,8 @@ public class CollectionService {
         public int baseHp;
         public int recharge;
         public String pamPath;
+        public boolean isBoosted = false; // always false for now
     }
-
     public static class ZombieData {
         public String name;
         public boolean encountered;

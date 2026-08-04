@@ -33,7 +33,8 @@ public class AdventureProgress {
 
     // UPDATED CONSTRUCTOR to accept completedLevels
     public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin,
-                             int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels) {
+                             int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels
+            ,Map<String, Integer> seedPackets, List<String> seenZombies) {
         this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
         this.minigamesWon = minigamesWon;
@@ -52,8 +53,8 @@ public class AdventureProgress {
             }
         }
 
-        this.seedPackets = new HashMap<>();
-        this.seenZombies = new ArrayList<>();
+        this.seedPackets = seedPackets;
+        this.seenZombies = seenZombies;
         this.accountPlants = new ArrayList<>();
 
         // Initialize completed levels list

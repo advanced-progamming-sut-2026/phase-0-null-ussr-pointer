@@ -10,6 +10,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,22 @@ public class ChoosePlantService {
     private static final int LAWN_COLS = 9;
 
     private final List<String> selectedPlants = new ArrayList<>();
+    private final List<String> boostedPlants = new ArrayList<>();
+
+    public ChoosePlantService() {
+        // On init, pre-load any saved boosts from the account into boostedPlants
+        if (App.getAccount() != null) {
+            com.ussr.pvz.model.account.SavedBoosts saved = App.getAccount().getSavedBoosts();
+            if (saved != null) {
+                for (String boost : saved.getBoosts()) {
+                    String key = normalizePlantKey(boost);
+                    if (!boostedPlants.contains(key)) {
+                        boostedPlants.add(key);
+                    }
+                }
+            }
+        }
+    }
 
     public static String normalizePlantKey(String rawName) {
         if (rawName == null) return "";
@@ -37,6 +54,14 @@ public class ChoosePlantService {
             }
         }
         return rawName.trim().toUpperCase().replace('_', ' ');
+    }
+
+    public static String getCleanedUppercaseName(String rawName) {
+        if (rawName == null) {
+            return "";
+        }
+        // Removes all spaces, underscores, and hyphens, then capitalizes
+        return rawName.replaceAll("[\\s_\\-]", "").toUpperCase();
     }
 
     public String showAllPlants() {
@@ -127,14 +152,13 @@ public class ChoosePlantService {
             return "no seed packets available for " + canonicalName;
 
         adv.spendSeedPacket(canonicalName);
-        App.getGameSession().getBoostedPlants().add(canonicalName);
+        boostedPlants.add(canonicalName);
         return "seed packet used for " + canonicalName + " (" + (available - 1) + " remaining)";
     }
 
     public String startGame() {
         Level level = App.getLevelManager().getCurrentLevel();
         if (level == null) return "no level selected";
-
         boolean requiresSelection = !(level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery
                 .ConveyorDeliveryStrategy)
                 && !(level.getBehavior() instanceof com.ussr.pvz.model.level.behavior.BeghouledBehavior)
@@ -157,7 +181,7 @@ public class ChoosePlantService {
         session.addSun(INITIAL_SUN);
         session.setProgressTracked(!App.isCheatedLevel());
         App.setGameSession(session);
-
+        session.setBoostedPlants(new ArrayList<>(boostedPlants));
         ZombieFactory.init();
         level.onStart();
         session.initClock();
@@ -171,5 +195,70 @@ public class ChoosePlantService {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         String chapterId = chapter != null ? chapter.getId() : null;
         return TerrainFactory.build(chapterId, rows, cols);
+    }
+
+    // ── ChoosePlantService additions ──────────────────────────────────────────────
+// Add these methods to the existing ChoosePlantService:
+
+    public List<CollectionService.PlantData> getSelectablePlants() {
+        Chapter chapter = App.getLevelManager().getCurrentChapter();
+        List<String> allowed = chapter != null ? chapter.getAllowedPlants() : null;
+        AdventureProgress adv = App.getAccount().getAdventureProgress();
+
+        return new CollectionService().getPlantDataForGUI().stream()
+                .filter(p -> {
+                    if (allowed != null && !allowed.isEmpty()) {
+                        return allowed.stream().anyMatch(a -> normalizePlantKey(a).equals(p.id));
+                    }
+                    return true;
+                })
+                .peek(p -> {
+                    // sync boost state from boostedPlants list
+                    p.isBoosted = boostedPlants.contains(p.id);
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public String toggleBoost(String plantId) {
+        String key = normalizePlantKey(plantId);
+        if (!selectedPlants.contains(key)) return key + " is not selected";
+
+        AdventureProgress adv = App.getAccount().getAdventureProgress();
+        if (boostedPlants.contains(key)) {
+            // un-boost: refund the packet
+            boostedPlants.remove(key);
+            adv.getSeedPackets().merge(key, 1, Integer::sum);
+            return "boost removed for " + key;
+        } else {
+            int available = adv.getSeedPackets().getOrDefault(key, 0);
+            if (available <= 0) return "no seed packets for " + key;
+            adv.spendSeedPacket(key);
+            boostedPlants.add(key);
+            return "boosted " + key;
+        }
+    }
+
+    public boolean isSelected(String plantId) {
+        return selectedPlants.contains(normalizePlantKey(plantId));
+    }
+
+    public boolean isBoosted(String plantId) {
+        return boostedPlants.contains(normalizePlantKey(plantId));
+    }
+
+    public int selectedCount() {
+        return selectedPlants.size();
+    }
+
+    public int maxSlots() {
+        return MAX_SEED_SLOTS;
+    }
+
+    // Add to ChoosePlantService:
+    public void applyBoost(String plantId) {
+        String key = normalizePlantKey(plantId);
+        if (!boostedPlants.contains(key)) {
+            boostedPlants.add(key);
+        }
     }
 }

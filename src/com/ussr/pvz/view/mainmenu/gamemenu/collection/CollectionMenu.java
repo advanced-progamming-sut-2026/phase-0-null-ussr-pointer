@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -15,12 +16,13 @@ import com.ussr.pvz.service.CollectionService;
 import com.ussr.pvz.service.CollectionService.PlantData;
 import com.ussr.pvz.service.CollectionService.ZombieData;
 import com.ussr.pvz.view.FadingMenu;
-import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.animation.ZombiePamActor;
+import com.ussr.pvz.view.components.PlantCard;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CollectionMenu extends FadingMenu {
     private final Skin skin;
@@ -29,9 +31,21 @@ public class CollectionMenu extends FadingMenu {
     private final PamPlayer pamPlayer;
 
     private Table contentTable;
+    private Table filterBar;
     private ScrollPane scrollPane;
     private Table mainLayout;
     private TextureRegionDrawable dimBackground;
+    private SelectBox<String> categoryBox;
+
+    // Active filter buttons (fields so setActive lambda can reach them)
+    private TextButton btnAll, btnUnlocked, btnLocked, btnUpgradeable;
+
+    private String activeCategoryFilter = "ALL";
+    private String activeLockFilter     = "ALL";
+    private boolean upgradeableOnly     = false;
+    private List<PlantData> allPlants;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
 
     public CollectionMenu(Skin skin) {
         this.skin = skin;
@@ -50,236 +64,244 @@ public class CollectionMenu extends FadingMenu {
         pixmap.dispose();
     }
 
+    // ── Build UI ──────────────────────────────────────────────────────────────
+
     private void buildUI() {
         mainLayout = new Table();
         mainLayout.setFillParent(true);
-
-        TextureRegion bgRegion = textures.region("image_ui_quests_travel_log_final");
-        if (bgRegion == null) bgRegion = textures.region("image_ui_quests_travel_log_corner");
-        if (bgRegion != null) mainLayout.setBackground(new TextureRegionDrawable(bgRegion));
-
-        Table tabsTable = new Table();
-        TextButton btnPlants = new TextButton("Plants", skin, "green");
-        TextButton btnZombies = new TextButton("Zombies", skin, "purple");
-
-        tabsTable.add(btnPlants).pad(10).width(200);
-        tabsTable.add(btnZombies).pad(10).width(200);
+        applyBackground();
 
         contentTable = new Table();
         contentTable.top().pad(20);
-
         scrollPane = new ScrollPane(contentTable, skin);
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setFadeScrollBars(false);
 
-        mainLayout.add(tabsTable).top().expandX().fillX().padTop(10).row();
+        mainLayout.add(buildTabsTable()).top().expandX().fillX().padTop(10).row();
+        mainLayout.add(buildFilterBar()).expandX().fillX().row();
         mainLayout.add(scrollPane).expand().fill().pad(20);
-
         this.addActor(mainLayout);
-
-        btnPlants.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent event, float x, float y) { loadPlantsTab(); }
-        });
-        btnZombies.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent event, float x, float y) { loadZombiesTab(); }
-        });
 
         loadPlantsTab();
     }
 
+    private void applyBackground() {
+        TextureRegion bg = textures.region("image_ui_quests_travel_log_final");
+        if (bg == null) bg = textures.region("image_ui_quests_travel_log_corner");
+        if (bg != null) mainLayout.setBackground(new TextureRegionDrawable(bg));
+    }
+
+    private Table buildTabsTable() {
+        Table tabs = new Table();
+        TextButton btnPlants  = new TextButton("Plants",  skin, "green");
+        TextButton btnZombies = new TextButton("Zombies", skin, "purple");
+        tabs.add(btnPlants).pad(10).width(200);
+        tabs.add(btnZombies).pad(10).width(200);
+
+        btnPlants.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                filterBar.setVisible(true);
+                loadPlantsTab();
+            }
+        });
+        btnZombies.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                filterBar.setVisible(false);
+                loadZombiesTab();
+            }
+        });
+        return tabs;
+    }
+
+    // ── Filter Bar ────────────────────────────────────────────────────────────
+
+    private Table buildFilterBar() {
+        filterBar = new Table();
+        filterBar.pad(6, 16, 6, 16);
+        filterBar.defaults().padRight(8);
+
+        addLockFilters(filterBar);
+        filterBar.add(new Label("|", skin, "default")).padLeft(4).padRight(4);
+        addUpgradeableFilter(filterBar);
+        filterBar.add(new Label("|", skin, "default")).padLeft(4).padRight(4);
+        addCategoryFilter(filterBar);
+
+        return filterBar;
+    }
+
+    private void addLockFilters(Table bar) {
+        bar.add(new Label("Show:", skin, "default"));
+
+        btnAll      = new TextButton("All",      skin, "default");
+        btnUnlocked = new TextButton("Unlocked", skin, "default");
+        btnLocked   = new TextButton("Locked",   skin, "default");
+        setLockActive(btnAll);
+
+        btnAll.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                activeLockFilter = "ALL"; setLockActive(btnAll); refreshPlantsTab();
+            }
+        });
+        btnUnlocked.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                activeLockFilter = "UNLOCKED"; setLockActive(btnUnlocked); refreshPlantsTab();
+            }
+        });
+        btnLocked.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                activeLockFilter = "LOCKED"; setLockActive(btnLocked); refreshPlantsTab();
+            }
+        });
+
+        bar.add(btnAll).width(80);
+        bar.add(btnUnlocked).width(90);
+        bar.add(btnLocked).width(80);
+    }
+
+    private void setLockActive(TextButton active) {
+        btnAll.setColor(Color.GRAY);
+        btnUnlocked.setColor(Color.GRAY);
+        btnLocked.setColor(Color.GRAY);
+        active.setColor(Color.WHITE);
+    }
+
+    private void addUpgradeableFilter(Table bar) {
+        btnUpgradeable = new TextButton("Upgradeable", skin, "default");
+        btnUpgradeable.setColor(Color.GRAY);
+        btnUpgradeable.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                upgradeableOnly = !upgradeableOnly;
+                btnUpgradeable.setColor(upgradeableOnly ? Color.WHITE : Color.GRAY);
+                refreshPlantsTab();
+            }
+        });
+        bar.add(btnUpgradeable).width(120);
+    }
+
+    private void addCategoryFilter(Table bar) {
+        bar.add(new Label("Family:", skin, "default")).padLeft(4);
+        categoryBox = new SelectBox<>(skin);
+        categoryBox.setItems("ALL");
+        categoryBox.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+            @Override public void changed(ChangeEvent event, Actor actor) {
+                activeCategoryFilter = categoryBox.getSelected();
+                refreshPlantsTab();
+            }
+        });
+        bar.add(categoryBox).width(140);
+    }
+
+    // ── Plants ────────────────────────────────────────────────────────────────
+
     private void loadPlantsTab() {
+        allPlants = collectionService.getPlantDataForGUI();
+        populateCategoryBox();
+        refreshPlantsTab();
+    }
+
+    private void populateCategoryBox() {
+        List<String> categories = allPlants.stream()
+                .map(p -> p.category)
+                .filter(c -> c != null && !c.isBlank())
+                .distinct().sorted()
+                .collect(Collectors.toList());
+        categories.add(0, "ALL");
+        categoryBox.setItems(categories.toArray(new String[0]));
+        categoryBox.setSelected("ALL");
+    }
+
+    private void refreshPlantsTab() {
         contentTable.clearChildren();
-        List<PlantData> plants = collectionService.getPlantDataForGUI();
+        if (allPlants == null) return;
 
-        int columns = 6;
-        int currentCount = 0;
+        List<PlantData> filtered = allPlants.stream()
+                .filter(this::passesLockFilter)
+                .filter(this::passesUpgradeFilter)
+                .filter(this::passesCategoryFilter)
+                .collect(Collectors.toList());
 
+        renderPlantCards(filtered);
+    }
+
+    private boolean passesLockFilter(PlantData p) {
+        if ("UNLOCKED".equals(activeLockFilter)) return p.level > 0;
+        if ("LOCKED".equals(activeLockFilter))   return p.level == 0;
+        return true;
+    }
+
+    private boolean passesUpgradeFilter(PlantData p) {
+        if (!upgradeableOnly) return true;
+        return p.level > 0 && p.level < 4 && p.ownedPackets > 0;
+    }
+
+    private boolean passesCategoryFilter(PlantData p) {
+        if ("ALL".equals(activeCategoryFilter)) return true;
+        return activeCategoryFilter.equals(p.category);
+    }
+
+    private void renderPlantCards(List<PlantData> plants) {
+        int columns = 6, col = 0;
         for (PlantData plant : plants) {
-            Table card = new Table();
-            card.setTouchable(Touchable.enabled);
-
-            TextureRegion cardBg = textures.region("image_ui_cards_almanac_plant_card");
-            if (cardBg != null) {
-                card.setBackground(new TextureRegionDrawable(cardBg));
-            } else if (skin.has("image_ui_cards_almanac_plant_card_10", com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {
-                card.setBackground(skin.getDrawable("image_ui_cards_almanac_plant_card_10"));
-            }
-
-            PamActor pamActor = new PamActor(pamPlayer, plant.pamPath, "idle");
-            pamActor.setPamScale(0.3f);
-            card.add(pamActor).size(80, 80).padTop(10).row();
-
-            Label statusLbl = new Label(plant.level > 0 ? "Lvl " + plant.level : "Locked", skin, "secondary");
-            statusLbl.setAlignment(Align.center);
-            card.add(statusLbl).bottom().pad(5);
-
-            if (plant.level == 0) {
-                card.setColor(Color.DARK_GRAY);
-            } else {
-                card.setColor(Color.WHITE);
-            }
-
-            card.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    showPlantDetailsOverlay(plant);
-                }
-            });
-
+            PlantCard card = new PlantCard(plant, skin, textures, () -> showPlantDetailsOverlay(plant));
             contentTable.add(card).size(110, 160).pad(10);
-            currentCount++;
-            if (currentCount >= columns) {
-                contentTable.row();
-                currentCount = 0;
-            }
+            if (++col >= columns) { contentTable.row(); col = 0; }
+        }
+        if (plants.isEmpty()) {
+            Label empty = new Label("No plants match the filter.", skin, "default");
+            empty.setAlignment(Align.center);
+            contentTable.add(empty).colspan(6).pad(40);
         }
     }
+
+    // ── Zombies ───────────────────────────────────────────────────────────────
 
     private void loadZombiesTab() {
         contentTable.clearChildren();
         List<ZombieData> zombies = collectionService.getZombieDataForGUI();
-
-        int columns = 6;
-        int currentCount = 0;
-
+        int columns = 6, col = 0;
         for (ZombieData zombie : zombies) {
-            Table card = new Table();
-            card.setTouchable(Touchable.enabled);
-
-            // Fetch lowercase name for the frame
-            TextureRegion cardBg = textures.region("image_ui_cards_almanac_zombie_card");
-            if (cardBg != null) {
-                card.setBackground(new TextureRegionDrawable(cardBg));
-            }
-
-            // Create a Stack to layer the background tile and the zombie animation
-            Stack animStack = new Stack();
-
-            // Add the floor background tile
-            TextureRegion floorTile = textures.region("image_ui_dialog_asset_dialogtexture");
-            if (floorTile != null) {
-                Image floorImage = new Image(new TextureRegionDrawable(floorTile));
-                // Optional: Adjust scaling if needed to fit nicely in the card
-                animStack.add(floorImage);
-            }
-
-            // Add the Zombie PAM Animation
-            ZombiePamActor pamActor = new ZombiePamActor(pamPlayer, zombie.pamPath);
-            // Scale down specifically for the grid view
-            pamActor.setPamScale(0.3f);
-            // Adjust offset for the grid scale
-            pamActor.setOffsetY(-15f);
-            animStack.add(pamActor);
-
-            card.add(animStack).size(80, 80).padTop(10).row();
-
-            Label nameLbl = new Label(zombie.name, skin, "default");
-            nameLbl.setFontScale(0.65f);
-            nameLbl.setAlignment(Align.center);
-            card.add(nameLbl).bottom().pad(5);
-
-            // Apply the Bright / Dim logic to the entire card
-            if (zombie.encountered) {
-                card.setColor(Color.WHITE); // Bright
-            } else {
-                card.setColor(Color.DARK_GRAY); // Dim
-            }
-
-            card.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    showZombieDetailsOverlay(zombie);
-                }
-            });
-
-            contentTable.add(card).size(110, 160).pad(10);
-            currentCount++;
-            if (currentCount >= columns) {
-                contentTable.row();
-                currentCount = 0;
-            }
+            contentTable.add(buildZombieCard(zombie)).size(110, 160).pad(10);
+            if (++col >= columns) { contentTable.row(); col = 0; }
         }
     }
 
+    private Table buildZombieCard(ZombieData zombie) {
+        Table card = new Table();
+        card.setTouchable(Touchable.enabled);
+
+        TextureRegion cardBg = textures.region("image_ui_cards_almanac_zombie_card");
+        if (cardBg != null) card.setBackground(new TextureRegionDrawable(cardBg));
+
+        Stack animStack = new Stack();
+        TextureRegion floor = textures.region("image_ui_dialog_asset_dialogtexture");
+        if (floor != null) animStack.add(new Image(new TextureRegionDrawable(floor)));
+        ZombiePamActor pam = new ZombiePamActor(pamPlayer, zombie.pamPath);
+        pam.setPamScale(0.3f); pam.setOffsetY(-15f);
+        animStack.add(pam);
+        card.add(animStack).size(80, 80).padTop(10).row();
+
+        Label name = new Label(zombie.name, skin, "default");
+        name.setFontScale(0.65f); name.setAlignment(Align.center);
+        card.add(name).bottom().pad(5);
+        card.setColor(zombie.encountered ? Color.WHITE : Color.DARK_GRAY);
+
+        card.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                showZombieDetailsOverlay(zombie);
+            }
+        });
+        return card;
+    }
+
+    // ── Overlays ──────────────────────────────────────────────────────────────
+
     private void showPlantDetailsOverlay(PlantData plant) {
-        Window.WindowStyle dialogStyle = new Window.WindowStyle();
-        dialogStyle.titleFont = skin.get("default", Label.LabelStyle.class).font;
-        if (skin.has("image_ui_dialog_asset_dialogborder", com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {
-            dialogStyle.background = skin.getDrawable("image_ui_dialog_asset_dialogborder");
-        }
-        dialogStyle.stageBackground = dimBackground;
-
-        Dialog dialog = new Dialog("", dialogStyle);
-        Table content = dialog.getContentTable();
-
-        Table leftSide = new Table();
-        Table rightSide = new Table();
-
-        PamActor pamActor = new PamActor(pamPlayer, plant.pamPath, "idle");
-        pamActor.setPamScale(0.8f);
-        leftSide.add(pamActor).size(200, 200);
-
-        rightSide.add(new Label(plant.name, skin, "big_outline")).left().padBottom(15).row();
-        rightSide.add(new Label("Level: " + (plant.level > 0 ? plant.level : "Not Owned"), skin, "medium")).left().row();
-
-        Table statsTable = new Table();
-        statsTable.add(new Label("Sun Cost:\n" + plant.cost, skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Recharge:\n" + plant.recharge + "s", skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Toughness:\n" + plant.baseHp, skin, "secondary"));
-        rightSide.add(statsTable).left().padTop(10).row();
-
-        rightSide.add(new Label("Damage: " + plant.damage, skin, "secondary")).left().padTop(10).row();
-
-        content.add(leftSide).pad(20);
-        content.add(rightSide).pad(20).top().left();
-
-        dialog.getButtonTable().pad(20);
-        TextButton closeBtn = new TextButton("Close", skin, "brown");
-        dialog.button(closeBtn, true);
-
-        dialog.show(getStage());
+        new PlantCardOverlay(plant, skin, textures, pamPlayer, dimBackground, collectionService)
+                .show(getStage());
     }
 
     private void showZombieDetailsOverlay(ZombieData zombie) {
-        Window.WindowStyle dialogStyle = new Window.WindowStyle();
-        dialogStyle.titleFont = skin.get("default", Label.LabelStyle.class).font;
-        if (skin.has("image_ui_dialog_asset_dialogborder", com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {
-            dialogStyle.background = skin.getDrawable("image_ui_dialog_asset_dialogborder");
-        }
-        dialogStyle.stageBackground = dimBackground;
-
-        Dialog dialog = new Dialog("", dialogStyle);
-        Table content = dialog.getContentTable();
-
-        Table leftSide = new Table();
-        Table rightSide = new Table();
-
-        PamActor pamActor = new PamActor(pamPlayer, zombie.pamPath, "walk");
-        pamActor.setPamScale(0.8f);
-        leftSide.add(pamActor).size(200, 200);
-
-        rightSide.add(new Label(zombie.name, skin, "big_outline")).left().padBottom(15).row();
-
-        Table statsTable = new Table();
-
-        TextureRegion toughIcon = textures.region("image_ui_almanac_zombies_zombietoughness_icon");
-        if (toughIcon != null) statsTable.add(new Image(new TextureRegionDrawable(toughIcon))).size(40,40);
-        statsTable.add(new Label("Toughness:\n" + zombie.hitpoints, skin, "medium")).padRight(30);
-
-        TextureRegion speedIcon = textures.region("image_ui_almanac_zombies_zombiespeed_icon");
-        if (speedIcon != null) statsTable.add(new Image(new TextureRegionDrawable(speedIcon))).size(40,40);
-        statsTable.add(new Label("Speed:\n" + String.format("%.2f", zombie.speed), skin, "medium"));
-
-        rightSide.add(statsTable).left().padBottom(10).row();
-        rightSide.add(new Label("Attack Power (DPS): " + zombie.eatDPS, skin, "secondary")).left().row();
-
-        content.add(leftSide).pad(20);
-        content.add(rightSide).pad(20).top().left();
-
-        dialog.getButtonTable().pad(20);
-        TextButton closeBtn = new TextButton("Close", skin, "brown");
-        dialog.button(closeBtn, true);
-
-        dialog.show(getStage());
+        new ZombieCardOverlay(zombie, skin, textures, pamPlayer, dimBackground)
+                .show(getStage());
     }
 }

@@ -16,6 +16,7 @@ import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.loading.LoadingCenter;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
+import com.ussr.pvz.view.mainmenu.gamemenu.chooseplant.ChoosePlantMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.collection.CollectionMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.GameMenu;
 import com.ussr.pvz.view.mainmenu.gamemenu.GraphicalLevelSelectionMenu;
@@ -286,6 +287,7 @@ public class AppView implements ApplicationListener {
                     screenRoot.add(new CollectionMenu(
                             skin
                     )).grow();
+            case CHOOSE_PLANT -> screenRoot.add(new ChoosePlantMenu(skin)).grow();
 
             default ->
                     screenRoot.add(
