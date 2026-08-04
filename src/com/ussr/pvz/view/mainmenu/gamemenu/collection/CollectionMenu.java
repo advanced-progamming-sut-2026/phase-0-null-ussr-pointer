@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.service.CollectionService;
@@ -25,6 +26,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CollectionMenu extends FadingMenu {
+    private static final Color FILTER_ACTIVE_COLOR =
+            new Color(1f, 0.88f, 0.48f, 1f);
+    private static final Color FILTER_INACTIVE_COLOR =
+            new Color(0.52f, 0.52f, 0.52f, 1f);
+    private static final Color FILTER_ACTIVE_TEXT =
+            new Color(0.20f, 0.13f, 0.06f, 1f);
+    private static final Color FILTER_INACTIVE_TEXT =
+            new Color(0.82f, 0.82f, 0.82f, 1f);
+
     private final Skin skin;
     private final CollectionService collectionService;
     private final TextureBank textures;
@@ -36,6 +46,9 @@ public class CollectionMenu extends FadingMenu {
     private Table mainLayout;
     private TextureRegionDrawable dimBackground;
     private SelectBox<String> categoryBox;
+    private Label resultsLabel;
+    private TextButton plantsTabButton;
+    private TextButton zombiesTabButton;
 
     // Active filter buttons (fields so setActive lambda can reach them)
     private TextButton btnAll, btnUnlocked, btnLocked, btnUpgradeable;
@@ -77,9 +90,15 @@ public class CollectionMenu extends FadingMenu {
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setFadeScrollBars(false);
 
-        mainLayout.add(buildTabsTable()).top().expandX().fillX().padTop(10).row();
-        mainLayout.add(buildFilterBar()).expandX().fillX().row();
-        mainLayout.add(scrollPane).expand().fill().pad(20);
+        mainLayout.add(buildTabsTable())
+                .top().expandX().fillX()
+                .pad(14, 24, 0, 24)
+                .row();
+        mainLayout.add(buildFilterBar())
+                .expandX().fillX()
+                .pad(8, 24, 0, 24)
+                .row();
+        mainLayout.add(scrollPane).expand().fill().pad(12, 20, 20, 20);
         this.addActor(mainLayout);
 
         loadPlantsTab();
@@ -92,45 +111,108 @@ public class CollectionMenu extends FadingMenu {
     }
 
     private Table buildTabsTable() {
-        Table tabs = new Table();
-        TextButton btnPlants  = new TextButton("Plants",  skin, "green");
-        TextButton btnZombies = new TextButton("Zombies", skin, "purple");
-        tabs.add(btnPlants).pad(10).width(200);
-        tabs.add(btnZombies).pad(10).width(200);
+        Table header = new Table();
+        header.pad(12, 18, 10, 18);
+        if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class)) {
+            header.setBackground(skin.getDrawable(
+                    "image_ui_dialog_asset_inner_bkgd_10"
+            ));
+        }
 
-        btnPlants.addListener(new ClickListener() {
+        Label title = new Label("COLLECTION", skin, "big_outline");
+        Label subtitle = new Label(
+                "Browse your plants and discovered zombies",
+                skin,
+                "default"
+        );
+        subtitle.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
+
+        Table heading = new Table();
+        heading.left();
+        heading.add(title).left().row();
+        heading.add(subtitle).left().padTop(2f);
+
+        resultsLabel = new Label("", skin, "default");
+        resultsLabel.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
+        resultsLabel.setAlignment(Align.right);
+
+        header.add(heading).growX().left();
+        header.add(resultsLabel).width(250f).right().row();
+
+        plantsTabButton = new TextButton("PLANTS", skin, "green");
+        zombiesTabButton = new TextButton("ZOMBIES", skin, "purple");
+        plantsTabButton.getLabel().setFontScale(0.9f);
+        zombiesTabButton.getLabel().setFontScale(0.9f);
+
+        Table tabs = new Table();
+        tabs.left();
+        tabs.add(plantsTabButton).width(220f).height(52f).padRight(8f);
+        tabs.add(zombiesTabButton).width(220f).height(52f);
+        header.add(tabs).colspan(2).growX().left().padTop(12f);
+
+        plantsTabButton.addListener(new ClickListener() {
             @Override public void clicked(InputEvent e, float x, float y) {
                 filterBar.setVisible(true);
+                setActiveTab(true);
                 loadPlantsTab();
             }
         });
-        btnZombies.addListener(new ClickListener() {
+        zombiesTabButton.addListener(new ClickListener() {
             @Override public void clicked(InputEvent e, float x, float y) {
                 filterBar.setVisible(false);
+                setActiveTab(false);
                 loadZombiesTab();
             }
         });
-        return tabs;
+
+        setActiveTab(true);
+        return header;
+    }
+
+    private void setActiveTab(boolean plantsActive) {
+        plantsTabButton.setColor(
+                plantsActive ? Color.WHITE : new Color(0.52f, 0.52f, 0.52f, 1f)
+        );
+        zombiesTabButton.setColor(
+                plantsActive ? new Color(0.52f, 0.52f, 0.52f, 1f) : Color.WHITE
+        );
     }
 
     // ── Filter Bar ────────────────────────────────────────────────────────────
 
     private Table buildFilterBar() {
         filterBar = new Table();
-        filterBar.pad(6, 16, 6, 16);
-        filterBar.defaults().padRight(8);
+        filterBar.pad(10, 14, 10, 14);
+        filterBar.defaults().padRight(8f);
+        if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class)) {
+            filterBar.setBackground(skin.getDrawable(
+                    "image_ui_dialog_asset_inner_bkgd_10"
+            ));
+        }
 
         addLockFilters(filterBar);
-        filterBar.add(new Label("|", skin, "default")).padLeft(4).padRight(4);
+        filterBar.add().width(16f);
         addUpgradeableFilter(filterBar);
-        filterBar.add(new Label("|", skin, "default")).padLeft(4).padRight(4);
+        filterBar.add().width(16f);
         addCategoryFilter(filterBar);
+        filterBar.add().expandX();
+
+        TextButton resetButton = new TextButton("RESET", skin, "brown");
+        resetButton.getLabel().setFontScale(0.75f);
+        resetButton.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent e, float x, float y) {
+                resetPlantFilters();
+            }
+        });
+        filterBar.add(resetButton).width(105f).height(40f).padRight(0f);
 
         return filterBar;
     }
 
     private void addLockFilters(Table bar) {
-        bar.add(new Label("Show:", skin, "default"));
+        Label showLabel = new Label("Ownership", skin, "default");
+        showLabel.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
+        bar.add(showLabel).padRight(10f);
 
         btnAll      = new TextButton("All",      skin, "default");
         btnUnlocked = new TextButton("Unlocked", skin, "default");
@@ -138,18 +220,23 @@ public class CollectionMenu extends FadingMenu {
         setLockActive(btnAll);
 
         btnAll.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent e, float x, float y) {
-                activeLockFilter = "ALL"; setLockActive(btnAll); refreshPlantsTab();
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectOwnershipFilter("ALL", btnAll);
             }
         });
+
         btnUnlocked.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent e, float x, float y) {
-                activeLockFilter = "UNLOCKED"; setLockActive(btnUnlocked); refreshPlantsTab();
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectOwnershipFilter("UNLOCKED", btnUnlocked);
             }
         });
+
         btnLocked.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent e, float x, float y) {
-                activeLockFilter = "LOCKED"; setLockActive(btnLocked); refreshPlantsTab();
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectOwnershipFilter("LOCKED", btnLocked);
             }
         });
 
@@ -158,28 +245,67 @@ public class CollectionMenu extends FadingMenu {
         bar.add(btnLocked).width(80);
     }
 
+    private void selectOwnershipFilter(
+            String filter,
+            TextButton activeButton
+    ) {
+        activeLockFilter = filter;
+
+        // Disable the upgradeable-only filter.
+        upgradeableOnly = false;
+        setFilterButtonState(btnUpgradeable, false);
+
+        setLockActive(activeButton);
+        refreshPlantsTab();
+    }
+
     private void setLockActive(TextButton active) {
-        btnAll.setColor(Color.GRAY);
-        btnUnlocked.setColor(Color.GRAY);
-        btnLocked.setColor(Color.GRAY);
-        active.setColor(Color.WHITE);
+        setFilterButtonState(btnAll, btnAll == active);
+        setFilterButtonState(btnUnlocked, btnUnlocked == active);
+        setFilterButtonState(btnLocked, btnLocked == active);
+    }
+
+    private void setFilterButtonState(
+            TextButton button,
+            boolean active
+    ) {
+        button.setColor(
+                active ? FILTER_ACTIVE_COLOR : FILTER_INACTIVE_COLOR
+        );
+        button.getLabel().setColor(
+                active ? FILTER_ACTIVE_TEXT : FILTER_INACTIVE_TEXT
+        );
+        button.getLabel().setFontScale(active ? 0.82f : 0.72f);
     }
 
     private void addUpgradeableFilter(Table bar) {
-        btnUpgradeable = new TextButton("Upgradeable", skin, "default");
-        btnUpgradeable.setColor(Color.GRAY);
+        btnUpgradeable = new TextButton("Ready to upgrade", skin, "default");
+        setFilterButtonState(btnUpgradeable, false);
         btnUpgradeable.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent e, float x, float y) {
-                upgradeableOnly = !upgradeableOnly;
-                btnUpgradeable.setColor(upgradeableOnly ? Color.WHITE : Color.GRAY);
-                refreshPlantsTab();
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectUpgradeableFilter();
             }
         });
-        bar.add(btnUpgradeable).width(120);
+        bar.add(btnUpgradeable).width(145);
+    }
+
+    private void selectUpgradeableFilter() {
+        upgradeableOnly = true;
+        activeLockFilter = "ALL";
+
+        setFilterButtonState(btnAll, false);
+        setFilterButtonState(btnUnlocked, false);
+        setFilterButtonState(btnLocked, false);
+        setFilterButtonState(btnUpgradeable, true);
+
+        refreshPlantsTab();
     }
 
     private void addCategoryFilter(Table bar) {
-        bar.add(new Label("Family:", skin, "default")).padLeft(4);
+        Label familyLabel = new Label("Plant family", skin, "default");
+        familyLabel.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
+        bar.add(familyLabel).padLeft(4).padRight(8f);
         categoryBox = new SelectBox<>(skin);
         categoryBox.setItems("ALL");
         categoryBox.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
@@ -189,6 +315,17 @@ public class CollectionMenu extends FadingMenu {
             }
         });
         bar.add(categoryBox).width(140);
+    }
+
+    private void resetPlantFilters() {
+        activeLockFilter = "ALL";
+        activeCategoryFilter = "ALL";
+        upgradeableOnly = false;
+
+        setLockActive(btnAll);
+        setFilterButtonState(btnUpgradeable, false);
+        categoryBox.setSelected("ALL");
+        refreshPlantsTab();
     }
 
     // ── Plants ────────────────────────────────────────────────────────────────
@@ -207,7 +344,12 @@ public class CollectionMenu extends FadingMenu {
                 .collect(Collectors.toList());
         categories.add(0, "ALL");
         categoryBox.setItems(categories.toArray(new String[0]));
-        categoryBox.setSelected("ALL");
+        if (categories.contains(activeCategoryFilter)) {
+            categoryBox.setSelected(activeCategoryFilter);
+        } else {
+            activeCategoryFilter = "ALL";
+            categoryBox.setSelected("ALL");
+        }
     }
 
     private void refreshPlantsTab() {
@@ -220,6 +362,9 @@ public class CollectionMenu extends FadingMenu {
                 .filter(this::passesCategoryFilter)
                 .collect(Collectors.toList());
 
+        resultsLabel.setText(
+                filtered.size() + " of " + allPlants.size() + " plants"
+        );
         renderPlantCards(filtered);
     }
 
@@ -240,16 +385,16 @@ public class CollectionMenu extends FadingMenu {
     }
 
     private void renderPlantCards(List<PlantData> plants) {
-        int columns = 6, col = 0;
+        int columns = 4, col = 0;
         for (PlantData plant : plants) {
             PlantCard card = new PlantCard(plant, skin, textures, () -> showPlantDetailsOverlay(plant));
-            contentTable.add(card).size(110, 160).pad(10);
+            contentTable.add(card).size(240, 135).pad(8);
             if (++col >= columns) { contentTable.row(); col = 0; }
         }
         if (plants.isEmpty()) {
             Label empty = new Label("No plants match the filter.", skin, "default");
             empty.setAlignment(Align.center);
-            contentTable.add(empty).colspan(6).pad(40);
+            contentTable.add(empty).colspan(columns).pad(40);
         }
     }
 
@@ -258,39 +403,32 @@ public class CollectionMenu extends FadingMenu {
     private void loadZombiesTab() {
         contentTable.clearChildren();
         List<ZombieData> zombies = collectionService.getZombieDataForGUI();
-        int columns = 6, col = 0;
+        long discovered = zombies.stream().filter(z -> z.encountered).count();
+        resultsLabel.setText(
+                discovered + " of " + zombies.size() + " discovered"
+        );
+        int columns = 4, col = 0;
         for (ZombieData zombie : zombies) {
-            contentTable.add(buildZombieCard(zombie)).size(110, 160).pad(10);
+            ZombieCard card = new ZombieCard(
+                    zombie,
+                    skin,
+                    textures,
+                    pamPlayer,
+                    () -> showZombieDetailsOverlay(zombie)
+            );
+            contentTable.add(card).size(240, 135).pad(8);
             if (++col >= columns) { contentTable.row(); col = 0; }
         }
-    }
 
-    private Table buildZombieCard(ZombieData zombie) {
-        Table card = new Table();
-        card.setTouchable(Touchable.enabled);
-
-        TextureRegion cardBg = textures.region("image_ui_cards_almanac_zombie_card");
-        if (cardBg != null) card.setBackground(new TextureRegionDrawable(cardBg));
-
-        Stack animStack = new Stack();
-        TextureRegion floor = textures.region("image_ui_dialog_asset_dialogtexture");
-        if (floor != null) animStack.add(new Image(new TextureRegionDrawable(floor)));
-        ZombiePamActor pam = new ZombiePamActor(pamPlayer, zombie.pamPath);
-        pam.setPamScale(0.3f); pam.setOffsetY(-15f);
-        animStack.add(pam);
-        card.add(animStack).size(80, 80).padTop(10).row();
-
-        Label name = new Label(zombie.name, skin, "default");
-        name.setFontScale(0.65f); name.setAlignment(Align.center);
-        card.add(name).bottom().pad(5);
-        card.setColor(zombie.encountered ? Color.WHITE : Color.DARK_GRAY);
-
-        card.addListener(new ClickListener() {
-            @Override public void clicked(InputEvent e, float x, float y) {
-                showZombieDetailsOverlay(zombie);
-            }
-        });
-        return card;
+        if (zombies.isEmpty()) {
+            Label empty = new Label(
+                    "No zombies are available.",
+                    skin,
+                    "default"
+            );
+            empty.setAlignment(Align.center);
+            contentTable.add(empty).colspan(columns).pad(40);
+        }
     }
 
     // ── Overlays ──────────────────────────────────────────────────────────────

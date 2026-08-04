@@ -13,7 +13,6 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
-import com.ussr.pvz.view.loading.LoadingCenter;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.mainmenu.gamemenu.chooseplant.ChoosePlantMenu;
@@ -39,7 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.ussr.pvz.view.mainmenu.news.NewsMenu;
-
+import com.badlogic.gdx.utils.TimeUtils;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class AppView implements ApplicationListener {
@@ -54,8 +53,16 @@ public class AppView implements ApplicationListener {
     private MenuState displayedMenu;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
-    private static final float MINIMUM_LOADING_TIME = 2.5f;
+    private static final long LOADING_FADE_IN_TIME_MS = 180L;
+    private static final long MINIMUM_LOADING_TIME_MS = 1_500L;
+
     private boolean transitioning;
+    private boolean menuLoaded;
+    private MenuState loadingTarget;
+    private long loadingStartedAt;
+
+    private boolean menuLoadPending;
+    private int loadingFramesDrawn;
 
     public AppView() {
         App.initShop();
@@ -212,6 +219,9 @@ public class AppView implements ApplicationListener {
                 1f / 30f
         );
 
+        startPendingMenuLoad();
+        updateLoadingTransition();
+
         Gdx.gl.glClearColor(0.08f, 0.1f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -223,6 +233,39 @@ public class AppView implements ApplicationListener {
 
         stage.act(delta);
         stage.draw();
+
+        countRenderedLoadingFrame();
+    }
+
+    private void startPendingMenuLoad() {
+        if (!menuLoadPending
+                || loadingFramesDrawn < 1
+                || TimeUtils.timeSinceMillis(loadingStartedAt)
+                < LOADING_FADE_IN_TIME_MS) {
+            return;
+        }
+
+        MenuState targetMenu = loadingTarget;
+        menuLoadPending = false;
+        loadTargetMenu(targetMenu);
+    }
+
+    private void countRenderedLoadingFrame() {
+        if (menuLoadPending && loadingOverlay.isVisible()) {
+            loadingFramesDrawn++;
+        }
+    }
+
+    private void updateLoadingTransition() {
+        if (loadingTarget == null || !menuLoaded) {
+            return;
+        }
+
+        long elapsed = TimeUtils.timeSinceMillis(loadingStartedAt);
+
+        if (elapsed >= MINIMUM_LOADING_TIME_MS) {
+            finishLoadingTransition();
+        }
     }
 
     @Override
@@ -347,62 +390,93 @@ public class AppView implements ApplicationListener {
     }
 
     private void transitionTo(MenuState targetMenu) {
+        if (targetMenu == null) {
+            return;
+        }
+
         transitioning = true;
         displayedMenu = targetMenu;
-
-        boolean showLoading =
-                LoadingCenter.consumeFor(targetMenu);
 
         screenRoot.clearActions();
         screenRoot.setTouchable(Touchable.disabled);
 
-        screenRoot.addAction(sequence(
-                fadeOut(HALF_TRANSITION_DURATION),
-                run(() -> completeMenuChange(
-                        targetMenu,
-                        showLoading
-                ))
-        ));
+        /*
+         * Crossfade the old menu and loading overlay. Menu construction
+         * starts only after the loading overlay has finished fading in.
+         */
+        showLoadingAndRebuild(targetMenu);
+        screenRoot.addAction(fadeOut(HALF_TRANSITION_DURATION));
     }
 
-    private void completeMenuChange(
-            MenuState targetMenu,
-            boolean showLoading
-    ) {
-        if (showLoading) {
-            showLoadingAndRebuild(targetMenu);
+    private void showLoadingAndRebuild(MenuState targetMenu) {
+        loadingTarget = targetMenu;
+        loadingStartedAt = TimeUtils.millis();
+        menuLoaded = false;
+
+        menuLoadPending = true;
+        loadingFramesDrawn = 0;
+
+        loadingOverlay.show();
+    }
+
+    private void loadTargetMenu(MenuState targetMenu) {
+        if (loadingTarget != targetMenu) {
             return;
         }
 
-        rebuildAndFadeIn(targetMenu);
+        try {
+            rebuildMenu(targetMenu);
+            menuLoaded = true;
+        } catch (RuntimeException exception) {
+            handleMenuLoadingFailure(targetMenu, exception);
+        }
     }
 
-    private void rebuildAndFadeIn(MenuState targetMenu) {
-        rebuildMenu(targetMenu);
-        screenRoot.getColor().a = 0f;
+    private void finishLoadingTransition() {
+        if (loadingTarget == null) {
+            return;
+        }
 
+        loadingTarget = null;
+        menuLoaded = false;
+        loadingStartedAt = 0L;
+        menuLoadPending = false;
+        loadingFramesDrawn = 0;
+
+        screenRoot.getColor().a = 0f;
+        loadingOverlay.hide();
+
+        screenRoot.clearActions();
         screenRoot.addAction(sequence(
                 fadeIn(HALF_TRANSITION_DURATION),
                 run(this::finishTransition)
         ));
     }
 
-    private void showLoadingAndRebuild(MenuState targetMenu) {
-        loadingOverlay.show();
+    private void handleMenuLoadingFailure(
+            MenuState targetMenu,
+            RuntimeException exception
+    ) {
+        Gdx.app.error(
+                "AppView",
+                "Failed to load menu: " + targetMenu,
+                exception
+        );
 
-        loadingOverlay.addAction(sequence(
-                delay(MINIMUM_LOADING_TIME),
-                run(() -> {
-                    rebuildMenu(targetMenu);
-                    screenRoot.getColor().a = 0f;
-                    loadingOverlay.hide();
+        loadingTarget = null;
+        menuLoaded = false;
+        loadingStartedAt = 0L;
+        menuLoadPending = false;
+        loadingFramesDrawn = 0;
 
-                    screenRoot.addAction(sequence(
-                            fadeIn(HALF_TRANSITION_DURATION),
-                            run(this::finishTransition)
-                    ));
-                })
-        ));
+        loadingOverlay.hide();
+
+        transitioning = false;
+        screenRoot.setTouchable(Touchable.childrenOnly);
+
+        NotificationCenter.error(
+                "Could not load " + targetMenu.getName() + "."
+        );
     }
 
     private void finishTransition() {

@@ -13,7 +13,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.GameMode;
-import com.ussr.pvz.view.loading.LoadingCenter;
+
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.color;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
@@ -150,7 +150,6 @@ public class GameMenu extends Table {
     }
 
     private void openGreenhouse() {
-        LoadingCenter.requestFor(MenuState.GREENHOUSE);
         App.setMenuState(MenuState.GREENHOUSE);
     }
 

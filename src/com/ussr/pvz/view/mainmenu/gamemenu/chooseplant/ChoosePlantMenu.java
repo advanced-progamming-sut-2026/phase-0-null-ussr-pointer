@@ -22,11 +22,11 @@ import java.util.List;
 
 public class ChoosePlantMenu extends FadingMenu {
 
-    private static final int COLUMNS      = 6;
-    private static final int CARD_W       = 95;
-    private static final int CARD_H       = 130;
-    private static final int SELECTED_W   = 85;
-    private static final int SELECTED_H   = 115;
+    private static final int COLUMNS      = 4;
+    private static final int CARD_W       = 190;
+    private static final int CARD_H       = 110;
+    private static final int SELECTED_W   = 105;
+    private static final int SELECTED_H   = 68;
 
     private final Skin skin;
     private final TextureBank textures;
@@ -161,7 +161,7 @@ public class ChoosePlantMenu extends FadingMenu {
         for (PlantData p : plants) {
             PlantCard card = new PlantCard(p, skin, textures, () -> onCardClicked(p));
             // Tint selected cards green
-            if (service.isSelected(p.id)) card.setColor(new Color(0.6f, 1f, 0.6f, 1f));
+            card.setSelectionVisible(service.isSelected(p.id));
             plantGrid.add(card).size(CARD_W, CARD_H).pad(4);
             if (++col >= COLUMNS) { plantGrid.row(); col = 0; }
         }
@@ -212,7 +212,7 @@ public class ChoosePlantMenu extends FadingMenu {
 
         // Big card preview
         PlantCard preview = new PlantCard(p, skin, textures, null);
-        detailPanel.add(preview).size(120, 165).padBottom(6).row();
+        detailPanel.add(preview).size(190, 110).padBottom(6).row();
 
         // Plant name
         Label nameLbl = new Label(p.name, skin, "default");
