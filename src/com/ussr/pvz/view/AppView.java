@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
@@ -102,7 +103,7 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void create() {
-        Viewport viewport = new ExtendViewport(1280f, 720f);
+        Viewport viewport = new FitViewport(1280f, 720f);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
