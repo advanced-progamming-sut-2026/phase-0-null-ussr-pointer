@@ -1,6 +1,7 @@
 package com.ussr.pvz.view;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -27,6 +28,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.view.mainmenu.profile.ProfileMenu;
+import pvz.libpvz.pam.PamPlayer;
+import pvz.libpvz.textures.TextureBank;
 import pvz.skin.PvzSkin;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
@@ -39,6 +42,8 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.ussr.pvz.view.mainmenu.news.NewsMenu;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import static com.badlogic.gdx.Gdx.files;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class AppView implements ApplicationListener {
@@ -306,8 +311,21 @@ public class AppView implements ApplicationListener {
             case SETTING ->
                     screenRoot.add(new SettingMenu(skin)).grow();
 
-            case GAME ->
+            case GAME -> {
+                if (App.getGameSession() != null) {
+                    FileHandle assetsFolder =
+                            files.local("pvz-assets");
+                    TextureBank gameTextures =
+                            new TextureBank("768", assetsFolder);
+                    PamPlayer gamePamPlayer =
+                            new PamPlayer(gameTextures, assetsFolder);
+
+                    screenRoot.add(new com.ussr.pvz.view.gameplay.ActiveGameplayView(
+                            skin, gameTextures, gamePamPlayer)).grow();
+                } else {
                     screenRoot.add(new GameMenu(skin)).grow();
+                }
+            }
 
             case LEVEL_SELECTION ->
                     screenRoot.add(
@@ -315,13 +333,13 @@ public class AppView implements ApplicationListener {
                     ).grow();
 
             case GREENHOUSE ->
-                screenRoot.add(new GreenHouseMenu(skin)).grow();
+                    screenRoot.add(new GreenHouseMenu(skin)).grow();
 
             case SHOP ->
-                screenRoot.add(new ShopMenu(skin)).grow();
+                    screenRoot.add(new ShopMenu(skin)).grow();
 
             case TRAVEL_LOG ->
-                screenRoot.add(new TravelLogMenu(skin)).grow();
+                    screenRoot.add(new TravelLogMenu(skin)).grow();
 
             case LEADERBOARD ->
                     screenRoot.add(new LeaderBoardMenu(skin)).grow();

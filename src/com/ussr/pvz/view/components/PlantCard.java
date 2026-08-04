@@ -227,7 +227,7 @@ public class PlantCard extends Table {
         return highlight;
     }
 
-    private static String resolvePacketKey(String plantName) {
+    public static String resolvePacketKey(String plantName) {
         String upper = plantName.toUpperCase().trim();
         return PACKET_KEY_OVERRIDES.getOrDefault(
                 upper,
