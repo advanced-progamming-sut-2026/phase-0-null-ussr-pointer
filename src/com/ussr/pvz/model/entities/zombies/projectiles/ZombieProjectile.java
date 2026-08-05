@@ -39,4 +39,6 @@ public abstract class ZombieProjectile extends GameEntity {
     protected abstract void updateFlightPath(double progress);
 
     protected abstract void onDestinationReached(GameSession session);
+
+    public abstract void onDestinationReached();
 }

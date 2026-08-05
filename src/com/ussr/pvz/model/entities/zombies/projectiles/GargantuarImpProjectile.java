@@ -40,4 +40,9 @@ public class GargantuarImpProjectile extends ZombieProjectile {
         Zombie imp = ZombieFactory.create(impAlias, targetRow, targetCol);
         session.spawnZombie(imp);
     }
+
+    @Override
+    public void onDestinationReached() {
+
+    }
 }

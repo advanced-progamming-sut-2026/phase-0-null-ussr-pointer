@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.board.terrain;
 
 public enum TileType {
+    Burning(false),
     Crater(false),
     Frozen(false),
     Grave(false),

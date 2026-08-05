@@ -39,4 +39,9 @@ public class ZombiePeaProjectile extends ZombieProjectile {
     protected void onDestinationReached(GameSession session) {
         // Projectile flew off-screen safely
     }
+
+    @Override
+    public void onDestinationReached() {
+
+    }
 }
