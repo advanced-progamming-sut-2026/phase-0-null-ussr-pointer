@@ -40,6 +40,9 @@ public class ActiveGameplayView extends Table {
         this.entityLayer =
                 new EntityRenderLayer(pamPlayer, textures);
 
+        TerrainRenderLayer terrainLayer =
+                new TerrainRenderLayer(pamPlayer, textures);
+
         this.inGameHud =
                 new InGameHud(skin, textures, controller);
 
@@ -56,6 +59,7 @@ public class ActiveGameplayView extends Table {
         Stack layers = new Stack();
 
         layers.add(background);
+        layers.add(terrainLayer);
         layers.add(entityLayer);
         layers.add(lawnWidget);
         layers.add(inGameHud);

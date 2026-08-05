@@ -430,7 +430,8 @@ public class GameService {
             Plant blueprint
     ) {
         boolean waterTile =
-                cell.getTile().getType() == TileType.Water;
+                cell.getTile().getType() == TileType.Water
+                        || cell.getTile().getType() == TileType.ShallowCoast;
 
         boolean aquaticPlant = isAquaticPlant(blueprint);
         boolean lilyPadPlant = isLilyPad(blueprint);
