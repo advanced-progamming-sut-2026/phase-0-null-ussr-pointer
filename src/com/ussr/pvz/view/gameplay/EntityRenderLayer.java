@@ -65,7 +65,7 @@ public class EntityRenderLayer extends Group {
             });
 
             actor.setPosition(
-                    GRID_OFFSET_X + (float)(mower.getPosition().x() * CELL_WIDTH) - 20f,
+                    GRID_OFFSET_X + (float)(mower.getPosition().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f - 20f,
                     GRID_OFFSET_Y + (float)(mower.getPosition().y() * CELL_HEIGHT)
             );
         }
@@ -84,8 +84,8 @@ public class EntityRenderLayer extends Group {
 
             actor.setClip(plant.getPlantFoodTimer() > 0 ? "plantfood" : "idle");
             actor.setPosition(
-                    GRID_OFFSET_X + (plant.getLocation().x() * CELL_WIDTH),
-                    GRID_OFFSET_Y + (plant.getLocation().y() * CELL_HEIGHT)
+                    GRID_OFFSET_X + (plant.getLocation().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f,
+                    GRID_OFFSET_Y + (plant.getLocation().y() * CELL_HEIGHT) - 20f
             );
         }
 
@@ -102,7 +102,7 @@ public class EntityRenderLayer extends Group {
 
             // Note: Since PamActor doesn't support the visibilityMap, armor layers won't toggle dynamically yet.
             actor.setPosition(
-                    GRID_OFFSET_X + (float)(zombie.getPosition().x() * CELL_WIDTH),
+                    GRID_OFFSET_X + (float)(zombie.getPosition().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f,
                     GRID_OFFSET_Y + (float)(zombie.getPosition().y() * CELL_HEIGHT)
             );
         }
