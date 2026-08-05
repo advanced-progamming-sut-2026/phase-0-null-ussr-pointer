@@ -23,13 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class EntityRenderLayer extends Group {
-
-    // Updated constants to match the visual background grid
-    private static final float GRID_OFFSET_X = 320f;
-    private static final float GRID_OFFSET_Y = 80f;
-    private static final float CELL_WIDTH = 100f;
-    private static final float CELL_HEIGHT = 115f;
-
     private final PamPlayer pamPlayer;
     private final TextureBank textures;
 
@@ -65,8 +58,13 @@ public class EntityRenderLayer extends Group {
             });
 
             actor.setPosition(
-                    GRID_OFFSET_X + (float)(mower.getPosition().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f - 20f,
-                    GRID_OFFSET_Y + (float)(mower.getPosition().y() * CELL_HEIGHT)
+                    LawnGridLayout.worldX(
+                            mower.getPosition().x()
+                    ) + LawnGridLayout.CELL_WIDTH / 2f - 60f,
+
+                    LawnGridLayout.worldY(
+                            mower.getPosition().y()
+                    )
             );
         }
 
@@ -84,8 +82,14 @@ public class EntityRenderLayer extends Group {
 
             actor.setClip(plant.getPlantFoodTimer() > 0 ? "plantfood" : "idle");
             actor.setPosition(
-                    GRID_OFFSET_X + (plant.getLocation().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f,
-                    GRID_OFFSET_Y + (plant.getLocation().y() * CELL_HEIGHT) - 20f
+                    LawnGridLayout.cellX(
+                            plant.getLocation().x()
+                    ) + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.PLANT_DRAW_OFFSET_X,
+
+                    LawnGridLayout.cellY(
+                            plant.getLocation().y()
+                    ) + LawnGridLayout.PLANT_DRAW_OFFSET_Y
             );
         }
 
@@ -102,8 +106,14 @@ public class EntityRenderLayer extends Group {
 
             // Note: Since PamActor doesn't support the visibilityMap, armor layers won't toggle dynamically yet.
             actor.setPosition(
-                    GRID_OFFSET_X + (float)(zombie.getPosition().x() * CELL_WIDTH) + (CELL_WIDTH / 2f) - 40f,
-                    GRID_OFFSET_Y + (float)(zombie.getPosition().y() * CELL_HEIGHT)
+                    LawnGridLayout.worldX(
+                            zombie.getPosition().x()
+                    ) + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X,
+
+                    LawnGridLayout.worldY(
+                            zombie.getPosition().y()
+                    ) + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
             );
         }
 
@@ -137,8 +147,13 @@ public class EntityRenderLayer extends Group {
         for (Projectile proj : session.getProjectiles()) {
             if (!proj.isAlive()) continue;
 
-            float screenX = GRID_OFFSET_X + (float)(proj.getPosition().x() * CELL_WIDTH);
-            float screenY = GRID_OFFSET_Y + (float)(proj.getPosition().y() * CELL_HEIGHT);
+            float screenX = LawnGridLayout.worldX(
+                    proj.getPosition().x()
+            );
+
+            float screenY = LawnGridLayout.worldY(
+                    proj.getPosition().y()
+            );
 
             TextureRegion region = textures.region("IMAGE_EFFECTS_T_PEA_PROJECTILE_T_PEA_PROJECTILE_39X36");
             if (region != null) {
@@ -151,8 +166,13 @@ public class EntityRenderLayer extends Group {
         for (GroundItem item : session.getItems()) {
             if (item.isCollected()) continue;
 
-            float screenX = GRID_OFFSET_X + (float)(item.getPosition().x() * CELL_WIDTH);
-            float screenY = GRID_OFFSET_Y + (float)(item.getPosition().y() * CELL_HEIGHT);
+            float screenX = LawnGridLayout.worldX(
+                    item.getPosition().x()
+            );
+
+            float screenY = LawnGridLayout.worldY(
+                    item.getPosition().y()
+            );
 
             if (item.getItemType() == ItemType.SUN) {
                 try {

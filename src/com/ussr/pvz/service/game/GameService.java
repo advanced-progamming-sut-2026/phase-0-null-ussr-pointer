@@ -230,8 +230,6 @@ public class GameService {
                             blueprint.setRecharge(accountPlant.getRecharge()));
 
             Cell cell = requirePlantableCell(session, x, y, blueprint);
-            String result = isSpecialPlantAllowed(blueprint, x, y);
-            if (result != null) return result;
             checkRechargeAndSpendSun(session, blueprint);
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
@@ -250,23 +248,6 @@ public class GameService {
             e.printStackTrace();
             return "An internal system error occurred while planting: " + e.getMessage();
         }
-    }
-
-    private String isSpecialPlantAllowed(Plant blueprint, int x, int y) {
-        if(ChoosePlantService.normalizePlantKey(blueprint.getName())
-                .equals(ChoosePlantService.normalizePlantKey("Grave Buster"))){
-            if(isGraveBusterAllowed(x, y)){
-                return "grave buster is not allowed on this cell";
-            }
-        }
-
-        if(ChoosePlantService.normalizePlantKey(blueprint.getName())
-                .equals(ChoosePlantService.normalizePlantKey("Hot Potato"))){
-            if(isHotPotatoAllowed(x, y)){
-                return "hot potato is not allowed on this cell";
-            }
-        }
-        return null;
     }
 
     private int[] parseLocation(String xStr, String yStr) {
@@ -364,71 +345,175 @@ public class GameService {
         return session;
     }
 
-    private Cell requirePlantableCell(GameSession session, int x, int y, Plant blueprint) {
+    private Cell requirePlantableCell(
+            GameSession session,
+            int x,
+            int y,
+            Plant blueprint
+    ) {
         if (blueprint == null) {
-            throw new IllegalStateException("Plant profile template is completely missing.");
+            throw new IllegalStateException(
+                    "Plant profile is missing."
+            );
         }
+
         Lawn lawn = session.getLawn();
-        if (lawn == null || y < 0 || y >= lawn.getRows() || x < 0 || x >= lawn.getCols()) {
+
+        if (lawn == null
+                || x < 0
+                || x >= lawn.getCols()
+                || y < 0
+                || y >= lawn.getRows()) {
             throw new IllegalStateException("invalid location");
         }
+
         Cell cell = lawn.getCell(y, x);
-        if (cell == null) {
-            throw new IllegalStateException("invalid location");
+
+        if (cell == null || cell.getTile() == null) {
+            throw new IllegalStateException(
+                    "this cell has no valid terrain"
+            );
         }
-        boolean isWaterTile = cell.getTile() != null
-                && cell.getTile().getType() == com.ussr.pvz.model.board.terrain.TileType.Water;
-        boolean isAquaticPlant = false;
-        if (blueprint.getTags() != null) {
-            isAquaticPlant = blueprint.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.WATER);
+
+        String plantKey = ChoosePlantService.normalizePlantKey(
+                blueprint.getName()
+        );
+
+        if (plantKey.equals(
+                ChoosePlantService.normalizePlantKey("Grave Buster")
+        )) {
+            return requireSpecialTerrainCell(
+                    cell,
+                    TileType.Grave,
+                    "Grave Buster"
+            );
         }
-        if (blueprint.getName() != null) {
-            isAquaticPlant = isAquaticPlant ||
-                    blueprint.getName().equalsIgnoreCase("Lily Pad") ||
-                    blueprint.getName().equalsIgnoreCase("LilyPad");
+
+        if (plantKey.equals(
+                ChoosePlantService.normalizePlantKey("Hot Potato")
+        )) {
+            return requireSpecialTerrainCell(
+                    cell,
+                    TileType.Frozen,
+                    "Hot Potato"
+            );
         }
-        boolean hasLilyPadUnderneath = false;
-        if (!cell.isEmpty()) {
-            Plant existingPlant = cell.getPlant();
-            if (existingPlant != null && existingPlant.getName() != null) {
-                hasLilyPadUnderneath = existingPlant.getName().equalsIgnoreCase("Lily Pad") ||
-                        existingPlant.getName().equalsIgnoreCase("LilyPad");
-            }
+
+        return requireNormalPlantCell(cell, blueprint);
+    }
+
+    private Cell requireSpecialTerrainCell(
+            Cell cell,
+            TileType requiredTerrain,
+            String plantName
+    ) {
+        if (cell.getTile().getType() != requiredTerrain) {
+            throw new IllegalStateException(
+                    plantName
+                            + " can only be planted on "
+                            + requiredTerrain
+                            + " tiles"
+            );
         }
-        String displayName = blueprint.getName() != null ? blueprint.getName() : "this plant";
-        if (cell.getTile() != null && !cell.getTile().allowsPlant()) {
-            if (!(isWaterTile && (isAquaticPlant || hasLilyPadUnderneath))) {
-                throw new IllegalStateException("cannot plant " + displayName + " on this tile (" + x + ", " + y + ")");
-            }
-        } else if (isWaterTile && !isAquaticPlant && cell.isEmpty()) {
-            throw new IllegalStateException(displayName + " must be planted on a Lily Pad!");
+
+        if (cell.getPlant() != null) {
+            throw new IllegalStateException(
+                    "a plant already occupies this cell"
+            );
         }
-        if(cell.getPlant() != null) {
-            throw new IllegalStateException("can not plant plant here cause there is an interactible structure here");
-        }
-        if (!cell.isEmpty()) {
-            if (hasLilyPadUnderneath && !isAquaticPlant) {
-            } else {
-                throw new IllegalStateException("a plant is already at (" + x + ", " + y + ")");
-            }
-        }
+
         return cell;
     }
 
-    private boolean isGraveBusterAllowed(int x , int y){
-        if(App.getGameSession().getLawn().getTile(y,x) != null){
-            return App.getGameSession().getLawn().getTile(y, x).getType().equals(TileType.Grave);
+    private Cell requireNormalPlantCell(
+            Cell cell,
+            Plant blueprint
+    ) {
+        boolean waterTile =
+                cell.getTile().getType() == TileType.Water;
+
+        boolean aquaticPlant = isAquaticPlant(blueprint);
+        boolean lilyPadPlant = isLilyPad(blueprint);
+        boolean hasLilyPad = isLilyPad(cell.getPlant());
+
+        if (waterTile) {
+            validateWaterPlanting(
+                    blueprint,
+                    cell,
+                    aquaticPlant,
+                    lilyPadPlant,
+                    hasLilyPad
+            );
+            return cell;
         }
 
-        return false;
+        if (!cell.getTile().allowsPlant()) {
+            throw new IllegalStateException(
+                    "cannot plant "
+                            + blueprint.getName()
+                            + " on this terrain"
+            );
+        }
+
+        if (cell.getInteractableStructure() != null) {
+            throw new IllegalStateException(
+                    "an interactable structure occupies this cell"
+            );
+        }
+
+        if (cell.getPlant() != null) {
+            throw new IllegalStateException(
+                    "a plant already occupies this cell"
+            );
+        }
+
+        return cell;
     }
 
-    private boolean isHotPotatoAllowed(int x, int y){
-        if(App.getGameSession().getLawn().getTile(y,x) != null){
-            return App.getGameSession().getLawn().getTile(y,x).getType().equals(TileType.Frozen);
+    private void validateWaterPlanting(
+            Plant blueprint,
+            Cell cell,
+            boolean aquaticPlant,
+            boolean lilyPadPlant,
+            boolean hasLilyPad
+    ) {
+        if (lilyPadPlant || aquaticPlant) {
+            if (cell.getPlant() != null) {
+                throw new IllegalStateException(
+                        "a plant already occupies this water cell"
+                );
+            }
+            return;
         }
 
-        return false;
+        if (!hasLilyPad) {
+            throw new IllegalStateException(
+                    blueprint.getName()
+                            + " must be planted on a Lily Pad"
+            );
+        }
+    }
+
+    private boolean isAquaticPlant(Plant plant) {
+        return plant != null
+                && plant.getTags() != null
+                && plant.getTags().contains(
+                com.ussr.pvz.model.entities.plants.Tag.WATER
+        );
+    }
+
+    private boolean isLilyPad(Plant plant) {
+        if (plant == null || plant.getName() == null) {
+            return false;
+        }
+
+        String key = ChoosePlantService.normalizePlantKey(
+                plant.getName()
+        );
+
+        return key.equals(
+                ChoosePlantService.normalizePlantKey("Lily Pad")
+        );
     }
 
     private Plant requireUnlockedPlant(String requestedType) {

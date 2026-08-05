@@ -18,7 +18,6 @@ public class InGameHud extends Table {
     private final SeedBankHud seedBankHud;
     private final ShovelWidget shovelWidget;
     private final WaveProgressBar waveProgressBar;
-    private final LawnWidget lawnWidget;
 
     public InGameHud(Skin skin, TextureBank textures, GameplayController controller) {
         setFillParent(true);
@@ -28,9 +27,7 @@ public class InGameHud extends Table {
         seedBankHud = new SeedBankHud(skin, textures);
         shovelWidget = new ShovelWidget(skin, textures, controller);
         waveProgressBar = new WaveProgressBar(skin, textures);
-        lawnWidget = new LawnWidget(controller);
 
-        HoverCursorWidget hoverCursor = new HoverCursorWidget(lawnWidget, seedBankHud, textures);
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
 
@@ -62,8 +59,6 @@ public class InGameHud extends Table {
         // Center Grid Layout
         Stack lawnStack = new Stack();
         lawnStack.add(objectives.lawnOverlayWidget());
-        lawnStack.add(lawnWidget);
-        lawnStack.add(hoverCursor);
 
         // Assemble standard game layer
         Table mainGameLayer = new Table();

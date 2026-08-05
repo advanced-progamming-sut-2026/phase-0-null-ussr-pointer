@@ -14,6 +14,8 @@ import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.view.hud.InGameHud;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
+import com.ussr.pvz.view.hud.HoverCursorWidget;
+import com.ussr.pvz.view.hud.LawnWidget;
 
 public class ActiveGameplayView extends Table {
 
@@ -24,18 +26,39 @@ public class ActiveGameplayView extends Table {
     private final InGameHud inGameHud;
     private final EntityRenderLayer entityLayer;
 
-    public ActiveGameplayView(Skin skin, TextureBank textures, PamPlayer pamPlayer) {
+    public ActiveGameplayView(
+            Skin skin,
+            TextureBank textures,
+            PamPlayer pamPlayer
+    ) {
         setFillParent(true);
+
         this.controller = new GameplayController();
 
         Image background = createBackground(textures);
-        this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
-        this.inGameHud = new InGameHud(skin, textures, controller);
+
+        this.entityLayer =
+                new EntityRenderLayer(pamPlayer, textures);
+
+        this.inGameHud =
+                new InGameHud(skin, textures, controller);
+
+        LawnWidget lawnWidget =
+                new LawnWidget(controller);
+
+        HoverCursorWidget hoverCursor =
+                new HoverCursorWidget(
+                        inGameHud.getSeedBankHud(),
+                        textures
+                );
 
         Stack layers = new Stack();
+
         layers.add(background);
         layers.add(entityLayer);
+        layers.add(lawnWidget);
         layers.add(inGameHud);
+        layers.add(hoverCursor);
 
         add(layers).grow();
     }
