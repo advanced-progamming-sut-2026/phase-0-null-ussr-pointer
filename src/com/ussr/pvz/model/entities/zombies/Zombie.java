@@ -46,7 +46,23 @@ public class Zombie extends GameEntity implements Damageable {
     private java.util.List<String> damageWhileSubmerged;
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
     private String pamPath;
+    private float deathTimer = -1f; // -1 means not dying yet
+    private static final float DEATH_ANIM_DURATION = 2.0f; // tweak to match your animation length
 
+    public void startDeathTimer() {
+        if (deathTimer < 0) deathTimer = DEATH_ANIM_DURATION;
+    }
+
+    public boolean isDeathAnimDone() {
+        return deathTimer == 0f;
+    }
+
+    public void tickDeathTimer(float delta) {
+        if (deathTimer > 0) {
+            deathTimer -= delta;
+            if (deathTimer < 0) deathTimer = 0f;
+        }
+    }
     @Override
     public void takeDamage(int damage) {
         takeDamage(damage, false);
@@ -62,7 +78,7 @@ public class Zombie extends GameEntity implements Damageable {
                 this.hp = 0;
                 this.isAlive = false;
                 this.state = ZombieActivity.DEAD;
-
+                startDeathTimer();
                 GameSession session = App.getGameSession();
 
                 if (isGlowing) {
@@ -123,6 +139,7 @@ public class Zombie extends GameEntity implements Damageable {
         }
 
         if (!isAlive) {
+            tickDeathTimer(delta);  // ← add this
             applyEffect(session, delta);
             return;
         }
@@ -307,7 +324,7 @@ public class Zombie extends GameEntity implements Damageable {
                 hp = 0;
                 isAlive = false;
                 state = ZombieActivity.DEAD;
-
+                startDeathTimer();
                 GameSession session = App.getGameSession();
 
                 if (isGlowing) {

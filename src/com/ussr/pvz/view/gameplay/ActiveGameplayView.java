@@ -57,10 +57,12 @@ public class ActiveGameplayView extends Table {
                 );
 
         Stack layers = new Stack();
-
+// in your GameplayScreen or wherever the stage is assembled
+        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);// on top so suns render above entities
         layers.add(background);
         layers.add(terrainLayer);
         layers.add(entityLayer);
+        layers.add(sunLayer);
         layers.add(lawnWidget);
         layers.add(inGameHud);
         layers.add(hoverCursor);

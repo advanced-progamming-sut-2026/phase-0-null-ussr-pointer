@@ -17,4 +17,15 @@ public class ZombiePamActor extends PamActor {
         this.pamScale = 0.65f;
         this.offsetY = -40f;
     }
+
+    @Override
+    public void setClip(String clipName) {
+        super.setClip(clipName);
+        if ("die".equals(clipName)) {
+            this.looping = false;
+            this.stateTime = 0f; // restart from beginning exactly once
+        } else {
+            this.looping = true;
+        }
+    }
 }

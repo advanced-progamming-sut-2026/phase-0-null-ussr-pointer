@@ -92,6 +92,9 @@ public class TerrainRenderLayer extends Group {
                 key -> createGraveActor(grave)
         );
 
+        // Dynamically update the damage clip based on current HP
+        actor.setClip(getGraveDamageClip(grave.getHp()));
+
         actor.setPosition(
                 LawnGridLayout.cellX(column)
                         + LawnGridLayout.CELL_WIDTH / 2f
@@ -101,15 +104,47 @@ public class TerrainRenderLayer extends Group {
         );
     }
 
+    /**
+     * Determines the correct PAM clip based on the Grave's current HP.
+     * Max HP is 700 as defined in Grave.java.
+     */
+    private String getGraveDamageClip(int hp) {
+        // If it's at full health
+        if (hp >= 700) {
+            return "undamaged";
+        }
+        // 75% to 99% health
+        else if (hp >= 525) {
+            return "damage1";
+        }
+        // 50% to 74% health
+        else if (hp >= 350) {
+            return "damage2";
+        }
+        // 25% to 49% health
+        else if (hp >= 175) {
+            return "damage3";
+        }
+        // Below 25% health
+        else {
+            return "damage4";
+        }
+    }
     private PamActor createGraveActor(Grave grave) {
+        // Default to the Grave content's PAM path (which are the Dark Ages ones)
         String pamPath = grave.getContent().getPamLocation();
 
-        if (App.getLevelManager() != null
-                && App.getLevelManager().getCurrentChapter() != null
-                && "ancient_egypt".equals(
-                App.getLevelManager().getCurrentChapter().getId()
-        )) {
-            pamPath = "768/INITIAL/GRAVESTONES/EGYPT_HIEROGLYPH/EGYPT_HIEROGLYPH.PAM";
+        if (App.getLevelManager() != null && App.getLevelManager().getCurrentChapter() != null) {
+            String chapterId = App.getLevelManager().getCurrentChapter().getId();
+
+            // Override for Ancient Egypt
+            if ("ancient_egypt".equals(chapterId)) {
+                pamPath = "768/INITIAL/GRAVESTONES/EGYPT_HIEROGLYPH/EGYPT_HIEROGLYPH.PAM";
+            }
+            // Explicit check for Dark Ages (uses the default PAM paths defined in the Grave Content enum)
+            else if ("dark_ages".equals(chapterId)) {
+                pamPath = grave.getContent().getPamLocation();
+            }
         }
 
         PamActor actor = new PamActor(

@@ -16,7 +16,7 @@ public class PamActor extends Actor {
     protected boolean playing = true;
     protected float pamScale = 0.4f;
     protected float offsetY = 0f;
-
+    protected boolean looping = true;
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
         this.pamPath = pamPath;
@@ -72,6 +72,13 @@ public class PamActor extends Actor {
         super.act(delta);
         if (playing) {
             stateTime += delta;
+            if (!looping && clipRef != null) {
+                float duration = clipRef.duration; // whatever the actual method is on ClipRef
+                if (stateTime >= duration) {
+                    stateTime = duration; // clamp, don't reset
+                    playing = false;
+                }
+            }
         }
     }
 

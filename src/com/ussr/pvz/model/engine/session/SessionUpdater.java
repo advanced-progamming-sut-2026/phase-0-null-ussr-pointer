@@ -330,9 +330,7 @@ public final class SessionUpdater {
         session.getPlants()
                 .removeIf(plant -> !plant.isAlive());
 
-        session.getZombies()
-                .removeIf(zombie -> !zombie.isAlive());
-
+        session.getZombies().removeIf(zombie -> !zombie.isAlive() && zombie.isDeathAnimDone());
         session.getItems()
                 .removeIf(item -> !item.isAlive());
 
