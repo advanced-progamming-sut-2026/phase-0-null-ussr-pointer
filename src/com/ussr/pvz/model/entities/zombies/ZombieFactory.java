@@ -29,6 +29,7 @@ public class ZombieFactory {
     private static final String ARMOR_PATH = "src/resources/ArmorTypeData.json";
 
     private static final Map<String, Map<String, Object>> blueprints = new HashMap<>();
+    private static final Map<String, String> pamLocations = new HashMap<>();
     private static final Map<String, Integer> armorBaseHp = new HashMap<>();
 
     private static boolean loaded = false;
@@ -55,9 +56,15 @@ public class ZombieFactory {
             for (Map<String, Object> entry : entries) {
                 List<String> aliases = (List<String>) entry.get("aliases");
                 Map<String, Object> objdata = (Map<String, Object>) entry.get("objdata");
+                String pamLocation = (String) entry.get("pamLocation");
+
                 if (aliases == null || objdata == null) continue;
+
                 for (String alias : aliases) {
                     blueprints.put(alias, objdata);
+                    if (pamLocation != null) {
+                        pamLocations.put(alias, pamLocation);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -155,6 +162,8 @@ public class ZombieFactory {
         zombie.setHp(hp);
         zombie.setEatDps(eatDps);
         zombie.setSize(size);
+        zombie.setPamPath(pamLocations.get(alias));
+
         if (data.containsKey("DamageWhileSubmerged")) {
             Map<String, Object> map = (Map<String, Object>) data.get("DamageWhileSubmerged");
             zombie.setDamageWhileSubmerged((List<String>) map.get("List"));

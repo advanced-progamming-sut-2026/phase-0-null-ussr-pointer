@@ -5,6 +5,8 @@
       "name": "Ancient Egypt",
       "gameMode": "ADVENTURE",
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_EGYPT",
+      "lawnRegion": "IMAGE_BACKGROUNDS_EGYPT_TEXTURE",
+      "mowerPam": "768/INITIAL/MOWERS/MOWER_EGYPT/MOWER_EGYPT.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -254,6 +256,8 @@
       "name": "Frostbite Caves",
       "gameMode": "ADVENTURE",
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_ICEAGE",
+      "lawnRegion": "IMAGE_BACKGROUNDS_ICEAGE_TEXTURE",
+      "mowerPam": "768/FULL/MOWERS/MOWER_ICEAGE/MOWER_ICEAGE.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -480,6 +484,8 @@
       "name": "Dark Ages",
       "gameMode": "ADVENTURE",
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_DARK",
+      "lawnRegion": "IMAGE_BACKGROUNDS_DARK_TEXTURE",
+      "mowerPam": "768/FULL/MOWERS/MOWER_DARK/MOWER_DARK.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -716,6 +722,9 @@
       "name": "Big Wave Beach",
       "gameMode": "ADVENTURE",
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_BEACH",
+      "lawnRegion": "IMAGE_BACKGROUNDS_BEACH_TEXTURE",
+      "waterRegion": "IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_174X209",
+      "mowerPam": "768/FULL/MOWERS/MOWER_BEACH/MOWER_BEACH.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -852,6 +861,7 @@
           "allowedPlantsLost": -1,
           "environment": "BigWaveBeachEnvironment",
           "behavior": "SaveOurSeedsBehavior",
+          "saveZone": "IMAGE_BACKGROUNDS_PROTECT_TILE_PROTECT_TILE_112X125",
           "lockedPlants": [],
           "seedPlants": [],
           "rewardPlantAliases": [
@@ -969,6 +979,7 @@
       "id": "minigames_arcade",
       "name": "Zomboss Arcade",
       "gameMode": "MINIGAME",
+      "lawnRegion": "IMAGE_BACKGROUNDS_FRONTLAWN_PADDYS_TEXTURE",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -1693,6 +1704,7 @@
       "id": "meow_chapter",
       "name": "Meow Mode",
       "gameMode": "MEOW",
+      "lawnRegion": "IMAGE_BACKGROUNDS_FRONTLAWN_SPRING_TEXTURE",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",

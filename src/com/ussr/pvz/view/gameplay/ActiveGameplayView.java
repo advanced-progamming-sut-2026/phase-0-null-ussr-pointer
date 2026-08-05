@@ -42,18 +42,15 @@ public class ActiveGameplayView extends Table {
 
     private Image createBackground(TextureBank textures) {
         Chapter currentChapter = App.getLevelManager().getCurrentChapter();
-        String chapterId = currentChapter != null ? currentChapter.getId() : "ancient_egypt";
 
-        String regionKey = switch (chapterId) {
-            case "big_wave_beach" -> "IMAGE_BACKGROUNDS_BEACH";
-            case "dark_ages" -> "IMAGE_BACKGROUNDS_DARKAGES";
-            case "frostbite_caves" -> "IMAGE_BACKGROUNDS_FROSTBITE";
-            default -> "IMAGE_BACKGROUNDS_EGYPT";
-        };
+        // Dynamically fetch the lawn region defined in your JSON
+        String regionKey = currentChapter != null ? currentChapter.getLawnRegion() : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
 
         Image bg = new Image();
-        if (textures.region(regionKey) != null) {
+        if (regionKey != null && textures.region(regionKey) != null) {
             bg.setDrawable(new TextureRegionDrawable(textures.region(regionKey)));
+        } else {
+            System.err.println("[ActiveGameplayView] Warning: Missing texture region for " + regionKey);
         }
 
         bg.setScaling(Scaling.fill);

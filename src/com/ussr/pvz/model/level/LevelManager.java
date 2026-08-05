@@ -43,7 +43,9 @@ public class LevelManager {
                     chapterData.name,
                     mode,
                     chapterData.menuRegion,
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    chapterData.lawnRegion,
+                    chapterData.mowerPam
             );
 
             if (chapterData.allowedPlants != null) {

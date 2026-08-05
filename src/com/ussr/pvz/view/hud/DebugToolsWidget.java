@@ -36,14 +36,14 @@ public class DebugToolsWidget extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
-        boolean isDebug = false;
-        try {
-            // Checks if the difficulty is set to debug/cheat configurations or an arbitrary global var.
-            // Adjust to your precise global debug flag binding from SettingMenu.
-            if (App.getAccount() != null && App.getAccount().getDifficultyLvl() == -1) {
-                isDebug = true;
-            }
-        } catch (Exception ignored) {}
+        boolean isDebug = true;
+//        try {
+//            // Checks if the difficulty is set to debug/cheat configurations or an arbitrary global var.
+//            // Adjust to your precise global debug flag binding from SettingMenu.
+//            if (App.getAccount() != null && App.getAccount().getDifficultyLvl() == -1) {
+//                isDebug = true;
+//            }
+//        } catch (Exception ignored) {}
 
         setVisible(isDebug); // Falls back to hidden unless explicitly triggered
     }

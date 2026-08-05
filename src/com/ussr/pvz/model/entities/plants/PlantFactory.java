@@ -58,6 +58,13 @@ public class PlantFactory {
         plant.setCost(Math.max(0, result.runtimeCost()));
         plant.setActionInterval(Math.max(0.05, result.runtimeInterval()));
         plant.setDamage(result.runtimeDamage());
+
+        // Set the PAM location/path from the data map
+        String pamLocation = (String) data.get("pamLocation");
+        if (pamLocation != null) {
+            plant.setPamPath(pamLocation); // Or plant.setPamLocation(pamLocation);
+        }
+
         try {
             plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
                     Math.max(0.0, result.runtimeRecharge()));

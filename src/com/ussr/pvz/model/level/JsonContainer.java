@@ -16,6 +16,8 @@ public class JsonContainer {
         public List<String> allowedPlants;
         public List<JsonLevelData> levels;
         public List<String> allowedTiles;
+        public String lawnRegion;
+        public String mowerPam;
     }
 
     public static class JsonLevelData {

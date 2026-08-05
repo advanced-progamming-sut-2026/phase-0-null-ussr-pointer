@@ -45,12 +45,22 @@ public class Plant extends GameEntity implements Damageable {
     private double abilityValue;
     private int chillLevel = 0;
     private GrowthTracker growthTracker;
+    private String pamPath;
 
     private double plantFoodTimer = 0.0;
 
     private PlantArmor armor;
 
     private double lifetime = Double.MAX_VALUE;
+
+    public String getPamPath() {
+        return pamPath;
+    }
+
+    public void setPamPath(String pamPath) {
+        this.pamPath = pamPath;
+    }
+
     public enum PlantState {
         ACTIVE,
         INCAPACITATED,
@@ -97,6 +107,7 @@ public class Plant extends GameEntity implements Damageable {
         //this.isBuffed = blueprint.isBuffed;
         //this.internalTimer = blueprint.internalTimer;
         this.growthTracker = blueprint.growthTracker;
+        this.pamPath = blueprint.pamPath;
         if (this.actStrategy instanceof MeleeStrategy) {
             this.internalTimer = this.actionInterval;
         } else {

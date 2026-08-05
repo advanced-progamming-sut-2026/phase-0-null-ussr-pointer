@@ -6,14 +6,16 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 
-/**
- * An invisible interaction layer mapping Scene2D local coordinates
- * to precise logical grid indices for the simulation.
- */
 public class LawnWidget extends Actor {
 
     private static final int COLUMNS = 9;
     private static final int ROWS = 5;
+
+    // Sync these exactly with EntityRenderLayer
+    private static final float GRID_OFFSET_X = 320f;
+    private static final float GRID_OFFSET_Y = 80f;
+    private static final float CELL_WIDTH = 100f;
+    private static final float CELL_HEIGHT = 115f;
 
     public LawnWidget(GameplayController controller) {
         setTouchable(Touchable.enabled);
@@ -21,20 +23,18 @@ public class LawnWidget extends Actor {
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // 'x' and 'y' are automatically localized to this Actor's bounds by Scene2D.
-                float cellWidth = getWidth() / COLUMNS;
-                float cellHeight = getHeight() / ROWS;
+                // Remove the padding to find the true relative click position
+                float gridXRaw = x - GRID_OFFSET_X;
+                float gridYRaw = y - GRID_OFFSET_Y;
 
-                int gridX = (int) (x / cellWidth);
+                // Ensure the click was actually inside the grid bounds, not on the UI or house
+                if (gridXRaw >= 0 && gridYRaw >= 0) {
+                    int gridX = (int) (gridXRaw / CELL_WIDTH);
+                    int gridY = (int) (gridYRaw / CELL_HEIGHT);
 
-                // LibGDX origin (0,0) is bottom-left. If your logical Model uses
-                // (0,0) as top-left, invert the Y coordinate:
-                // int gridY = ROWS - 1 - (int) (y / cellHeight);
-                int gridY = (int) (y / cellHeight);
-
-                // Guard against edge-case out-of-bounds clicks on the absolute extreme pixels
-                if (gridX >= 0 && gridX < COLUMNS && gridY >= 0 && gridY < ROWS) {
-                    controller.handleGridClick(gridX, gridY);
+                    if (gridX < COLUMNS && gridY < ROWS) {
+                        controller.handleGridClick(gridX, gridY);
+                    }
                 }
             }
         });

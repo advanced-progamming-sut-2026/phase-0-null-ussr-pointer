@@ -317,7 +317,7 @@ public class AppView implements ApplicationListener {
                     FileHandle assetsFolder =
                             files.local("pvz-assets");
                     TextureBank gameTextures =
-                            new TextureBank("768", assetsFolder);
+                            new TextureBank("ATLASES", assetsFolder);
                     PamPlayer gamePamPlayer =
                             new PamPlayer(gameTextures, assetsFolder);
 

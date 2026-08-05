@@ -15,14 +15,18 @@ public class Chapter {
     private List<String> allowedPlants;
     private final List<Level> levels;
     private List<TileType> allowedTiles;
+    private String lawnRegion;
+    private String mowerPam;
 
     public Chapter(String id, String name, GameMode gameMode,
-                   String menuRegion, List<TileType> allowedTiles) {
+                   String menuRegion, List<TileType> allowedTiles, String lawnRegion, String mowerPam) {
         this.id = id;
         this.name = name;
         this.gameMode = gameMode;
         this.menuRegion = menuRegion;
         this.allowedTiles = allowedTiles != null ? allowedTiles : new ArrayList<>();
+        this.lawnRegion = lawnRegion;
+        this.mowerPam = mowerPam;
         this.levels = new ArrayList<>();
         this.allowedPlants = new ArrayList<>();
     }
@@ -110,5 +114,21 @@ public class Chapter {
 
     public List<TileType> getAllowedTiles() {
         return Collections.unmodifiableList(allowedTiles);
+    }
+
+    public String getMowerPam() {
+        return mowerPam;
+    }
+
+    public void setMowerPam(String mowerPam) {
+        this.mowerPam = mowerPam;
+    }
+
+    public String getLawnRegion() {
+        return lawnRegion;
+    }
+
+    public void setLawnRegion(String lawnRegion) {
+        this.lawnRegion = lawnRegion;
     }
 }

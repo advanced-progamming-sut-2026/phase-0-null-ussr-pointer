@@ -45,6 +45,7 @@ public class Zombie extends GameEntity implements Damageable {
     private boolean isGlowing;
     private java.util.List<String> damageWhileSubmerged;
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
+    private String pamPath;
 
     @Override
     public void takeDamage(int damage) {
@@ -86,6 +87,14 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setGlowing(boolean isGlowing) {
         this.isGlowing = isGlowing;
+    }
+
+    public String getPamPath() {
+        return pamPath;
+    }
+
+    public void setPamPath(String pamPath) {
+        this.pamPath = pamPath;
     }
 
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
