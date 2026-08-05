@@ -25,7 +25,12 @@ public class InGameHud extends Table {
 
         // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
-        shovelWidget = new ShovelWidget(skin, textures, controller);
+        shovelWidget = new ShovelWidget(
+                skin,
+                textures,
+                controller,
+                seedBankHud::clearSelection
+        );
         waveProgressBar = new WaveProgressBar(skin, textures);
 
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();

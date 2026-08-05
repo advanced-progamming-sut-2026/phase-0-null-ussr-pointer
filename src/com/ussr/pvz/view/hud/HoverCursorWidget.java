@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 import pvz.libpvz.textures.TextureBank;
@@ -15,18 +16,26 @@ public class HoverCursorWidget extends Actor {
 
     private final SeedBankHud seedBankHud;
     private final TextureBank textures;
+    private final GameplayController controller;
 
     public HoverCursorWidget(
             SeedBankHud seedBankHud,
-            TextureBank textures
+            TextureBank textures,
+            GameplayController controller
     ) {
         this.seedBankHud = seedBankHud;
         this.textures = textures;
+        this.controller = controller;
         setTouchable(Touchable.disabled);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        if (controller.isShovelModeActive()) {
+            drawShovelPreview(batch, parentAlpha, getLocalMousePosition());
+            return;
+        }
+
         String selectedKey =
                 seedBankHud.getSelectedPlantKey();
 
@@ -144,6 +153,36 @@ public class HoverCursorWidget extends Actor {
                 previewHeight
         );
 
+        batch.setColor(previousColor);
+    }
+
+    private void drawShovelPreview(
+            Batch batch,
+            float parentAlpha,
+            Vector2 mouse
+    ) {
+        TextureRegion shovel =
+                textures.region("IMAGE_UI_HUD_INGAME_SHOVEL_BUTTON");
+
+        if (shovel == null) {
+            shovel = textures.region("IMAGE_SHOVEL");
+        }
+        if (shovel == null) {
+            return;
+        }
+
+        float width = 70f;
+        float height = 70f;
+        Color previousColor = new Color(batch.getColor());
+
+        batch.setColor(1f, 1f, 1f, 0.9f * parentAlpha);
+        batch.draw(
+                shovel,
+                mouse.x + 12f,
+                mouse.y - height - 12f,
+                width,
+                height
+        );
         batch.setColor(previousColor);
     }
 }

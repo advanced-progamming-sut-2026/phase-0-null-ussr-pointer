@@ -49,7 +49,8 @@ public class ActiveGameplayView extends Table {
         HoverCursorWidget hoverCursor =
                 new HoverCursorWidget(
                         inGameHud.getSeedBankHud(),
-                        textures
+                        textures,
+                        controller
                 );
 
         Stack layers = new Stack();

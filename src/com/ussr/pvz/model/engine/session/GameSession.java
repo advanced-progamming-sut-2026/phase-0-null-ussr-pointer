@@ -4,6 +4,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.NewsObserver;
@@ -307,24 +308,29 @@ public class GameSession {
     }
 
     public boolean removePlantAt(int x, int y) {
-        Plant.Location targetLoc = new Plant.Location(x, y);
+        if (lawn == null) {
+            return false;
+        }
 
-        Optional<Plant> plantOpt = plants.stream()
-                .filter(p -> p.isAlive() && targetLoc.equals(p.getLocation()))
-                .findFirst();
+        Cell cell = lawn.getCell(y, x);
 
-        if (plantOpt.isEmpty()) return false;
+        if (cell == null || cell.getPlant() == null) {
+            return false;
+        }
 
-        Plant plant = plantOpt.get();
+        Plant plant = cell.getPlant();
+        Plant bottomPlant = plant.getBottom();
+
         plant.setAlive(false);
+        plant.setBottom(null);
+
         plants.remove(plant);
         notifyPlantPlucked(plant);
 
-        if (lawn != null) {
-            var cell = lawn.getCell(y, x);
-            if (cell != null && cell.getPlant() == plant) {
-                cell.setPlant(null);
-            }
+        if (bottomPlant != null && bottomPlant.isAlive()) {
+            cell.setPlant(bottomPlant);
+        } else {
+            cell.setPlant(null);
         }
 
         return true;

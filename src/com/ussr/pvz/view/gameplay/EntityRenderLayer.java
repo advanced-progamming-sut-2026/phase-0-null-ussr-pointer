@@ -60,11 +60,12 @@ public class EntityRenderLayer extends Group {
             actor.setPosition(
                     LawnGridLayout.worldX(
                             mower.getPosition().x()
-                    ) + LawnGridLayout.CELL_WIDTH / 2f - 60f,
+                    ) + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.MOWER_DRAW_OFFSET_X,
 
                     LawnGridLayout.worldY(
                             mower.getPosition().y()
-                    )
+                    ) + LawnGridLayout.MOWER_DRAW_OFFSET_Y
             );
         }
 

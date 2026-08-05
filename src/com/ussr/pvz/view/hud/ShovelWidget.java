@@ -14,24 +14,22 @@ import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import pvz.libpvz.textures.TextureBank;
 
 public class ShovelWidget extends Stack {
-    private static final String REGION_SHOVEL_BANK = "IMAGE_UI_HUD_INGAME_SHOVEL_BUTTON";
-    // TODO: find proper shovel for this
     private static final String REGION_SHOVEL = "IMAGE_UI_HUD_INGAME_SHOVEL_BUTTON";
 
     private final Image shovelImage;
-    private boolean isActive = false;
+    private final GameplayController controller;
+    private boolean visuallyActive;
 
-    public ShovelWidget(Skin skin, TextureBank textures, GameplayController controller) {
+    public ShovelWidget(
+            Skin skin,
+            TextureBank textures,
+            GameplayController controller,
+            Runnable onActivated
+    ) {
+        this.controller = controller;
+
         setSize(70f, 70f);
         setTouchable(Touchable.enabled);
-
-        TextureRegion bankRegion = textures != null ? textures.region(REGION_SHOVEL_BANK) : null;
-        Image bankImage = bankRegion != null
-                ? new Image(new TextureRegionDrawable(bankRegion))
-                : new Image(skin.getDrawable("image_ui_generic_brownbutton_10"));
-        bankImage.setScaling(Scaling.fit);
-        bankImage.setTouchable(Touchable.disabled);
-        add(bankImage);
 
         TextureRegion shovelRegion = textures != null ? textures.region(REGION_SHOVEL) : null;
         if (shovelRegion == null && textures != null) {
@@ -52,17 +50,30 @@ public class ShovelWidget extends Stack {
 
         addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                isActive = !isActive;
-                controller.toggleShovelMode(isActive);
-                updateVisuals();
+            public void clicked(
+                    InputEvent event,
+                    float x,
+                    float y
+            ) {
+                boolean activate =
+                        !controller.isShovelModeActive();
+
+                controller.toggleShovelMode(activate);
+
+                if (activate && onActivated != null) {
+                    onActivated.run();
+                }
+
+                synchronizeVisualState();
             }
         });
     }
 
     private void updateVisuals() {
-        if (isActive) {
-            shovelImage.setColor(new Color(0.5f, 1.0f, 0.5f, 1.0f));
+        if (visuallyActive) {
+            shovelImage.setColor(
+                    new Color(0.5f, 1f, 0.5f, 1f)
+            );
             shovelImage.setY(10f);
         } else {
             shovelImage.setColor(Color.WHITE);
@@ -71,8 +82,25 @@ public class ShovelWidget extends Stack {
     }
 
     public void deactivate() {
-        if (!isActive) return;
-        isActive = false;
+        controller.toggleShovelMode(false);
+        synchronizeVisualState();
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        synchronizeVisualState();
+    }
+
+    private void synchronizeVisualState() {
+        boolean controllerActive =
+                controller.isShovelModeActive();
+
+        if (visuallyActive == controllerActive) {
+            return;
+        }
+
+        visuallyActive = controllerActive;
         updateVisuals();
     }
 }
