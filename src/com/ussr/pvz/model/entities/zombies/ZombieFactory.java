@@ -308,4 +308,10 @@ public class ZombieFactory {
         init();
         return blueprints.keySet();
     }
+
+    public static Map<String, Object> getBlueprint(String alias) {
+        init();
+        Map<String, Object> blueprint = blueprints.get(alias);
+        return blueprint == null ? null : new HashMap<>(blueprint);
+    }
 }
