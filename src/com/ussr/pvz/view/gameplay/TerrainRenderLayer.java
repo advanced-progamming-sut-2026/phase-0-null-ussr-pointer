@@ -96,11 +96,15 @@ public class TerrainRenderLayer extends Group {
         actor.setClip(getGraveDamageClip(grave.getHp()));
 
         actor.setPosition(
-                LawnGridLayout.cellX(column)
-                        + LawnGridLayout.CELL_WIDTH / 2f
-                        - 60f,
+                LawnGridLayout.centeredActorX(
+                        column,
+                        actor.getWidth()
+                ) + LawnGridLayout.GRAVE_DRAW_OFFSET_X,
 
-                LawnGridLayout.cellY(row) - 25f
+                LawnGridLayout.centeredActorY(
+                        row,
+                        actor.getHeight()
+                ) + LawnGridLayout.GRAVE_DRAW_OFFSET_Y
         );
     }
 
@@ -154,6 +158,7 @@ public class TerrainRenderLayer extends Group {
         );
 
         actor.setPamScale(0.55f);
+        actor.setLooping(false);
         actor.setTouchable(Touchable.disabled);
         addActor(actor);
 

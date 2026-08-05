@@ -236,10 +236,13 @@ public class GameService {
             session.addPlant(plant);
             blueprint.setRecharge(blueprint.getMaxRecharge());
             App.getAccount().getAdventureProgress().getAccountPlants().stream()
-                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(blueprint.getName()))
+                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(
+                            ChoosePlantService.normalizePlantKey(blueprint.getName())))
                     .findFirst()
-                    .ifPresent(accountPlant ->
-                            accountPlant.setRecharge(blueprint.getMaxRecharge()));
+                    .ifPresent(accountPlant -> {
+                        accountPlant.setMaxRecharge(blueprint.getMaxRecharge());
+                        accountPlant.setRecharge(blueprint.getMaxRecharge());
+                    });
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
         } catch (IllegalStateException e) {
             return e.getMessage();

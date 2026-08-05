@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
-import com.ussr.pvz.service.ChoosePlantService;
+import com.ussr.pvz.view.components.PlantCard;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 import pvz.libpvz.textures.TextureBank;
 
@@ -31,6 +31,10 @@ public class HoverCursorWidget extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        if (controller.isPaused()) {
+            return;
+        }
+
         if (controller.isShovelModeActive()) {
             drawShovelPreview(batch, parentAlpha, getLocalMousePosition());
             return;
@@ -116,8 +120,9 @@ public class HoverCursorWidget extends Actor {
             float mouseX,
             float mouseY
     ) {
-        String packetKey =
-                ChoosePlantService.normalizePlantKey(selectedKey);
+        // Packet atlas names are not always the same as gameplay IDs
+        // (for example WALL-NUT -> WALLNUT).
+        String packetKey = PlantCard.resolvePacketKey(selectedKey);
 
         TextureRegion plantRegion =
                 textures.region("IMAGE_UI_PACKETS_" + packetKey);
@@ -161,25 +166,27 @@ public class HoverCursorWidget extends Actor {
             float parentAlpha,
             Vector2 mouse
     ) {
-        TextureRegion shovel =
-                textures.region("IMAGE_UI_HUD_INGAME_SHOVEL_BUTTON");
+        // Prefer the shovel itself; the HUD button region contains its square
+        // button background and should only be used as a fallback.
+        TextureRegion shovel = textures.region("IMAGE_SHOVEL");
 
         if (shovel == null) {
-            shovel = textures.region("IMAGE_SHOVEL");
+            shovel = textures.region("IMAGE_UI_HUD_INGAME_SHOVEL_BUTTON");
         }
         if (shovel == null) {
             return;
         }
 
-        float width = 70f;
         float height = 70f;
+        float width = height * shovel.getRegionWidth()
+                / Math.max(1f, shovel.getRegionHeight());
         Color previousColor = new Color(batch.getColor());
 
         batch.setColor(1f, 1f, 1f, 0.9f * parentAlpha);
         batch.draw(
                 shovel,
-                mouse.x + 12f,
-                mouse.y - height - 12f,
+                mouse.x - width / 2f,
+                mouse.y - height / 2f,
                 width,
                 height
         );

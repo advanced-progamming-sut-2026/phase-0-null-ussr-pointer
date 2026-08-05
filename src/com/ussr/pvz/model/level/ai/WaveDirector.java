@@ -237,4 +237,12 @@ public class WaveDirector {
     public int getWaveIndex() {
         return this.waveIndex;
     }
+
+    public int getInitialBudget() {
+        return initialBudget;
+    }
+
+    public int getSpentBudget() {
+        return initialBudget - remainingBudget;
+    }
 }

@@ -94,7 +94,8 @@ public class ShovelWidget extends Stack {
 
     private void synchronizeVisualState() {
         boolean controllerActive =
-                controller.isShovelModeActive();
+                controller.isShovelModeActive()
+                        && !controller.isPaused();
 
         if (visuallyActive == controllerActive) {
             return;

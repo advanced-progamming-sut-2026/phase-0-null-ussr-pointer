@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
@@ -17,7 +18,7 @@ import pvz.libpvz.textures.TextureBank;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
 import com.ussr.pvz.view.hud.LawnWidget;
 
-public class ActiveGameplayView extends Table {
+public class ActiveGameplayView extends Table implements Disposable {
 
     private static final float TICK_RATE = 0.1f;
     private float accumulator = 0f;
@@ -102,5 +103,10 @@ public class ActiveGameplayView extends Table {
                 accumulator -= TICK_RATE;
             }
         }
+    }
+
+    @Override
+    public void dispose() {
+        inGameHud.dispose();
     }
 }

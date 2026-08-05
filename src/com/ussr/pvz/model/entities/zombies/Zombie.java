@@ -47,7 +47,10 @@ public class Zombie extends GameEntity implements Damageable {
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
     private String pamPath;
     private float deathTimer = -1f; // -1 means not dying yet
-    private static final float DEATH_ANIM_DURATION = 2.0f; // tweak to match your animation length
+    // Some zombie PAM death clips are longer than two seconds. Keeping the
+    // entity for four seconds lets both the body fall and the late head drop
+    // finish before EntityRenderLayer removes its actor.
+    private static final float DEATH_ANIM_DURATION = 4.0f;
 
     public void startDeathTimer() {
         if (deathTimer < 0) deathTimer = DEATH_ANIM_DURATION;

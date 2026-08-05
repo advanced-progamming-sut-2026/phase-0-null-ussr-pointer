@@ -181,6 +181,9 @@ public class ChoosePlantService {
         session.addSun(INITIAL_SUN);
         session.setProgressTracked(!App.isCheatedLevel());
         App.setGameSession(session);
+        // A new level always starts with every chosen packet ready. This also
+        // repairs accounts loaded before max/current recharge were separated.
+        session.removeAllCooldowns();
         session.setBoostedPlants(new ArrayList<>(boostedPlants));
         ZombieFactory.init();
         level.onStart();

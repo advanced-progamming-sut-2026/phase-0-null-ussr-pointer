@@ -18,6 +18,10 @@ public final class LawnGridLayout {
     public static final float MOWER_DRAW_OFFSET_X = -60f;
     public static final float MOWER_DRAW_OFFSET_Y = -60f;
 
+    public static final float GRAVE_DRAW_OFFSET_X = 0f;
+
+    public static final float GRAVE_DRAW_OFFSET_Y = -60f;
+
     private LawnGridLayout() {
     }
 
@@ -50,5 +54,21 @@ public final class LawnGridLayout {
 
     public static float worldY(double row) {
         return OFFSET_Y + (float) row * CELL_HEIGHT;
+    }
+
+    public static float centeredActorX(
+            int column,
+            float actorWidth
+    ) {
+        return cellX(column)
+                + (CELL_WIDTH - actorWidth) / 2f;
+    }
+
+    public static float centeredActorY(
+            int row,
+            float actorHeight
+    ) {
+        return cellY(row)
+                + (CELL_HEIGHT - actorHeight) / 2f;
     }
 }

@@ -17,12 +17,16 @@ public class PamActor extends Actor {
     protected float pamScale = 0.4f;
     protected float offsetY = 0f;
     protected boolean looping = true;
+    protected String currentClipName;
+
+
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
         this.pamPath = pamPath;
         this.preferredClip = preferredClip;
         setSize(80f, 80f);
         this.clipRef = resolveClip(player, pamPath, preferredClip);
+        this.currentClipName = preferredClip;
     }
 
     public static ClipRef resolveClip(PamPlayer player, String pamPath, String preferredClip) {
@@ -53,10 +57,31 @@ public class PamActor extends Actor {
     }
 
     public void setClip(String clipName) {
-        ClipRef ref = resolveClip(player, pamPath, clipName);
-        if (ref != null) {
-            this.clipRef = ref;
+        if (java.util.Objects.equals(
+                currentClipName,
+                clipName
+        )) {
+            return;
         }
+
+        ClipRef ref = resolveClip(
+                player,
+                pamPath,
+                clipName
+        );
+
+        if (ref == null) {
+            return;
+        }
+
+        currentClipName = clipName;
+        clipRef = ref;
+        stateTime = 0f;
+        playing = true;
+    }
+
+    public void setLooping(boolean looping) {
+        this.looping = looping;
     }
 
     public void setPamScale(float pamScale) {
@@ -102,7 +127,14 @@ public class PamActor extends Actor {
         batch.setTransformMatrix(transform);
 
         try {
-            player.draw(batch, clipRef, stateTime, 0, 0, true);
+            player.draw(
+                    batch,
+                    clipRef,
+                    stateTime,
+                    0,
+                    0,
+                    looping
+            );
         } catch (Exception ignored) {
         }
 

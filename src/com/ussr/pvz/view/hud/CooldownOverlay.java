@@ -38,13 +38,24 @@ public class CooldownOverlay extends Actor {
 
         float overlayHeight = getHeight() * progress;
         Color prev = batch.getColor();
-        batch.setColor(0f, 0f, 0f, 0.62f * parentAlpha);
+        batch.setColor(0.08f, 0.10f, 0.12f, 0.72f * parentAlpha);
         batch.draw(
                 new TextureRegion(whitePixel),
                 getX(),
                 getY(),
                 getWidth(),
                 overlayHeight
+        );
+
+        // A bright moving edge makes the retracting cooldown curtain clear.
+        float edgeHeight = Math.min(3f, overlayHeight);
+        batch.setColor(0.78f, 0.88f, 0.96f, 0.8f * parentAlpha);
+        batch.draw(
+                new TextureRegion(whitePixel),
+                getX(),
+                getY() + overlayHeight - edgeHeight,
+                getWidth(),
+                edgeHeight
         );
         batch.setColor(prev);
     }
