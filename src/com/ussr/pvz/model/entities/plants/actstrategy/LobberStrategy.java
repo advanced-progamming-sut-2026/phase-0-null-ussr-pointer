@@ -34,7 +34,7 @@ public class LobberStrategy implements ActStrategy {
                 initialVelocity, target,
                 user.getDamage(),
                 new ArcMove(GRAVITY),
-                hitEffect
+                hitEffect,user
         ));
     }
 

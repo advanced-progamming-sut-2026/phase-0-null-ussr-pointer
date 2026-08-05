@@ -8,6 +8,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 public class IceBlock extends InteractableStructure implements Damageable {
     private final Plant boundPlant;
     private int hp;
+    private final String pamLocation = "768/FULL/EFFECTS/FROSTBITE_ICE_BLOCK_PLANT/FROSTBITE_ICE_BLOCK_PLANT.PAM";
 
     public IceBlock(Plant boundPlant, int initialHp) {
         this.boundPlant = boundPlant;
@@ -47,5 +48,9 @@ public class IceBlock extends InteractableStructure implements Damageable {
         if (boundPlant == null || !boundPlant.isAlive()) {
             this.setAlive(false);
         }
+    }
+
+    public String getPamLocation() {
+        return pamLocation;
     }
 }

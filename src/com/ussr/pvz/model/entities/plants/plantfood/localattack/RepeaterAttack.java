@@ -26,7 +26,7 @@ public class RepeaterAttack extends LocalAttack implements PlantFoodEffect{
                 null,
                 giantPeaDamage,
                 new StraightMove(),
-                new NormalHit(1)));
+                new NormalHit(1),user));
     }
 
     

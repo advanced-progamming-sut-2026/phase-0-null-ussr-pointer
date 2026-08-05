@@ -41,7 +41,7 @@ public class ExplodeStrategy implements ActStrategy {
                             null,
                             50,
                             new BounceMove(),
-                            new PierceHit(Integer.MAX_VALUE)));
+                            new PierceHit(Integer.MAX_VALUE),user));
                 break;
             case 3:
                 targets = lineDetect(user, session);

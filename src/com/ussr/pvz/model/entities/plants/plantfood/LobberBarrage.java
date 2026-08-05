@@ -33,7 +33,7 @@ public class LobberBarrage implements PlantFoodEffect {
         for (Zombie target : targetsInLine) {
             HitEffectStrategy hitEffect = handleHitEffect(user);
             session.addProjectile(new Projectile(target , user.getPosition() , new Vec2(3 , 5) ,
-                    user.getDamage() * 5 , new ArcMove(8) , hitEffect));
+                    user.getDamage() * 5 , new ArcMove(8) , hitEffect,user));
         }
     }
 

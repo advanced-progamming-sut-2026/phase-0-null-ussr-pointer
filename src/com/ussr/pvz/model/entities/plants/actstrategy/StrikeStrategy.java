@@ -25,7 +25,7 @@ public class StrikeStrategy implements ActStrategy {
                 new Vec2(6, 0), target,
                 user.getDamage(),
                 new StraightMove(),
-                new PierceHit(pierceCount)
+                new PierceHit(pierceCount),user
         ));
     }
 

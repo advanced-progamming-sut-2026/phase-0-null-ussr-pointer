@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.zombies.effect;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
@@ -54,7 +55,8 @@ public class PeashooterZombieEffect implements EffectStatus {
                         Vec2.of(-4.0, 0), // Shoot left
                         damage,
                         new StraightMove(),
-                        new NormalHit(1)
+                        new NormalHit(1),
+                        PlantFactory.createPlantByName("peashooter",1)
                 );
                 session.addProjectile(pea);
             }

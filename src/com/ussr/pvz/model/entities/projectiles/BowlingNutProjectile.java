@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.projectiles;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -20,7 +21,8 @@ public class BowlingNutProjectile extends Projectile {
     }
 
     public BowlingNutProjectile(Vec2 position, NutType nutType, double verticalSign) {
-        super(null, position, diagonalVelocity(verticalSign), resolveDamage(nutType), null, null);
+        super(null, position, diagonalVelocity(verticalSign), resolveDamage(nutType), null,
+                null, PlantFactory.createPlantByName("peashooter",1));
         this.nutType = nutType;
     }
 

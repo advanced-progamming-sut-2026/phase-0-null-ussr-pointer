@@ -46,6 +46,10 @@ public class Plant extends GameEntity implements Damageable {
     private int chillLevel = 0;
     private GrowthTracker growthTracker;
     private String pamPath;
+    private String projectilePam;
+    private String hitPam;
+    private String plantFoodProjectilePam;
+    private String plantFoodHitPam;
 
     private double plantFoodTimer = 0.0;
 
@@ -59,6 +63,38 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setPamPath(String pamPath) {
         this.pamPath = pamPath;
+    }
+
+    public String getProjectilePam() {
+        return projectilePam;
+    }
+
+    public void setProjectilePam(String projectilePam) {
+        this.projectilePam = projectilePam;
+    }
+
+    public String getHitPam() {
+        return hitPam;
+    }
+
+    public void setHitPam(String hitPam) {
+        this.hitPam = hitPam;
+    }
+
+    public String getPlantFoodProjectilePam() {
+        return plantFoodProjectilePam;
+    }
+
+    public void setPlantFoodProjectilePam(String plantFoodProjectilePam) {
+        this.plantFoodProjectilePam = plantFoodProjectilePam;
+    }
+
+    public String getPlantFoodHitPam() {
+        return plantFoodHitPam;
+    }
+
+    public void setPlantFoodHitPam(String plantFoodHitPam) {
+        this.plantFoodHitPam = plantFoodHitPam;
     }
 
     public enum PlantState {
@@ -103,9 +139,10 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodTimer = blueprint.plantFoodTimer;
         this.armor = blueprint.armor;
         this.plantFoodEffect =  blueprint.plantFoodEffect;
-        //this.stackNumber = blueprint.stackNumber;
-        //this.isBuffed = blueprint.isBuffed;
-        //this.internalTimer = blueprint.internalTimer;
+        this.projectilePam = blueprint.projectilePam;
+        this.hitPam = blueprint.hitPam;
+        this.plantFoodHitPam = blueprint.plantFoodHitPam;
+        this.plantFoodProjectilePam = blueprint.plantFoodProjectilePam;
         this.growthTracker = blueprint.growthTracker;
         this.pamPath = blueprint.pamPath;
         if (this.actStrategy instanceof MeleeStrategy) {

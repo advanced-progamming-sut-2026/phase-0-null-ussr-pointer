@@ -30,7 +30,7 @@ public class KnockBackBlast implements PlantFoodEffect {
         MoveStrategy moveStrategy = new StraightMove();
         HitEffectStrategy hitEffectStrategy = new PierceKnockBackHit(Integer.MAX_VALUE, knockbackDistance);
 
-        Projectile projectile = new Projectile(userPos, vel, null, user.getDamage(), moveStrategy, hitEffectStrategy);
+        Projectile projectile = new Projectile(userPos, vel, null, user.getDamage(), moveStrategy, hitEffectStrategy,user);
         session.addProjectile(projectile);
     }
 

@@ -6,7 +6,20 @@ import com.ussr.pvz.model.engine.session.GameSession;
 
 public class Grave extends InteractableStructure implements Damageable {
 
-    public enum Content { NONE, SUN, PLANT_FOOD }
+    public enum Content {
+        NONE("768/FULL/GRAVESTONES/DARK_NOOP/DARK_NOOP.PAM"),
+        SUN("768/FULL/GRAVESTONES/DARK_SUN/DARK_SUN.PAM"),
+        PLANT_FOOD("768/FULL/GRAVESTONES/DARK_PLANTFOOD/DARK_PLANTFOOD.PAM");
+        private final String pamLocation;
+
+        Content(String pamLocation) {
+            this.pamLocation = pamLocation;
+        }
+
+        public String getPamLocation() {
+            return pamLocation;
+        }
+    }
 
     private final String zombieId; // Used if a zombie spawns from this grave later
     private final Content content;
@@ -43,7 +56,7 @@ public class Grave extends InteractableStructure implements Damageable {
         int row = (int) this.getPosition().y();
         int col = (int) this.getPosition().x();
         session.notifyGraveDestroyed(row, col);
-        session.getLawn().getCell(row , col).getTile().setType(TileType.Normal);
+        session.getLawn().getCell(row, col).getTile().setType(TileType.Normal);
 
         switch (content) {
             case SUN -> {
@@ -54,7 +67,8 @@ public class Grave extends InteractableStructure implements Damageable {
                 session.addPlantFood();
                 System.out.println("The tombstone crumbled and released a plant food!");
             }
-            case NONE -> {}
+            case NONE -> {
+            }
         }
     }
 

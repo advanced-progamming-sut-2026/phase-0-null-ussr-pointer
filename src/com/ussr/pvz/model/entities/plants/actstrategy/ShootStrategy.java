@@ -47,7 +47,7 @@ public class ShootStrategy implements ActStrategy {
                     velocity,
                     user.getDamage(),
                     moveStrategy,
-                    hitEffect
+                    hitEffect,user
             ));
         }
     }

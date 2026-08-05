@@ -64,7 +64,24 @@ public class PlantFactory {
         if (pamLocation != null) {
             plant.setPamPath(pamLocation); // Or plant.setPamLocation(pamLocation);
         }
+        String projectilePam = (String) data.get("projectilePam");
+        if (projectilePam != null) {
+            plant.setProjectilePam(projectilePam); // Or plant.setPamLocation(pamLocation);
+        }
 
+        String hitPam = (String) data.get("hitPam");
+        if (hitPam != null) {
+            plant.setHitPam(hitPam); // Or plant.setPamLocation(pamLocation);
+        }
+
+        String plantFoodPam = (String) data.get("plantFoodProjectilePam");
+        if (plantFoodPam != null) {
+            plant.setPlantFoodProjectilePam(plantFoodPam);
+        }
+        String plantFoodHitPam = (String) data.get("plantFoodHitPam");
+        if (plantFoodHitPam != null) {
+            plant.setPlantFoodHitPam(plantFoodHitPam);
+        }
         try {
             plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
                     Math.max(0.0, result.runtimeRecharge()));

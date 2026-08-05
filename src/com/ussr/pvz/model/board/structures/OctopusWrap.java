@@ -8,6 +8,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 public class OctopusWrap extends InteractableStructure implements Damageable {
     private final Plant boundPlant;
     private int hp;
+    private final String pamLocation = "768/FULL/EFFECTS/ZOMBIE_OCTOPUS_PROJECTILE/ZOMBIE_OCTOPUS_PROJECTILE.PAM";
 
     public OctopusWrap(Plant boundPlant, int initialHp) {
         this.boundPlant = boundPlant;
@@ -48,5 +49,9 @@ public class OctopusWrap extends InteractableStructure implements Damageable {
         if (boundPlant == null || !boundPlant.isAlive()) {
             this.setAlive(false);
         }
+    }
+
+    public String getPamLocation() {
+        return pamLocation;
     }
 }

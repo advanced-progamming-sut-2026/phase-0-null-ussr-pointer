@@ -41,7 +41,7 @@ public class InstantMassiveBlast implements PlantFoodEffect{
                     null,
                     totalDamage,
                     moveStrategy,
-                    hitEffectStrategy
+                    hitEffectStrategy,user
             ));
         }
     }

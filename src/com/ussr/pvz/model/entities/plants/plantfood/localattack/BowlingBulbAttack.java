@@ -22,20 +22,20 @@ public class BowlingBulbAttack extends LocalAttack {
                 null,
                 damage * 10,
                 new BounceMove(),
-                new PierceHit(Integer.MAX_VALUE)));
+                new PierceHit(Integer.MAX_VALUE),user));
 
         session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 15,
                 new BounceMove(),
-                new PierceHit(Integer.MAX_VALUE)));
+                new PierceHit(Integer.MAX_VALUE),user));
 
         session.addProjectile(new Projectile(user.getPosition(),
                 new Vec2(4 , 0),
                 null,
                 damage * 20,
                 new BounceMove(),
-                new PierceHit(Integer.MAX_VALUE)));
+                new PierceHit(Integer.MAX_VALUE),user));
     }
 }

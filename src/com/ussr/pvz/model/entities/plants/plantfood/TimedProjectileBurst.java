@@ -89,7 +89,8 @@ public class TimedProjectileBurst implements PlantFoodEffect {
                         target,
                         finalDamage,
                         new StraightMove(),
-                        hitEffect
+                        hitEffect,
+                        user
                 ));
             }
         }

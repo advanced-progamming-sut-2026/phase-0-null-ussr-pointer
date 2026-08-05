@@ -21,17 +21,18 @@ public class Projectile extends GameEntity {
     private int damage;
     private Damageable target;
     private boolean isStunning;
+    private final Plant user;
 
     private MoveStrategy moveStrategy;
     private HitEffectStrategy hitEffectStrategy;
 
     public Projectile(Vec2 position, Vec2 velocity, Zombie zombie, int damage, MoveStrategy moveStrategy,
-                      HitEffectStrategy hitEffectStrategy) {
-        this(zombie, position, velocity, damage, moveStrategy, hitEffectStrategy);
+                      HitEffectStrategy hitEffectStrategy, Plant user) {
+        this(zombie, position, velocity, damage, moveStrategy, hitEffectStrategy, user);
     }
 
     public Projectile(Damageable target, Vec2 position, Vec2 velocity, int damage, MoveStrategy moveStrategy,
-                      HitEffectStrategy hitEffectStrategy) {
+                      HitEffectStrategy hitEffectStrategy, Plant user) {
         this.setPosition(position);
         this.setSpeed(velocity);
         this.target = target;
@@ -39,7 +40,7 @@ public class Projectile extends GameEntity {
         this.moveStrategy = moveStrategy;
         this.hitEffectStrategy = hitEffectStrategy;
         this.isStunning = false;
-
+        this.user = user;
         if (moveStrategy != null) {
             switch (moveStrategy) {
                 case ArcMove arcMove -> arcMove.setGroundY(position.y());
@@ -61,9 +62,8 @@ public class Projectile extends GameEntity {
         if (!isAlive) return;
 
         if (moveStrategy != null) {
-            moveStrategy.move(this , delta);
-        }
-        else {
+            moveStrategy.move(this, delta);
+        } else {
             this.isAlive = false;
         }
 
@@ -74,10 +74,10 @@ public class Projectile extends GameEntity {
             targets = checkCollision();
         }
 
-        if(targets == null || targets.isEmpty())
-            return ;
-        if(hitEffectStrategy != null)
-            hitEffectStrategy.apply(targets , this);
+        if (targets == null || targets.isEmpty())
+            return;
+        if (hitEffectStrategy != null)
+            hitEffectStrategy.apply(targets, this);
         else
             this.isAlive = false;
 //        if (moveStrategy instanceof BounceMove bounceMove) {
@@ -180,7 +180,7 @@ public class Projectile extends GameEntity {
 
         int areaLength = hitEffectStrategy.getAreaLength();
         double straightDist = (int) (areaLength / 2) + 0.2;
-        if(areaLength == 1)
+        if (areaLength == 1)
             straightDist = 0.2;
 
         Vec2 explosionEpicenter = this.getPosition();
@@ -245,9 +245,15 @@ public class Projectile extends GameEntity {
         return damage;
     }
 
-    public void setDamage(int damage) { this.damage = damage; }
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
 
     public boolean isStunning() {
         return isStunning;
+    }
+
+    public Plant getUser() {
+        return user;
     }
 }

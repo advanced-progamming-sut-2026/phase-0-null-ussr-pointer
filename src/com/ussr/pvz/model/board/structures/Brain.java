@@ -5,7 +5,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 
 public class Brain extends InteractableStructure implements Damageable {
     private int hp = 100; // Eaten relatively quickly once reached
-
+    private final String pamLocation = "768/FULL/ZOMBIE/POWER_BRAIN_PROJECTILE/POWER_BRAIN_PROJECTILE.PAM";
     public Brain() {
         this.setAlive(true);
     }
@@ -33,4 +33,9 @@ public class Brain extends InteractableStructure implements Damageable {
     public int getHp() {
         return hp;
     }
+
+    public String getPamLocation() {
+        return pamLocation;
+    }
+
 }
