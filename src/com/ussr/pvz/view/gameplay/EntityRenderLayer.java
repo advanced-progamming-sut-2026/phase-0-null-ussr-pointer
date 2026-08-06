@@ -32,9 +32,7 @@ public class EntityRenderLayer extends Group {
     private final PamPlayer pamPlayer;
     private final TextureBank textures;
 
-    // -------------------------------------------------------------------------
     // Sub-groups — added to this Group in draw order (back → front)
-    // -------------------------------------------------------------------------
     /**
      * Plants — rendered first (furthest back among entities)
      */
@@ -55,37 +53,25 @@ public class EntityRenderLayer extends Group {
      */
     private final Group zombieGroup = new Group();
 
-    // -------------------------------------------------------------------------
     // Entity → actor maps
-    // -------------------------------------------------------------------------
     private final Map<Plant, PamActor> plantActors = new HashMap<>();
     private final Map<Object, PamActor> overlayActors = new HashMap<>(); // IceBlock, OctopusWrap keyed by structure
     private final Map<Projectile, ProjectilePamActor> projectileActors = new HashMap<>();
     private final Map<Object, PamActor> zombieGroupActors = new HashMap<>(); // Zombie, LawnMower, PushableStructure
     private final Map<ZombieProjectile, PamActor> zombieProjActors = new HashMap<>();
 
-    // -------------------------------------------------------------------------
     // Pending immediate draw calls (atlas textures, not actors)
-    // -------------------------------------------------------------------------
-    private final List<ArmorDrawCall> pendingArmorDraws = new ArrayList<>();
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
-
-    private record ArmorDrawCall(TextureRegion region, float x, float y, float w, float h) {
-    }
 
     private record ZombieAtlasDrawCall(TextureRegion region, float x, float y) {
     }
 
-    // -------------------------------------------------------------------------
     // Newspaper state machine
-    // -------------------------------------------------------------------------
     private enum NewspaperPhase {HAS_PAPER, DEFEAT_PLAYING, GONE}
 
     private final Map<Zombie, NewspaperPhase> newspaperPhase = new HashMap<>();
 
-    // -------------------------------------------------------------------------
     // Constructor
-    // -------------------------------------------------------------------------
     public EntityRenderLayer(PamPlayer pamPlayer, TextureBank textures) {
         this.pamPlayer = pamPlayer;
         this.textures = textures;
@@ -101,11 +87,10 @@ public class EntityRenderLayer extends Group {
         addActor(overlayGroup);
         addActor(plantProjectileGroup);
         addActor(zombieGroup);
+
     }
 
-    // =========================================================================
     // act — sync every category
-    // =========================================================================
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -113,7 +98,6 @@ public class EntityRenderLayer extends Group {
         GameSession session = App.getGameSession();
         if (session == null) return;
 
-        pendingArmorDraws.clear();
         pendingZombieAtlasDraws.clear();
 
         Set<Plant> livePlants = new HashSet<>();
@@ -199,36 +183,46 @@ public class EntityRenderLayer extends Group {
     private void syncOverlays(GameSession session, Set<Object> live) {
         if (session.getLawn() == null) return;
 
-        for (var s : session.getLawn().getAllInteractable()) {
-            if (!s.isAlive()) continue;
+        for (int row = 0; row < session.getLawn().getRows(); row++) {
+            for (int col = 0; col < session.getLawn().getCols(); col++) {
+                var cell = session.getLawn().getCell(row, col);
+                if (cell == null) continue;
+                var s = cell.getInteractableStructure();
+                if (s == null || !s.isAlive()) continue;
 
-            if (s instanceof IceBlock ice) {
-                live.add(ice);
-                PamActor actor = overlayActors.computeIfAbsent(ice, k -> {
-                    PamActor pa = new PamActor(pamPlayer, ice.getPamLocation(), "idle");
-                    pa.setPamScale(0.55f);
-                    overlayGroup.addActor(pa);
-                    return pa;
-                });
-                float screenX = LawnGridLayout.worldX((float) ice.getPosition().x())
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-                float screenY = LawnGridLayout.worldY((float) ice.getPosition().y());
-                actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+                if (s instanceof IceBlock ice) {
+                    live.add(ice);
+                    PamActor actor = overlayActors.computeIfAbsent(ice, k -> {
+                        PamActor pa = new PamActor(pamPlayer, ice.getPamLocation(), "freeze_idle");
+                        pa.setPamScale(0.55f);
+                        pa.setOffsetY(-20f);
+                        overlayGroup.addActor(pa);
+                        return pa;
+                    });
+                    positionLikePlant(actor, col, row);
 
-            } else if (s instanceof OctopusWrap wrap) {
-                live.add(wrap);
-                PamActor actor = overlayActors.computeIfAbsent(wrap, k -> {
-                    PamActor pa = new PamActor(pamPlayer, wrap.getPamLocation(), "animation3");
-                    pa.setPamScale(0.55f);
-                    overlayGroup.addActor(pa);
-                    return pa;
-                });
-                float screenX = LawnGridLayout.worldX((float) wrap.getPosition().x())
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-                float screenY = LawnGridLayout.worldY((float) wrap.getPosition().y());
-                actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+                } else if (s instanceof OctopusWrap wrap) {
+                    live.add(wrap);
+                    PamActor actor = overlayActors.computeIfAbsent(wrap, k -> {
+                        PamActor pa = new PamActor(pamPlayer, wrap.getPamLocation(), "animation3");
+                        pa.setPamScale(0.55f);
+                        overlayGroup.addActor(pa);
+                        return pa;
+                    });
+                    positionLikePlant(actor, col, row);
+                }
             }
         }
+    }
+
+    private void positionLikePlant(PamActor actor, int column, int row) {
+        actor.setPosition(
+                LawnGridLayout.cellX(column)
+                        + LawnGridLayout.CELL_WIDTH / 2f
+                        + LawnGridLayout.PLANT_DRAW_OFFSET_X,
+                LawnGridLayout.cellY(row)
+                        + LawnGridLayout.PLANT_DRAW_OFFSET_Y
+        );
     }
 
     // ---- Zombies ------------------------------------------------------------
@@ -245,12 +239,24 @@ public class EntityRenderLayer extends Group {
             });
 
             String currentClip = resolveZombieCurrentClip(zombie, actor);
-            actor.setClip(currentClip);
 
-            // One-shot special animation event from model (e.g. smash, fire)
-            String animEvent = zombie.pollAnimEvent();
-            if (animEvent != null && actor instanceof ZombiePamActor za) {
-                za.playOnce(animEvent, currentClip);
+            if (actor instanceof ZombiePamActor zombieActor) {
+                if (!zombieActor.isPlayingSpecial()) {
+                    String animEvent = zombie.pollAnimEvent();
+                    if (animEvent != null) {
+                        zombieActor.playOnce(animEvent, currentClip);
+                    } else {
+                        zombieActor.setClip(currentClip);
+                    }
+                }
+
+                if (zombie.getState() == com.ussr.pvz.model.entities.zombies.ZombieActivity.DEAD) {
+                    zombieActor.setClip(currentClip);
+                }
+
+                zombieActor.setArmor(zombie.getArmor());
+            } else {
+                actor.setClip(currentClip);
             }
 
             actor.setPosition(
@@ -261,8 +267,6 @@ public class EntityRenderLayer extends Group {
                             + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
             );
 
-            // Armor overlay (immediate draw, flushed in draw())
-            syncArmorOverlay(zombie, actor);
         }
     }
 
@@ -312,46 +316,6 @@ public class EntityRenderLayer extends Group {
         };
     }
 
-    private void syncArmorOverlay(Zombie zombie, PamActor actor) {
-        Armor armor = zombie.getArmor();
-        if (armor == null || armor.isDestroyed()) return;
-        if (armor.getArmorType() == ArmorType.NEWSPAPER) return; // handled via PAM clips
-
-        ArmorType type = armor.getArmorType();
-        int layer = armor.getDamageLayer();
-        String atlasKey = (layer <= 1) ? type.getFullAtlas() : type.getDamagedAtlas();
-        if (atlasKey == null || atlasKey.isEmpty()) return;
-
-        TextureRegion region = textures.region(atlasKey);
-        if (region == null) return;
-
-        float actorCenterX = actor.getX() + actor.getWidth() / 2f;
-        float actorTopY = actor.getY() + actor.getHeight();
-
-        float ARMOR_SCALE = 0.65f;
-        float rw = region.getRegionWidth() * ARMOR_SCALE;
-        float rh = region.getRegionHeight() * ARMOR_SCALE;
-
-        // Cap head armor to 55% of actor height
-        if (type != ArmorType.SHOULDER_ARMOR) {
-            float cap = actor.getHeight() * 0.55f;
-            float capFactor = Math.min(1f, cap / rh);
-            rw *= capFactor;
-            rh *= capFactor;
-        }
-
-        float drawX, drawY;
-        if (type == ArmorType.SHOULDER_ARMOR) {
-            drawX = actorCenterX - rw / 2f + type.getOffsetX();
-            drawY = actor.getY() + actor.getHeight() * 0.30f;
-        } else {
-            drawX = actorCenterX - rw / 2f + type.getOffsetX();
-            drawY = actorTopY - rh * 0.75f;
-        }
-
-        pendingArmorDraws.add(new ArmorDrawCall(region, drawX, drawY, rw, rh));
-    }
-
     // ---- PushableStructures (sort with zombies by Y) ------------------------
     private void syncPushableStructures(GameSession session, Set<Object> live) {
         for (var s : session.getLawn().getAllInteractable()) {
@@ -362,16 +326,21 @@ public class EntityRenderLayer extends Group {
             PamActor actor = zombieGroupActors.computeIfAbsent(pushable, k -> {
                 PamActor pa = new PamActor(pamPlayer, pushable.getType().getPamLocation(), "idle");
                 pa.setPamScale(0.6f);
+                pa.setOffsetY(-20f);
                 zombieGroup.addActor(pa);
                 return pa;
             });
 
-            float screenX = LawnGridLayout.worldX((float) pushable.getPosition().x())
-                    + LawnGridLayout.CELL_WIDTH / 2f;
-            float screenY = LawnGridLayout.worldY((float) pushable.getPosition().y());
-            actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+            actor.setPosition(
+                    LawnGridLayout.worldX(pushable.getPosition().x())
+                            + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.PLANT_DRAW_OFFSET_X,
+                    LawnGridLayout.worldY(pushable.getPosition().y())
+                            + LawnGridLayout.PLANT_DRAW_OFFSET_Y
+            );
         }
     }
+
 
     // ---- Plant projectiles --------------------------------------------------
     private void syncPlantProjectiles(GameSession session) {
@@ -501,11 +470,6 @@ public class EntityRenderLayer extends Group {
         // Draws sub-groups in the order they were added:
         // plantGroup → overlayGroup → plantProjectileGroup → zombieGroup
         super.draw(batch, parentAlpha);
-
-        // Armor overlays: drawn after zombies so they sit on top
-        for (ArmorDrawCall call : pendingArmorDraws) {
-            batch.draw(call.region(), call.x(), call.y(), call.w(), call.h());
-        }
 
         // Atlas zombie projectiles (BoneProjectile etc.)
         for (ZombieAtlasDrawCall call : pendingZombieAtlasDraws) {

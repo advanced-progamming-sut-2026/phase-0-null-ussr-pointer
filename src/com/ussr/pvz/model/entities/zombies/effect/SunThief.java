@@ -124,9 +124,12 @@ public class SunThief implements EffectStatus {
 
     private void processBankThief(Zombie zombie, GameSession session, float delta) {
         if (laserFired) return;
-        zombie.queueAnimEvent("power");
         if (!isStealing) {
-            if (canSeePlant(zombie, session)) isStealing = true;
+            if (canSeePlant(zombie, session)) {
+                isStealing = true;
+                zombie.queueAnimEvent("power_up");
+                zombie.queueAnimEvent("power");
+            }
         } else {
             stateTimer += delta;
             oneSecondAccumulator += delta;
@@ -141,6 +144,7 @@ public class SunThief implements EffectStatus {
             }
 
             if (stateTimer >= chargingTime) {
+                zombie.queueAnimEvent("power_down");
                 fireLaser(zombie, session);
                 laserFired = true;
                 isStealing = false;

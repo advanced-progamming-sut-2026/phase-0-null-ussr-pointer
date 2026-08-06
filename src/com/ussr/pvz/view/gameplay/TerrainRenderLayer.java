@@ -85,16 +85,17 @@ public class TerrainRenderLayer extends Group {
     }
 
     private void synchronizeStructure(InteractableStructure structure, int col, int row) {
-        float worldX = LawnGridLayout.centeredActorX(col, 80f) + structureOffsetX(structure);
-        float worldY = LawnGridLayout.centeredActorY(row, 80f) + structureOffsetY(structure);
+        float worldX = LawnGridLayout.centeredActorX(col, 80f)
+                + LawnGridLayout.GRAVE_DRAW_OFFSET_X
+                + structureOffsetX(structure);
+        float worldY = LawnGridLayout.centeredActorY(row, 80f)
+                + LawnGridLayout.GRAVE_DRAW_OFFSET_Y
+                + structureOffsetY(structure);
 
         if (structure instanceof Grave grave) {
             PamActor actor = structureActors.computeIfAbsent(grave, k -> createGraveActor(grave));
             actor.setClip(getGraveDamageClip(grave.getHp()));
-            actor.setPosition(
-                    worldX + LawnGridLayout.GRAVE_DRAW_OFFSET_X,
-                    worldY + LawnGridLayout.GRAVE_DRAW_OFFSET_Y
-            );
+            actor.setPosition(worldX, worldY);
 
         } else if (structure instanceof Vase vase) {
             PamActor actor = structureActors.computeIfAbsent(vase,
@@ -201,7 +202,7 @@ public class TerrainRenderLayer extends Group {
         TileType type = tile.getType();
         if (type == null || type == TileType.Normal || type == TileType.Beghouled) return;
 
-        TextureRegion region = findTerrainRegion(type);
+        TextureRegion region = findTerrainRegion(tile);
         if (region != null) {
             drawTerrainRegion(batch, parentAlpha, region, col, row);
         } else {
@@ -209,18 +210,27 @@ public class TerrainRenderLayer extends Group {
         }
     }
 
-    private TextureRegion findTerrainRegion(TileType type) {
+    private TextureRegion findTerrainRegion(Tile tile) {
+        TileType type = tile.getType();
         return switch (type) {
             case Crater       -> textures.region("IMAGE_EFFECTS_CRATER_CRATER_129X131");
             case ShallowCoast -> textures.region("IMAGE_EFFECTS_SHALLOW_PUDDLE_TILE");
             case Water        -> textures.region("IMAGE_EFFECTS_WATER_TILE");
-            case Frozen       -> textures.region("IMAGE_EFFECTS_FROZEN_TILE");
-            case Slippery     -> textures.region("IMAGE_EFFECTS_ICE_PATH_TILE");
+            case Frozen       -> textures.region(
+                    "IMAGE_EFFECTS_CHILLYPEPPER_TILE_ICE_CHILLYPEPPER_TILE_ICE_248X147");
+            case Slippery     -> textures.region(slipperyRegion(tile));
             case Burning      -> textures.region("IMAGE_EFFECTS_BURNING_GROUND_TILE");
             case Necromancy   -> textures.region("IMAGE_EFFECTS_NECROMANCY_TILE");
             // Grave tile: no overlay — the Grave structure actor is sufficient
             default           -> null;
         };
+    }
+
+    private String slipperyRegion(Tile tile) {
+        if (tile.getSlipperyDirection() == Tile.SlipperyDirection.UP) {
+            return "IMAGE_EFFECTS_TILESLIDER_ICEAGE_UP_TILESLIDER_ICEAGE_UP_141X169";
+        }
+        return "IMAGE_EFFECTS_TILESLIDER_ICEAGE_DOWN_TILESLIDER_ICEAGE_DOWN_141X169";
     }
 
     private void drawTerrainRegion(Batch batch, float parentAlpha,

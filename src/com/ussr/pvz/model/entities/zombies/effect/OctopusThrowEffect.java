@@ -44,6 +44,7 @@ public class OctopusThrowEffect implements EffectStatus {
                 Cell cell = session.getLawn().getCell(zRow, c);
                 if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
                     Vec2 targetPos = Vec2.of(cell.getPlant().getLocation().x(), cell.getPlant().getLocation().y());
+                    zombie.queueAnimEvent("toss");
                     session.addZombieProjectile(new OctopusProjectile(startPos, targetPos, 1.5));
                     return true;
                 }

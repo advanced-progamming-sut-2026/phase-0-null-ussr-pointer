@@ -64,7 +64,7 @@ public class GargantuarImpThrowEffect implements EffectStatus {
         gargantuar.queueAnimEvent("fire");
         Vec2 startPos = gargantuar.getPosition();
         Vec2 targetPos = Vec2.of(targetCol, row);
-        gargantuar.queueAnimEvent("canon_fire");
+        gargantuar.queueAnimEvent("cannon_fire");
         session.addZombieProjectile(new GargantuarImpProjectile(
                 startPos, targetPos, impFlightTime, impApex, row, impAlias
         ));

@@ -55,6 +55,7 @@ public class SpinEffect implements EffectStatus {
     private void applyBoost(Zombie zombie) {
         Vec2 current = zombie.getSpeed();
         if (current == null) return;
+        zombie.queueAnimEvent("spinup");
         zombie.queueAnimEvent("spin");
         zombie.setSpeed(current.scale(SPIN_SPEED_MULTIPLIER));
     }

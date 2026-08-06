@@ -21,6 +21,8 @@ import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 
 import java.util.Random;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class Zombie extends GameEntity implements Damageable {
 
@@ -51,18 +53,17 @@ public class Zombie extends GameEntity implements Damageable {
     // entity for four seconds lets both the body fall and the late head drop
     // finish before EntityRenderLayer removes its actor.
     private static final float DEATH_ANIM_DURATION = 4.0f;
-    // One pending anim event the view should consume this frame
-    private String pendingAnimEvent = null;
+    private final Queue<String> pendingAnimEvents = new ArrayDeque<>();
 
     public void queueAnimEvent(String clipName) {
-        this.pendingAnimEvent = clipName;
+        if (clipName != null && !clipName.isBlank()) {
+            pendingAnimEvents.offer(clipName);
+        }
     }
 
     /** View calls this — read and clear in one shot */
     public String pollAnimEvent() {
-        String event = this.pendingAnimEvent;
-        this.pendingAnimEvent = null;
-        return event;
+        return pendingAnimEvents.poll();
     }
     public void startDeathTimer() {
         if (deathTimer < 0) deathTimer = DEATH_ANIM_DURATION;

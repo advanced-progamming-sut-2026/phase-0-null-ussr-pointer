@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
 
+import java.util.Map;
+
 public class PamActor extends Actor {
 
     protected final PamPlayer player;
@@ -18,7 +20,7 @@ public class PamActor extends Actor {
     protected float offsetY = 0f;
     protected boolean looping = true;
     protected String currentClipName;
-
+    protected Map<String, Boolean> partVisibility;
 
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
@@ -127,14 +129,11 @@ public class PamActor extends Actor {
         batch.setTransformMatrix(transform);
 
         try {
-            player.draw(
-                    batch,
-                    clipRef,
-                    stateTime,
-                    0,
-                    0,
-                    looping
-            );
+            if (partVisibility == null || partVisibility.isEmpty()) {
+                player.draw(batch, clipRef, stateTime, 0, 0, looping);
+            } else {
+                player.draw(batch, clipRef, stateTime, 0, 0, looping, partVisibility);
+            }
         } catch (Exception ignored) {
         }
 
@@ -148,5 +147,9 @@ public class PamActor extends Actor {
     // In PamActor or ZombiePamActor:
     public boolean isPlaying() {
         return playing;
+    }
+
+    public float getAnimationTime() {
+        return stateTime;
     }
 }

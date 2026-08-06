@@ -40,6 +40,9 @@ public class SmashAttack implements AttackBehavior {
             return;
         }
 
+        if (timer == 0) {
+            zombie.queueAnimEvent(isOneTime ? "tackle" : "smash_left");
+        }
         timer += delta;
 
         if (timer >= windupDuration) {
