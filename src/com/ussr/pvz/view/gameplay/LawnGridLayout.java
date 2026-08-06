@@ -21,7 +21,8 @@ public final class LawnGridLayout {
     public static final float GRAVE_DRAW_OFFSET_X = -0f;
 
     public static final float GRAVE_DRAW_OFFSET_Y = -60f;
-
+    public static final float TILE_DRAW_OFFSET_X = 20f;   // nudge right
+    public static final float TILE_DRAW_OFFSET_Y = -80f;  // nudge down
     private LawnGridLayout() {
     }
 

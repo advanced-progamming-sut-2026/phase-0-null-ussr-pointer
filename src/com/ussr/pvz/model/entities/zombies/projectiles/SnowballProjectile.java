@@ -44,7 +44,7 @@ public class SnowballProjectile extends ZombieProjectile {
                     // Suspend the plant: remove from cell and session without killing it
                     targetCell.setPlant(null);
                     targetPlant.setState(Plant.PlantState.INCAPACITATED);
-                    session.getPlants().remove(targetPlant);
+                    //session.getPlants().remove(targetPlant);
                 }
             }
         }

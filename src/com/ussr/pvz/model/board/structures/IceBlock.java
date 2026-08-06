@@ -39,7 +39,7 @@ public class IceBlock extends InteractableStructure implements Damageable {
                 cell.setPlant(boundPlant);
             }
 
-            session.getPlants().add(boundPlant);
+            //session.getPlants().add(boundPlant);
         }
     }
 
