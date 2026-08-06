@@ -46,6 +46,9 @@ public class Level {
     private double windTimerElapsed = 0.0;
     private double thawTimerElapsed = 0.0;
 
+    // === Boss levels: which Zomboss to spawn ===
+    private String zombossAlias;
+
     public void onStart() {
         if (behavior != null) behavior.onStart(this);
     }
@@ -309,6 +312,14 @@ public class Level {
         if (rewardPlantAliases != null) {
             this.rewardPlantAliases.addAll(rewardPlantAliases);
         }
+    }
+
+    public String getZombossAlias() {
+        return zombossAlias;
+    }
+
+    public void setZombossAlias(String zombossAlias) {
+        this.zombossAlias = zombossAlias;
     }
     public record AllowedZombie(String id, int weight) {}
 

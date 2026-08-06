@@ -45,6 +45,11 @@ public class ObjectiveWidgetFactory {
                 case "DeadlineBehavior":
                     overlay.addActor(new DeadlineLineActor(session, textures));
                     break;
+                case "BossBehavior":
+                    topBar.add(new BossHealthBarActor(
+                            (com.ussr.pvz.model.level.behavior.BossBehavior) behavior
+                    )).width(400f).height(28f).pad(10f);
+                    break;
             }
         }
 
@@ -81,6 +86,50 @@ public class ObjectiveWidgetFactory {
                     batch.draw(redLine, lineX, getParent().getY(), 10f, getParent().getHeight());
                 }
             } catch (Exception ignored) {}
+        }
+    }
+
+    private static class BossHealthBarActor extends Actor {
+        private final com.ussr.pvz.model.level.behavior.BossBehavior bossBehavior;
+
+        BossHealthBarActor(com.ussr.pvz.model.level.behavior.BossBehavior bossBehavior) {
+            this.bossBehavior = bossBehavior;
+            setTouchable(Touchable.disabled);
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            var controller = bossBehavior.getController();
+            if (controller == null) return;
+
+            float width = getWidth();
+            float height = getHeight();
+            float x = getX();
+            float y = getY();
+
+            // Background track
+            drawRect(batch, x, y, width, height, 0.15f, 0.15f, 0.15f, 0.9f);
+
+            // Filled portion, proportional to current HP
+            float pct = controller.getMaxHp() <= 0
+                    ? 0f
+                    : (float) controller.getCurrentHp() / controller.getMaxHp();
+            float fillColor = controller.isStunned() ? 0.6f : 0.85f;
+            drawRect(batch, x, y, width * pct, height,
+                    fillColor, controller.isStunned() ? 0.75f : 0.1f, 0.1f, 1f);
+
+            // Two divider lines marking the 3 segment boundaries
+            drawRect(batch, x + width / 3f - 1f, y, 2f, height, 0f, 0f, 0f, 1f);
+            drawRect(batch, x + (2 * width) / 3f - 1f, y, 2f, height, 0f, 0f, 0f, 1f);
+        }
+
+        private void drawRect(Batch batch, float x, float y, float w, float h,
+                              float r, float g, float b, float a) {
+            if (w <= 0 || h <= 0) return;
+            com.badlogic.gdx.graphics.Color old = batch.getColor().cpy();
+            batch.setColor(r, g, b, a);
+            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(), x, y, w, h);
+            batch.setColor(old);
         }
     }
 }

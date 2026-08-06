@@ -2,42 +2,61 @@ package com.ussr.pvz.model.level.behavior;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossFactory;
 import com.ussr.pvz.model.level.Level;
 
 public class BossBehavior extends LevelBehavior {
 
-    private static final String FALLBACK_ZOMBOSS_ALIAS = "ZombieGargantuar";
+    private ZombossController controller;
+    private boolean bossSpawned = false;
+
+    public BossBehavior() {
+        this.autoWinOnWavesClear = false;
+    }
 
     @Override
     public void onStart(Level level) {
         super.onStart(level);
 
         GameSession session = App.getGameSession();
-        if (session == null || session.getLawn() == null) return;
+        if (session == null || session.getLawn() == null || bossSpawned) return;
 
-        String alias = resolveZombossAlias(level);
-        int rows = session.getLawn().getRows();
-        int primaryRow = Math.max(0, (rows / 2) - 1);
-        int col = session.getLawn().getCols() - 1;
-
-        ZombossFactory.spawn(alias, primaryRow, col, session);
-    }
-
-    private String resolveZombossAlias(Level level) {
-        if (level.getAllowedZombies() == null || level.getAllowedZombies().isEmpty()) {
-            return FALLBACK_ZOMBOSS_ALIAS;
+        String alias = level.getZombossAlias();
+        if (alias == null || alias.isBlank()) {
+            System.err.println("[BossBehavior] Level " + level.getId()
+                    + " uses BossBehavior but has no \"zombossAlias\" configured.");
+            return;
         }
-        return level.getAllowedZombies().get(0).id();
+
+        int rows = session.getLawn().getRows();
+        int cols = session.getLawn().getCols();
+
+        int primaryRow = Math.max(0, (rows / 2) - 1);
+        int spawnCol = cols - 1;
+
+        try {
+            this.controller = ZombossFactory.spawn(alias, primaryRow, spawnCol, session);
+            this.bossSpawned = true;
+        } catch (Exception e) {
+            System.err.println("[BossBehavior] Failed to spawn zomboss \"" + alias + "\": " + e.getMessage());
+        }
     }
 
     @Override
-    public void onWaveComplete(Level level, int waveNumber) {
+    public void tick(GameSession session, double deltaTime) {
+        if (levelCompleted) return;
 
+        if (aiManager != null) {
+            aiManager.tick(session, deltaTime);
+        }
+
+        if (controller != null && controller.getCurrentHp() <= 0) {
+            onComplete(session.getLevel());
+        }
     }
 
-    @Override
-    public boolean isFailed(Level level) {
-        return false;
+    public ZombossController getController() {
+        return controller;
     }
 }

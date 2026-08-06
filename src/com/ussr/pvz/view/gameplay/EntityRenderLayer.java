@@ -92,6 +92,7 @@ public class EntityRenderLayer extends Group {
         // 3. Sync Zombies using your ZombiePamActor
         for (Zombie zombie : session.getZombies()) {
             if (!zombie.isAlive()) continue;
+            if (zombie.isBossMirror()) continue;
             entitiesThisFrame.put(zombie, true);
 
             PamActor actor = entityActors.computeIfAbsent(zombie, z -> {
