@@ -79,8 +79,8 @@ public class TerrainRenderLayer extends Group {
 
                 Tile.SlipperyDirection dir = cell.getTile().getSlipperyDirection();
                 String pamPath = dir == Tile.SlipperyDirection.UP
-                        ? "768/FULL/EFFECTS/TILESLIDER_ICEAGE_UP/TILESLIDER_ICEAGE_UP.PAM"
-                        : "768/FULL/EFFECTS/TILESLIDER_ICEAGE_DOWN/TILESLIDER_ICEAGE_DOWN.PAM";
+                        ? "768/FULL/EFFECTS/TILESLIDER_ICEAGE_DOWN/TILESLIDER_ICEAGE_DOWN.PAM"
+                        : "768/FULL/EFFECTS/TILESLIDER_ICEAGE_UP/TILESLIDER_ICEAGE_UP.PAM";
 
                 final int c = col, r = row;
                 PamActor actor = slipperyActors.computeIfAbsent(key, k -> {
@@ -93,8 +93,8 @@ public class TerrainRenderLayer extends Group {
                 });
 
                 actor.setPosition(
-                        LawnGridLayout.cellX(c) + LawnGridLayout.TILE_DRAW_OFFSET_X,
-                        LawnGridLayout.cellY(r) + LawnGridLayout.TILE_DRAW_OFFSET_Y
+                        LawnGridLayout.cellX(c) + LawnGridLayout.SLIPPERY_DRAW_OFFSET_X,
+                        LawnGridLayout.cellY(r) + LawnGridLayout.SLIPPERY_DRAW_OFFSET_Y
                 );
             }
         }

@@ -50,9 +50,9 @@ public class WaveDirector {
 
         // 1. Precalculate the base spawn interval once
         double calculatedBase = switch (difficulty) {
-            case SIMPLE -> 7.5 * Math.pow(0.85, waveIndex);
-            case MEDIUM -> 6.5 * Math.pow(0.80, waveIndex);
-            case HARD   -> 5.5 * Math.pow(0.75, waveIndex);
+            case SIMPLE -> 10 * Math.pow(0.85, waveIndex);
+            case MEDIUM -> 9 * Math.pow(0.80, waveIndex);
+            case HARD   -> 8 * Math.pow(0.75, waveIndex);
         };
         this.baseInterval = Math.max(calculatedBase, 1.0);
 

@@ -19,6 +19,7 @@ import com.ussr.pvz.model.entities.zombies.move.JumpMove;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Random;
 import java.util.ArrayDeque;
@@ -54,6 +55,13 @@ public class Zombie extends GameEntity implements Damageable {
     // finish before EntityRenderLayer removes its actor.
     private static final float DEATH_ANIM_DURATION = 4.0f;
     private final Queue<String> pendingAnimEvents = new ArrayDeque<>();
+
+    private static final float SLIPPERY_SLIDE_DURATION = 2.25f;
+
+    private boolean slidingBetweenRows;
+    private float slipperySlideElapsed;
+    private double slipperyStartRow;
+    private double slipperyTargetRow;
 
     public void queueAnimEvent(String clipName) {
         if (clipName != null && !clipName.isBlank()) {
@@ -197,6 +205,10 @@ public class Zombie extends GameEntity implements Damageable {
             GameSession session,
             float delta
     ) {
+        if (updateSlipperySlide(delta)) {
+            return;
+        }
+
         Damageable target = acquireTarget(session);
 
         if (canJumpOver(target)) {
@@ -513,5 +525,59 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setDamageWhileSubmergedPlantfoodOnly(java.util.List<String> damageWhileSubmergedPlantfoodOnly) {
         this.damageWhileSubmergedPlantfoodOnly = damageWhileSubmergedPlantfoodOnly;
+    }
+
+    public boolean isSlidingBetweenRows() {
+        return slidingBetweenRows;
+    }
+
+    public void startSlipperySlide(double targetRow) {
+        if (slidingBetweenRows || getPosition() == null) {
+            return;
+        }
+
+        slidingBetweenRows = true;
+        slipperySlideElapsed = 0f;
+        slipperyStartRow = getPosition().y();
+        slipperyTargetRow = targetRow;
+    }
+
+    private boolean updateSlipperySlide(float delta) {
+        if (!slidingBetweenRows || getPosition() == null) {
+            return false;
+        }
+
+        slipperySlideElapsed = Math.min(
+                SLIPPERY_SLIDE_DURATION,
+                slipperySlideElapsed + delta
+        );
+
+        double progress =
+                slipperySlideElapsed / SLIPPERY_SLIDE_DURATION;
+
+        // Smoothstep prevents the movement from starting or stopping sharply.
+        double smoothProgress =
+                progress * progress * (3.0 - 2.0 * progress);
+
+        double currentRow =
+                slipperyStartRow
+                        + (slipperyTargetRow - slipperyStartRow)
+                        * smoothProgress;
+
+        setPosition(Vec2.of(
+                getPosition().x(),
+                currentRow
+        ));
+
+        if (progress >= 1.0) {
+            setPosition(Vec2.of(
+                    getPosition().x(),
+                    slipperyTargetRow
+            ));
+
+            slidingBetweenRows = false;
+        }
+
+        return true;
     }
 }

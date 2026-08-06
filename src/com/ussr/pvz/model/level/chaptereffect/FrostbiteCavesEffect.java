@@ -6,6 +6,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.model.engine.event.GameEvent;
 
 public class FrostbiteCavesEffect implements ChapterEffect {
 
@@ -49,6 +50,7 @@ public class FrostbiteCavesEffect implements ChapterEffect {
 
     private void processFireThawing(GameSession session) {
         if (session.getPlants() == null) return;
+
         for (Plant firePlant : session.getPlants()) {
             if (!firePlant.isAlive() || !firePlant.getTags().contains(Tag.FIRE)) continue;
 
@@ -72,6 +74,10 @@ public class FrostbiteCavesEffect implements ChapterEffect {
 
     private void applyFreezingWind(GameSession session, Level level) {
         if (session.getPlants() == null) return;
+
+        session.getEventBus().publish(
+                new GameEvent.FreezingWindTriggered()
+        );
 
         int stacks = level.getFreezeStacksPerWind();
         System.out.println("A freezing wind sweeps through the lawn!");

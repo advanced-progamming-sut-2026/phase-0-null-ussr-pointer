@@ -19,10 +19,14 @@ public final class LawnGridLayout {
     public static final float MOWER_DRAW_OFFSET_Y = -60f;
 
     public static final float GRAVE_DRAW_OFFSET_X = -0f;
-
     public static final float GRAVE_DRAW_OFFSET_Y = -60f;
+
     public static final float TILE_DRAW_OFFSET_X = 20f;   // nudge right
-    public static final float TILE_DRAW_OFFSET_Y = -80f;  // nudge down
+    public static final float TILE_DRAW_OFFSET_Y = -90f;  // nudge down
+
+    public static final float SLIPPERY_DRAW_OFFSET_X = TILE_DRAW_OFFSET_X;
+    public static final float SLIPPERY_DRAW_OFFSET_Y = TILE_DRAW_OFFSET_Y + 40f;
+
     private LawnGridLayout() {
     }
 

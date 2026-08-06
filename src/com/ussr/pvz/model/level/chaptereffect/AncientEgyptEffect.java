@@ -5,6 +5,7 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.model.engine.event.GameEvent;
 
 import java.util.List;
 import java.util.Random;
@@ -34,6 +35,14 @@ public class AncientEgyptEffect implements ChapterEffect {
 
         try {
             Zombie zombie = ZombieFactory.create(zombieAlias, targetRow, targetCol);
+
+            session.getEventBus().publish(
+                    new GameEvent.SandstormTriggered(
+                            targetRow,
+                            targetCol
+                    )
+            );
+
             zombie.setPosition(Vec2.of(targetCol, targetRow));
             session.spawnZombie(zombie);
             System.out.println("A sandstorm blows in a zombie at row " + (targetRow + 1) + "!");

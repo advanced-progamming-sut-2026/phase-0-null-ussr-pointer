@@ -60,10 +60,17 @@ public class ActiveGameplayView extends Table implements Disposable {
         Stack layers = new Stack();
 // in your GameplayScreen or wherever the stage is assembled
         SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);// on top so suns render above entities
+        StormRenderLayer stormRearLayer =
+                new StormRenderLayer(pamPlayer, true);
+        StormRenderLayer stormTopLayer =
+                new StormRenderLayer(pamPlayer, false);
+
         layers.add(background);
         layers.add(terrainLayer);
+        layers.add(stormRearLayer);
         layers.add(entityLayer);
         layers.add(sunLayer);
+        layers.add(stormTopLayer);
         layers.add(lawnWidget);
         layers.add(inGameHud);
         layers.add(hoverCursor);

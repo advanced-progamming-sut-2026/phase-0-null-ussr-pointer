@@ -84,11 +84,12 @@ public class JumpMove implements MoveBehavior {
             gridAccumulator = 0;
         } else {
             Vec2 newPos = pos.add(vel.scale(delta));
-            int oldCol = (int) pos.x();
-            int newCol = (int) newPos.x();
-            if (newCol != oldCol) {
-                newPos = applySlipperyShift(newPos, session); // Handle Ice Age slider tiles!
-            }
+            newPos = applySlipperyShift(
+                    zombie,
+                    pos,
+                    newPos,
+                    session
+            );
             zombie.setPosition(newPos);
         }
     }
