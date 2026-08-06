@@ -28,24 +28,25 @@ public class HoverCursorWidget extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         String selectedKey = seedBankHud.getSelectedPlantKey();
+        boolean dragging = false;
+        if (selectedKey == null) {
+            selectedKey = lawnWidget.getDragPreviewKey();
+            dragging = selectedKey != null;
+        }
         if (selectedKey == null) return;
 
         Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         lawnWidget.screenToLocalCoordinates(mouse);
 
-        if (mouse.x < 0 || mouse.x > lawnWidget.getWidth() || mouse.y < 0 || mouse.y > lawnWidget.getHeight()) {
-            return;
-        }
+        int[] cell = lawnWidget.gridCellAt(mouse.x, mouse.y);
+        if (cell == null) return;
 
-        float cellW = lawnWidget.getWidth() / 9f;
-        float cellH = lawnWidget.getHeight() / 5f;
-        int gridX = (int) (mouse.x / cellW);
-        int gridY = (int) (mouse.y / cellH);
+        float[] pos = lawnWidget.screenPositionForCell(cell[0], cell[1]);
+        float drawX = pos[0];
+        float drawY = pos[1];
+        float cellW = lawnWidget.getCellWidth();
+        float cellH = lawnWidget.getCellHeight();
 
-        float drawX = lawnWidget.getX() + gridX * cellW;
-        float drawY = lawnWidget.getY() + gridY * cellH;
-
-        // Draw tile grid highlight
         // TODO-ASSET: image_ui_hud_tile_highlight, replace with real atlas region name
         TextureRegion highlight = textures.region("IMAGE_UI_HUD_TILE_HIGHLIGHT");
         if (highlight != null) {
@@ -55,14 +56,15 @@ public class HoverCursorWidget extends Actor {
             batch.setColor(c);
         }
 
-        // Draw the plant preview
-        String packetKey = ChoosePlantService.normalizePlantKey(selectedKey);
-        TextureRegion plantReg = textures.region("IMAGE_UI_PACKETS_" + packetKey);
-        if (plantReg != null) {
-            Color c = batch.getColor();
-            batch.setColor(1f, 1f, 1f, 0.6f * parentAlpha); // Semi-transparent hover
-            batch.draw(plantReg, drawX + cellW * 0.1f, drawY + cellH * 0.1f, cellW * 0.8f, cellH * 0.8f);
-            batch.setColor(c);
+        if (!dragging) {
+            String packetKey = ChoosePlantService.normalizePlantKey(selectedKey);
+            TextureRegion plantReg = textures.region("IMAGE_UI_PACKETS_" + packetKey);
+            if (plantReg != null) {
+                Color c = batch.getColor();
+                batch.setColor(1f, 1f, 1f, 0.6f * parentAlpha);
+                batch.draw(plantReg, drawX + cellW * 0.1f, drawY + cellH * 0.1f, cellW * 0.8f, cellH * 0.8f);
+                batch.setColor(c);
+            }
         }
     }
 }

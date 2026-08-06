@@ -94,6 +94,16 @@ public class SeedPacketWidget extends Stack {
         costLabel.setColor(affordable ? Color.WHITE : new Color(0.85f, 0.35f, 0.3f, 1f));
     }
 
+    public Image createDragIcon(TextureBank textures) {
+        String packetKey = PlantCard.resolvePacketKey(blueprint.getName());
+        TextureRegion iconRegion = textures.region("IMAGE_UI_PACKETS_" + packetKey);
+        Image icon = iconRegion != null ? new Image(iconRegion) : new Image();
+        icon.setScaling(Scaling.fit);
+        icon.setSize(64f, 82f);
+        icon.getColor().a = 0.85f;
+        return icon;
+    }
+
     public boolean isUsable() {
         return affordable && blueprint.getRecharge() <= 0;
     }

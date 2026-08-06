@@ -5,11 +5,16 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossFactory;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 
 public class BossBehavior extends LevelBehavior {
 
+    private static final double CONVEYOR_INTERVAL = 12.0;
+
     private ZombossController controller;
     private boolean bossSpawned = false;
+    private boolean initialDeliveryDone = false;
+    private double conveyorTimer = 0.0;
 
     public BossBehavior() {
         this.autoWinOnWavesClear = false;
@@ -51,8 +56,29 @@ public class BossBehavior extends LevelBehavior {
             aiManager.tick(session, deltaTime);
         }
 
+        tickDelivery(session, deltaTime);
+
         if (controller != null && controller.getCurrentHp() <= 0) {
             onComplete(session.getLevel());
+        }
+    }
+
+    private void tickDelivery(GameSession session, double deltaTime) {
+        Level level = session.getLevel();
+        if (level == null) return;
+
+        DeliveryStrategy strategy = level.getDeliveryStrategy();
+        if (strategy == null) return;
+
+        if (!initialDeliveryDone) {
+            strategy.onLevelStart();
+            initialDeliveryDone = true;
+        }
+
+        conveyorTimer += deltaTime;
+        if (conveyorTimer >= CONVEYOR_INTERVAL) {
+            conveyorTimer = 0.0;
+            strategy.deliver();
         }
     }
 

@@ -1,7 +1,6 @@
 package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.level.GameMode;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
@@ -77,7 +76,7 @@ public class QuestService {
                 if (target != null) {
                     App.setCheatedLevel(false); // Minigames don't strictly use adventure progress
                     App.getLevelManager().startLevel(target.getId());
-                    App.setMenuState(MenuState.CHOOSE_PLANT); // Jump to game prep
+                    ChoosePlantService.proceedPastLevelStart();
                     return "Starting minigame: " + levelId;
                 }
             }

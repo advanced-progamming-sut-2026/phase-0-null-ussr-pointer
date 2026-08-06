@@ -1,11 +1,14 @@
 package com.ussr.pvz.view.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -22,6 +25,8 @@ public class SeedBankHud extends Table {
 
     private final Skin skin;
     private final TextureBank textures;
+    private final DragAndDrop dragAndDrop;
+    private final GameplayController controller;
 
     private final Label sunLabel;
     private final Label plantFoodLabel;
@@ -33,9 +38,11 @@ public class SeedBankHud extends Table {
 
     private GameSession lastSession;
 
-    public SeedBankHud(Skin skin, TextureBank textures) {
+    public SeedBankHud(Skin skin, TextureBank textures, DragAndDrop dragAndDrop, GameplayController controller) {
         this.skin = skin;
         this.textures = textures;
+        this.dragAndDrop = dragAndDrop;
+        this.controller = controller;
         top().left();
 
         sunLabel = new Label("0", skin, "default");
@@ -133,7 +140,29 @@ public class SeedBankHud extends Table {
             );
             packets.put(key, widget);
             seedRow.add(widget).size(SLOT_W, SLOT_H).pad(2f);
+            registerDragSource(widget, key);
         }
+    }
+
+    private void registerDragSource(SeedPacketWidget widget, String key) {
+        dragAndDrop.addSource(new DragAndDrop.Source(widget) {
+            @Override
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                if (!widget.isUsable()) return null;
+                if (controller.isPaused() || controller.isShovelModeActive() || controller.isPlantFoodModeActive()) {
+                    return null;
+                }
+
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                payload.setObject(key);
+
+                Image dragIcon = widget.createDragIcon(textures);
+                payload.setDragActor(dragIcon);
+                dragAndDrop.setDragActorPosition(dragIcon.getWidth() / 2f, -dragIcon.getHeight() / 2f);
+
+                return payload;
+            }
+        });
     }
 
     private void selectPlant(String key) {

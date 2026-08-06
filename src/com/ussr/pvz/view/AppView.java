@@ -14,6 +14,7 @@ import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.view.hud.DebugOverlay;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
@@ -238,6 +239,7 @@ public class AppView implements ApplicationListener {
         refreshGlobalHudCurrencies();
 
         stage.act(delta);
+        stage.setDebugAll(DebugOverlay.isHitboxEnabled());
         stage.draw();
 
         countRenderedLoadingFrame();

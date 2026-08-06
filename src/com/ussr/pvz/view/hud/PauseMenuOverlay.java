@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.service.ChoosePlantService;
 
 public class PauseMenuOverlay extends Table {
     private final GameplayController controller;
@@ -44,7 +45,7 @@ public class PauseMenuOverlay extends Table {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 App.getLevelManager().startLevel(App.getGameSession().getLevel().getId());
-                App.setMenuState(MenuState.CHOOSE_PLANT);
+                ChoosePlantService.proceedPastLevelStart();
             }
         });
         dialog.add(restartBtn).width(240f).height(60f).padBottom(15f).row();

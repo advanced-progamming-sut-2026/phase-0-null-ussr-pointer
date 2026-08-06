@@ -235,7 +235,7 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossEgypt",
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": ["Peashooter", "Sunflower", "Wall-nut", "Repeater", "Cherry Bomb"],
           "rewardPlantAliases": [
             "Fire Peashooter",
             "Hot Potato",
@@ -464,7 +464,7 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossMammoth",
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": ["Snow Pea", "Sunflower", "Wall-nut", "Iceberg Lettuce", "Cabbage-pult"],
           "rewardPlantAliases": [
             "Fume-shroom",
             "Magnet-shroom",
@@ -703,7 +703,7 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossDragon",
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": ["Peashooter", "Sunflower", "Wall-nut", "Doom-shroom", "Torchwood"],
           "rewardPlantAliases": [
             "Garlic",
             "Lily Pad",
@@ -962,7 +962,7 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossShark",
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": ["Peashooter", "Sunflower", "Tangle Kelp", "Wall-nut", "Melon-pult"],
           "rewardPlantAliases": [
             "Cat-tail",
             "Cherry Bomb",

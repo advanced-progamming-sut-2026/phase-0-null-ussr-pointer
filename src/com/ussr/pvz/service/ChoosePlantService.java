@@ -156,6 +156,23 @@ public class ChoosePlantService {
         return "seed packet used for " + canonicalName + " (" + (available - 1) + " remaining)";
     }
 
+    public static boolean isConveyorLevel(Level level) {
+        return level != null && level.getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery
+                .ConveyorDeliveryStrategy;
+    }
+
+    /**
+     * Called right after a level is (re)started. Conveyor-delivery levels don't use a
+     * pre-game loadout, so we skip the choose-plant menu and jump straight into the game.
+     */
+    public static void proceedPastLevelStart() {
+        if (isConveyorLevel(App.getLevelManager().getCurrentLevel())) {
+            new ChoosePlantService().startGame();
+        } else {
+            App.setMenuState(MenuState.CHOOSE_PLANT);
+        }
+    }
+
     public String startGame() {
         Level level = App.getLevelManager().getCurrentLevel();
         if (level == null) return "no level selected";

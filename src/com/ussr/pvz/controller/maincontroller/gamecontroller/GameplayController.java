@@ -1,8 +1,13 @@
 package com.ussr.pvz.controller.maincontroller.gamecontroller;
 
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
+import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.service.game.GameService;
 
 /**
@@ -120,16 +125,41 @@ public class GameplayController {
         }
     }
 
-    private void executePlantingAction(int x, int y) {
-        PlantPlantRequest req = new PlantPlantRequest(selectedSeedKey, String.valueOf(x), String.valueOf(y));
+    public void plantAt(String plantKey, int gridX, int gridY) {
+        if (this.paused || plantKey == null) return;
+
+        PlantPlantRequest req = new PlantPlantRequest(plantKey, String.valueOf(gridX), String.valueOf(gridY));
         String result = gameService.plantPlant(req);
 
         if (result.contains("placed")) {
             NotificationCenter.success(result);
-            // Selected seed remains active to allow rapid planting
+            consumeFromConveyorIfNeeded(plantKey);
         } else {
             NotificationCenter.warning(result);
         }
+    }
+
+    private void executePlantingAction(int x, int y) {
+        plantAt(selectedSeedKey, x, y);
+    }
+
+    /**
+     * On conveyor-delivery levels, a planted packet is removed from the belt and the
+     * player has to pick a new one — mirrors ChoosePlantMenu being skipped for these levels.
+     */
+    private void consumeFromConveyorIfNeeded(String plantedKey) {
+        GameSession session = App.getGameSession();
+        Level level = session != null ? session.getLevel() : null;
+        if (level == null || !(level.getDeliveryStrategy() instanceof ConveyorDeliveryStrategy conveyor)) {
+            return;
+        }
+
+        conveyor.getConveyorBelt().stream()
+                .filter(name -> ChoosePlantService.normalizePlantKey(name).equals(plantedKey))
+                .findFirst()
+                .ifPresent(name -> conveyor.getConveyorBelt().remove(name));
+
+        this.selectedSeedKey = null;
     }
 
     private void executeSunCollection(int x, int y) {
