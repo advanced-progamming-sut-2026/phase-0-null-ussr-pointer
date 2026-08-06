@@ -46,4 +46,9 @@ public class OctopusProjectile extends ZombieProjectile {
             }
         }
     }
+
+    @Override
+    public void onDestinationReached() {
+
+    }
 }

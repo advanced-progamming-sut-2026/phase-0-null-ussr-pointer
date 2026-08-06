@@ -1,9 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
-import com.ussr.pvz.model.board.Cell;
-import com.ussr.pvz.model.board.structures.Grave;
-import com.ussr.pvz.model.board.terrain.Tile;
-import com.ussr.pvz.model.board.terrain.TileType;
+import com.ussr.pvz.model.board.structures.GraveSpawner;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.util.Vec2;
 
@@ -30,13 +27,11 @@ public class BoneProjectile extends ZombieProjectile {
         int targetRow = (int) targetPosition.y();
         int targetCol = (int) targetPosition.x();
 
-        Cell targetCell = session.getLawn().getCell(targetRow, targetCol);
+        GraveSpawner.spawnGraveIfEmpty(session, targetRow, targetCol);
+    }
 
-        if (targetCell != null && targetCell.getPlant() == null && targetCell.getInteractableStructure() == null) {
-            Grave newGrave = new Grave();
-            newGrave.setPosition(Vec2.of(targetCol, targetRow));
-            targetCell.setStructure(newGrave);
-            targetCell.setTile(new Tile(TileType.Grave));
-        }
+    @Override
+    public void onDestinationReached() {
+
     }
 }

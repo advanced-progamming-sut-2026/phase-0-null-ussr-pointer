@@ -72,6 +72,7 @@ public class Chapter {
                 case "SHALLOW_COAST", "SHALLOWCOAST" -> TileType.ShallowCoast;
                 case "NECROMANCY_TILE", "NECROMANCY" -> TileType.Necromancy;
                 case "CRATER_TILE", "CRATER" -> TileType.Crater;
+                case "BURNING_TILE", "BURNING" -> TileType.Burning;
                 case "BEGHOULED_TILE", "BEGHOULED" -> TileType.Beghouled;
                 default -> null;
             };
