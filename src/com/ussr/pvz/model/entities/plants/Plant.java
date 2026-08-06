@@ -159,6 +159,10 @@ public class Plant extends GameEntity implements Damageable {
         if (!isAlive && state != PlantState.DYING) {
             return; // Allow DYING state to process for explosive animations
         }
+        if(state == PlantState.INCAPACITATED){
+            currentClip = "idle";
+            return;
+        }
 
         // --- NEW: Tick the animation timer ---
         if (animationTimer > 0) {

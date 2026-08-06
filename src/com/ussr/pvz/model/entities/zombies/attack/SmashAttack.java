@@ -57,8 +57,9 @@ public class SmashAttack implements AttackBehavior {
                 // Permanently slow the zombie down
                 if (zombie.getSpeed() != null) {
                     zombie.setSpeed(zombie.getSpeed().scale(speedScaleAfter));
+                    zombie.queueAnimEvent("run");
                 }
-
+                zombie.queueAnimEvent("kick");
                 // Fall back to a standard bite attack for the rest of the game
                 zombie.setAttackBehavior(new ChompAttack());
             }

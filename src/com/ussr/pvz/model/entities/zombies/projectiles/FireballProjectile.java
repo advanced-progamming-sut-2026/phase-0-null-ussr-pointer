@@ -38,4 +38,9 @@ public class FireballProjectile extends ZombieBossProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "768/FULL/EFFECTS/ZOMBOSS_DARK_FIREBALL/ZOMBOSS_DARK_FIREBALL.PAM";
+    }
 }

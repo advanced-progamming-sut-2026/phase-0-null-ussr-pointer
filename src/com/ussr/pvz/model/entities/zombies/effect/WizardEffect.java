@@ -54,7 +54,7 @@ public class WizardEffect implements EffectStatus {
 
     private void transformRandomTarget(Zombie wizard, GameSession session) {
         List<Damageable> validTargets = new ArrayList<>();
-
+        wizard.queueAnimEvent("power");
         if (wizard.getFaction() == Faction.ZOMBIES) {
             for (Plant p : session.getPlants()) {
                 if (p.isAlive() && !p.getState().equals(Plant.PlantState.INCAPACITATED)) {

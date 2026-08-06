@@ -41,7 +41,7 @@ public class PianistEffect implements EffectStatus {
 
             int direction = Math.random() < 0.5 ? -1 : 1;
             int newRow = currentRow + direction;
-
+            pianist.queueAnimEvent("play");
             if (newRow >= 0 && newRow < maxRows) {
                 z.setPosition(Vec2.of(z.getPosition().x(), newRow));
             } else {

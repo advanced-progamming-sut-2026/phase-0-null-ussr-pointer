@@ -51,7 +51,19 @@ public class Zombie extends GameEntity implements Damageable {
     // entity for four seconds lets both the body fall and the late head drop
     // finish before EntityRenderLayer removes its actor.
     private static final float DEATH_ANIM_DURATION = 4.0f;
+    // One pending anim event the view should consume this frame
+    private String pendingAnimEvent = null;
 
+    public void queueAnimEvent(String clipName) {
+        this.pendingAnimEvent = clipName;
+    }
+
+    /** View calls this — read and clear in one shot */
+    public String pollAnimEvent() {
+        String event = this.pendingAnimEvent;
+        this.pendingAnimEvent = null;
+        return event;
+    }
     public void startDeathTimer() {
         if (deathTimer < 0) deathTimer = DEATH_ANIM_DURATION;
     }

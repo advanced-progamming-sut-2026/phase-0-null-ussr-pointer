@@ -927,8 +927,8 @@
           ],
           "allowedZombies": [
             {
-              "id": "ZombieProspector",
-              "weight": 500
+              "id": "ZombieBeachOctopus",
+              "weight": 400
             },
             {
               "id": "ZombieLostCityJane",

@@ -145,4 +145,8 @@ public class PamActor extends Actor {
         this.stateTime = 0f;
         this.playing = true;
     }
+    // In PamActor or ZombiePamActor:
+    public boolean isPlaying() {
+        return playing;
+    }
 }

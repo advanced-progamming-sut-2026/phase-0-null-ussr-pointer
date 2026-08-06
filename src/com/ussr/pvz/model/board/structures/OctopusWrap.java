@@ -40,7 +40,7 @@ public class OctopusWrap extends InteractableStructure implements Damageable {
             if (targetCell != null) {
                 targetCell.setPlant(boundPlant);
             }
-            session.getPlants().add(boundPlant);
+            //session.getPlants().add(boundPlant);
         }
     }
 

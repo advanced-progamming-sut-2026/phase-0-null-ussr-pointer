@@ -61,10 +61,10 @@ public class GargantuarImpThrowEffect implements EffectStatus {
 
         int cols = session.getLawn().getCols();
         int targetCol = Math.min(impTargetColumn, cols - 1);
-
+        gargantuar.queueAnimEvent("fire");
         Vec2 startPos = gargantuar.getPosition();
         Vec2 targetPos = Vec2.of(targetCol, row);
-
+        gargantuar.queueAnimEvent("canon_fire");
         session.addZombieProjectile(new GargantuarImpProjectile(
                 startPos, targetPos, impFlightTime, impApex, row, impAlias
         ));

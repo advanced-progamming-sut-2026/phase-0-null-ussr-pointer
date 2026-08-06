@@ -2,8 +2,8 @@ package com.ussr.pvz.view.hud;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -11,31 +11,38 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
+import pvz.libpvz.textures.TextureBank;
 
 public final class PauseMenuAssets implements Disposable {
-    private static final String ROOT =
-            "pvz-assets/exports/ui_pausemenu/";
 
-    private final Texture blankCard;
-    private final Texture objectiveLeft;
-    private final Texture objectiveMiddle;
-    private final Texture objectiveRight;
-    private final Texture windowTopper;
-    private final Texture sunflowerTopper;
-    private final Texture sliderBolt;
+    private final TextureBank textures;
+
+    private final TextureRegion blankCard;
+    private final TextureRegion objectiveLeft;
+    private final TextureRegion objectiveMiddle;
+    private final TextureRegion objectiveRight;
+    private final TextureRegion windowTopper;
+    private final TextureRegion sunflowerTopper;
+    private final TextureRegion sliderBolt;
 
     private final NinePatchDrawable cardDrawable;
     private final NinePatchDrawable cardHoverDrawable;
     private final NinePatchDrawable cardPressedDrawable;
 
     public PauseMenuAssets() {
-        blankCard = load("blank_card.png");
-        objectiveLeft = load("objective_card_left.png");
-        objectiveMiddle = load("objective_card_mid.png");
-        objectiveRight = load("objective_card_right.png");
-        windowTopper = load("windowtopper.png");
-        sunflowerTopper = load("sunflower_topper.png");
-        sliderBolt = load("slider_bolt.png");
+
+        textures = new TextureBank(
+                "ATLASES",
+                Gdx.files.local("pvz-assets")
+        );
+
+        blankCard = textures.region("IMAGE_UI_PAUSEMENU_BLANK_CARD");
+        objectiveLeft = textures.region("IMAGE_UI_PAUSEMENU_OBJECTIVE_CARD_LEFT");
+        objectiveMiddle = textures.region("IMAGE_UI_PAUSEMENU_OBJECTIVE_CARD_MID");
+        objectiveRight = textures.region("IMAGE_UI_PAUSEMENU_OBJECTIVE_CARD_RIGHT");
+        windowTopper = textures.region("IMAGE_UI_PAUSEMENU_WINDOWTOPPER");
+        sunflowerTopper = textures.region("IMAGE_UI_PAUSEMENU_SUNFLOWER_TOPPER");
+        sliderBolt = textures.region("IMAGE_UI_PAUSEMENU_SLIDER_BOLT");
 
         NinePatch cardPatch = new NinePatch(
                 blankCard,
@@ -62,19 +69,6 @@ public final class PauseMenuAssets implements Disposable {
                         0.48f,
                         1f
                 ));
-    }
-
-    private Texture load(String filename) {
-        Texture texture = new Texture(
-                Gdx.files.local(ROOT + filename)
-        );
-
-        texture.setFilter(
-                Texture.TextureFilter.Linear,
-                Texture.TextureFilter.Linear
-        );
-
-        return texture;
     }
 
     public Drawable cardDrawable() {
@@ -113,9 +107,8 @@ public final class PauseMenuAssets implements Disposable {
         return new TextureRegionDrawable(sliderBolt);
     }
 
-    public TextButton.TextButtonStyle createButtonStyle(
-            Skin skin
-    ) {
+    public TextButton.TextButtonStyle createButtonStyle(Skin skin) {
+
         TextButton.TextButtonStyle style =
                 new TextButton.TextButtonStyle();
 
@@ -126,10 +119,13 @@ public final class PauseMenuAssets implements Disposable {
         style.font = skin
                 .get("default", Label.LabelStyle.class)
                 .font;
+
         style.fontColor =
                 new Color(0.20f, 0.12f, 0.05f, 1f);
+
         style.overFontColor =
                 new Color(0.38f, 0.18f, 0.03f, 1f);
+
         style.downFontColor =
                 new Color(0.12f, 0.08f, 0.03f, 1f);
 
@@ -138,12 +134,6 @@ public final class PauseMenuAssets implements Disposable {
 
     @Override
     public void dispose() {
-        blankCard.dispose();
-        objectiveLeft.dispose();
-        objectiveMiddle.dispose();
-        objectiveRight.dispose();
-        windowTopper.dispose();
-        sunflowerTopper.dispose();
-        sliderBolt.dispose();
+        textures.dispose();
     }
 }

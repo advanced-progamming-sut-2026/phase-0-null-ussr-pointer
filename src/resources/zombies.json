@@ -75,7 +75,7 @@
       "ZombieArmor1"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "pamLocation": "768/FULL/ZOMBIE/LNY_CONEHEAD_ZOMBIE/LNY_CONEHEAD_ZOMBIE.PAM",
     "textureRegion":"",
     "objdata": {
       "ArtCenter": {
@@ -150,7 +150,7 @@
       "ZombieArmor2"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "pamLocation": "768/FULL/ZOMBIE/LNY_BUCKETHEAD_ZOMBIE/LNY_BUCKETHEAD_ZOMBIE.PAM",
     "textureRegion":"",
     "objdata": {
       "ArtCenter": {
@@ -225,7 +225,7 @@
       "ZombieArmor4"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_FUTURE_BASIC_BRICK/ZOMBIE_FUTURE_BASIC_BRICK.PAM",
     "textureRegion":"",
     "objdata": {
       "ArtCenter": {
@@ -1724,7 +1724,7 @@
       "ZombieDarkKing"
     ],
     "objclass": "ZombieDarkKingProps",
-    "pamLocation": "",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_KING/ZOMBIE_DARK_KING.PAM",
     "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_KING",
     "objdata": {
       "ArtCenter": {

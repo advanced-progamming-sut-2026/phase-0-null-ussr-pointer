@@ -13,7 +13,6 @@ public class LevelFactory {
     private static final Map<String, Supplier<LevelBehavior>> BEHAVIOR_REGISTRY = new HashMap<>();
 
     static {
-        BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
         BEHAVIOR_REGISTRY.put("ConveyorBehavior", ConveyorBehavior::new);
         BEHAVIOR_REGISTRY.put("DeadlineBehavior", DeadlineBehavior::new);
         BEHAVIOR_REGISTRY.put("LoveYourPlantsBehavior", LoveYourPlantsBehavior::new);
@@ -50,9 +49,6 @@ public class LevelFactory {
     }
 
     private static LevelBehavior parseBehavior(JsonContainer.JsonLevelData data) {
-        if (data.behavior == null || data.behavior.isBlank()) {
-            return (data.order == 4) ? new BossBehavior() : null;
-        }
 
         return switch (data.behavior.trim()) {
             case "TimedWarBehavior" -> {
@@ -89,7 +85,7 @@ public class LevelFactory {
                 Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior.trim());
                 if (supplier != null) yield supplier.get();
                 System.err.println("[LevelFactory] Unknown campaign behavior: " + data.behavior);
-                yield (data.order == 4) ? new BossBehavior() : null;
+                yield  null;
             }
         };
     }

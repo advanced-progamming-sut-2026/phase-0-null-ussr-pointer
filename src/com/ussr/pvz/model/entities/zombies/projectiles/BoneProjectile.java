@@ -34,4 +34,9 @@ public class BoneProjectile extends ZombieProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "IMAGE_ZOMBIE_BONE_PROJECTILE";
+    }
 }

@@ -52,6 +52,7 @@ public class OctopusThrowEffect implements EffectStatus {
             for (Zombie target : session.getZombies()) {
                 if (target.isAlive() && target.getFaction() == Faction.ZOMBIES
                         && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
+                    zombie.queueAnimEvent("toss");
                     session.addZombieProjectile(new OctopusProjectile(startPos, target.getPosition(), 1.5));
                     return true;
                 }

@@ -5,13 +5,19 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.structures.IceBlock;
+import com.ussr.pvz.model.board.structures.LawnMower;
+import com.ussr.pvz.model.board.structures.OctopusWrap;
+import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
-import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.armor.Armor;
+import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
+import com.ussr.pvz.model.entities.zombies.projectiles.*;
 import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.animation.PlantPamActor;
 import com.ussr.pvz.view.animation.ProjectilePamActor;
@@ -22,129 +28,353 @@ import pvz.libpvz.textures.TextureBank;
 import java.util.*;
 
 public class EntityRenderLayer extends Group {
+
     private final PamPlayer pamPlayer;
     private final TextureBank textures;
 
-    // Tracks logical entities to their visual PamActors
-    private final Map<Object, PamActor> entityActors = new HashMap<>();
-    // Add this field at the top with the other fields
+    // -------------------------------------------------------------------------
+    // Sub-groups — added to this Group in draw order (back → front)
+    // -------------------------------------------------------------------------
+    /**
+     * Plants — rendered first (furthest back among entities)
+     */
+    private final Group plantGroup = new Group();
+    /**
+     * On-plant overlays: OctopusWrap, IceBlock.
+     * Sit on top of the plant they cover, below zombies.
+     */
+    private final Group overlayGroup = new Group();
+    /**
+     * Plant projectiles (ProjectilePamActor).
+     * In front of plants and overlays, behind zombies.
+     */
+    private final Group plantProjectileGroup = new Group();
+    /**
+     * Zombies + PushableStructures + LawnMowers, Y-sorted together.
+     * Zombie PAM projectiles also land here so they sort with zombies.
+     */
+    private final Group zombieGroup = new Group();
+
+    // -------------------------------------------------------------------------
+    // Entity → actor maps
+    // -------------------------------------------------------------------------
+    private final Map<Plant, PamActor> plantActors = new HashMap<>();
+    private final Map<Object, PamActor> overlayActors = new HashMap<>(); // IceBlock, OctopusWrap keyed by structure
     private final Map<Projectile, ProjectilePamActor> projectileActors = new HashMap<>();
+    private final Map<Object, PamActor> zombieGroupActors = new HashMap<>(); // Zombie, LawnMower, PushableStructure
+    private final Map<ZombieProjectile, PamActor> zombieProjActors = new HashMap<>();
+
+    // -------------------------------------------------------------------------
+    // Pending immediate draw calls (atlas textures, not actors)
+    // -------------------------------------------------------------------------
+    private final List<ArmorDrawCall> pendingArmorDraws = new ArrayList<>();
+    private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
+
+    private record ArmorDrawCall(TextureRegion region, float x, float y, float w, float h) {
+    }
+
+    private record ZombieAtlasDrawCall(TextureRegion region, float x, float y) {
+    }
+
+    // -------------------------------------------------------------------------
+    // Newspaper state machine
+    // -------------------------------------------------------------------------
+    private enum NewspaperPhase {HAS_PAPER, DEFEAT_PLAYING, GONE}
+
+    private final Map<Zombie, NewspaperPhase> newspaperPhase = new HashMap<>();
+
+    // -------------------------------------------------------------------------
+    // Constructor
+    // -------------------------------------------------------------------------
     public EntityRenderLayer(PamPlayer pamPlayer, TextureBank textures) {
         this.pamPlayer = pamPlayer;
         this.textures = textures;
         setTouchable(Touchable.disabled);
+
+        // Order matters — each group draws on top of the previous
+        plantGroup.setTouchable(Touchable.disabled);
+        overlayGroup.setTouchable(Touchable.disabled);
+        plantProjectileGroup.setTouchable(Touchable.disabled);
+        zombieGroup.setTouchable(Touchable.disabled);
+
+        addActor(plantGroup);
+        addActor(overlayGroup);
+        addActor(plantProjectileGroup);
+        addActor(zombieGroup);
     }
 
+    // =========================================================================
+    // act — sync every category
+    // =========================================================================
     @Override
     public void act(float delta) {
         super.act(delta);
+
         GameSession session = App.getGameSession();
         if (session == null) return;
 
-        Map<Object, Boolean> entitiesThisFrame = new HashMap<>();
+        pendingArmorDraws.clear();
+        pendingZombieAtlasDraws.clear();
 
-        // 1. Sync LawnMowers
-        // 1. Sync LawnMowers
+        Set<Plant> livePlants = new HashSet<>();
+        Set<Object> liveOverlays = new HashSet<>();
+        Set<Object> liveZombieGroup = new HashSet<>();
+
+        syncLawnMowers(session, liveZombieGroup);
+        syncPlants(session, livePlants);
+        syncOverlays(session, liveOverlays);
+        syncZombies(session, liveZombieGroup);
+        syncPushableStructures(session, liveZombieGroup);
+        syncPlantProjectiles(session);
+        syncZombieProjectiles(session);
+
+        // Cleanup stale actors
+        cleanupMap(plantActors, livePlants, plantGroup);
+        cleanupMap(overlayActors, liveOverlays, overlayGroup);
+        cleanupMap(zombieGroupActors, liveZombieGroup, zombieGroup);
+        cleanupZombieProjActors(session);
+
+        // Also clean newspaper state for dead zombies
+        newspaperPhase.keySet().removeIf(z -> !session.getZombies().contains(z));
+
+        // Y-sort each group independently
+        sortByY(plantGroup);
+        sortByY(overlayGroup);
+        sortByY(zombieGroup);
+    }
+
+    // =========================================================================
+    // Sync methods
+    // =========================================================================
+
+    // ---- LawnMowers ---------------------------------------------------------
+    private void syncLawnMowers(GameSession session, Set<Object> live) {
         for (LawnMower mower : session.getLawnMowers()) {
             if (!mower.isAlive()) continue;
-            entitiesThisFrame.put(mower, true);
+            live.add(mower);
 
-            PamActor actor = entityActors.computeIfAbsent(mower, m -> {
+            PamActor actor = zombieGroupActors.computeIfAbsent(mower, m -> {
                 String pamPath = App.getLevelManager().getCurrentChapter().getMowerPam();
                 PamActor pa = new PamActor(pamPlayer, pamPath, "idle");
                 pa.setPamScale(0.45f);
-                addActor(pa);
+                zombieGroup.addActor(pa);
                 return pa;
             });
 
-            // Dynamically set the clip based on the mower's current state.
-            // Note: Replace 'isTriggered()' with whatever method your LawnMower class uses!
-            String currentClip = mower.isActivated() ? "attack" : "idle";
-            actor.setClip(currentClip);
-
+            actor.setClip(mower.isActivated() ? "attack" : "idle");
             actor.setPosition(
-                    LawnGridLayout.worldX(
-                            mower.getPosition().x()
-                    ) + LawnGridLayout.CELL_WIDTH / 2f
+                    LawnGridLayout.worldX(mower.getPosition().x())
+                            + LawnGridLayout.CELL_WIDTH / 2f
                             + LawnGridLayout.MOWER_DRAW_OFFSET_X,
-
-                    LawnGridLayout.worldY(
-                            mower.getPosition().y()
-                    ) + LawnGridLayout.MOWER_DRAW_OFFSET_Y
+                    LawnGridLayout.worldY(mower.getPosition().y())
+                            + LawnGridLayout.MOWER_DRAW_OFFSET_Y
             );
         }
+    }
 
-        // 2. Sync Plants using your PlantPamActor
-        // 2. Sync Plants using your PlantPamActor
+    // ---- Plants -------------------------------------------------------------
+    private void syncPlants(GameSession session, Set<Plant> live) {
         for (Plant plant : session.getPlants()) {
-            // Keep rendering if it's dead BUT currently playing its dying/explosion animation
             if (!plant.isAlive() && plant.getState() != Plant.PlantState.DYING) continue;
+            live.add(plant);
 
-            entitiesThisFrame.put(plant, true);
-
-            PamActor actor = entityActors.computeIfAbsent(plant, p -> {
-                // Initialize with the smart clip manager
+            PamActor actor = plantActors.computeIfAbsent(plant, p -> {
                 PlantPamActor pa = new PlantPamActor(pamPlayer, plant.getPamPath(), plant.getAnimationClip());
-                addActor(pa);
+                plantGroup.addActor(pa);
                 return pa;
             });
 
-            // Dynamically update the clip every frame based on the state manager
             actor.setClip(plant.getAnimationClip());
-
             actor.setPosition(
-                    LawnGridLayout.cellX(
-                            plant.getLocation().x()
-                    ) + LawnGridLayout.CELL_WIDTH / 2f
+                    LawnGridLayout.cellX(plant.getLocation().x())
+                            + LawnGridLayout.CELL_WIDTH / 2f
                             + LawnGridLayout.PLANT_DRAW_OFFSET_X,
-
-                    LawnGridLayout.cellY(
-                            plant.getLocation().y()
-                    ) + LawnGridLayout.PLANT_DRAW_OFFSET_Y
+                    LawnGridLayout.cellY(plant.getLocation().y())
+                            + LawnGridLayout.PLANT_DRAW_OFFSET_Y
             );
         }
-        // 3. Sync Zombies using your ZombiePamActor
+    }
+
+    // ---- On-plant overlays: IceBlock, OctopusWrap ---------------------------
+    private void syncOverlays(GameSession session, Set<Object> live) {
+        if (session.getLawn() == null) return;
+
+        for (var s : session.getLawn().getAllInteractable()) {
+            if (!s.isAlive()) continue;
+
+            if (s instanceof IceBlock ice) {
+                live.add(ice);
+                PamActor actor = overlayActors.computeIfAbsent(ice, k -> {
+                    PamActor pa = new PamActor(pamPlayer, ice.getPamLocation(), "idle");
+                    pa.setPamScale(0.55f);
+                    overlayGroup.addActor(pa);
+                    return pa;
+                });
+                float screenX = LawnGridLayout.worldX((float) ice.getPosition().x())
+                        + LawnGridLayout.CELL_WIDTH / 2f;
+                float screenY = LawnGridLayout.worldY((float) ice.getPosition().y());
+                actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+
+            } else if (s instanceof OctopusWrap wrap) {
+                live.add(wrap);
+                PamActor actor = overlayActors.computeIfAbsent(wrap, k -> {
+                    PamActor pa = new PamActor(pamPlayer, wrap.getPamLocation(), "animation3");
+                    pa.setPamScale(0.55f);
+                    overlayGroup.addActor(pa);
+                    return pa;
+                });
+                float screenX = LawnGridLayout.worldX((float) wrap.getPosition().x())
+                        + LawnGridLayout.CELL_WIDTH / 2f;
+                float screenY = LawnGridLayout.worldY((float) wrap.getPosition().y());
+                actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+            }
+        }
+    }
+
+    // ---- Zombies ------------------------------------------------------------
+    private void syncZombies(GameSession session, Set<Object> live) {
         for (Zombie zombie : session.getZombies()) {
             if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
-            entitiesThisFrame.put(zombie, true);
+            live.add(zombie);
 
-            PamActor actor = entityActors.computeIfAbsent(zombie, z -> {
-                String animation = switch (zombie.getState()) {
-                    case WALKING -> "walk";
-                    case DEAD -> "die";
-                    case EATING -> "eat";
-                    case null -> "idle";
-                };
+            PamActor actor = zombieGroupActors.computeIfAbsent(zombie, z -> {
+                String animation = resolveZombieClip(zombie);
                 ZombiePamActor za = new ZombiePamActor(pamPlayer, zombie.getPamPath(), animation);
-                addActor(za);
+                zombieGroup.addActor(za);
                 return za;
             });
 
-            String currentClip = switch (zombie.getState()) {
-                case WALKING -> "walk";
-                case DEAD -> "die";
-                case EATING -> "eat";
-                case null -> "idle";
-            };
+            String currentClip = resolveZombieCurrentClip(zombie, actor);
             actor.setClip(currentClip);
 
-            // Note: Since PamActor doesn't support the visibilityMap, armor layers won't toggle dynamically yet.
-            actor.setPosition(
-                    LawnGridLayout.worldX(
-                            zombie.getPosition().x()
-                    ) + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X,
+            // One-shot special animation event from model (e.g. smash, fire)
+            String animEvent = zombie.pollAnimEvent();
+            if (animEvent != null && actor instanceof ZombiePamActor za) {
+                za.playOnce(animEvent, currentClip);
+            }
 
-                    LawnGridLayout.worldY(
-                            zombie.getPosition().y()
-                    ) + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
+            actor.setPosition(
+                    LawnGridLayout.worldX(zombie.getPosition().x())
+                            + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X,
+                    LawnGridLayout.worldY(zombie.getPosition().y())
+                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
             );
+
+            // Armor overlay (immediate draw, flushed in draw())
+            syncArmorOverlay(zombie, actor);
+        }
+    }
+
+    private String resolveZombieClip(Zombie zombie) {
+        return switch (zombie.getState()) {
+            case WALKING -> "walk";
+            case DEAD -> "die";
+            case EATING -> "eat";
+            case null -> "idle";
+        };
+    }
+
+    private String resolveZombieCurrentClip(Zombie zombie, PamActor actor) {
+        Armor armor = zombie.getArmor();
+        boolean hasNewspaper = armor != null
+                && armor.getArmorType() == ArmorType.NEWSPAPER
+                && !armor.isDestroyed();
+        boolean hadNewspaper = armor != null
+                && armor.getArmorType() == ArmorType.NEWSPAPER;
+
+        if (!hadNewspaper) {
+            return resolveZombieClip(zombie);
         }
 
-        // 4. Cleanup destroyed entities
-        // 4. Cleanup destroyed entities (skip projectiles — managed separately above)
-      // 3b. Sync Projectiles
-        // 3b. Sync Projectiles
+        NewspaperPhase phase = newspaperPhase.computeIfAbsent(zombie, z -> NewspaperPhase.HAS_PAPER);
+
+        // Transition: newspaper just destroyed
+        if (phase == NewspaperPhase.HAS_PAPER && !hasNewspaper) {
+            newspaperPhase.put(zombie, NewspaperPhase.DEFEAT_PLAYING);
+            return "newspaper_defeat";
+        }
+
+        return switch (phase) {
+            case DEFEAT_PLAYING -> {
+                if (actor instanceof ZombiePamActor za && !za.isPlaying()) {
+                    newspaperPhase.put(zombie, NewspaperPhase.GONE);
+                }
+                yield "newspaper_defeat";
+            }
+            case HAS_PAPER -> switch (zombie.getState()) {
+                case EATING -> "eat_newspaper";
+                case WALKING -> "walk_newspaper";
+                case DEAD -> "die";
+                case null -> "idle";
+            };
+            case GONE -> resolveZombieClip(zombie);
+        };
+    }
+
+    private void syncArmorOverlay(Zombie zombie, PamActor actor) {
+        Armor armor = zombie.getArmor();
+        if (armor == null || armor.isDestroyed()) return;
+        if (armor.getArmorType() == ArmorType.NEWSPAPER) return; // handled via PAM clips
+
+        ArmorType type = armor.getArmorType();
+        int layer = armor.getDamageLayer();
+        String atlasKey = (layer <= 1) ? type.getFullAtlas() : type.getDamagedAtlas();
+        if (atlasKey == null || atlasKey.isEmpty()) return;
+
+        TextureRegion region = textures.region(atlasKey);
+        if (region == null) return;
+
+        float actorCenterX = actor.getX() + actor.getWidth() / 2f;
+        float actorTopY = actor.getY() + actor.getHeight();
+
+        float ARMOR_SCALE = 0.65f;
+        float rw = region.getRegionWidth() * ARMOR_SCALE;
+        float rh = region.getRegionHeight() * ARMOR_SCALE;
+
+        // Cap head armor to 55% of actor height
+        if (type != ArmorType.SHOULDER_ARMOR) {
+            float cap = actor.getHeight() * 0.55f;
+            float capFactor = Math.min(1f, cap / rh);
+            rw *= capFactor;
+            rh *= capFactor;
+        }
+
+        float drawX, drawY;
+        if (type == ArmorType.SHOULDER_ARMOR) {
+            drawX = actorCenterX - rw / 2f + type.getOffsetX();
+            drawY = actor.getY() + actor.getHeight() * 0.30f;
+        } else {
+            drawX = actorCenterX - rw / 2f + type.getOffsetX();
+            drawY = actorTopY - rh * 0.75f;
+        }
+
+        pendingArmorDraws.add(new ArmorDrawCall(region, drawX, drawY, rw, rh));
+    }
+
+    // ---- PushableStructures (sort with zombies by Y) ------------------------
+    private void syncPushableStructures(GameSession session, Set<Object> live) {
+        for (var s : session.getLawn().getAllInteractable()) {
+            if (!(s instanceof PushableStructure pushable)) continue;
+            if (!pushable.isAlive()) continue;
+            live.add(pushable);
+
+            PamActor actor = zombieGroupActors.computeIfAbsent(pushable, k -> {
+                PamActor pa = new PamActor(pamPlayer, pushable.getType().getPamLocation(), "idle");
+                pa.setPamScale(0.6f);
+                zombieGroup.addActor(pa);
+                return pa;
+            });
+
+            float screenX = LawnGridLayout.worldX((float) pushable.getPosition().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f;
+            float screenY = LawnGridLayout.worldY((float) pushable.getPosition().y());
+            actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+        }
+    }
+
+    // ---- Plant projectiles --------------------------------------------------
+    private void syncPlantProjectiles(GameSession session) {
         List<Projectile> liveProjectiles = new ArrayList<>(session.getProjectiles());
         Set<Projectile> liveSet = new HashSet<>(liveProjectiles);
 
@@ -152,9 +382,9 @@ public class EntityRenderLayer extends Group {
             ProjectilePamActor actor = projectileActors.computeIfAbsent(proj, p -> {
                 Plant user = p.getUser();
                 String projPam = user != null ? user.getProjectilePam() : null;
-                String hitPam  = user != null ? user.getHitPam()        : null;
+                String hitPam = user != null ? user.getHitPam() : null;
                 ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
-                addActor(pa);
+                plantProjectileGroup.addActor(pa);
                 return pa;
             });
 
@@ -176,57 +406,122 @@ public class EntityRenderLayer extends Group {
             }
         }
 
-// Sweep orphaned projectile actors — ones whose projectile was already removed from the session list
-// but are still mid-hit or were never transitioned
-        Iterator<Map.Entry<Projectile, ProjectilePamActor>> projIt = projectileActors.entrySet().iterator();
-        while (projIt.hasNext()) {
-            Map.Entry<Projectile, ProjectilePamActor> entry = projIt.next();
+        // Sweep orphaned plant projectile actors
+        Iterator<Map.Entry<Projectile, ProjectilePamActor>> it = projectileActors.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Projectile, ProjectilePamActor> entry = it.next();
             ProjectilePamActor actor = entry.getValue();
-
             if (!liveSet.contains(entry.getKey())) {
-                // Projectile was cleaned up from session — trigger hit if still flying, else just remove
                 if (actor.phase == ProjectilePamActor.Phase.FLYING) {
                     Projectile proj = entry.getKey();
                     float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
                     float hy = LawnGridLayout.worldY(proj.getPosition().y());
                     actor.triggerHit(hx, hy);
-                    // keep it in the map so the hit plays out next frames
                 } else if (actor.isDone()) {
                     actor.remove();
-                    projIt.remove();
+                    it.remove();
                 }
-                // if phase == HIT and not done yet, leave it — it'll be caught next frame
             }
         }
-        Iterator<Map.Entry<Object, PamActor>> it = entityActors.entrySet().iterator();
+    }
+
+    // ---- Zombie projectiles -------------------------------------------------
+    private void syncZombieProjectiles(GameSession session) {
+        List<ZombieProjectile> live = new ArrayList<>(session.getZombieProjectiles());
+        Set<ZombieProjectile> liveSet = new HashSet<>(live);
+
+        for (ZombieProjectile proj : live) {
+            if (!proj.isAlive()) continue;
+
+            float screenX = LawnGridLayout.worldX((float) proj.getPosition().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f;
+            float screenY = LawnGridLayout.worldY((float) proj.getPosition().y());
+
+            // BoneProjectile is atlas-only
+            if (proj instanceof BoneProjectile) {
+                TextureRegion region = textures.region("IMAGE_ZOMBIE_BONE_PROJECTILE");
+                if (region != null) {
+                    pendingZombieAtlasDraws.add(new ZombieAtlasDrawCall(
+                            region,
+                            screenX - region.getRegionWidth() / 2f,
+                            screenY
+                    ));
+                }
+                continue;
+            }
+
+            // PAM zombie projectiles go in zombieGroup so they Y-sort with zombies
+            String clip = resolveZombieProjectileClip(proj);
+            PamActor actor = zombieProjActors.computeIfAbsent(proj, p -> {
+                PamActor a = new PamActor(pamPlayer, p.getPamLocation(), clip);
+                a.setPamScale(pamScaleForZombieProjectile(p));
+                zombieGroup.addActor(a);
+                return a;
+            });
+            actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+        }
+
+        cleanupZombieProjActors(liveSet);
+    }
+
+    private void cleanupZombieProjActors(GameSession session) {
+        // overload used by act() cleanup pass
+        Set<ZombieProjectile> liveSet = new HashSet<>(session.getZombieProjectiles());
+        cleanupZombieProjActors(liveSet);
+    }
+
+    private void cleanupZombieProjActors(Set<ZombieProjectile> liveSet) {
+        Iterator<Map.Entry<ZombieProjectile, PamActor>> it = zombieProjActors.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<Object, PamActor> entry = it.next();
-            if (entry.getKey() instanceof Projectile) continue; // handled above
-            if (!entitiesThisFrame.containsKey(entry.getKey())) {
+            Map.Entry<ZombieProjectile, PamActor> entry = it.next();
+            if (!liveSet.contains(entry.getKey()) || !entry.getKey().isAlive()) {
                 entry.getValue().remove();
                 it.remove();
             }
         }
-        // 5. Painter's Algorithm (Y-based Z-Sorting)
-        getChildren().sort((a1, a2) -> Float.compare(a2.getY(), a1.getY()));
     }
 
+    private String resolveZombieProjectileClip(ZombieProjectile proj) {
+        if (proj instanceof ZombieBossProjectile) return "missile";
+        if (proj instanceof OctopusProjectile) return "animation2";
+        return "animation";
+    }
+
+    private float pamScaleForZombieProjectile(ZombieProjectile proj) {
+        if (proj instanceof ZombieBossProjectile) return 0.55f;
+        if (proj instanceof GargantuarImpProjectile) return 0.6f;
+        return 0.45f;
+    }
+
+    // =========================================================================
+    // draw
+    // =========================================================================
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        // Draws sub-groups in the order they were added:
+        // plantGroup → overlayGroup → plantProjectileGroup → zombieGroup
         super.draw(batch, parentAlpha);
 
-        // Immediate mode for simple items/projectiles
+        // Armor overlays: drawn after zombies so they sit on top
+        for (ArmorDrawCall call : pendingArmorDraws) {
+            batch.draw(call.region(), call.x(), call.y(), call.w(), call.h());
+        }
+
+        // Atlas zombie projectiles (BoneProjectile etc.)
+        for (ZombieAtlasDrawCall call : pendingZombieAtlasDraws) {
+            batch.draw(call.region(), call.x(), call.y());
+        }
+
         GameSession session = App.getGameSession();
         if (session != null) {
             renderDrops(batch, session);
         }
     }
 
-
     private void renderDrops(Batch batch, GameSession session) {
         for (GroundItem item : session.getItems()) {
             if (item.isCollected()) continue;
-            if (item.getItemType() == ItemType.SUN) continue; // handled by SunRenderLayer
+            if (item.getItemType() == ItemType.SUN) continue; // SunRenderLayer handles suns
 
             float screenX = LawnGridLayout.worldX(item.getPosition().x());
             float screenY = LawnGridLayout.worldY(item.getPosition().y());
@@ -234,6 +529,24 @@ public class EntityRenderLayer extends Group {
             if (item.getItemType() == ItemType.PLANT_FOOD) {
                 TextureRegion region = textures.region("IMAGE_PLANTFOOD");
                 if (region != null) batch.draw(region, screenX, screenY, 48f, 48f);
+            }
+        }
+    }
+
+    // =========================================================================
+    // Helpers
+    // =========================================================================
+    private static void sortByY(Group group) {
+        group.getChildren().sort((a, b) -> Float.compare(b.getY(), a.getY()));
+    }
+
+    private static <K> void cleanupMap(Map<K, PamActor> map, Set<K> live, Group group) {
+        Iterator<Map.Entry<K, PamActor>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<K, PamActor> entry = it.next();
+            if (!live.contains(entry.getKey())) {
+                entry.getValue().remove(); // removes from its parent group
+                it.remove();
             }
         }
     }
