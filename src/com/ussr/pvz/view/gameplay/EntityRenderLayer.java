@@ -228,7 +228,10 @@ public class EntityRenderLayer extends Group {
     // ---- Zombies ------------------------------------------------------------
     private void syncZombies(GameSession session, Set<Object> live) {
         for (Zombie zombie : session.getZombies()) {
-            if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
+         if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
+            if (zombie.isBossMirror()) continue;
+            entitiesThisFrame.put(zombie, true);
+          
             live.add(zombie);
 
             PamActor actor = zombieGroupActors.computeIfAbsent(zombie, z -> {

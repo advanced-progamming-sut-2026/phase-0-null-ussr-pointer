@@ -29,22 +29,32 @@ public class DebugToolsWidget extends Table {
             }
         });
 
+        TextButton gridDebugBtn = new TextButton("Grid Debug", skin, "default");
+        gridDebugBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                DebugOverlay.toggleGrid();
+            }
+        });
+
+        TextButton hitboxDebugBtn = new TextButton("Hitbox Debug", skin, "default");
+        hitboxDebugBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                DebugOverlay.toggleHitboxes();
+            }
+        });
+
         add(addSunBtn).height(35f).padRight(5f);
-        add(addPfBtn).height(35f);
+        add(addPfBtn).height(35f).padRight(5f);
+        add(gridDebugBtn).height(35f).padRight(5f);
+        add(hitboxDebugBtn).height(35f);
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
         boolean isDebug = true;
-//        try {
-//            // Checks if the difficulty is set to debug/cheat configurations or an arbitrary global var.
-//            // Adjust to your precise global debug flag binding from SettingMenu.
-//            if (App.getAccount() != null && App.getAccount().getDifficultyLvl() == -1) {
-//                isDebug = true;
-//            }
-//        } catch (Exception ignored) {}
-
-        setVisible(isDebug); // Falls back to hidden unless explicitly triggered
+        setVisible(isDebug);
     }
 }

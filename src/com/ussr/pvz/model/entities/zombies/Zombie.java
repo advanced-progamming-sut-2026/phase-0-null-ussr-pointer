@@ -49,6 +49,7 @@ public class Zombie extends GameEntity implements Damageable {
     private java.util.List<String> damageWhileSubmerged;
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
     private String pamPath;
+    private boolean bossMirror = false;
     private float deathTimer = -1f; // -1 means not dying yet
     // Some zombie PAM death clips are longer than two seconds. Keeping the
     // entity for four seconds lets both the body fall and the late head drop
@@ -135,6 +136,14 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setPamPath(String pamPath) {
         this.pamPath = pamPath;
+    }
+
+    public boolean isBossMirror() {
+        return bossMirror;
+    }
+
+    public void setBossMirror(boolean bossMirror) {
+        this.bossMirror = bossMirror;
     }
 
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}

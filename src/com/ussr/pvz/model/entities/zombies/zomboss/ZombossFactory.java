@@ -19,6 +19,7 @@ public final class ZombossFactory {
 
         Zombie primary = ZombieFactory.create(alias, primaryRow, col);
         Zombie mirror = ZombieFactory.create(alias, primaryRow + 1, col);
+        mirror.setBossMirror(true);
 
         ZombossController controller = new ZombossController(primary, mirror, data);
         primary.setEffectStatus(controller);

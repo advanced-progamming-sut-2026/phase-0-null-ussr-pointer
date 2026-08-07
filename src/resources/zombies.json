@@ -301,7 +301,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL/ZOMBIE_TUTORIAL.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -377,7 +377,7 @@
     ],
     "objclass": "ZombieGargantuarProps",
     "pamLocation": "768/INITIAL/ZOMBIE/TUTORIAL_GARGANTUAR/TUTORIAL_GARGANTUAR.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "AlmanacOffset": {
         "x": -10,
@@ -521,7 +521,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL_IMP/ZOMBIE_TUTORIAL_IMP.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 102,
@@ -597,7 +597,7 @@
     ],
     "objclass": "ZombieRaProps",
     "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EGYPT_RA/ZOMBIE_EGYPT_RA.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -670,7 +670,7 @@
     ],
     "objclass": "ZombieExplorerProps",
     "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EXPLORER/ZOMBIE_EXPLORER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -750,7 +750,7 @@
     ],
     "objclass": "ZombieTombRaiserProps",
     "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EGYPT_TOMBRAISER/ZOMBIE_EGYPT_TOMBRAISER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "# TombRaiser specific properties ": 0,
       "Ammo": 5,
@@ -828,7 +828,7 @@
     ],
     "objclass": "ZombieIceAgeDodoProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_DODORIDER/ZOMBIE_ICEAGE_DODORIDER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "AddRandomChanceForJumpPerGridWalked": 0.1,
       "ArmDropFraction": -1,
@@ -942,7 +942,7 @@
     ],
     "objclass": "ZombieIceAgeHunterProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_HUNTER/ZOMBIE_ICEAGE_HUNTER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "Actions": [
         "RTID(ZombieIceAgeProjectileAction@ZombieActions)"
@@ -1021,7 +1021,7 @@
     ],
     "objclass": "ZombieIceAgeTroglobiteProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_TROGLOBITE/ZOMBIE_ICEAGE_TROGLOBITE.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "Actions": [
         "RTID(ZombiePushGridItemAction@ZombieActions)"
@@ -1099,7 +1099,7 @@
     ],
     "objclass": "ZombieBeachFishermanProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_FISHERMAN/ZOMBIE_BEACH_FISHERMAN.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "AllowedLowPlants": [],
       "ArtCenter": {
@@ -1187,7 +1187,7 @@
     ],
     "objclass": "ZombieBeachOctopusProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_OCTOPUS/ZOMBIE_BEACH_OCTOPUS.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "Actions": [
         "RTID(ZombieOctopusProjectileAction@ZombieActions)"
@@ -1262,7 +1262,7 @@
     ],
     "objclass": "ZombieBeachSnorkelProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_SNORKELER/ZOMBIE_BEACH_SNORKELER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -1464,7 +1464,7 @@
     ],
     "objclass": "ZombieDarkJugglerProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_JESTER/ZOMBIE_DARK_JESTER.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "AngleAgnosticProjectiles": [
         "HomingThistleDefault",
@@ -1650,7 +1650,7 @@
     ],
     "objclass": "ZombieDarkWizardProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_WIZARD/ZOMBIE_DARK_WIZARD.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_WIZARD",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_WIZARD",
     "objdata": {
       "Actions": [
         "RTID(ZombieDarkWizardZap@ZombieActions)"
@@ -1820,7 +1820,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_IMP_DRAGON/ZOMBIE_DARK_IMP_DRAGON.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_IMP_DRAGON",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_IMP_DRAGON",
     "objdata": {
       "ArtCenter": {
         "x": 96,
@@ -1898,7 +1898,7 @@
     ],
     "objclass": "ZombieModernAllStarProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_MODERN_ALLSTAR/ZOMBIE_MODERN_ALLSTAR.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -1982,7 +1982,7 @@
     ],
     "objclass": "ZombieLostCityJaneProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_LOSTCITY_JANE/ZOMBIE_LOSTCITY_JANE.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_JANE",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_JANE",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -2090,7 +2090,7 @@
     ],
     "objclass": "ZombieCrystalSkullProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_LOSTCITY_CRYSTALSKULL/ZOMBIE_LOSTCITY_CRYSTALSKULL.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_CRYSTALSKULL",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LOSTCITY_CRYSTALSKULL",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -2177,7 +2177,7 @@
     ],
     "objclass": "ZombieProspectorProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PROSPECTOR/ZOMBIE_PROSPECTOR.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "Apex": 250,
       "ArtCenter": {
@@ -2253,7 +2253,7 @@
     ],
     "objclass": "ZombiePianoProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PIANO/ZOMBIE_PIANO.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_PIANO",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_PIANO",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -2349,7 +2349,7 @@
     ],
     "objclass": "ZombieNewspaperProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_MODERN_NEWSPAPER/ZOMBIE_MODERN_NEWSPAPER.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_MODERN_NEWSPAPER",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_MODERN_NEWSPAPER",
     "objdata": {
       "ArtCenter": {
         "x": 100,
@@ -2427,32 +2427,71 @@
     ],
     "objclass": "ZombieBarrelRollerProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_PIRATE_BARREL_PUSHER/ZOMBIE_PIRATE_BARREL_PUSHER.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_BARRELROLLER",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_BARRELROLLER",
     "objdata": {
       "Actions": [
         "RTID(ZombiePushGridItemAction@ZombieActions)"
       ],
-      "ArtCenter": { "x": 90, "y": 125 },
-      "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
       "CanSpawnPlantFood": true,
       "Cost": 150,
       "EatDPS": 100,
       "GroundTrackName": "ground_swatch",
-      "HitRect": { "mHeight": 95, "mWidth": 32, "mX": 10, "mY": 10 },
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
       "Hitpoints": 190,
       "ScaledProps": [
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "Hitpoints" },
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "EatDPS" },
-        { "Formula": "constant", "Key": "Speed" },
-        { "Formula": "constant", "Key": "WavePointCost" }
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
       ],
-      "ShadowOffset": { "x": 5, "y": 0, "z": 1.4 },
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
       "Speed": 0.185,
       "WavePointCost": 400,
       "Weight": 2500,
       "ZombieStats": [
-        { "Type": "toughness", "Value": "toughness1" },
-        { "Type": "speed", "Value": "speed2" }
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
       ],
       "move": "PusherMove"
     }
@@ -2463,7 +2502,7 @@
     ],
     "objclass": "ZombieArcadeProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_80S_ARCADE/ZOMBIE_80S_ARCADE.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_EIGHTIES_ARCADE",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_EIGHTIES_ARCADE",
     "objdata": {
       "Actions": [
         "RTID(ZombieArcadePushAction@ZombieActions)"
@@ -2539,29 +2578,68 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
-      "ArtCenter": { "x": 90, "y": 125 },
-      "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
       "CanSpawnPlantFood": true,
       "Cost": 150,
       "EatDPS": 100,
       "GroundTrackName": "ground_swatch",
-      "HitRect": { "mHeight": 95, "mWidth": 32, "mX": 10, "mY": 10 },
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
       "Hitpoints": 190,
       "ScaledProps": [
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "Hitpoints" },
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "EatDPS" },
-        { "Formula": "constant", "Key": "Speed" },
-        { "Formula": "constant", "Key": "WavePointCost" }
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
       ],
-      "ShadowOffset": { "x": 5, "y": 0, "z": 1.4 },
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
       "Speed": 0.185,
       "WavePointCost": 200,
       "Weight": 1000,
       "ZombieStats": [
-        { "Type": "toughness", "Value": "toughness1" },
-        { "Type": "speed", "Value": "speed2" }
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
       ],
       "effect": {
         "type": "PeashooterZombieEffect",
@@ -2576,29 +2654,68 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
-      "ArtCenter": { "x": 90, "y": 125 },
-      "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
       "CanSpawnPlantFood": true,
       "Cost": 50,
       "EatDPS": 100,
       "GroundTrackName": "ground_swatch",
-      "HitRect": { "mHeight": 95, "mWidth": 40, "mX": 5, "mY": 10 },
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 40,
+        "mX": 5,
+        "mY": 10
+      },
       "Hitpoints": 4000,
       "ScaledProps": [
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "Hitpoints" },
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "EatDPS" },
-        { "Formula": "constant", "Key": "Speed" },
-        { "Formula": "constant", "Key": "WavePointCost" }
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
       ],
-      "ShadowOffset": { "x": 5, "y": 0, "z": 1.4 },
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
       "Speed": 0.12,
       "WavePointCost": 400,
       "Weight": 2500,
       "ZombieStats": [
-        { "Type": "toughness", "Value": "toughness7" },
-        { "Type": "speed", "Value": "speed0" }
+        {
+          "Type": "toughness",
+          "Value": "toughness7"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
       ]
     }
   },
@@ -2608,29 +2725,68 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
-      "ArtCenter": { "x": 90, "y": 125 },
-      "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
       "CanSpawnPlantFood": true,
       "Cost": 125,
       "EatDPS": 100,
       "GroundTrackName": "ground_swatch",
-      "HitRect": { "mHeight": 95, "mWidth": 32, "mX": 10, "mY": 10 },
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
       "Hitpoints": 190,
       "ScaledProps": [
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "Hitpoints" },
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "EatDPS" },
-        { "Formula": "constant", "Key": "Speed" },
-        { "Formula": "constant", "Key": "WavePointCost" }
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
       ],
-      "ShadowOffset": { "x": 5, "y": 0, "z": 1.4 },
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
       "Speed": 0.185,
       "WavePointCost": 300,
       "Weight": 1000,
       "ZombieStats": [
-        { "Type": "toughness", "Value": "toughness1" },
-        { "Type": "speed", "Value": "speed2" }
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
       ],
       "effect": "JalapenoZombieEffect"
     }
@@ -2641,33 +2797,448 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
-      "ArtCenter": { "x": 90, "y": 125 },
-      "AttackRect": { "mHeight": 95, "mWidth": 20, "mX": 15, "mY": 0 },
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
       "CanSpawnPlantFood": true,
       "Cost": 50,
       "EatDPS": 0,
       "GroundTrackName": "ground_swatch",
-      "HitRect": { "mHeight": 95, "mWidth": 32, "mX": 10, "mY": 10 },
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
       "Hitpoints": 190,
       "ScaledProps": [
-        { "Arg1": 1.3, "Arg2": 0.05, "Formula": "standard", "Key": "Hitpoints" },
-        { "Formula": "constant", "Key": "Speed" },
-        { "Formula": "constant", "Key": "WavePointCost" }
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
       ],
-      "ShadowOffset": { "x": 5, "y": 0, "z": 1.4 },
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
       "Speed": 0.35,
       "WavePointCost": 350,
       "Weight": 1000,
       "ZombieStats": [
-        { "Type": "toughness", "Value": "toughness1" },
-        { "Type": "speed", "Value": "speed5" }
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed5"
+        }
       ],
       "attack": {
         "type": "KamikazeAttack",
         "damage": 1800
       }
+    }
+  },
+  {
+    "aliases": [
+      "ZombossEgypt"
+    ],
+    "objclass": "ZombossEgyptProps",
+    "pamLocation": "768/INITIAL/ZOMBIE/ZOMBIE_EGYPT_ZOMBOSS/ZOMBIE_EGYPT_ZOMBOSS.PAM",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_ZOMBOSSMECH_EGYPT",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 0,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 140,
+        "mWidth": 90,
+        "mX": 0,
+        "mY": 0
+      },
+      "Hitpoints": 6000,
+      "ScaledProps": [
+        {
+          "Formula": "constant",
+          "Key": "Hitpoints"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.4
+      },
+      "Size": "large",
+      "Speed": 0.0,
+      "WavePointCost": 0,
+      "Weight": 0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness9"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ],
+      "move": "StationaryMove",
+      "ZombossStunDuration": 3.0,
+      "ZombossCanSpawnZombies": true,
+      "ZombossCanSwitchRows": true,
+      "ZombossMoveIntervalMin": 5.0,
+      "ZombossMoveIntervalMax": 9.0,
+      "ZombossMinionPool": [
+        "ZombieDefault",
+        "ZombieArmor1",
+        "ZombieArmor2",
+        "ZombieImp"
+      ],
+      "ZombossMoves": [
+        {
+          "name": "EgyptRocket",
+          "weight": 400,
+          "cooldown": 9.0
+        },
+        {
+          "name": "ForwardDash",
+          "weight": 250,
+          "cooldown": 14.0
+        },
+        {
+          "name": "SpawnMinions",
+          "weight": 250,
+          "cooldown": 16.0
+        },
+        {
+          "name": "RowSwitch",
+          "weight": 100,
+          "cooldown": 12.0
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombossMammoth"
+    ],
+    "objclass": "ZombossMammothProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_ZOMBOSS/ZOMBIE_ICEAGE_ZOMBOSS.PAM",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_ZOMBOSSMECH_ICEAGE",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 0,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 150,
+        "mWidth": 110,
+        "mX": 0,
+        "mY": 0
+      },
+      "Hitpoints": 6500,
+      "ScaledProps": [
+        {
+          "Formula": "constant",
+          "Key": "Hitpoints"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.4
+      },
+      "Size": "large",
+      "Speed": 0.0,
+      "WavePointCost": 0,
+      "Weight": 0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness9"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ],
+      "move": "StationaryMove",
+      "ZombossStunDuration": 3.0,
+      "ZombossCanSpawnZombies": false,
+      "ZombossCanSwitchRows": false,
+      "ZombossMoveIntervalMin": 5.0,
+      "ZombossMoveIntervalMax": 9.0,
+      "ZombossMoves": [
+        {
+          "name": "IceRocket",
+          "weight": 400,
+          "cooldown": 8.0
+        },
+        {
+          "name": "IceWind",
+          "weight": 300,
+          "cooldown": 11.0
+        },
+        {
+          "name": "ColumnFreeze",
+          "weight": 300,
+          "cooldown": 13.0
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombossDragon"
+    ],
+    "objclass": "ZombossDragonProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_ZOMBOSS/ZOMBIE_DARK_ZOMBOSS.PAM",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_ZOMBOSSMECH_DARK",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 0,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 140,
+        "mWidth": 120,
+        "mX": 0,
+        "mY": 0
+      },
+      "Hitpoints": 7000,
+      "ScaledProps": [
+        {
+          "Formula": "constant",
+          "Key": "Hitpoints"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.4
+      },
+      "Size": "large",
+      "Speed": 0.0,
+      "WavePointCost": 0,
+      "Weight": 0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness9"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ],
+      "move": "StationaryMove",
+      "ZombossStunDuration": 3.0,
+      "ZombossCanSpawnZombies": true,
+      "ZombossCanSwitchRows": true,
+      "ZombossMoveIntervalMin": 5.0,
+      "ZombossMoveIntervalMax": 9.0,
+      "ZombossMinionPool": [
+        "ZombieDarkArmor3",
+        "ZombieDarkImpDragon",
+        "ZombiePiano"
+      ],
+      "ZombossMoves": [
+        {
+          "name": "FireballBarrage",
+          "weight": 350,
+          "cooldown": 10.0,
+          "count": 3
+        },
+        {
+          "name": "RowIgnite",
+          "weight": 300,
+          "cooldown": 15.0
+        },
+        {
+          "name": "SpawnMinions",
+          "weight": 250,
+          "cooldown": 16.0
+        },
+        {
+          "name": "RowSwitch",
+          "weight": 100,
+          "cooldown": 12.0
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombossShark"
+    ],
+    "objclass": "ZombossSharkProps",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_BEACH_ZOMBOSS/ZOMBIE_BEACH_ZOMBOSS.PAM",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_ZOMBOSSMECH_BEACH",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 0,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 140,
+        "mWidth": 120,
+        "mX": 0,
+        "mY": 0
+      },
+      "Hitpoints": 7500,
+      "ScaledProps": [
+        {
+          "Formula": "constant",
+          "Key": "Hitpoints"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.4
+      },
+      "Size": "large",
+      "Speed": 0.0,
+      "WavePointCost": 0,
+      "Weight": 0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness9"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ],
+      "move": "StationaryMove",
+      "ZombossStunDuration": 3.0,
+      "ZombossCanSpawnZombies": true,
+      "ZombossCanSwitchRows": true,
+      "ZombossMoveIntervalMin": 5.0,
+      "ZombossMoveIntervalMax": 9.0,
+      "ZombossMinionPool": [
+        "ZombieBeachFisherman",
+        "ZombieBeachOctopus",
+        "ZombieBeachSnorkel"
+      ],
+      "ZombossMoves": [
+        {
+          "name": "BabySharks",
+          "weight": 350,
+          "cooldown": 9.0,
+          "count": 4
+        },
+        {
+          "name": "Turbine",
+          "weight": 300,
+          "cooldown": 13.0
+        },
+        {
+          "name": "SpawnMinions",
+          "weight": 250,
+          "cooldown": 16.0
+        },
+        {
+          "name": "RowSwitch",
+          "weight": 100,
+          "cooldown": 12.0
+        }
+      ]
     }
   }
 ]

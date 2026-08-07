@@ -531,6 +531,9 @@ public class GameService {
 
         String plantKey = requestedType == null ? "" : requestedType.trim().toUpperCase().replaceAll("[\\s_]", "");
 
+        GameSession session = App.getGameSession();
+        boolean deliveredByConveyor = isOnConveyorBelt(session, requestedType);
+
         // Safe retrieve without raw unboxing side effects
         var progressMap = account.getAdventureProgress().getPlantLvls();
         if (progressMap == null) {
@@ -538,11 +541,11 @@ public class GameService {
         }
 
         Integer level = progressMap.get(plantKey);
-        if (level == null || level == 0) {
+        if (!deliveredByConveyor && (level == null || level == 0)) {
             throw new IllegalStateException("You haven't unlocked " + requestedType);
         }
+        int effectiveLevel = (level == null || level == 0) ? 1 : level;
 
-        GameSession session = App.getGameSession();
         if (session != null && session.getSelectedPlants() != null && !session.getSelectedPlants().isEmpty()) {
             String canonical = ChoosePlantService.normalizePlantKey(requestedType);
             boolean inLoadout = session.getSelectedPlants().stream()
@@ -553,7 +556,18 @@ public class GameService {
         }
 
         int plantId = PlantFactory.findIdByName(requestedType);
-        return PlantFactory.createPlant(plantId, level);
+        return PlantFactory.createPlant(plantId, effectiveLevel);
+    }
+
+    private boolean isOnConveyorBelt(GameSession session, String requestedType) {
+        if (session == null || session.getLevel() == null) return false;
+        if (!(session.getLevel().getDeliveryStrategy() instanceof com.ussr.pvz.model.level.delivery
+                .ConveyorDeliveryStrategy conveyor)) {
+            return false;
+        }
+        String canonical = ChoosePlantService.normalizePlantKey(requestedType);
+        return conveyor.getConveyorBelt().stream()
+                .anyMatch(name -> ChoosePlantService.normalizePlantKey(name).equals(canonical));
     }
 
     private Plant instantiatePlant(Plant blueprint, int x, int y) {
@@ -785,7 +799,7 @@ public class GameService {
                 ? "zombie waves started (" + totalWaves + " waves loaded)"
                 : "zombie waves started (no wave data — add waves to your level JSON)";
     }
-      public String showPlantFood() {
+    public String showPlantFood() {
         if (App.getGameSession() == null) {
             return "no active game session";
         }

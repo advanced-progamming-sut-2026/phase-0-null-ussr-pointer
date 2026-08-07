@@ -1,7 +1,6 @@
 package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 
@@ -81,7 +80,7 @@ public class LevelSelectionService {
         // Tell LevelManager this is now the active level.
         App.getLevelManager().startLevel(level.getId());
 
-        App.setMenuState(MenuState.CHOOSE_PLANT);
+        ChoosePlantService.proceedPastLevelStart();
 
         return isCheated
                 ? "Cheat enabled! Entering locked level: " + level.getId() +

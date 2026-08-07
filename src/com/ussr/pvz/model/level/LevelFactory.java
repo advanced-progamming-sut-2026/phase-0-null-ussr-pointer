@@ -21,6 +21,7 @@ public class LevelFactory {
         BEHAVIOR_REGISTRY.put("NormalBehavior", NormalBehavior::new);
         BEHAVIOR_REGISTRY.put("VaseBreakerBehavior", VaseBreakerBehavior::new);
         BEHAVIOR_REGISTRY.put("MeowBehavior", MeowBehavior::new);
+
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
@@ -46,6 +47,7 @@ public class LevelFactory {
         level.setLockedPlants(data.lockedPlants != null ? data.lockedPlants : new ArrayList<>());
         level.setSeedPlants(data.seedPlants != null ? data.seedPlants : new ArrayList<>());
         level.setRewardPlantAliases(data.rewardPlantAliases != null ? data.rewardPlantAliases : new ArrayList<>());
+        level.setZombossAlias(data.zombossAlias);
     }
 
     private static LevelBehavior parseBehavior(JsonContainer.JsonLevelData data) {

@@ -14,6 +14,7 @@ import pvz.libpvz.textures.TextureBank;
  */
 public class InGameHud extends Table implements Disposable {
     private final SeedBankHud seedBankHud;
+    private final ConveyorBeltWidget conveyorBeltWidget;
     private final ShovelWidget shovelWidget;
     private final WaveProgressBar waveProgressBar;
     private final PauseMenuAssets pauseMenuAssets;
@@ -53,7 +54,6 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row Layout
         Table topRow = new Table();
         topRow.add(seedBankHud).left().expandX();
         topRow.add(objectives.topBarWidget()).center().expandX();
@@ -61,19 +61,20 @@ public class InGameHud extends Table implements Disposable {
         topRow.add(debugTools).right().padRight(15f);
         topRow.add(pauseButton).right().top().pad(15f);
 
-        // Bottom Row Layout
         Table bottomRow = new Table();
         bottomRow.add().expandX();
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Center Grid Layout
         Stack lawnStack = new Stack();
         lawnStack.add(objectives.lawnOverlayWidget());
 
-        // Assemble standard game layer
+        Table middleRow = new Table();
+        middleRow.add(conveyorBeltWidget).top().padTop(10f).padLeft(10f);
+        middleRow.add(lawnStack).grow();
+
         Table mainGameLayer = new Table();
         mainGameLayer.add(topRow).growX().top().row();
-        mainGameLayer.add(lawnStack).grow().row();
+        mainGameLayer.add(middleRow).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
 
         // High priority overlays
@@ -85,14 +86,37 @@ public class InGameHud extends Table implements Disposable {
                 );
         GameOverOverlay gameOverOverlay = new GameOverOverlay(skin);
 
-        // Root construction
         Stack rootStack = new Stack();
         rootStack.add(mainGameLayer);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
-        rootStack.add(eventAnnouncer); // Logical UI event dispatcher (invisible)
+        rootStack.add(eventAnnouncer);
 
         add(rootStack).grow();
+    }
+
+    private void registerLawnDropTarget(DragAndDrop dragAndDrop, GameplayController controller) {
+        dragAndDrop.addTarget(new DragAndDrop.Target(lawnWidget) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                lawnWidget.setDragPreviewKey((String) payload.getObject());
+                return lawnWidget.gridCellAt(x, y) != null;
+            }
+
+            @Override
+            public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                lawnWidget.setDragPreviewKey(null);
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                lawnWidget.setDragPreviewKey(null);
+                int[] cell = lawnWidget.gridCellAt(x, y);
+                if (cell != null) {
+                    controller.plantAt((String) payload.getObject(), cell[0], cell[1]);
+                }
+            }
+        });
     }
 
     public SeedBankHud getSeedBankHud() {
