@@ -2,47 +2,51 @@ package com.ussr.pvz.view.hud;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import pvz.libpvz.textures.TextureBank;
 
-public class InGameHud extends Table {
+/**
+ * Master layout for the in-game UI layer.
+ * Enforces MVC by delegating all interactions to the GameplayController.
+ */
+public class InGameHud extends Table implements Disposable {
     private final SeedBankHud seedBankHud;
     private final ConveyorBeltWidget conveyorBeltWidget;
     private final ShovelWidget shovelWidget;
     private final WaveProgressBar waveProgressBar;
-    private final LawnWidget lawnWidget;
+    private final PauseMenuAssets pauseMenuAssets;
 
     public InGameHud(Skin skin, TextureBank textures, GameplayController controller) {
         setFillParent(true);
         setTouchable(Touchable.childrenOnly);
 
-        DragAndDrop dragAndDrop = new DragAndDrop();
-        dragAndDrop.setTapSquareSize(24f);
+        pauseMenuAssets = new PauseMenuAssets();
 
         // Initialize components
-        seedBankHud = new SeedBankHud(skin, textures, dragAndDrop, controller);
-        conveyorBeltWidget = new ConveyorBeltWidget(skin, textures, controller);
-        shovelWidget = new ShovelWidget(skin, textures, controller);
+        seedBankHud = new SeedBankHud(skin, textures);
+        shovelWidget = new ShovelWidget(
+                skin,
+                textures,
+                controller,
+                seedBankHud::clearSelection
+        );
         waveProgressBar = new WaveProgressBar(skin, textures);
-        lawnWidget = new LawnWidget(controller);
 
-        registerLawnDropTarget(dragAndDrop, controller);
-
-        HoverCursorWidget hoverCursor = new HoverCursorWidget(lawnWidget, seedBankHud, textures);
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
+        controller.setOnPlantingCompleted(seedBankHud::clearSelection);
 
         ObjectiveWidgetFactory.ObjectiveWidgets objectives = ObjectiveWidgetFactory.create(skin, textures);
 
-        TextButton pauseButton = new TextButton("Pause", skin, "brown");
+        // Pause Menu Trigger
+        ImageButton pauseButton = new ImageButton(
+                pauseMenuAssets.sliderBoltDrawable()
+        );
         pauseButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -53,17 +57,16 @@ public class InGameHud extends Table {
         Table topRow = new Table();
         topRow.add(seedBankHud).left().expandX();
         topRow.add(objectives.topBarWidget()).center().expandX();
+        topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
         topRow.add(debugTools).right().padRight(15f);
         topRow.add(pauseButton).right().top().pad(15f);
 
         Table bottomRow = new Table();
-        bottomRow.add(waveProgressBar).bottom().right().expandX().padRight(20f).padBottom(15f);
+        bottomRow.add().expandX();
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
         Stack lawnStack = new Stack();
         lawnStack.add(objectives.lawnOverlayWidget());
-        lawnStack.add(lawnWidget);
-        lawnStack.add(hoverCursor);
 
         Table middleRow = new Table();
         middleRow.add(conveyorBeltWidget).top().padTop(10f).padLeft(10f);
@@ -74,7 +77,13 @@ public class InGameHud extends Table {
         mainGameLayer.add(middleRow).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
 
-        PauseMenuOverlay pauseOverlay = new PauseMenuOverlay(skin, controller);
+        // High priority overlays
+        PauseMenuOverlay pauseOverlay =
+                new PauseMenuOverlay(
+                        skin,
+                        pauseMenuAssets,
+                        controller
+                );
         GameOverOverlay gameOverOverlay = new GameOverOverlay(skin);
 
         Stack rootStack = new Stack();
@@ -112,5 +121,10 @@ public class InGameHud extends Table {
 
     public SeedBankHud getSeedBankHud() {
         return seedBankHud;
+    }
+
+    @Override
+    public void dispose() {
+        pauseMenuAssets.dispose();
     }
 }

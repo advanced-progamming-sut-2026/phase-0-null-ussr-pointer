@@ -50,6 +50,7 @@ public class ShootStrategy implements ActStrategy {
                     hitEffect,user
             ));
         }
+        user.triggerActionAnimation(0.5f);
     }
 
     private HitEffectStrategy buildHitEffect(Plant user) {

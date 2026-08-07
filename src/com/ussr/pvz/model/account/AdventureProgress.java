@@ -140,8 +140,13 @@ public class AdventureProgress {
             plantInstance.setDamage(((Number) plantData.get("damage")).intValue());
         if (plantData.get("actionInterval") != null)
             plantInstance.setActionInterval(((Number) plantData.get("actionInterval")).doubleValue());
-        if (plantData.get("recharge") != null)
-            plantInstance.setRecharge(((Number) plantData.get("recharge")).intValue());
+        if (plantData.get("recharge") != null) {
+            double rechargeDuration =
+                    ((Number) plantData.get("recharge")).doubleValue();
+            plantInstance.setMaxRecharge(rechargeDuration);
+            // The JSON value is the cooldown duration, not an active cooldown.
+            plantInstance.setRecharge(0.0);
+        }
         if (plantData.get("abilityValue") != null)
             plantInstance.setAbilityValue(((Number) plantData.get("abilityValue")).doubleValue());
         if (plantData.get("wramp-up") != null) {

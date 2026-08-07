@@ -6,6 +6,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class FishermanEffect implements EffectStatus {
     private boolean castHook(Zombie zombie, GameSession session) {
         int zRow = (int) zombie.getPosition().y();
         int zCol = (int) zombie.getPosition().x();
-
+        zombie.queueAnimEvent("cast");
         if (zombie.getFaction() == Faction.ZOMBIES) {
             return hookPlant(session, zRow, zCol, zombie);
         } else {
@@ -67,7 +68,6 @@ public class FishermanEffect implements EffectStatus {
         Plant hookedPlant = plantsInRow.get(RANDOM.nextInt(plantsInRow.size()));
         int hookedX = hookedPlant.getLocation().x();
         int targetX = hookedX + 1;
-
         Cell targetCell = session.getLawn().getCell(zRow, targetX);
 
         if (targetX >= zCol || (targetCell != null && targetCell.getPlant() != null)) {
@@ -81,6 +81,7 @@ public class FishermanEffect implements EffectStatus {
             targetCell.setPlant(hookedPlant);
             hookedPlant.setLocation(new Plant.Location(targetX, zRow));
             hookedPlant.setPosition(Vec2.of(targetX, zRow));
+            zombie.queueAnimEvent("reel");
             return true;
         }
 

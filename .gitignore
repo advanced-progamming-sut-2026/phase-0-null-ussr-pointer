@@ -35,6 +35,10 @@ bin/
 .gradle
 .gradle-codex/
 
+# Local Gradle cache used by Codex verification runs
+/.codex-gradle/
+/.codex-video-*/
+
 # Ignore Gradle build output directory
 build
 users.json

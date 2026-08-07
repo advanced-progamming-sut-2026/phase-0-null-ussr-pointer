@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
@@ -14,8 +15,10 @@ import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.view.hud.InGameHud;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
+import com.ussr.pvz.view.hud.HoverCursorWidget;
+import com.ussr.pvz.view.hud.LawnWidget;
 
-public class ActiveGameplayView extends Table {
+public class ActiveGameplayView extends Table implements Disposable {
 
     private static final float TICK_RATE = 0.1f;
     private float accumulator = 0f;
@@ -24,18 +27,53 @@ public class ActiveGameplayView extends Table {
     private final InGameHud inGameHud;
     private final EntityRenderLayer entityLayer;
 
-    public ActiveGameplayView(Skin skin, TextureBank textures, PamPlayer pamPlayer) {
+    public ActiveGameplayView(
+            Skin skin,
+            TextureBank textures,
+            PamPlayer pamPlayer
+    ) {
         setFillParent(true);
+
         this.controller = new GameplayController();
 
         Image background = createBackground(textures);
-        this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
-        this.inGameHud = new InGameHud(skin, textures, controller);
+
+        this.entityLayer =
+                new EntityRenderLayer(pamPlayer, textures);
+
+        TerrainRenderLayer terrainLayer =
+                new TerrainRenderLayer(pamPlayer, textures);
+
+        this.inGameHud =
+                new InGameHud(skin, textures, controller);
+
+        LawnWidget lawnWidget =
+                new LawnWidget(controller);
+
+        HoverCursorWidget hoverCursor =
+                new HoverCursorWidget(
+                        inGameHud.getSeedBankHud(),
+                        textures,
+                        controller
+                );
 
         Stack layers = new Stack();
+// in your GameplayScreen or wherever the stage is assembled
+        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);// on top so suns render above entities
+        StormRenderLayer stormRearLayer =
+                new StormRenderLayer(pamPlayer, true);
+        StormRenderLayer stormTopLayer =
+                new StormRenderLayer(pamPlayer, false);
+
         layers.add(background);
+        layers.add(terrainLayer);
+        layers.add(stormRearLayer);
         layers.add(entityLayer);
+        layers.add(sunLayer);
+        layers.add(stormTopLayer);
+        layers.add(lawnWidget);
         layers.add(inGameHud);
+        layers.add(hoverCursor);
 
         add(layers).grow();
     }
@@ -72,5 +110,10 @@ public class ActiveGameplayView extends Table {
                 accumulator -= TICK_RATE;
             }
         }
+    }
+
+    @Override
+    public void dispose() {
+        inGameHud.dispose();
     }
 }

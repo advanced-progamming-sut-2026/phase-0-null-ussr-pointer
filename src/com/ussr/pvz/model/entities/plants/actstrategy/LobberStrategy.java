@@ -36,6 +36,7 @@ public class LobberStrategy implements ActStrategy {
                 new ArcMove(GRAVITY),
                 hitEffect,user
         ));
+        user.triggerActionAnimation(0.5f);
     }
 
 

@@ -34,6 +34,7 @@ public class TombRaiserEffect implements EffectStatus {
         timer += delta;
         if (timer >= cooldown) {
             timer = 0;
+            zombie.queueAnimEvent("power");
             throwBones(zombie, session);
         }
     }

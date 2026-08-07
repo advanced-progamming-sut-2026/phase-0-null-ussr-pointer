@@ -44,4 +44,9 @@ public class ZombiePeaProjectile extends ZombieProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "768/INITIAL/EFFECTS/T_SNOW_PEA/T_SNOW_PEA.PAM";
+    }
 }

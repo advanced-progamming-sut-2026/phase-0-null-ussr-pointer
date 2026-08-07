@@ -41,4 +41,5 @@ public abstract class ZombieProjectile extends GameEntity {
     protected abstract void onDestinationReached(GameSession session);
 
     public abstract void onDestinationReached();
+    public abstract String getPamLocation();
 }

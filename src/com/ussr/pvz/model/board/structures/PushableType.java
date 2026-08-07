@@ -20,4 +20,6 @@ public enum PushableType {
 
     public int getBaseHp() { return baseHp; }
     public String getSpawnAlias() { return spawnAlias; }
+    // Add to PushableType enum:
+    public String getPamLocation() { return pamLocation; }
 }

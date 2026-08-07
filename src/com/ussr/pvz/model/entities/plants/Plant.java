@@ -50,7 +50,9 @@ public class Plant extends GameEntity implements Damageable {
     private String hitPam;
     private String plantFoodProjectilePam;
     private String plantFoodHitPam;
-
+    // Animation State Manager Variables
+    private String currentClip = "idle";
+    private float animationTimer = 0f;
     private double plantFoodTimer = 0.0;
 
     private PlantArmor armor;
@@ -154,13 +156,24 @@ public class Plant extends GameEntity implements Damageable {
 
     @Override
     public void update(float delta) {
-        if (!isAlive
-                || state == PlantState.INCAPACITATED) {
+        if (!isAlive && state != PlantState.DYING) {
+            return; // Allow DYING state to process for explosive animations
+        }
+        if(state == PlantState.INCAPACITATED){
+            currentClip = "idle";
             return;
         }
 
-        lifetime -= delta;
+        // --- NEW: Tick the animation timer ---
+        if (animationTimer > 0) {
+            animationTimer -= delta;
+            if (animationTimer <= 0) {
+                currentClip = "idle";
+            }
+        }
+        // -------------------------------------
 
+        lifetime -= delta;
         if (lifetime < 0) {
             killPlant();
             return;
@@ -533,6 +546,55 @@ public class Plant extends GameEntity implements Damageable {
                 plantFoodEffect.triggerSuperpower(this , App.getGameSession());
             }
         }
+    }
+    /**
+     * Call this from your ActStrategy (e.g., when Peashooter shoots or Sunflower drops sun).
+     * It will play the "attack" clip for the specified duration before returning to "idle".
+     */
+    public void triggerActionAnimation(float duration) {
+        if(this.getType().equals(PlantType.SUN_PRODUCER)){
+            this.currentClip = "special";
+        }else
+          this.currentClip = "attack";
+        this.animationTimer = duration;
+    }
+
+    /**
+     * Evaluates the plant's current situation and returns the correct PAM clip.
+     */
+    public String getAnimationClip() {
+        // 1. Plant Food State
+        if (plantFoodTimer > 0 || isBuffed) {
+            return "plantfood"; // Note: If your PamActor uses "plantfood_on" as a fallback, handle that inside PlantPamActor.
+        }
+
+        // 2. Explosive / Dying State (e.g., Cherry Bomb)
+        if (state == PlantState.DYING) {
+            return "attack";
+        }
+
+        // 3. Prepping State (Mints intro, or Potato Mine charging)
+        if (state == PlantState.PREPPING) {
+            // According to image_24af05.jpg, Mints have an intro and Charge plants have an unready animation.
+            // You may need to change "prepping" to the exact PAM string (like "intro" or "unarmed").
+            return "prepping";
+        }
+
+        // 4. Defensive Plants Damage States (Wall-nut, Tall-nut)
+        // According to image_24af05.jpg, defensive plants change appearance 2 to 3 times as health decreases.
+        if (this.actStrategy instanceof WallNutStrategy) {
+            float hpPercent = (float) getHp() / (float) getMaxHp();
+
+            if (hpPercent <= 0.33f) {
+                return "damage2"; // Heavy damage
+            } else if (hpPercent <= 0.66f) {
+                return "damage1"; // Light damage
+            }
+            // If above 66%, it falls through to return currentClip (idle)
+        }
+
+        // 5. Default Action or Idle State
+        return currentClip;
     }
 
     public void setLifetime(double lifetime) { this.lifetime = lifetime; }

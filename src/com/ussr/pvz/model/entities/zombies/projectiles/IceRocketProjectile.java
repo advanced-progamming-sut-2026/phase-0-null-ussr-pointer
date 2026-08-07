@@ -24,4 +24,9 @@ public class IceRocketProjectile extends ZombieBossProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "768/FULL/EFFECTS/ZOMBOSS_MISSILE_EXPLOSION_ICEAGE/ZOMBOSS_MISSILE_EXPLOSION_ICEAGE.PAM";
+    }
 }

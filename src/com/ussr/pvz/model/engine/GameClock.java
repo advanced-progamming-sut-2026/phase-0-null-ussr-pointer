@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.engine;
 
+import com.ussr.pvz.model.entities.zombies.Zombie;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +33,10 @@ public class GameClock {
                 new ArrayList<>(entities);
 
         for (Tickable entity : currentEntities) {
-            if (entity instanceof GameEntity gameEntity
-                    && !gameEntity.isAlive()) {
+            if (entity instanceof Zombie zombie) {
+                // Skip only when fully done; still tick during death animation
+                if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
+            } else if (entity instanceof GameEntity gameEntity && !gameEntity.isAlive()) {
                 continue;
             }
 
@@ -41,10 +45,12 @@ public class GameClock {
     }
 
     private void removeDeadEntities() {
-        entities.removeIf(entity ->
-                entity instanceof GameEntity gameEntity
-                        && !gameEntity.isAlive()
-        );
+        entities.removeIf(entity -> {
+            if (entity instanceof Zombie zombie) {
+                return !zombie.isAlive() && zombie.isDeathAnimDone();
+            }
+            return entity instanceof GameEntity gameEntity && !gameEntity.isAlive();
+        });
     }
 
     public double getElapsedSeconds() {

@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
 
+import java.util.Map;
+
 public class PamActor extends Actor {
 
     protected final PamPlayer player;
@@ -16,6 +18,9 @@ public class PamActor extends Actor {
     protected boolean playing = true;
     protected float pamScale = 0.4f;
     protected float offsetY = 0f;
+    protected boolean looping = true;
+    protected String currentClipName;
+    protected Map<String, Boolean> partVisibility;
 
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
@@ -23,6 +28,7 @@ public class PamActor extends Actor {
         this.preferredClip = preferredClip;
         setSize(80f, 80f);
         this.clipRef = resolveClip(player, pamPath, preferredClip);
+        this.currentClipName = preferredClip;
     }
 
     public static ClipRef resolveClip(PamPlayer player, String pamPath, String preferredClip) {
@@ -53,10 +59,31 @@ public class PamActor extends Actor {
     }
 
     public void setClip(String clipName) {
-        ClipRef ref = resolveClip(player, pamPath, clipName);
-        if (ref != null) {
-            this.clipRef = ref;
+        if (java.util.Objects.equals(
+                currentClipName,
+                clipName
+        )) {
+            return;
         }
+
+        ClipRef ref = resolveClip(
+                player,
+                pamPath,
+                clipName
+        );
+
+        if (ref == null) {
+            return;
+        }
+
+        currentClipName = clipName;
+        clipRef = ref;
+        stateTime = 0f;
+        playing = true;
+    }
+
+    public void setLooping(boolean looping) {
+        this.looping = looping;
     }
 
     public void setPamScale(float pamScale) {
@@ -72,6 +99,13 @@ public class PamActor extends Actor {
         super.act(delta);
         if (playing) {
             stateTime += delta;
+            if (!looping && clipRef != null) {
+                float duration = clipRef.duration; // whatever the actual method is on ClipRef
+                if (stateTime >= duration) {
+                    stateTime = duration; // clamp, don't reset
+                    playing = false;
+                }
+            }
         }
     }
 
@@ -95,7 +129,11 @@ public class PamActor extends Actor {
         batch.setTransformMatrix(transform);
 
         try {
-            player.draw(batch, clipRef, stateTime, 0, 0, true);
+            if (partVisibility == null || partVisibility.isEmpty()) {
+                player.draw(batch, clipRef, stateTime, 0, 0, looping);
+            } else {
+                player.draw(batch, clipRef, stateTime, 0, 0, looping, partVisibility);
+            }
         } catch (Exception ignored) {
         }
 
@@ -105,5 +143,13 @@ public class PamActor extends Actor {
     public void resetAnimation() {
         this.stateTime = 0f;
         this.playing = true;
+    }
+    // In PamActor or ZombiePamActor:
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public float getAnimationTime() {
+        return stateTime;
     }
 }

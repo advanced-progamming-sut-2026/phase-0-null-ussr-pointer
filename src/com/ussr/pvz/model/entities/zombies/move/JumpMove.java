@@ -8,6 +8,9 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.List;
 
 public class JumpMove implements MoveBehavior {
+    private static final double JUMP_DISTANCE = 1.2;
+    private static final double JUMP_TRAVEL_SECONDS = 0.95;
+
     private final double addChancePerGrid;
     private final double cooldownSeconds;
     private final double resetChance;
@@ -16,6 +19,10 @@ public class JumpMove implements MoveBehavior {
     private double currentChance;
     private double cooldownTimer = 0;
     private double gridAccumulator = 0;
+    private boolean jumping;
+    private double jumpStartX;
+    private double jumpTargetX;
+    private double jumpElapsed;
 
     public JumpMove(double addChance, double cooldown, double initChance,
                     double resetChance, List<String> plantsToFlyOver) {
@@ -38,6 +45,10 @@ public class JumpMove implements MoveBehavior {
         }
         Vec2 pos = zombie.getPosition();
         Vec2 vel = zombie.getSpeed();
+        if (jumping) {
+            advanceJump(zombie, delta);
+            return;
+        }
         double dx = Math.abs(vel.x() * delta);
         gridAccumulator += dx;
         if (gridAccumulator >= 1.0) {
@@ -61,19 +72,37 @@ public class JumpMove implements MoveBehavior {
             }
         }
         if (shouldJump) {
-            double leapX = pos.x() - 1.2;
-            zombie.setPosition(Vec2.of(leapX, pos.y()));
+            zombie.queueAnimEvent("fly_start");
+            zombie.queueAnimEvent("fly_loop");
+            zombie.queueAnimEvent("fly_end");
+            jumping = true;
+            jumpStartX = pos.x();
+            jumpTargetX = pos.x() - JUMP_DISTANCE;
+            jumpElapsed = 0;
             currentChance = resetChance;
             cooldownTimer = cooldownSeconds;
             gridAccumulator = 0;
         } else {
             Vec2 newPos = pos.add(vel.scale(delta));
-            int oldCol = (int) pos.x();
-            int newCol = (int) newPos.x();
-            if (newCol != oldCol) {
-                newPos = applySlipperyShift(newPos, session); // Handle Ice Age slider tiles!
-            }
+            newPos = applySlipperyShift(
+                    zombie,
+                    pos,
+                    newPos,
+                    session
+            );
             zombie.setPosition(newPos);
+        }
+    }
+
+    private void advanceJump(Zombie zombie, float delta) {
+        jumpElapsed = Math.min(JUMP_TRAVEL_SECONDS, jumpElapsed + delta);
+        double progress = jumpElapsed / JUMP_TRAVEL_SECONDS;
+        double smoothProgress = progress * progress * (3.0 - 2.0 * progress);
+        double x = jumpStartX + (jumpTargetX - jumpStartX) * smoothProgress;
+        zombie.setPosition(Vec2.of(x, zombie.getPosition().y()));
+
+        if (progress >= 1.0) {
+            jumping = false;
         }
     }
 

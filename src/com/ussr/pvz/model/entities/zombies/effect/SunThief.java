@@ -63,13 +63,13 @@ public class SunThief implements EffectStatus {
         }
 
         if (isBankThief) {
-            processBankThief(zombie, session , delta);
+            processBankThief(zombie, session, delta);
         } else {
-            processGroundThief(zombie, session , delta);
+            processGroundThief(zombie, session, delta);
         }
     }
 
-    private void processGroundThief(Zombie zombie, GameSession session , float delta) {
+    private void processGroundThief(Zombie zombie, GameSession session, float delta) {
         if (stolenSuns >= maxSunsToSteal) return;
 
         if (currentTarget != null && (!currentTarget.isAlive() || currentTarget.getItemType() != ItemType.SUN)) {
@@ -118,14 +118,18 @@ public class SunThief implements EffectStatus {
                 ));
             }
         }
+        zombie.queueAnimEvent("power");
         item.setAlive(false);
     }
 
-    private void processBankThief(Zombie zombie, GameSession session , float delta) {
+    private void processBankThief(Zombie zombie, GameSession session, float delta) {
         if (laserFired) return;
-
         if (!isStealing) {
-            if (canSeePlant(zombie, session)) isStealing = true;
+            if (canSeePlant(zombie, session)) {
+                isStealing = true;
+                zombie.queueAnimEvent("power_up");
+                zombie.queueAnimEvent("power");
+            }
         } else {
             stateTimer += delta;
             oneSecondAccumulator += delta;
@@ -140,6 +144,7 @@ public class SunThief implements EffectStatus {
             }
 
             if (stateTimer >= chargingTime) {
+                zombie.queueAnimEvent("power_down");
                 fireLaser(zombie, session);
                 laserFired = true;
                 isStealing = false;
@@ -163,6 +168,7 @@ public class SunThief implements EffectStatus {
     private void fireLaser(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
+        zombie.queueAnimEvent("attack");
         for (int i = 0; i <= 3; i++) {
             int targetCol = zCol - i;
             if (targetCol >= 0) {
@@ -177,6 +183,7 @@ public class SunThief implements EffectStatus {
     private void fireLaserAtZombies(Zombie zombie, GameSession session) {
         int zCol = (int) zombie.getPosition().x();
         int zRow = (int) zombie.getPosition().y();
+        zombie.queueAnimEvent("attack");
         session.getZombies().stream()
                 .filter(z -> z.isAlive() && z.getFaction() == Faction.ZOMBIES && (int) z.getPosition().y() == zRow)
                 .forEach(z -> {

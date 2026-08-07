@@ -3,6 +3,7 @@ package com.ussr.pvz.model.level.chaptereffect;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.Grave;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
@@ -34,6 +35,7 @@ public class DarkAgesEffect implements ChapterEffect {
                 Grave grave = new Grave(null, content);
                 grave.setPosition(Vec2.of(targetCol, targetRow));
                 cell.setStructure(grave);
+                cell.getTile().setType(TileType.Grave);
                 session.registerStructure(grave);
             }
         }

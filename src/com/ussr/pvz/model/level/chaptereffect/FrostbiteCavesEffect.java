@@ -6,11 +6,13 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.model.engine.event.GameEvent;
 
 public class FrostbiteCavesEffect implements ChapterEffect {
 
     @Override
     public void onTick(GameSession session, Level level, double deltaTime) {
+        updateFreezingWind(session, level, deltaTime);
         double thawTimer = level.getThawTimerElapsed() + deltaTime;
 
         // Thawing remains continuous (60 HP per second check)
@@ -25,11 +27,30 @@ public class FrostbiteCavesEffect implements ChapterEffect {
     public void onWaveStart(GameSession session, Level level, int waveNumber, boolean isFinalWave) {
         // "در هر موج از زامبی، ممکن است باد یخی به تعدادی از ردیف ها برخورد کند"
         // Freezing wind triggers on wave starts instead of a continuous tick timer
-        applyFreezingWind(session, level);
+        // Freezing wind is timed continuously in onTick.
+    }
+
+    private void updateFreezingWind(
+            GameSession session,
+            Level level,
+            double deltaTime
+    ) {
+        double interval = level.getWindIntervalSeconds();
+        if (interval <= 0 || level.getFreezeStacksPerWind() <= 0) {
+            return;
+        }
+
+        double elapsed = level.getWindTimerElapsed() + deltaTime;
+        while (elapsed >= interval) {
+            applyFreezingWind(session, level);
+            elapsed -= interval;
+        }
+        level.setWindTimerElapsed(elapsed);
     }
 
     private void processFireThawing(GameSession session) {
         if (session.getPlants() == null) return;
+
         for (Plant firePlant : session.getPlants()) {
             if (!firePlant.isAlive() || !firePlant.getTags().contains(Tag.FIRE)) continue;
 
@@ -53,6 +74,10 @@ public class FrostbiteCavesEffect implements ChapterEffect {
 
     private void applyFreezingWind(GameSession session, Level level) {
         if (session.getPlants() == null) return;
+
+        session.getEventBus().publish(
+                new GameEvent.FreezingWindTriggered()
+        );
 
         int stacks = level.getFreezeStacksPerWind();
         System.out.println("A freezing wind sweeps through the lawn!");

@@ -23,6 +23,7 @@ public class GameplayController {
     private boolean shovelModeActive = false;
     private boolean plantFoodModeActive = false;
     private String selectedSeedKey = null;
+    private Runnable onPlantingCompleted;
 
     public GameplayController() {
         this.gameService = new GameService();
@@ -81,6 +82,10 @@ public class GameplayController {
         }
     }
 
+    public void setOnPlantingCompleted(Runnable callback) {
+        this.onPlantingCompleted = callback;
+    }
+
     /**
      * Translates a grid cell click into a simulation action based on current state.
      *
@@ -134,6 +139,10 @@ public class GameplayController {
         if (result.contains("placed")) {
             NotificationCenter.success(result);
             consumeFromConveyorIfNeeded(plantKey);
+            setSelectedSeed(null);
+            if (onPlantingCompleted != null) {
+                onPlantingCompleted.run();
+            }
         } else {
             NotificationCenter.warning(result);
         }

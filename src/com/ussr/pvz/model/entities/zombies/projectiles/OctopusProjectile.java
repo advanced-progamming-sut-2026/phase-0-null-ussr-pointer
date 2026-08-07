@@ -42,7 +42,7 @@ public class OctopusProjectile extends ZombieProjectile {
 
                 targetCell.setPlant(null);
                 targetPlant.setState(Plant.PlantState.INCAPACITATED);
-                session.getPlants().remove(targetPlant);
+                //session.getPlants().remove(targetPlant);
             }
         }
     }
@@ -50,5 +50,10 @@ public class OctopusProjectile extends ZombieProjectile {
     @Override
     public void onDestinationReached() {
 
+    }
+
+    @Override
+    public String getPamLocation() {
+        return "768/FULL/EFFECTS/ZOMBIE_OCTOPUS_PROJECTILE/ZOMBIE_OCTOPUS_PROJECTILE.PAM";
     }
 }

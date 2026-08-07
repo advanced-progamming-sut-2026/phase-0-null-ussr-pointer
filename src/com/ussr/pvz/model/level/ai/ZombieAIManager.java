@@ -3,6 +3,7 @@ package com.ussr.pvz.model.level.ai;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Level;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ZombieAIManager {
@@ -11,6 +12,8 @@ public class ZombieAIManager {
 
     private final Difficulty difficulty;
     private final double costMultiplier;
+
+    private long completedBudget;
 
     public ZombieAIManager(int difficultyLevel) {
         // Rule: Map integer levels directly to Behavior Enum
@@ -60,7 +63,53 @@ public class ZombieAIManager {
         }
 
         // 4. Clean up any directors that have exhausted their budget and cleared their spawned zombies
-        activeDirectors.removeIf(WaveDirector::isFullyCleared);
+        Iterator<WaveDirector> iterator =
+                activeDirectors.iterator();
+
+        while (iterator.hasNext()) {
+            WaveDirector director = iterator.next();
+
+            if (director.isFullyCleared()) {
+                completedBudget +=
+                        director.getInitialBudget();
+
+                iterator.remove();
+            }
+        }
+    }
+
+    public float getCostProgress(
+            List<Level.Wave> waves
+    ) {
+        if (waves == null || waves.isEmpty()) {
+            return 0f;
+        }
+
+        long totalBudget = 0L;
+
+        for (Level.Wave wave : waves) {
+            totalBudget += Math.max(
+                    0,
+                    (int) (wave.cost() * costMultiplier)
+            );
+        }
+
+        if (totalBudget <= 0L) {
+            return 0f;
+        }
+
+        long consumedBudget = completedBudget;
+
+        for (WaveDirector director : activeDirectors) {
+            consumedBudget +=
+                    director.getSpentBudget();
+        }
+
+        return Math.min(
+                1f,
+                (float) consumedBudget
+                        / (float) totalBudget
+        );
     }
 
     private void spawnNextWaveDirector(List<Level.Wave> waves, GameSession session) {
@@ -82,6 +131,8 @@ public class ZombieAIManager {
     }
 
     public void resetWaves() {
-        this.nextWaveIndexToSpawn = 0;
+        nextWaveIndexToSpawn = 0;
+        completedBudget = 0L;
+        activeDirectors.clear();
     }
 }

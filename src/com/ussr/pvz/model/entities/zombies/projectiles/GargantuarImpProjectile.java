@@ -45,4 +45,9 @@ public class GargantuarImpProjectile extends ZombieProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "768/INITIAL/ZOMBIE/ZOMBIE_TUTORIAL_IMP/ZOMBIE_TUTORIAL_IMP.PAM";
+    }
 }

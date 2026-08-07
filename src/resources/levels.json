@@ -7,6 +7,8 @@
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_EGYPT",
       "lawnRegion": "IMAGE_BACKGROUNDS_EGYPT_TEXTURE",
       "mowerPam": "768/INITIAL/MOWERS/MOWER_EGYPT/MOWER_EGYPT.PAM",
+      "sandstormRearPam": "768/INITIAL/EFFECTS/SANDSTORM_REAR/SANDSTORM_REAR.PAM",
+      "sandstormTopPam": "768/INITIAL/EFFECTS/SANDSTORM_TOP/SANDSTORM_TOP.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -126,11 +128,11 @@
           "waves": [
             {
               "waveNumber": 1,
-              "cost": 10000
+              "cost": 1000
             },
             {
               "waveNumber": 2,
-              "cost": 15000
+              "cost": 1500
             }
           ]
         },
@@ -259,6 +261,7 @@
       "menuRegion": "IMAGE_UI_UNIVERSE_WORLDS_ICEAGE",
       "lawnRegion": "IMAGE_BACKGROUNDS_ICEAGE_TEXTURE",
       "mowerPam": "768/FULL/MOWERS/MOWER_ICEAGE/MOWER_ICEAGE.PAM",
+      "windstormPam": "768/FULL/EFFECTS/FROSTBITE_CHILL_WIND/FROSTBITE_CHILL_WIND.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -930,8 +933,8 @@
           ],
           "allowedZombies": [
             {
-              "id": "ZombieProspector",
-              "weight": 500
+              "id": "ZombieBeachOctopus",
+              "weight": 400
             },
             {
               "id": "ZombieLostCityJane",

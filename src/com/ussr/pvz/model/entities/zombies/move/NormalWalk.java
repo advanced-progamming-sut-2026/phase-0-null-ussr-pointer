@@ -24,7 +24,12 @@ public class NormalWalk implements MoveBehavior {
         );
 
         zombie.setPosition(
-                applySlipperyShift(newPosition, session)
+                applySlipperyShift(
+                        zombie,
+                        position,
+                        newPosition,
+                        session
+                )
         );
     }
 }

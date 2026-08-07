@@ -42,4 +42,9 @@ public class EgyptRocketProjectile extends ZombieBossProjectile {
     public void onDestinationReached() {
 
     }
+
+    @Override
+    public String getPamLocation() {
+        return "768/INITIAL/EFFECTS/ZOMBOSS_MISSILE_EXPLOSION_EGYPT/ZOMBOSS_MISSILE_EXPLOSION_EGYPT.PAM";
+    }
 }

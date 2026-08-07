@@ -50,6 +50,7 @@ public class KingBuffEffect implements EffectStatus {
                 .map(targetZombie -> {
                     Armor knightArmor = ZombieFactory.createKnightArmor();
                     targetZombie.setArmor(knightArmor);
+                    king.queueAnimEvent("special");
                     return true;
                 }).orElse(false);
     }

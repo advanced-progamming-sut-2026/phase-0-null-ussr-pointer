@@ -40,6 +40,9 @@ public class SmashAttack implements AttackBehavior {
             return;
         }
 
+        if (timer == 0) {
+            zombie.queueAnimEvent(isOneTime ? "tackle" : "smash_left");
+        }
         timer += delta;
 
         if (timer >= windupDuration) {
@@ -57,8 +60,9 @@ public class SmashAttack implements AttackBehavior {
                 // Permanently slow the zombie down
                 if (zombie.getSpeed() != null) {
                     zombie.setSpeed(zombie.getSpeed().scale(speedScaleAfter));
+                    zombie.queueAnimEvent("run");
                 }
-
+                zombie.queueAnimEvent("kick");
                 // Fall back to a standard bite attack for the rest of the game
                 zombie.setAttackBehavior(new ChompAttack());
             }

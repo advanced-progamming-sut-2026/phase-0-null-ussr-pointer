@@ -178,4 +178,20 @@ public class SeedBankHud extends Table {
             onPlantSelected.accept(selectedKey);
         }
     }
+
+    public void clearSelection() {
+        if (selectedKey == null) {
+            return;
+        }
+
+        selectedKey = null;
+
+        for (SeedPacketWidget widget : packets.values()) {
+            widget.setSelected(false);
+        }
+
+        if (onPlantSelected != null) {
+            onPlantSelected.accept(null);
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.Row;
 import com.ussr.pvz.model.board.structures.Grave;
+import com.ussr.pvz.model.board.structures.IcedZombie;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.util.Vec2;
@@ -67,13 +68,21 @@ public final class TerrainFactory {
                     : Tile.SlipperyDirection.DOWN;
             lawn.getCell(r, c).setTile(new Tile(TileType.Slippery, dir));
         }
+
+        int iceblockCount = 2 + RAND.nextInt(2);
+        for (int i = 0; i < iceblockCount; i++) {
+            int r = RAND.nextInt(rows);
+            int c = RAND.nextInt(cols);
+            lawn.getCell(r,c).setStructure(new IcedZombie());
+        }
     }
 
     private static void scatterBeachTerrain(Lawn lawn, int rows, int cols) {
         int seaColumns = 3;
         for (int r = 0; r < rows; r++) {
             for (int c = cols - seaColumns; c < cols; c++) {
-                TileType type = RAND.nextInt(4) == 0 ? TileType.ShallowCoast : TileType.Water;
+                // rightmost sea column = shallow coast, everything behind it = water
+                TileType type = (c == cols - seaColumns) ? TileType.ShallowCoast : TileType.Water;
                 lawn.getCell(r, c).setTile(new Tile(type));
             }
         }

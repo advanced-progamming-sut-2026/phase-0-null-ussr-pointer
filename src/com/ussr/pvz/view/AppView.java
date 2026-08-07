@@ -293,6 +293,7 @@ public class AppView implements ApplicationListener {
     }
 
     private void rebuildMenu(MenuState state) {
+        disposeCurrentScreen();
         screenRoot.clearChildren();
 
         switch (state) {
@@ -364,6 +365,14 @@ public class AppView implements ApplicationListener {
         }
 
         configureGlobalHud(state);
+    }
+
+    private void disposeCurrentScreen() {
+        for (Actor actor : screenRoot.getChildren()) {
+            if (actor instanceof Disposable disposable) {
+                disposable.dispose();
+            }
+        }
     }
 
     private Actor createNewsScreen() {
@@ -510,6 +519,7 @@ public class AppView implements ApplicationListener {
         NotificationCenter.clear();
 
         if (stage != null) {
+            disposeCurrentScreen();
             stage.dispose();
         }
 
