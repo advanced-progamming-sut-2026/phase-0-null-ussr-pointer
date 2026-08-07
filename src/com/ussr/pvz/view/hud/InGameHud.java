@@ -13,9 +13,10 @@ import pvz.libpvz.textures.TextureBank;
  * Enforces MVC by delegating all interactions to the GameplayController.
  */
 public class InGameHud extends Table implements Disposable {
+
     private final SeedBankHud seedBankHud;
-    private final ConveyorBeltWidget conveyorBeltWidget;
     private final ShovelWidget shovelWidget;
+    private final PlantFoodWidget plantFoodWidget;
     private final WaveProgressBar waveProgressBar;
     private final PauseMenuAssets pauseMenuAssets;
 
@@ -33,6 +34,10 @@ public class InGameHud extends Table implements Disposable {
                 controller,
                 seedBankHud::clearSelection
         );
+
+        // Plant food button — wires itself to controller.setOnPlantFoodDeactivated
+        plantFoodWidget = new PlantFoodWidget(skin, textures, controller);
+
         waveProgressBar = new WaveProgressBar(skin, textures);
 
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
@@ -41,7 +46,8 @@ public class InGameHud extends Table implements Disposable {
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
         controller.setOnPlantingCompleted(seedBankHud::clearSelection);
 
-        ObjectiveWidgetFactory.ObjectiveWidgets objectives = ObjectiveWidgetFactory.create(skin, textures);
+        ObjectiveWidgetFactory.ObjectiveWidgets objectives =
+                ObjectiveWidgetFactory.create(skin, textures);
 
         // Pause Menu Trigger
         ImageButton pauseButton = new ImageButton(
@@ -54,6 +60,7 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
+        // Top Row: seed bank | objectives | wave bar | debug | pause
         Table topRow = new Table();
         topRow.add(seedBankHud).left().expandX();
         topRow.add(objectives.topBarWidget()).center().expandX();
@@ -61,31 +68,29 @@ public class InGameHud extends Table implements Disposable {
         topRow.add(debugTools).right().padRight(15f);
         topRow.add(pauseButton).right().top().pad(15f);
 
+        // Bottom Row: [plant food] ... [shovel]
+        // Plant food sits to the left of the shovel so both are thumb-reachable.
         Table bottomRow = new Table();
         bottomRow.add().expandX();
+        bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
+        // Center overlay (objectives lawn widget, etc.)
         Stack lawnStack = new Stack();
         lawnStack.add(objectives.lawnOverlayWidget());
 
-        Table middleRow = new Table();
-        middleRow.add(conveyorBeltWidget).top().padTop(10f).padLeft(10f);
-        middleRow.add(lawnStack).grow();
-
+        // Standard game layer
         Table mainGameLayer = new Table();
         mainGameLayer.add(topRow).growX().top().row();
-        mainGameLayer.add(middleRow).grow().row();
+        mainGameLayer.add(lawnStack).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
 
         // High priority overlays
         PauseMenuOverlay pauseOverlay =
-                new PauseMenuOverlay(
-                        skin,
-                        pauseMenuAssets,
-                        controller
-                );
+                new PauseMenuOverlay(skin, pauseMenuAssets, controller);
         GameOverOverlay gameOverOverlay = new GameOverOverlay(skin);
 
+        // Root stack
         Stack rootStack = new Stack();
         rootStack.add(mainGameLayer);
         rootStack.add(pauseOverlay);
@@ -95,32 +100,13 @@ public class InGameHud extends Table implements Disposable {
         add(rootStack).grow();
     }
 
-    private void registerLawnDropTarget(DragAndDrop dragAndDrop, GameplayController controller) {
-        dragAndDrop.addTarget(new DragAndDrop.Target(lawnWidget) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                lawnWidget.setDragPreviewKey((String) payload.getObject());
-                return lawnWidget.gridCellAt(x, y) != null;
-            }
-
-            @Override
-            public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
-                lawnWidget.setDragPreviewKey(null);
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                lawnWidget.setDragPreviewKey(null);
-                int[] cell = lawnWidget.gridCellAt(x, y);
-                if (cell != null) {
-                    controller.plantAt((String) payload.getObject(), cell[0], cell[1]);
-                }
-            }
-        });
-    }
-
     public SeedBankHud getSeedBankHud() {
         return seedBankHud;
+    }
+
+    /** Exposed so HoverCursorWidget can read plant-food mode state. */
+    public PlantFoodWidget getPlantFoodWidget() {
+        return plantFoodWidget;
     }
 
     @Override

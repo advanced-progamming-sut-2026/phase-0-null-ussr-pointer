@@ -25,8 +25,6 @@ public class SeedBankHud extends Table {
 
     private final Skin skin;
     private final TextureBank textures;
-    private final DragAndDrop dragAndDrop;
-    private final GameplayController controller;
 
     private final Label sunLabel;
     private final Label plantFoodLabel;
@@ -38,11 +36,9 @@ public class SeedBankHud extends Table {
 
     private GameSession lastSession;
 
-    public SeedBankHud(Skin skin, TextureBank textures, DragAndDrop dragAndDrop, GameplayController controller) {
+    public SeedBankHud(Skin skin, TextureBank textures) {
         this.skin = skin;
         this.textures = textures;
-        this.dragAndDrop = dragAndDrop;
-        this.controller = controller;
         top().left();
 
         sunLabel = new Label("0", skin, "default");
@@ -140,29 +136,7 @@ public class SeedBankHud extends Table {
             );
             packets.put(key, widget);
             seedRow.add(widget).size(SLOT_W, SLOT_H).pad(2f);
-            registerDragSource(widget, key);
         }
-    }
-
-    private void registerDragSource(SeedPacketWidget widget, String key) {
-        dragAndDrop.addSource(new DragAndDrop.Source(widget) {
-            @Override
-            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                if (!widget.isUsable()) return null;
-                if (controller.isPaused() || controller.isShovelModeActive() || controller.isPlantFoodModeActive()) {
-                    return null;
-                }
-
-                DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(key);
-
-                Image dragIcon = widget.createDragIcon(textures);
-                payload.setDragActor(dragIcon);
-                dragAndDrop.setDragActorPosition(dragIcon.getWidth() / 2f, -dragIcon.getHeight() / 2f);
-
-                return payload;
-            }
-        });
     }
 
     private void selectPlant(String key) {

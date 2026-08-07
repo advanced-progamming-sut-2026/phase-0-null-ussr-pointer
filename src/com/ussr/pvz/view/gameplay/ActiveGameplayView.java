@@ -17,6 +17,7 @@ import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
 import com.ussr.pvz.view.hud.LawnWidget;
+import com.ussr.pvz.view.gameplay.ItemRenderLayer;
 
 public class ActiveGameplayView extends Table implements Disposable {
 
@@ -59,7 +60,8 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         Stack layers = new Stack();
 // in your GameplayScreen or wherever the stage is assembled
-        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);// on top so suns render above entities
+        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer); // suns
+        ItemRenderLayer itemLayer = new ItemRenderLayer(pamPlayer); // coins, diamonds, plant food, seed packs
         StormRenderLayer stormRearLayer =
                 new StormRenderLayer(pamPlayer, true);
         StormRenderLayer stormTopLayer =
@@ -70,6 +72,7 @@ public class ActiveGameplayView extends Table implements Disposable {
         layers.add(stormRearLayer);
         layers.add(entityLayer);
         layers.add(sunLayer);
+        layers.add(itemLayer);
         layers.add(stormTopLayer);
         layers.add(lawnWidget);
         layers.add(inGameHud);

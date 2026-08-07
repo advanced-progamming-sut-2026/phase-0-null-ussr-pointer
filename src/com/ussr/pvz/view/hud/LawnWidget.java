@@ -1,8 +1,5 @@
 package com.ussr.pvz.view.hud;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -14,7 +11,6 @@ public class LawnWidget extends Actor {
 
     public LawnWidget(GameplayController controller) {
         setTouchable(Touchable.enabled);
-
         addListener(new ClickListener() {
             @Override
             public void clicked(
@@ -26,7 +22,6 @@ public class LawnWidget extends Actor {
             }
         });
     }
-
     private void handleLawnClick(
             GameplayController controller,
             float x,
@@ -35,10 +30,8 @@ public class LawnWidget extends Actor {
         if (!LawnGridLayout.contains(x, y)) {
             return;
         }
-
         int column = LawnGridLayout.columnAt(x);
         int row = LawnGridLayout.rowAt(y);
-
         controller.handleGridClick(column, row);
     }
 }

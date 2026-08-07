@@ -19,7 +19,9 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import pvz.libpvz.textures.TextureBank;
 
 public class PlantFoodWidget extends Stack {
-    private static final String REGION_PLANTFOOD = "IMAGE_PLANTFOOD";
+
+    private static final String REGION_PLANTFOOD =
+            "IMAGE_BACKGROUNDS_TILE_PLANTFOOD_TILE_PLANTFOOD_45X46";
 
     private final Image iconImage;
     private final Label countLabel;
@@ -29,23 +31,26 @@ public class PlantFoodWidget extends Stack {
         setSize(70f, 70f);
         setTouchable(Touchable.enabled);
 
-        Image bankImage = new Image(skin.getDrawable("image_ui_generic_brownbutton_10"));
+        // Background button
+        Image bankImage = new Image(textures.region("IMAGE_UI_GENERIC_BROWNBUTTON"));
         bankImage.setScaling(Scaling.fit);
         bankImage.setTouchable(Touchable.disabled);
         add(bankImage);
 
+        // Plant food icon
         TextureRegion pfRegion = textures != null ? textures.region(REGION_PLANTFOOD) : null;
         if (pfRegion == null && textures != null) {
-            pfRegion = textures.region("IMAGE_UI_HUD_INGAME_PLANTFOOD_ICON");
+            pfRegion = textures.region("IMAGE_UI_HUD_INGAME_PLANTFOOD_BUTTON");
         }
 
         iconImage = pfRegion != null
                 ? new Image(new TextureRegionDrawable(pfRegion))
-                : new Image(skin.getDrawable("image_ui_generic_gem_icon_small"));
+                : new Image(skin.getDrawable("IMAGE_UI_GENERIC_GEM_ICON_SMALL"));
         iconImage.setScaling(Scaling.fit);
         iconImage.setTouchable(Touchable.disabled);
         add(iconImage);
 
+        // Count badge
         Table labelTable = new Table();
         labelTable.setTouchable(Touchable.disabled);
         labelTable.bottom().right();
@@ -56,6 +61,7 @@ public class PlantFoodWidget extends Stack {
         labelTable.add(countLabel).pad(2f, 0f, 2f, 6f);
         add(labelTable);
 
+        // Click: toggle plant-food mode
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -67,6 +73,10 @@ public class PlantFoodWidget extends Stack {
                 updateVisuals();
             }
         });
+
+        // Controller calls this when a feed completes (or mode is cancelled)
+        // so the widget always reflects reality.
+        controller.setOnPlantFoodDeactivated(this::deactivate);
     }
 
     @Override
@@ -76,24 +86,30 @@ public class PlantFoodWidget extends Stack {
         if (session != null) {
             int count = session.getPlantFoodCount();
             countLabel.setText(String.valueOf(count));
+            // Auto-deactivate if player runs out
             if (count <= 0 && isActive) {
                 deactivate();
             }
         }
     }
 
+    // ── called by controller callback or internally ───────────────────────
+
+    public void deactivate() {
+        isActive = false;
+        updateVisuals();
+    }
+
+    // ── visuals ───────────────────────────────────────────────────────────
+
     private void updateVisuals() {
         if (isActive) {
-            iconImage.setColor(new Color(0.4f, 1.0f, 0.4f, 1.0f));
+            // Green tint + slight lift = "selected" look
+            iconImage.setColor(0.4f, 1.0f, 0.4f, 1.0f);
             iconImage.setY(8f);
         } else {
             iconImage.setColor(Color.WHITE);
             iconImage.setY(0f);
         }
-    }
-
-    public void deactivate() {
-        isActive = false;
-        updateVisuals();
     }
 }

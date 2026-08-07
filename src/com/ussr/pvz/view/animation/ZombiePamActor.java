@@ -1,5 +1,7 @@
 package com.ussr.pvz.view.animation;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
@@ -14,6 +16,35 @@ public class ZombiePamActor extends PamActor {
     private String returnToClip;
     private boolean playingSpecial;
 
+    // -------------------------------------------------------------------------
+    // Glow & danger state (view-only — driven by EntityRenderLayer each frame)
+    // -------------------------------------------------------------------------
+
+    /** When true, a soft green halo is drawn around this zombie. */
+    private boolean glowing;
+
+    /**
+     * 0 = no danger overlay; 1 = full danger.
+     * EntityRenderLayer sets this every frame based on the zombie's X position.
+     * The value is already a smooth sine-wave value so we just use it directly.
+     */
+    private float dangerAlpha;
+
+    // Glow pulse accumulator — advanced in act()
+    private float glowTime;
+
+    // Tuning constants
+    /** How fast the glow pulses (radians per second). */
+    private static final float GLOW_PULSE_SPEED   = 2.5f;
+    /** Base alpha of the green glow overlay. */
+    private static final float GLOW_BASE_ALPHA     = 0.25f;
+    /** Amplitude of the glow pulse on top of the base. */
+    private static final float GLOW_PULSE_AMPLITUDE = 0.12f;
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
     // Collection Constructor (Defaults to "walk")
     public ZombiePamActor(PamPlayer player, String pamPath) {
         super(player, pamPath, "walk");
@@ -21,7 +52,6 @@ public class ZombiePamActor extends PamActor {
         this.offsetY = -40f;
     }
 
-    // Gameplay Constructor (Takes dynamic clips)
     // Gameplay Constructor
     public ZombiePamActor(PamPlayer player, String pamPath, String preferredClip) {
         super(player, pamPath, preferredClip);
@@ -31,6 +61,78 @@ public class ZombiePamActor extends PamActor {
                 || "newspaper_defeat".equals(preferredClip);
         setLooping(!isOneShot);
     }
+
+    // -------------------------------------------------------------------------
+    // Public setters called by EntityRenderLayer each frame
+    // -------------------------------------------------------------------------
+
+    public void setGlowing(boolean glowing) {
+        this.glowing = glowing;
+    }
+
+    /**
+     * Set the danger flicker intensity [0..1].
+     * EntityRenderLayer computes a smooth sine value and passes it here.
+     */
+    public void setDangerAlpha(float dangerAlpha) {
+        this.dangerAlpha = Math.max(0f, Math.min(1f, dangerAlpha));
+    }
+
+    // -------------------------------------------------------------------------
+    // act — advance glow timer
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        if (glowing) {
+            glowTime += delta;
+        }
+
+        // Special-clip return logic (unchanged from original)
+        if (playingSpecial && !playing) {
+            String nextClip = returnToClip;
+            playingSpecial = false;
+            returnToClip = null;
+            currentClipName = null;
+            setClip(nextClip == null ? "idle" : nextClip);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // draw — overlay passes
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        // --- 1. Green glow (rendered BEFORE the normal sprite so it appears behind) ---
+        if (glowing) {
+            float pulse = GLOW_BASE_ALPHA
+                    + GLOW_PULSE_AMPLITUDE * (float) Math.sin(glowTime * GLOW_PULSE_SPEED);
+
+            Color prev = batch.getColor().cpy();
+            // Additive-style green tint: keep red/blue very low, green full
+            batch.setColor(0f, 1f, 0f, pulse * parentAlpha);
+            super.draw(batch, parentAlpha);
+            batch.setColor(prev);
+        }
+
+        // --- 2. Normal sprite draw ---
+        super.draw(batch, parentAlpha);
+
+        // --- 3. Red danger flicker (rendered ON TOP of the sprite) ---
+        if (dangerAlpha > 0f) {
+            Color prev = batch.getColor().cpy();
+            batch.setColor(1f, 0f, 0f, dangerAlpha * parentAlpha);
+            super.draw(batch, parentAlpha);
+            batch.setColor(prev);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Original methods — unchanged
+    // -------------------------------------------------------------------------
 
     public void playOnce(String clipName, String returnTo) {
         if (playingSpecial || !hasClip(clipName)) {
@@ -109,18 +211,6 @@ public class ZombiePamActor extends PamActor {
         }
         for (PamPlayer.AnimationPart child : part.children) {
             collectArmorParts(child);
-        }
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-        if (playingSpecial && !playing) {
-            String nextClip = returnToClip;
-            playingSpecial = false;
-            returnToClip = null;
-            currentClipName = null;
-            setClip(nextClip == null ? "idle" : nextClip);
         }
     }
 

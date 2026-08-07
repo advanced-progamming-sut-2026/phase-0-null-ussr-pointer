@@ -33,9 +33,7 @@ public class EntityRenderLayer extends Group {
     private final TextureBank textures;
 
     // Sub-groups — added to this Group in draw order (back → front)
-    /**
-     * Plants — rendered first (furthest back among entities)
-     */
+    /** Plants — rendered first (furthest back among entities) */
     private final Group plantGroup = new Group();
     /**
      * On-plant overlays: OctopusWrap, IceBlock.
@@ -63,13 +61,30 @@ public class EntityRenderLayer extends Group {
     // Pending immediate draw calls (atlas textures, not actors)
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
 
-    private record ZombieAtlasDrawCall(TextureRegion region, float x, float y) {
-    }
+    private record ZombieAtlasDrawCall(TextureRegion region, float x, float y) {}
 
     // Newspaper state machine
-    private enum NewspaperPhase {HAS_PAPER, DEFEAT_PLAYING, GONE}
+    private enum NewspaperPhase { HAS_PAPER, DEFEAT_PLAYING, GONE }
 
     private final Map<Zombie, NewspaperPhase> newspaperPhase = new HashMap<>();
+
+    // -------------------------------------------------------------------------
+    // Danger-flicker: per-zombie time accumulator for the sine wave
+    // -------------------------------------------------------------------------
+    /**
+     * Tracks how long each zombie has been in the danger zone so the sine wave
+     * runs continuously rather than resetting every frame.
+     */
+    private final Map<Zombie, Float> dangerTime = new HashMap<>();
+
+    /**
+     * Zombie X position (in grid units) at which the danger overlay starts fading in.
+     * Tune this to taste — 1.5 means "within 1.5 cells of the left edge".
+     */
+    private static final float DANGER_THRESHOLD_X = 1.5f;
+
+    /** Speed of the red flicker sine wave (radians per second). Slower = more menacing. */
+    private static final float DANGER_FLICKER_SPEED = 2.0f;
 
     // Constructor
     public EntityRenderLayer(PamPlayer pamPlayer, TextureBank textures) {
@@ -87,7 +102,6 @@ public class EntityRenderLayer extends Group {
         addActor(overlayGroup);
         addActor(plantProjectileGroup);
         addActor(zombieGroup);
-
     }
 
     // act — sync every category
@@ -107,7 +121,7 @@ public class EntityRenderLayer extends Group {
         syncLawnMowers(session, liveZombieGroup);
         syncPlants(session, livePlants);
         syncOverlays(session, liveOverlays);
-        syncZombies(session, liveZombieGroup);
+        syncZombies(session, liveZombieGroup, delta);
         syncPushableStructures(session, liveZombieGroup);
         syncPlantProjectiles(session);
         syncZombieProjectiles(session);
@@ -118,8 +132,9 @@ public class EntityRenderLayer extends Group {
         cleanupMap(zombieGroupActors, liveZombieGroup, zombieGroup);
         cleanupZombieProjActors(session);
 
-        // Also clean newspaper state for dead zombies
+        // Also clean newspaper state and danger timers for dead zombies
         newspaperPhase.keySet().removeIf(z -> !session.getZombies().contains(z));
+        dangerTime.keySet().removeIf(z -> !session.getZombies().contains(z));
 
         // Y-sort each group independently
         sortByY(plantGroup);
@@ -226,12 +241,12 @@ public class EntityRenderLayer extends Group {
     }
 
     // ---- Zombies ------------------------------------------------------------
-    private void syncZombies(GameSession session, Set<Object> live) {
+    /**
+     * @param delta frame time — needed to advance the danger-flicker accumulator.
+     */
+    private void syncZombies(GameSession session, Set<Object> live, float delta) {
         for (Zombie zombie : session.getZombies()) {
-         if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
-            if (zombie.isBossMirror()) continue;
-            entitiesThisFrame.put(zombie, true);
-          
+            if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
             live.add(zombie);
 
             PamActor actor = zombieGroupActors.computeIfAbsent(zombie, z -> {
@@ -258,6 +273,35 @@ public class EntityRenderLayer extends Group {
                 }
 
                 zombieActor.setArmor(zombie.getArmor());
+
+                // --- Glow effect -------------------------------------------
+                // Stay glowing until the zombie actually dies (death anim may
+                // still be playing after isAlive goes false).
+                zombieActor.setGlowing(zombie.isGlowing() && zombie.isAlive());
+
+                // --- Danger flicker -----------------------------------------
+                float zombieX = (float) zombie.getPosition().x();
+                if (zombieX <= DANGER_THRESHOLD_X && zombie.isAlive()) {
+                    // Advance this zombie's personal sine-wave clock
+                    float t = dangerTime.getOrDefault(zombie, 0f) + delta;
+                    dangerTime.put(zombie, t);
+
+                    // Map proximity to [0..1]: 0 at threshold, 1 at x=0
+                    float proximity = 1f - (zombieX / DANGER_THRESHOLD_X);
+                    proximity = Math.max(0f, Math.min(1f, proximity));
+
+                    // Sine flicker — always positive, scaled by proximity
+                    float flicker = (float) ((Math.sin(t * DANGER_FLICKER_SPEED) + 1.0) * 0.5);
+                    // Min alpha of 0.08 so the overlay never fully disappears
+                    float alpha = proximity * (0.08f + 0.30f * flicker);
+
+                    zombieActor.setDangerAlpha(alpha);
+                } else {
+                    // Out of danger zone — clear the overlay and the timer
+                    dangerTime.remove(zombie);
+                    zombieActor.setDangerAlpha(0f);
+                }
+
             } else {
                 actor.setClip(currentClip);
             }
@@ -269,7 +313,6 @@ public class EntityRenderLayer extends Group {
                     LawnGridLayout.worldY(zombie.getPosition().y())
                             + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
             );
-
         }
     }
 
@@ -486,18 +529,9 @@ public class EntityRenderLayer extends Group {
     }
 
     private void renderDrops(Batch batch, GameSession session) {
-        for (GroundItem item : session.getItems()) {
-            if (item.isCollected()) continue;
-            if (item.getItemType() == ItemType.SUN) continue; // SunRenderLayer handles suns
-
-            float screenX = LawnGridLayout.worldX(item.getPosition().x());
-            float screenY = LawnGridLayout.worldY(item.getPosition().y());
-
-            if (item.getItemType() == ItemType.PLANT_FOOD) {
-                TextureRegion region = textures.region("IMAGE_PLANTFOOD");
-                if (region != null) batch.draw(region, screenX, screenY, 48f, 48f);
-            }
-        }
+        // Non-sun collectable items (COIN, DIAMOND, PLANT_FOOD, SEED_PACK) are
+        // now rendered by ItemRenderLayer using proper PAM actors.
+        // Nothing to draw here.
     }
 
     // =========================================================================
