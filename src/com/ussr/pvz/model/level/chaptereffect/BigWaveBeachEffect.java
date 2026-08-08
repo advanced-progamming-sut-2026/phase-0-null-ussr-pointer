@@ -12,6 +12,7 @@ import com.ussr.pvz.model.level.Level;
 import java.util.List;
 
 public class BigWaveBeachEffect implements ChapterEffect {
+    public static final int WATER_LIMIT_COLUMN = 2;
 
     @Override
     public void onStart(GameSession session, Level level) {
@@ -46,7 +47,7 @@ public class BigWaveBeachEffect implements ChapterEffect {
         int cols = lawn.getCols();
 
         int coastColumn = Math.max(
-                0,
+                WATER_LIMIT_COLUMN,
                 Math.min(requestedCoastColumn, cols - 2)
         );
 

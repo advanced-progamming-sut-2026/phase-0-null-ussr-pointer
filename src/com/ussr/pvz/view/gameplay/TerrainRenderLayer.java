@@ -12,6 +12,7 @@ import com.ussr.pvz.model.board.structures.*;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.chaptereffect.BigWaveBeachEffect;
 import com.ussr.pvz.view.animation.PamActor;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
@@ -248,26 +249,211 @@ public class TerrainRenderLayer extends Group {
         super.draw(batch, parentAlpha); // PamActors (Graves, Vases, Brain)
     }
 
-    private void drawTerrain(Batch batch, float parentAlpha, Lawn lawn) {
+    private void drawTerrain(
+            Batch batch,
+            float parentAlpha,
+            Lawn lawn
+    ) {
         for (int row = 0; row < lawn.getRows(); row++) {
             for (int col = 0; col < lawn.getCols(); col++) {
                 Cell cell = lawn.getCell(row, col);
-                if (cell == null || cell.getTile() == null) continue;
-                drawTile(batch, parentAlpha, cell.getTile(), col, row);
+
+                if (cell == null || cell.getTile() == null) {
+                    continue;
+                }
+
+                drawTile(
+                        batch,
+                        parentAlpha,
+                        cell.getTile(),
+                        col,
+                        row
+                );
             }
+        }
+
+        if (findCoastColumn(lawn) >= 0) {
+            drawWaterLimitLine(
+                    batch,
+                    parentAlpha,
+                    lawn
+            );
         }
     }
 
-    private void drawTile(Batch batch, float parentAlpha, Tile tile, int col, int row) {
+    private void drawWaterTile(
+            Batch batch,
+            float parentAlpha,
+            int col,
+            int row
+    ) {
+        TextureRegion water = textures.region(
+                "IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_174X209"
+        );
+
+        if (water == null) {
+            return;
+        }
+
+        float x =
+                LawnGridLayout.cellX(col)
+                        + LawnGridLayout.WATER_DRAW_OFFSET_X
+                        + (LawnGridLayout.CELL_WIDTH
+                        - LawnGridLayout.WATER_DRAW_WIDTH) / 2f;
+
+        float y =
+                LawnGridLayout.cellY(row)
+                        + LawnGridLayout.WATER_DRAW_OFFSET_Y
+                        + (LawnGridLayout.CELL_HEIGHT
+                        - LawnGridLayout.WATER_DRAW_HEIGHT) / 2f;
+
+        Color previous = new Color(batch.getColor());
+        float drawHeight = LawnGridLayout.WATER_DRAW_HEIGHT
+                + (row == LawnGridLayout.ROWS - 1
+                ? LawnGridLayout.WATER_TOP_ROW_EXTENSION
+                : 0f);
+
+        TextureRegion base = textures.region(
+                "IMAGE_BACKGROUNDS_WATER_UNDERLAYER_WATER_UNDERLAYER_1586X49"
+        );
+        if (base != null) {
+            batch.setColor(0.38f, 0.70f, 0.96f, parentAlpha);
+            batch.draw(
+                    base,
+                    x,
+                    y,
+                    LawnGridLayout.WATER_DRAW_WIDTH,
+                    drawHeight
+            );
+        }
+
+        batch.setColor(
+                0.68f,
+                0.90f,
+                1f,
+                parentAlpha * 0.78f
+        );
+
+        batch.draw(
+                water,
+                x,
+                y,
+                LawnGridLayout.WATER_DRAW_WIDTH,
+                drawHeight
+        );
+
+        batch.setColor(previous);
+    }
+
+    private void drawShallowCoastTile(
+            Batch batch,
+            float parentAlpha,
+            int col,
+            int row
+    ) {
+        drawWaterTile(
+                batch,
+                parentAlpha,
+                col,
+                row
+        );
+
+        TextureRegion coast = textures.region(
+                "IMAGE_EFFECTS_SHALLOW_PUDDLE_TILE_SHALLOW_PUDDLE_TILE_38X105"
+        );
+
+        if (coast == null) {
+            return;
+        }
+
+        float x =
+                LawnGridLayout.cellX(col)
+                        + LawnGridLayout.WATER_DRAW_OFFSET_X
+                        + (LawnGridLayout.CELL_WIDTH
+                        - LawnGridLayout.WATER_DRAW_WIDTH) / 2f;
+
+        float y =
+                LawnGridLayout.cellY(row)
+                        + LawnGridLayout.WATER_DRAW_OFFSET_Y
+                        + (LawnGridLayout.CELL_HEIGHT
+                        - LawnGridLayout.WATER_DRAW_HEIGHT) / 2f;
+
+        float coastWidth =
+                LawnGridLayout.CELL_WIDTH * 0.40f;
+        float coastHeight = LawnGridLayout.WATER_DRAW_HEIGHT
+                + (row == LawnGridLayout.ROWS - 1
+                ? LawnGridLayout.WATER_TOP_ROW_EXTENSION
+                : 0f);
+
+        Color previous = new Color(batch.getColor());
+
+        batch.setColor(1f, 1f, 1f, parentAlpha);
+
+        batch.draw(
+                coast,
+                x,
+                y,
+                coastWidth,
+                coastHeight
+        );
+
+        batch.setColor(previous);
+    }
+
+    private void drawTile(
+            Batch batch,
+            float parentAlpha,
+            Tile tile,
+            int col,
+            int row
+    ) {
         TileType type = tile.getType();
-        if (type == null || type == TileType.Normal || type == TileType.Beghouled) return;
-        if (type == TileType.Slippery) return;   // ← PAM actor handles it in act()
+
+        if (type == null
+                || type == TileType.Normal
+                || type == TileType.Beghouled
+                || type == TileType.Slippery) {
+            return;
+        }
+
+        if (type == TileType.Water) {
+            drawWaterTile(
+                    batch,
+                    parentAlpha,
+                    col,
+                    row
+            );
+            return;
+        }
+
+        if (type == TileType.ShallowCoast) {
+            drawShallowCoastTile(
+                    batch,
+                    parentAlpha,
+                    col,
+                    row
+            );
+            return;
+        }
 
         TextureRegion region = findTerrainRegion(tile);
+
         if (region != null) {
-            drawTerrainRegion(batch, parentAlpha, region, col, row);
+            drawTerrainRegion(
+                    batch,
+                    parentAlpha,
+                    region,
+                    col,
+                    row
+            );
         } else {
-            drawTerrainColor(batch, parentAlpha, terrainColor(type), col, row);
+            drawTerrainColor(
+                    batch,
+                    parentAlpha,
+                    terrainColor(type),
+                    col,
+                    row
+            );
         }
     }
 
@@ -275,10 +461,6 @@ public class TerrainRenderLayer extends Group {
         TileType type = tile.getType();
         return switch (type) {
             case Crater -> textures.region("IMAGE_EFFECTS_CRATER_CRATER_129X131");
-            case ShallowCoast -> textures.region(
-                    "IMAGE_EFFECTS_SHALLOW_PUDDLE_TILE_SHALLOW_PUDDLE_TILE_38X105");
-            case Water -> textures.region(
-                    "IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_175X210");
             case Frozen -> textures.region(
                     "IMAGE_EFFECTS_CHILLYPEPPER_TILE_ICE_CHILLYPEPPER_TILE_ICE_248X147");
             case Slippery -> textures.region(slipperyRegion(tile));
@@ -343,5 +525,48 @@ public class TerrainRenderLayer extends Group {
         if (hp >= 350) return "damage2";
         if (hp >= 175) return "damage3";
         return "damage4";
+    }
+
+    private int findCoastColumn(Lawn lawn) {
+        for (int col = 0; col < lawn.getCols(); col++) {
+            for (int row = 0; row < lawn.getRows(); row++) {
+                Tile tile = lawn.getTile(row, col);
+
+                if (tile != null
+                        && tile.getType() == TileType.ShallowCoast) {
+                    return col;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private void drawWaterLimitLine(
+            Batch batch,
+            float parentAlpha,
+            Lawn lawn
+    ) {
+        TextureRegion marker = textures.region(
+                "IMAGE_BACKGROUNDS_WATER_TIDE_LINE_WATER_TIDE_LINE_161X397"
+        );
+        if (marker == null) {
+            return;
+        }
+
+        float height = LawnGridLayout.CELL_HEIGHT * lawn.getRows();
+        float width = height
+                * marker.getRegionWidth()
+                / marker.getRegionHeight();
+        float x = LawnGridLayout.cellX(BigWaveBeachEffect.WATER_LIMIT_COLUMN)
+                + LawnGridLayout.TILE_DRAW_OFFSET_X
+                - width * 0.5f;
+        float y = LawnGridLayout.cellY(0)
+                + LawnGridLayout.TILE_DRAW_OFFSET_Y;
+
+        Color previous = new Color(batch.getColor());
+        batch.setColor(1f, 1f, 1f, parentAlpha);
+        batch.draw(marker, x, y, width, height);
+        batch.setColor(previous);
     }
 }

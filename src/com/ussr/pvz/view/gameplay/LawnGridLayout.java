@@ -24,6 +24,12 @@ public final class LawnGridLayout {
     public static final float TILE_DRAW_OFFSET_X = 20f;   // nudge right
     public static final float TILE_DRAW_OFFSET_Y = -90f;  // nudge down
 
+    public static final float WATER_DRAW_OFFSET_X = 25f;  // 8 px left of other tiles
+    public static final float WATER_DRAW_OFFSET_Y = -82f; // 8 px above other tiles
+    public static final float WATER_DRAW_WIDTH = CELL_WIDTH + 12f;
+    public static final float WATER_DRAW_HEIGHT = CELL_HEIGHT + 12f;
+    public static final float WATER_TOP_ROW_EXTENSION = 18f;
+
     public static final float SLIPPERY_DRAW_OFFSET_X = TILE_DRAW_OFFSET_X;
     public static final float SLIPPERY_DRAW_OFFSET_Y = TILE_DRAW_OFFSET_Y + 40f;
 
