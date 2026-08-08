@@ -4,10 +4,8 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.dto.LocationRequest;
 import com.ussr.pvz.model.dto.PlantPlantRequest;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.model.level.Level;
-import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
+import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
 import com.ussr.pvz.notification.NotificationCenter;
-import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.service.game.GameService;
 
 public class GameplayController {
@@ -118,12 +116,10 @@ public class GameplayController {
     public void plantAt(String plantKey, int gridX, int gridY) {
         if (this.paused || plantKey == null) return;
 
-        PlantPlantRequest req = new PlantPlantRequest(plantKey, String.valueOf(gridX), String.valueOf(gridY));
-        String result = gameService.plantPlant(req);
+        String result = executeSelectedPlant(plantKey, gridX, gridY);
 
-        if (result.contains("placed")) {
+        if (result.contains("placed") || result.contains("Rolled")) {
             NotificationCenter.success(result);
-            consumeFromConveyorIfNeeded(plantKey);
             setSelectedSeed(null);
             if (onPlantingCompleted != null) onPlantingCompleted.run();
         } else {
@@ -131,21 +127,24 @@ public class GameplayController {
         }
     }
 
-    private void executePlantingAction(int x, int y) {
-        plantAt(selectedSeedKey, x, y);
+    private String executeSelectedPlant(String plantKey, int gridX, int gridY) {
+        GameSession session = App.getGameSession();
+        if (session != null
+                && session.getLevel() != null
+                && session.getLevel().getBehavior() instanceof WallnutBowlingBehavior bowling) {
+            return bowling.rollNut(plantKey, gridX, gridY);
+        }
+
+        PlantPlantRequest request = new PlantPlantRequest(
+                plantKey,
+                String.valueOf(gridX),
+                String.valueOf(gridY)
+        );
+        return gameService.plantPlant(request);
     }
 
-    private void consumeFromConveyorIfNeeded(String plantedKey) {
-        GameSession session = App.getGameSession();
-        Level level = session != null ? session.getLevel() : null;
-        if (level == null || !(level.getDeliveryStrategy() instanceof ConveyorDeliveryStrategy conveyor)) {
-            return;
-        }
-        conveyor.getConveyorBelt().stream()
-                .filter(name -> ChoosePlantService.normalizePlantKey(name).equals(plantedKey))
-                .findFirst()
-                .ifPresent(name -> conveyor.getConveyorBelt().remove(name));
-        this.selectedSeedKey = null;
+    private void executePlantingAction(int x, int y) {
+        plantAt(selectedSeedKey, x, y);
     }
 
     private void executeSunCollection(int x, int y) {

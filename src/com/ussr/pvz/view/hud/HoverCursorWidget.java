@@ -17,16 +17,13 @@ public class HoverCursorWidget extends Actor {
     private static final String REGION_PLANTFOOD =
             "IMAGE_BACKGROUNDS_TILE_PLANTFOOD_TILE_PLANTFOOD_45X46";
 
-    private final SeedBankHud seedBankHud;
     private final TextureBank textures;
     private final GameplayController controller;
 
     public HoverCursorWidget(
-            SeedBankHud seedBankHud,
             TextureBank textures,
             GameplayController controller
     ) {
-        this.seedBankHud = seedBankHud;
         this.textures = textures;
         this.controller = controller;
         setTouchable(Touchable.disabled);
@@ -51,7 +48,8 @@ public class HoverCursorWidget extends Actor {
         }
 
         // ── Plant selection mode ──────────────────────────────────────────
-        String selectedKey = seedBankHud.getSelectedPlantKey();
+        String selectedKey =
+                controller.getSelectedSeedKey();
         if (selectedKey == null) return;
 
         if (!LawnGridLayout.contains(mouse.x, mouse.y)) return;

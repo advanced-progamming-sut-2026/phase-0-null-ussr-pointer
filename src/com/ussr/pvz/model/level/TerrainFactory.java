@@ -77,13 +77,26 @@ public final class TerrainFactory {
         }
     }
 
-    private static void scatterBeachTerrain(Lawn lawn, int rows, int cols) {
-        int seaColumns = 3;
-        for (int r = 0; r < rows; r++) {
-            for (int c = cols - seaColumns; c < cols; c++) {
-                // rightmost sea column = shallow coast, everything behind it = water
-                TileType type = (c == cols - seaColumns) ? TileType.ShallowCoast : TileType.Water;
-                lawn.getCell(r, c).setTile(new Tile(type));
+    private static void scatterBeachTerrain(
+            Lawn lawn,
+            int rows,
+            int cols
+    ) {
+        int maxWaterColumns = Math.min(3, cols - 1);
+        int waterColumns = 1 + RAND.nextInt(maxWaterColumns);
+        int coastColumn = cols - waterColumns - 1;
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                TileType type = TileType.Normal;
+
+                if (col == coastColumn) {
+                    type = TileType.ShallowCoast;
+                } else if (col > coastColumn) {
+                    type = TileType.Water;
+                }
+
+                lawn.getCell(row, col).setTile(new Tile(type));
             }
         }
     }

@@ -22,6 +22,7 @@ import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.quest.QuestRewardApplier;
 import com.ussr.pvz.model.quest.QuestType;
 import com.ussr.pvz.service.ChoosePlantService;
@@ -220,29 +221,31 @@ public class GameService {
             int y = location[1];
 
             GameSession session = requireSession();
+
+            ConveyorDeliveryStrategy conveyor =
+                    getConveyor(session);
+
+            boolean conveyorPacket =
+                    conveyor != null && conveyor.contains(request.type());
+
             Plant blueprint = getPlantBlueprint(request.type());
 
-            App.getAccount().getAdventureProgress().getAccountPlants().stream()
-                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(
-                            ChoosePlantService.normalizePlantKey(blueprint.getName())))
-                    .findFirst()
-                    .ifPresent(accountPlant ->
-                            blueprint.setRecharge(accountPlant.getRecharge()));
+            if (!conveyorPacket) {
+                synchronizeRechargeFromAccount(blueprint);
+            }
 
             Cell cell = requirePlantableCell(session, x, y, blueprint);
-            checkRechargeAndSpendSun(session, blueprint);
+            if (!conveyorPacket) {
+                checkRechargeAndSpendSun(session, blueprint);
+            }
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
             session.addPlant(plant);
-            blueprint.setRecharge(blueprint.getMaxRecharge());
-            App.getAccount().getAdventureProgress().getAccountPlants().stream()
-                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(
-                            ChoosePlantService.normalizePlantKey(blueprint.getName())))
-                    .findFirst()
-                    .ifPresent(accountPlant -> {
-                        accountPlant.setMaxRecharge(blueprint.getMaxRecharge());
-                        accountPlant.setRecharge(blueprint.getMaxRecharge());
-                    });
+            if (conveyorPacket) {
+                conveyor.consume(request.type());
+            } else {
+                applyPlantRecharge(blueprint);
+            }
             return "plant " + plant.getName() + " placed at (" + x + ", " + y + ")";
         } catch (IllegalStateException e) {
             return e.getMessage();
@@ -251,6 +254,60 @@ public class GameService {
             e.printStackTrace();
             return "An internal system error occurred while planting: " + e.getMessage();
         }
+    }
+
+    private void synchronizeRechargeFromAccount(Plant blueprint) {
+        App.getAccount()
+                .getAdventureProgress()
+                .getAccountPlants()
+                .stream()
+                .filter(accountPlant ->
+                        ChoosePlantService.normalizePlantKey(accountPlant.getName())
+                                .equals(ChoosePlantService.normalizePlantKey(
+                                        blueprint.getName()
+                                ))
+                )
+                .findFirst()
+                .ifPresent(accountPlant ->
+                        blueprint.setRecharge(accountPlant.getRecharge())
+                );
+    }
+
+    private void applyPlantRecharge(Plant blueprint) {
+        blueprint.setRecharge(blueprint.getMaxRecharge());
+
+        App.getAccount()
+                .getAdventureProgress()
+                .getAccountPlants()
+                .stream()
+                .filter(accountPlant ->
+                        ChoosePlantService.normalizePlantKey(accountPlant.getName())
+                                .equals(ChoosePlantService.normalizePlantKey(
+                                        blueprint.getName()
+                                ))
+                )
+                .findFirst()
+                .ifPresent(accountPlant -> {
+                    accountPlant.setMaxRecharge(
+                            blueprint.getMaxRecharge()
+                    );
+                    accountPlant.setRecharge(
+                            blueprint.getMaxRecharge()
+                    );
+                });
+    }
+
+    private ConveyorDeliveryStrategy getConveyor(GameSession session) {
+        if (session == null || session.getLevel() == null) {
+            return null;
+        }
+
+        if (session.getLevel().getDeliveryStrategy()
+                instanceof ConveyorDeliveryStrategy conveyor) {
+            return conveyor;
+        }
+
+        return null;
     }
 
     private int[] parseLocation(String xStr, String yStr) {

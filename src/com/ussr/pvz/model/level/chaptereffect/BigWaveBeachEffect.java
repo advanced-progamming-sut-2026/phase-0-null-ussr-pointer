@@ -32,34 +32,79 @@ public class BigWaveBeachEffect implements ChapterEffect {
         }
     }
 
-    private void applyTide(GameSession session, Level level, int newTideCol) {
+    private void applyTide(
+            GameSession session,
+            Level level,
+            int requestedCoastColumn
+    ) {
         Lawn lawn = session.getLawn();
-        if (lawn == null) return;
-
-        level.setCurrentTideColumn(newTideCol);
-        System.out.println("The tide shifts: water now covers columns " + (newTideCol + 1) + " onward.");
+        if (lawn == null) {
+            return;
+        }
 
         int rows = lawn.getRows();
         int cols = lawn.getCols();
 
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                Cell cell = lawn.getCell(r, c);
-                if (cell == null || cell.getTile() == null) continue;
+        int coastColumn = Math.max(
+                0,
+                Math.min(requestedCoastColumn, cols - 2)
+        );
 
-                TileType current = cell.getTile().getType();
-                boolean shouldBeWater = c >= newTideCol && current == TileType.Normal;
-                boolean shouldBeLand = c < newTideCol
-                        && (current == TileType.Water || current == TileType.ShallowCoast);
+        level.setCurrentTideColumn(coastColumn);
 
-                if (shouldBeWater) {
-                    cell.setTile(new Tile(TileType.Water));
-                    washAwayIfNeeded(session, cell);
-                } else if (shouldBeLand) {
-                    cell.setTile(new Tile(TileType.Normal));
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Cell cell = lawn.getCell(row, col);
+                if (cell == null || cell.getTile() == null) {
+                    continue;
+                }
+
+                TileType oldType = cell.getTile().getType();
+                TileType newType = getBeachTileType(col, coastColumn);
+
+                if (!isBeachTerrain(oldType)) {
+                    continue;
+                }
+
+                if (oldType != newType) {
+                    cell.setTile(new Tile(newType));
+
+                    if (isNewlyFlooded(oldType, newType)) {
+                        washAwayIfNeeded(session, cell);
+                    }
                 }
             }
         }
+    }
+
+    private TileType getBeachTileType(
+            int column,
+            int coastColumn
+    ) {
+        if (column < coastColumn) {
+            return TileType.Normal;
+        }
+
+        if (column == coastColumn) {
+            return TileType.ShallowCoast;
+        }
+
+        return TileType.Water;
+    }
+
+    private boolean isBeachTerrain(TileType type) {
+        return type == TileType.Normal
+                || type == TileType.ShallowCoast
+                || type == TileType.Water;
+    }
+
+    private boolean isNewlyFlooded(
+            TileType oldType,
+            TileType newType
+    ) {
+        return oldType == TileType.Normal
+                && (newType == TileType.ShallowCoast
+                || newType == TileType.Water);
     }
 
     private void washAwayIfNeeded(GameSession session, Cell cell) {

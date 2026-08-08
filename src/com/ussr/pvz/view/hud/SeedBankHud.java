@@ -12,6 +12,7 @@ import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.service.ChoosePlantService;
 import pvz.libpvz.textures.TextureBank;
 
@@ -93,10 +94,23 @@ public class SeedBankHud extends Table {
         super.act(delta);
 
         GameSession session = App.getGameSession();
+
         if (session == null) {
             setVisible(false);
             return;
         }
+
+        boolean conveyorLevel =
+                session.getLevel() != null
+                        && session.getLevel().getDeliveryStrategy()
+                        instanceof ConveyorDeliveryStrategy;
+
+        if (conveyorLevel) {
+            setVisible(false);
+            clearSelection();
+            return;
+        }
+
         setVisible(true);
 
         if (session != lastSession) {
@@ -105,9 +119,12 @@ public class SeedBankHud extends Table {
         }
 
         sunLabel.setText(String.valueOf(session.getSunCount()));
-        plantFoodLabel.setText(String.valueOf(session.getPlantFoodCount()));
+        plantFoodLabel.setText(
+                String.valueOf(session.getPlantFoodCount())
+        );
 
         int sun = session.getSunCount();
+
         for (SeedPacketWidget widget : packets.values()) {
             widget.refresh(sun);
         }

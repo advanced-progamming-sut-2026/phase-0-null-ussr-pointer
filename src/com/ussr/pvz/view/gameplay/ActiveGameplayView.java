@@ -53,7 +53,6 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         HoverCursorWidget hoverCursor =
                 new HoverCursorWidget(
-                        inGameHud.getSeedBankHud(),
                         textures,
                         controller
                 );

@@ -19,12 +19,15 @@ public class InGameHud extends Table implements Disposable {
     private final PlantFoodWidget plantFoodWidget;
     private final WaveProgressBar waveProgressBar;
     private final PauseMenuAssets pauseMenuAssets;
+    private final ConveyorBeltWidget conveyorBeltWidget;
 
     public InGameHud(Skin skin, TextureBank textures, GameplayController controller) {
         setFillParent(true);
         setTouchable(Touchable.childrenOnly);
 
         pauseMenuAssets = new PauseMenuAssets();
+        conveyorBeltWidget =
+                new ConveyorBeltWidget(skin, textures, controller);
 
         // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
@@ -32,7 +35,7 @@ public class InGameHud extends Table implements Disposable {
                 skin,
                 textures,
                 controller,
-                seedBankHud::clearSelection
+                this::clearPlantSelection
         );
 
         // Plant food button — wires itself to controller.setOnPlantFoodDeactivated
@@ -44,7 +47,7 @@ public class InGameHud extends Table implements Disposable {
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
-        controller.setOnPlantingCompleted(seedBankHud::clearSelection);
+        controller.setOnPlantingCompleted(this::clearPlantSelection);
 
         ObjectiveWidgetFactory.ObjectiveWidgets objectives =
                 ObjectiveWidgetFactory.create(skin, textures);
@@ -67,6 +70,18 @@ public class InGameHud extends Table implements Disposable {
         topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
         topRow.add(debugTools).right().padRight(15f);
         topRow.add(pauseButton).right().top().pad(15f);
+
+        //conveyor table
+        Table conveyorLayer = new Table();
+        conveyorLayer.setFillParent(true);
+        conveyorLayer.setTouchable(Touchable.childrenOnly);
+        conveyorLayer.top().left();
+
+        conveyorLayer.add(conveyorBeltWidget)
+                .top()
+                .left()
+                .padTop(65f)
+                .padLeft(12f);
 
         // Bottom Row: [plant food] ... [shovel]
         // Plant food sits to the left of the shovel so both are thumb-reachable.
@@ -93,6 +108,7 @@ public class InGameHud extends Table implements Disposable {
         // Root stack
         Stack rootStack = new Stack();
         rootStack.add(mainGameLayer);
+        rootStack.add(conveyorLayer);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
         rootStack.add(eventAnnouncer);
@@ -102,6 +118,11 @@ public class InGameHud extends Table implements Disposable {
 
     public SeedBankHud getSeedBankHud() {
         return seedBankHud;
+    }
+
+    private void clearPlantSelection() {
+        seedBankHud.clearSelection();
+        conveyorBeltWidget.clearSelection();
     }
 
     /** Exposed so HoverCursorWidget can read plant-food mode state. */

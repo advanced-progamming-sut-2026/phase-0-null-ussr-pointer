@@ -26,12 +26,19 @@ public class SeedPacketWidget extends Stack {
     private final Image portraitIcon;
     private final Label costLabel;
     private final CooldownOverlay cooldownOverlay;
+    private final boolean availabilityRestricted;
 
     private boolean affordable = true;
     private boolean selected = false;
 
     public SeedPacketWidget(Plant blueprint, Skin skin, TextureBank textures, Runnable onClick) {
+        this(blueprint, skin, textures, onClick, true);
+    }
+
+    public SeedPacketWidget(Plant blueprint, Skin skin, TextureBank textures,
+                            Runnable onClick, boolean availabilityRestricted) {
         this.blueprint = blueprint;
+        this.availabilityRestricted = availabilityRestricted;
         setTouchable(Touchable.enabled);
 
         String packetKey = PlantCard.resolvePacketKey(blueprint.getName());
@@ -71,12 +78,14 @@ public class SeedPacketWidget extends Stack {
         costLabel.setAlignment(Align.left);
         costLabel.setTouchable(Touchable.disabled);
         costLayer.add(costLabel).pad(2f);
+        costLayer.setVisible(availabilityRestricted);
         add(costLayer);
+        cooldownOverlay.setVisible(availabilityRestricted);
 
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (!isUsable()) return;
+                if (availabilityRestricted && !isUsable()) return;
                 if (onClick != null) onClick.run();
             }
         });

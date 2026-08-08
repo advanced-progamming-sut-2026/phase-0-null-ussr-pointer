@@ -7,6 +7,7 @@ import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 import com.ussr.pvz.model.util.Vec2;
+import com.ussr.pvz.service.ChoosePlantService;
 
 public class WallnutBowlingBehavior extends LevelBehavior {
 
@@ -67,8 +68,9 @@ public class WallnutBowlingBehavior extends LevelBehavior {
             return "Current level has no conveyor belt to roll from.";
         }
 
+        String requestedKey = ChoosePlantService.normalizePlantKey(nutTypeStr);
         java.util.Optional<String> matched = conveyorStrategy.getConveyorBelt().stream()
-                .filter(s -> s.equalsIgnoreCase(nutTypeStr))
+                .filter(s -> ChoosePlantService.normalizePlantKey(s).equals(requestedKey))
                 .findFirst();
 
         if (matched.isEmpty()) {
@@ -76,9 +78,9 @@ public class WallnutBowlingBehavior extends LevelBehavior {
         }
 
         String belt = matched.get();
-        BowlingNutProjectile.NutType type = switch (belt.toUpperCase()) {
-            case "EXPLODE-O-NUT" -> BowlingNutProjectile.NutType.EXPLODING;
-            case "GIANT-WALLNUT" -> BowlingNutProjectile.NutType.GIANT;
+        BowlingNutProjectile.NutType type = switch (ChoosePlantService.normalizePlantKey(belt)) {
+            case "EXPLODEONUT" -> BowlingNutProjectile.NutType.EXPLODING;
+            case "GIANTWALLNUT" -> BowlingNutProjectile.NutType.GIANT;
             default -> BowlingNutProjectile.NutType.NORMAL;
         };
 
