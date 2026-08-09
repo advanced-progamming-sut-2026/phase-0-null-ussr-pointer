@@ -8,6 +8,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class StraightMove implements MoveStrategy {
     private double speedMagnitude = 4.0d;
+    private Damageable target;
 
     @Override
     public void move(
@@ -17,6 +18,17 @@ public class StraightMove implements MoveStrategy {
         Vec2 pos = projectile.getPosition();
         Vec2 speed = projectile.getSpeed();
 
+        if (target instanceof GameEntity targetEntity
+                && target.isAlive()
+                && pos != null
+                && targetEntity.getPosition() != null) {
+            Vec2 direction = targetEntity.getPosition().add(pos.scale(-1));
+            if (direction.length() > 0) {
+                speed = direction.normalize().scale(speedMagnitude);
+                projectile.setSpeed(speed);
+            }
+        }
+
         if (pos != null && speed != null) {
             Vec2 newPos = pos.add(speed.scale(delta));
             projectile.setPosition(newPos);
@@ -25,6 +37,7 @@ public class StraightMove implements MoveStrategy {
 
     @Override
     public void initialize(Projectile projectile, Damageable target) {
+        this.target = target;
         Vec2 startPos = projectile.getPosition();
         if (startPos == null) return;
 

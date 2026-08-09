@@ -16,7 +16,8 @@ public abstract class ZombieBossProjectile extends ZombieProjectile {
 
         // Arc offset for parabolic trajectory
         double arc = 4.0 * progress * (1.0 - progress) * 2.0;
-        this.setPosition(Vec2.of(curX, curY + arc));
+        this.setPosition(Vec2.of(curX, curY));
+        this.setVisualHeight(arc);
     }
 
     @Override

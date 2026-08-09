@@ -14,6 +14,7 @@ public class BounceMove implements MoveStrategy {
     private final double MAX_Y = 4d;
 
     private int hitCount = 0;
+    private Damageable target;
 
 
     public BounceMove() {};
@@ -25,6 +26,18 @@ public class BounceMove implements MoveStrategy {
     ) {
         Vec2 pos = projectile.getPosition();
         Vec2 speed = projectile.getSpeed();
+
+        if (hitCount == 0
+                && target instanceof GameEntity targetEntity
+                && target.isAlive()
+                && pos != null
+                && targetEntity.getPosition() != null) {
+            Vec2 direction = targetEntity.getPosition().add(pos.scale(-1));
+            if (direction.length() > 0) {
+                speed = direction.normalize().scale(speedMagnitude);
+                projectile.setSpeed(speed);
+            }
+        }
 
         if (pos != null && speed != null) {
             Vec2 newPos = pos.add(speed.scale(delta));
@@ -72,6 +85,7 @@ public class BounceMove implements MoveStrategy {
 
     @Override
     public void initialize(Projectile projectile, Damageable target) {
+        this.target = target;
         Vec2 startPos = projectile.getPosition();
         if (startPos == null) return;
 

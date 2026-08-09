@@ -5,6 +5,7 @@ import com.ussr.pvz.model.entities.plants.factory.ActStrategyRegistry;
 import com.ussr.pvz.model.entities.plants.factory.PlantFoodEffectRegistry;
 import com.ussr.pvz.model.entities.plants.factory.ShootingVectorRegistry;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,11 @@ public class PlantFactory {
         plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
         plant.setActStrategy(ActStrategyRegistry.create(data));
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
+        if (plant.getName().equalsIgnoreCase("puff-shroom")
+                || plant.getName().equalsIgnoreCase("sea-shroom")) {
+            plant.setLifetime(60.0
+                    + plant.getSpecialUpgradeValue(SpecialUpgrade.LIFESPAN_EXT));
+        }
         return plant;
     }
 
@@ -135,8 +141,9 @@ public class PlantFactory {
                             case "BUFF_DAMAGE" -> runtimeDamage += (int) upVal;
                             case "BUFF_RECHARGE" -> runtimeRecharge += upVal;
                             case "SPECIAL_MECHANIC" -> {
-                                if (specialTag != null && !specialTag.isEmpty()) {
-                                    plant.getRawUpgrades().add(specialTag);
+                                SpecialUpgrade upgradee = SpecialUpgrade.fromJson(specialTag);
+                                if (upgradee != null) {
+                                    plant.addSpecialUpgrade(upgradee, upVal);
                                 }
                             }
                         }

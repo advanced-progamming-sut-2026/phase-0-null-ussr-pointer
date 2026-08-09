@@ -33,7 +33,7 @@
       {
         "level": 4,
         "type": "SPECIAL_MECHANIC",
-        "value": 1.0,
+        "value": 0.5,
         "specialTag": "DOUBLE_SUN_CHANCE"
       }
     ]
@@ -125,7 +125,7 @@
       {
         "level": 4,
         "type": "SPECIAL_MECHANIC",
-        "value": 1.0,
+        "value": 0.5,
         "specialTag": "DOUBLE_SUN_CHANCE"
       }
     ]

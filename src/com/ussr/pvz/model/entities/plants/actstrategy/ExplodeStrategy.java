@@ -7,6 +7,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
 import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
@@ -55,13 +56,20 @@ public class ExplodeStrategy implements ActStrategy {
                 break;
             case 6:
                 handleGraveDestroy(user , session);
-                break;
+                finishUtilityPlant(user, session);
+                return;
             case 7:
                 handleFreezeTileDestroy(user , session);
+                finishUtilityPlant(user, session);
+                return;
         }
 
         if (targets == null || targets.isEmpty()) return;
         userAct(user, targets);
+        if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
+            user.setInternalTimer(0.0);
+            return;
+        }
         user.setAlive(false); // Detonate and clear the plant entity
     }
 
@@ -90,6 +98,17 @@ public class ExplodeStrategy implements ActStrategy {
             }
         }
         if (firstTouch != null) targets.add(firstTouch);
+        int bonusTargets = user.getSpecialUpgradeInt(SpecialUpgrade.BONUS_GRAB_TARGETS);
+        if (bonusTargets > 0) {
+            Zombie primaryTarget = firstTouch;
+            session.getZombies().stream()
+                    .filter(z -> z != null && z.isAlive() && z != primaryTarget)
+                    .filter(z -> z.getPosition().distanceTo(userPos) < TRAP_ACTIVATION_RADIUS + 1.0)
+                    .sorted(java.util.Comparator.comparingDouble(
+                            z -> z.getPosition().distanceTo(userPos)))
+                    .limit(bonusTargets)
+                    .forEach(targets::add);
+        }
         return targets;
     }
 
@@ -158,9 +177,13 @@ public class ExplodeStrategy implements ActStrategy {
         int userDamage = user.getDamage();
         for (Zombie zombie : targets) {
             if (user.getTags().contains(Tag.ICE)) {
-                zombie.setStatus(Zombie.Status.FREEZE);
+                double extraDuration = user.getSpecialUpgradeValue(
+                        SpecialUpgrade.FREEZE_DURATION_EXT)
+                        + user.getSpecialUpgradeValue(SpecialUpgrade.CHILL_DURATION_EXT);
+                zombie.setStatus(Zombie.Status.FREEZE,
+                        Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
             } else if (user.getTags().contains(Tag.FIRE)) {
-                zombie.setStatus(Zombie.Status.FIRED);
+                zombie.setStatus(Zombie.Status.FIRED, Zombie.DEFAULT_FIRE_DURATION);
             }
             zombie.takeDamage(userDamage, user);
         }
@@ -181,11 +204,30 @@ public class ExplodeStrategy implements ActStrategy {
     private void handleFreezeTileDestroy(Plant user , GameSession session) {
         Vec2 userPos = user.getPosition();
 
-        boolean isFrozen = session.getLawn().getCell((int) userPos.y() ,
-                (int) userPos.x()).getTile().getType() == TileType.Frozen;
-        if(isFrozen) {
-            session.getLawn().getCell((int) userPos.y() ,
-                    (int) userPos.x()).getTile().setType(TileType.Normal);
+        int radius = user.hasSpecialUpgrade(SpecialUpgrade.MELT_AREA_3X3) ? 1 : 0;
+        int centerRow = (int) userPos.y();
+        int centerCol = (int) userPos.x();
+        for (int row = centerRow - radius; row <= centerRow + radius; row++) {
+            for (int col = centerCol - radius; col <= centerCol + radius; col++) {
+                com.ussr.pvz.model.board.Cell cell = session.getLawn().getCell(row, col);
+                if (cell != null && cell.getTile() != null
+                        && cell.getTile().getType() == TileType.Frozen) {
+                    cell.getTile().setType(TileType.Normal);
+                }
+            }
         }
+    }
+
+    private void finishUtilityPlant(Plant user, GameSession session) {
+        int damage = user.getSpecialUpgradeInt(SpecialUpgrade.EXPLODE_ON_FINISH);
+        if (damage > 0) {
+            for (Zombie zombie : session.getZombies()) {
+                if (zombie != null && zombie.isAlive()
+                        && zombie.getPosition().distanceTo(user.getPosition()) <= 1.5) {
+                    zombie.takeDamage(damage, user);
+                }
+            }
+        }
+        user.setAlive(false);
     }
 }

@@ -27,6 +27,13 @@ import java.util.Queue;
 
 public class Zombie extends GameEntity implements Damageable {
 
+    public static final double DEFAULT_FREEZE_DURATION = 5.0;
+    public static final double DEFAULT_BUTTER_DURATION = 4.0;
+    public static final double DEFAULT_POISON_DURATION = 5.0;
+    public static final double DEFAULT_FIRE_DURATION = 5.0;
+    public static final float FREEZE_SPEED_MULTIPLIER = 0.5f;
+    public static final float BUTTER_SPEED_MULTIPLIER = 0.7f;
+
 
     private static final Random RAND = new Random();
     private final String name;
@@ -43,6 +50,8 @@ public class Zombie extends GameEntity implements Damageable {
     private int maxHp;
     private double eatDps;
     private double statusTimeRemaining = 0.0;
+    private double poisonTickTimer;
+    private int poisonTickDamage;
     private ZombieSize size;
     private ZombieActivity state = ZombieActivity.WALKING;
     private boolean isGlowing;
@@ -180,6 +189,7 @@ public class Zombie extends GameEntity implements Damageable {
         ZombieFactory.respawnPushedStructureIfNeeded(this);
 
         applyEffect(session, delta);
+        updatePoison(delta);
         updateStatus(delta);
         updateActivity(session, delta);
     }
@@ -204,9 +214,21 @@ public class Zombie extends GameEntity implements Damageable {
             statusTimeRemaining = 0;
 
             if (status == Status.FREEZE
-                    || status == Status.BUTTER) {
+                    || status == Status.BUTTER
+                    || status == Status.POISONED
+                    || status == Status.FIRED) {
                 status = Status.NORMAL;
+                poisonTickDamage = 0;
             }
+        }
+    }
+
+    private void updatePoison(float delta) {
+        if (status != Status.POISONED || statusTimeRemaining <= 0 || !isAlive) return;
+        poisonTickTimer -= delta;
+        if (poisonTickTimer <= 0) {
+            takeDamage(poisonTickDamage, true);
+            poisonTickTimer += 1.0;
         }
     }
 
@@ -214,14 +236,16 @@ public class Zombie extends GameEntity implements Damageable {
             GameSession session,
             float delta
     ) {
-        if (updateSlipperySlide(delta)) {
+        float movementDelta = delta * getMovementSpeedMultiplier();
+
+        if (updateSlipperySlide(movementDelta)) {
             return;
         }
 
         Damageable target = acquireTarget(session);
 
         if (canJumpOver(target)) {
-            moveBehavior.move(this, session, delta);
+            moveBehavior.move(this, session, movementDelta);
             target = acquireTarget(session);
         }
 
@@ -242,8 +266,16 @@ public class Zombie extends GameEntity implements Damageable {
         state = ZombieActivity.WALKING;
 
         if (moveBehavior != null) {
-            moveBehavior.move(this, session, delta);
+            moveBehavior.move(this, session, movementDelta);
         }
+    }
+
+    public float getMovementSpeedMultiplier() {
+        return switch (status) {
+            case FREEZE -> FREEZE_SPEED_MULTIPLIER;
+            case BUTTER -> BUTTER_SPEED_MULTIPLIER;
+            default -> 1.0f;
+        };
     }
 
     private boolean canJumpOver(Damageable target) {
@@ -492,12 +524,29 @@ public class Zombie extends GameEntity implements Damageable {
     }
 
     public void setStatus(Status status) {
+        setStatus(status, getDefaultStatusDuration(status));
+    }
+
+    public void setStatus(Status status, double duration) {
         this.status = status;
-        this.statusTimeRemaining = switch (status) {
-            case FREEZE -> 5.0;
-            case BUTTER -> 4.0;
+        this.statusTimeRemaining = Math.max(0.0, duration);
+    }
+
+    public static double getDefaultStatusDuration(Status status) {
+        return switch (status) {
+            case FREEZE -> DEFAULT_FREEZE_DURATION;
+            case BUTTER -> DEFAULT_BUTTER_DURATION;
+            case POISONED -> DEFAULT_POISON_DURATION;
+            case FIRED -> DEFAULT_FIRE_DURATION;
             default -> 0.0;
         };
+    }
+
+    public void applyPoison(int tickDamage, double duration) {
+        this.status = Status.POISONED;
+        this.statusTimeRemaining = Math.max(this.statusTimeRemaining, duration);
+        this.poisonTickDamage = Math.max(this.poisonTickDamage, tickDamage);
+        this.poisonTickTimer = 1.0;
     }
 
     public double getStatusTimeRemaining() {

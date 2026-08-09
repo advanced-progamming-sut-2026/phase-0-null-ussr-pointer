@@ -48,10 +48,17 @@ public class PlantCardOverlay extends Dialog {
         // Right Side: Stats
         Table statsTable = new Table();
         statsTable.add(new Label("Sun Cost:\n" + plant.cost, skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Recharge:\n" + plant.recharge + "s", skin, "secondary")).padRight(20);
-        statsTable.add(new Label("Toughness:\n" + plant.baseHp, skin, "secondary"));
+        statsTable.add(new Label("Recharge:\n" + formatStat(plant.recharge) + "s", skin, "secondary")).padRight(20);
+        statsTable.add(new Label("Toughness:\n" + formatStat(plant.baseHp), skin, "secondary"));
         rightSide.add(statsTable).left().padTop(10).row();
-        rightSide.add(new Label("Damage: " + plant.damage, skin, "secondary")).left().padTop(10).row();
+        rightSide.add(new Label("Damage: " + formatStat(plant.damage), skin, "secondary")).left().padTop(10).row();
+        if (plant.actionInterval > 0) {
+            rightSide.add(new Label(
+                    "Action interval: " + formatStat(plant.actionInterval) + "s",
+                    skin,
+                    "secondary"
+            )).left().padTop(10).row();
+        }
 
         content.add(leftSide).pad(20);
         content.add(rightSide).pad(20).top().left();
@@ -83,6 +90,16 @@ public class PlantCardOverlay extends Dialog {
 
         TextButton closeBtn = new TextButton("Close", skin, "brown");
         button(closeBtn, true);
+    }
+
+    private static String formatStat(double value) {
+        if (Math.abs(value - Math.rint(value)) < 0.0001) {
+            return String.valueOf((int) Math.rint(value));
+        }
+
+        return String.format(java.util.Locale.US, "%.2f", value)
+                .replaceAll("0+$", "")
+                .replaceAll("\\.$", "");
     }
 
     private static WindowStyle buildStyle(Skin skin, TextureRegionDrawable dimBg) {

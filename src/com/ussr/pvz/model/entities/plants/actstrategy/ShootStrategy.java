@@ -6,6 +6,7 @@ import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.*;
 import com.ussr.pvz.model.entities.projectiles.move.BounceMove;
@@ -13,6 +14,7 @@ import com.ussr.pvz.model.entities.projectiles.move.MoveStrategy;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
+import com.badlogic.gdx.math.MathUtils;
 
 import java.util.List;
 
@@ -51,12 +53,24 @@ public class ShootStrategy implements ActStrategy {
             ));
         }
         user.triggerActionAnimation(0.5f);
+        double autoFoodChance = user.getSpecialUpgradeValue(
+                SpecialUpgrade.AUTO_PLANT_FOOD_CHANCE);
+        if (!user.isBuffed() && user.getPlantFoodEffect() != null
+                && autoFoodChance > 0
+                && MathUtils.random() < Math.min(1.0, autoFoodChance)) {
+            user.setBuffed(true);
+            session.notifyPlantFoodUsed(user);
+        }
     }
 
     private HitEffectStrategy buildHitEffect(Plant user) {
+        int extraPierce = user.getSpecialUpgradeInt(SpecialUpgrade.ADDITIONAL_PIERCE);
+        if (extraPierce > 0) return new PierceHit(1 + extraPierce);
         if (user.getTags().contains(Tag.FIRE)) return new FireHit(1);
         if (user.getTags().contains(Tag.ICE)) return new IceHit(1);
-        if (user.getTags().contains(Tag.POISON)) return new PoisonHit(1);
+        if (user.getTags().contains(Tag.POISON)) {
+            return new PoisonHit(1, user.getSpecialUpgradeInt(SpecialUpgrade.POISON_TICK_BUFF));
+        }
         if (user.getName().equalsIgnoreCase("bowling bulb")) return new PierceHit(Integer.MAX_VALUE);
         return new NormalHit(1);
     }
@@ -83,6 +97,8 @@ public class ShootStrategy implements ActStrategy {
             if (!isParallelSameDirection(relX, relY, dx, dy)) continue;
 
             double dist = Math.sqrt(relX * relX + relY * relY);
+            int rangeBonus = user.getSpecialUpgradeInt(SpecialUpgrade.TILE_RANGE_EXT);
+            if (rangeBonus > 0 && dist > user.getAbilityValue() + rangeBonus) continue;
             if (dist < bestDist) {
                 bestDist = dist;
                 nearest = zombie;

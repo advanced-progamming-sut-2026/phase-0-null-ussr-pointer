@@ -1,14 +1,9 @@
 package com.ussr.pvz.model.account;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class AdventureProgress {
@@ -82,77 +77,12 @@ public class AdventureProgress {
                 if (plantLvls.containsKey(plantName)) {
                     int currentLevel = plantLvls.get(plantName);
                     if (currentLevel > 0) {
-                        Plant plantInstance = new Plant();
-                        plantInstance.setName(displayName);
-                        plantInstance.setLevel(currentLevel);
-                        setDefaults(plantInstance, plantData);
-                        Object upgradesObj = plantData.get("upgrades");
-                        if (upgradesObj instanceof List) {
-                            @SuppressWarnings("unchecked")
-                            List<Map<String, Object>> upgradesList = (List<Map<String, Object>>) upgradesObj;
-                            upgradesList.sort(Comparator.comparingInt(u -> ((Number) u.get("level")).intValue()));
-                            for (Map<String, Object> upgrade : upgradesList) {
-                                int upgradeLevel = ((Number) upgrade.get("level")).intValue();
-                                if (upgradeLevel <= currentLevel) {
-                                    String type = (String) upgrade.get("type");
-                                    double value = ((Number) upgrade.get("value")).doubleValue();
-                                    applyBuffi(type, plantInstance, value);
-                                }
-                            }
-                        }
-                        this.accountPlants.add(plantInstance);
+                        this.accountPlants.add(
+                                PlantFactory.createPlantByName(displayName, currentLevel)
+                        );
                     }
                 }
             }
-        }
-    }
-
-    private void applyBuffi(String type, Plant plantInstance, double value) {
-        switch (type.toUpperCase()) {
-            case "HP":
-                plantInstance.setHp(plantInstance.getHp() + (int) value);
-                break;
-            case "DAMAGE":
-                plantInstance.setDamage(plantInstance.getDamage() + (int) value);
-                break;
-            case "COST":
-                plantInstance.setCost(plantInstance.getCost() + (int) value);
-                break;
-            case "RECHARGE":
-                plantInstance.setMaxRecharge(Math.max(0.0, plantInstance.getMaxRecharge() + value));
-                break;
-            case "ACTION_INTERVAL":
-                plantInstance.setActionInterval(plantInstance.getActionInterval() + value);
-                break;
-        }
-    }
-
-    private void setDefaults(Plant plantInstance, Map<String, Object> plantData) {
-        if (plantData.get("id") != null)
-            plantInstance.setId(((Number) plantData.get("id")).intValue());
-
-        if (plantData.get("baseHp") != null)
-            plantInstance.setHp(((Number) plantData.get("baseHp")).intValue());
-
-        if (plantData.get("cost") != null)
-            plantInstance.setCost(((Number) plantData.get("cost")).intValue());
-        if (plantData.get("damage") != null)
-            plantInstance.setDamage(((Number) plantData.get("damage")).intValue());
-        if (plantData.get("actionInterval") != null)
-            plantInstance.setActionInterval(((Number) plantData.get("actionInterval")).doubleValue());
-        if (plantData.get("recharge") != null) {
-            double rechargeDuration =
-                    ((Number) plantData.get("recharge")).doubleValue();
-            plantInstance.setMaxRecharge(rechargeDuration);
-            // The JSON value is the cooldown duration, not an active cooldown.
-            plantInstance.setRecharge(0.0);
-        }
-        if (plantData.get("abilityValue") != null)
-            plantInstance.setAbilityValue(((Number) plantData.get("abilityValue")).doubleValue());
-        if (plantData.get("wramp-up") != null) {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> wrampUpList = (List<Map<String, Object>>) plantData.get("wramp-up");
-            plantInstance.setWrampUp(wrampUpList);
         }
     }
 
