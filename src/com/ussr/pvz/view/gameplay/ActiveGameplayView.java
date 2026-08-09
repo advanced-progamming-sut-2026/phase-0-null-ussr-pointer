@@ -28,7 +28,7 @@ import com.ussr.pvz.view.hud.VaseBreakerOverlayWidget;
 
 public class ActiveGameplayView extends Table implements Disposable {
 
-    private static final float TICK_RATE = 0.1f;
+    static final float TICK_RATE = 0.1f;
     private float accumulator = 0f;
 
     private final GameplayController controller;

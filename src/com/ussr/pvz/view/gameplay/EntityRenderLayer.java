@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.board.structures.LawnMower;
@@ -59,6 +60,12 @@ public class EntityRenderLayer extends Group {
     private final Map<Projectile, ProjectilePamActor> projectileActors = new HashMap<>();
     private final Map<Object, PamActor> zombieGroupActors = new HashMap<>(); // Zombie, LawnMower, PushableStructure
     private final Map<ZombieProjectile, PamActor> zombieProjActors = new HashMap<>();
+
+    // Last commanded render target per projectile, used so we only issue a new
+    // tween when the underlying model actually advanced a physics tick, instead
+    // of re-snapping the actor to the same spot every render frame.
+    private final Map<Projectile, float[]> plantProjectileRenderTargets = new HashMap<>();
+    private final Map<ZombieProjectile, float[]> zombieProjectileRenderTargets = new HashMap<>();
 
     // Pending immediate draw calls (atlas textures, not actors)
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
@@ -411,6 +418,13 @@ public class EntityRenderLayer extends Group {
                 String projPam = user != null ? user.getProjectilePam() : null;
                 String hitPam = user != null ? user.getHitPam() : null;
                 ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
+
+                float startX = LawnGridLayout.worldX(p.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
+                float startY = LawnGridLayout.worldY(p.getPosition().y())
+                        + (float) p.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                pa.setPosition(startX, startY);
+                plantProjectileRenderTargets.put(p, new float[]{startX, startY});
+
                 plantProjectileGroup.addActor(pa);
                 return pa;
             });
@@ -418,6 +432,7 @@ public class EntityRenderLayer extends Group {
             if (actor.isDone()) {
                 actor.remove();
                 projectileActors.remove(proj);
+                plantProjectileRenderTargets.remove(proj);
                 continue;
             }
 
@@ -425,13 +440,20 @@ public class EntityRenderLayer extends Group {
                 float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
                 float hy = LawnGridLayout.worldY(proj.getPosition().y())
                         + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                actor.clearActions();
                 actor.triggerHit(hx, hy);
+                plantProjectileRenderTargets.remove(proj);
             } else if (proj.isAlive()) {
-                actor.setPosition(
-                        LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f,
-                        LawnGridLayout.worldY(proj.getPosition().y())
-                                + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT
-                );
+                float targetX = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
+                float targetY = LawnGridLayout.worldY(proj.getPosition().y())
+                        + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+
+                float[] lastTarget = plantProjectileRenderTargets.get(proj);
+                if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != targetY) {
+                    actor.clearActions();
+                    actor.addAction(Actions.moveTo(targetX, targetY, ActiveGameplayView.TICK_RATE));
+                    plantProjectileRenderTargets.put(proj, new float[]{targetX, targetY});
+                }
             }
         }
 
@@ -446,10 +468,13 @@ public class EntityRenderLayer extends Group {
                     float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
                     float hy = LawnGridLayout.worldY(proj.getPosition().y())
                             + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                    actor.clearActions();
                     actor.triggerHit(hx, hy);
+                    plantProjectileRenderTargets.remove(proj);
                 } else if (actor.isDone()) {
                     actor.remove();
                     it.remove();
+                    plantProjectileRenderTargets.remove(entry.getKey());
                 }
             }
         }
@@ -486,10 +511,22 @@ public class EntityRenderLayer extends Group {
             PamActor actor = zombieProjActors.computeIfAbsent(proj, p -> {
                 PamActor a = new PamActor(pamPlayer, p.getPamLocation(), clip);
                 a.setPamScale(pamScaleForZombieProjectile(p));
+                float startX = screenX - a.getWidth() / 2f;
+                a.setPosition(startX, screenY);
+                zombieProjectileRenderTargets.put(p, new float[]{startX, screenY});
                 zombieGroup.addActor(a);
                 return a;
             });
-            actor.setPosition(screenX - actor.getWidth() / 2f, screenY);
+
+            // Same fixed-tick-vs-render-frame mismatch as plant projectiles — tween
+            // toward the new model position instead of snapping every render frame.
+            float targetX = screenX - actor.getWidth() / 2f;
+            float[] lastTarget = zombieProjectileRenderTargets.get(proj);
+            if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != screenY) {
+                actor.clearActions();
+                actor.addAction(Actions.moveTo(targetX, screenY, ActiveGameplayView.TICK_RATE));
+                zombieProjectileRenderTargets.put(proj, new float[]{targetX, screenY});
+            }
         }
 
         cleanupZombieProjActors(liveSet);
@@ -508,6 +545,7 @@ public class EntityRenderLayer extends Group {
             if (!liveSet.contains(entry.getKey()) || !entry.getKey().isAlive()) {
                 entry.getValue().remove();
                 it.remove();
+                zombieProjectileRenderTargets.remove(entry.getKey());
             }
         }
     }

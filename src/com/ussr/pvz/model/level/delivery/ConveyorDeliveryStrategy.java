@@ -32,9 +32,7 @@ public class ConveyorDeliveryStrategy implements DeliveryStrategy {
 
     @Override
     public List<String> getAvailablePlants(List<String> chapterPlants) {
-        this.availablePlants = chapterPlants == null
-                ? new ArrayList<>()
-                : new ArrayList<>(chapterPlants);
+        this.availablePlants = sanitize(chapterPlants);
         return new ArrayList<>(availablePlants);
     }
 
@@ -43,9 +41,18 @@ public class ConveyorDeliveryStrategy implements DeliveryStrategy {
     }
 
     public void setAvailablePlants(List<String> availablePlants) {
-        this.availablePlants = availablePlants == null
-                ? new ArrayList<>()
-                : new ArrayList<>(availablePlants);
+        this.availablePlants = sanitize(availablePlants);
+    }
+
+    private List<String> sanitize(List<String> plants) {
+        List<String> cleaned = new ArrayList<>();
+        if (plants == null) return cleaned;
+        for (String name : plants) {
+            if (name != null && !name.isBlank()) {
+                cleaned.add(name);
+            }
+        }
+        return cleaned;
     }
 
     public boolean contains(String plantName) {
