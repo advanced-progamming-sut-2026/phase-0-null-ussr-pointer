@@ -168,8 +168,7 @@ public final class SessionUpdater {
     }
 
     private void failLevel() {
-        session.setGameOver(true);
-        App.setMenuState(MenuState.MAIN);
+        session.concludeDefeat();
     }
 
     private boolean shouldCompleteLevel() {
@@ -181,18 +180,19 @@ public final class SessionUpdater {
             return false;
         }
 
-        boolean allowsAutoWin =
-                level.getBehavior()
-                        .isAutoWinOnWavesClear();
+        if (level.getBehavior().isLevelCompleted()) {
+            return true;
+        }
+
+        boolean allowsAutoWin = level.getBehavior().isAutoWinOnWavesClear();
 
         return allowsAutoWin
                 && session.areWavesDone();
     }
 
     private void completeLevel() {
-        session.setGameOver(true);
         rewardAction.run();
-        App.setMenuState(MenuState.GAME);
+        session.concludeVictory();
     }
 
     private void plantDeath() {

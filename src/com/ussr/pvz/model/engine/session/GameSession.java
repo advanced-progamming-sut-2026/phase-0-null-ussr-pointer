@@ -53,12 +53,20 @@ public class GameSession {
     private boolean wavesStarted;
     private Lawn lawn;
     private boolean gameOver = false;
+    private GameOutcome outcome = GameOutcome.IN_PROGRESS;
     private List<String> selectedPlants = new ArrayList<>();
     private final List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
 
     private List<String> boostedPlants = new ArrayList<>();
+
+    public GameSession() {
+        eventBus.subscribe(
+                GameEvent.GameOver.class,
+                event -> markDefeat()
+        );
+    }
 
     public void initClock() {
         updater.resetClock();
@@ -156,10 +164,8 @@ public class GameSession {
     public void onZombieReachedEnd() {
         if (gameOver) return;
 
-        gameOver = true;
         eventBus.publish(new GameEvent.ZombieReachedHouse(-1));
-        eventBus.publish(new GameEvent.GameOver());
-        App.setMenuState(MenuState.MAIN);
+        concludeDefeat();
     }
 
     public void addPlant(Plant plant) {
@@ -357,6 +363,42 @@ public class GameSession {
 
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+        if (!gameOver) {
+            outcome = GameOutcome.IN_PROGRESS;
+        }
+    }
+
+    public GameOutcome getOutcome() {
+        return outcome;
+    }
+
+    public boolean isVictory() {
+        return outcome == GameOutcome.VICTORY;
+    }
+
+    public void concludeVictory() {
+        if (gameOver) {
+            return;
+        }
+        outcome = GameOutcome.VICTORY;
+        gameOver = true;
+        eventBus.publish(new GameEvent.GameWon());
+    }
+
+    public void concludeDefeat() {
+        if (gameOver) {
+            return;
+        }
+        markDefeat();
+        eventBus.publish(new GameEvent.GameOver());
+    }
+
+    private void markDefeat() {
+        if (outcome == GameOutcome.VICTORY) {
+            return;
+        }
+        outcome = GameOutcome.DEFEAT;
+        gameOver = true;
     }
 
     public Lawn getLawn() {

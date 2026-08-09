@@ -69,7 +69,6 @@ public abstract class LevelBehavior {
         GameSession session = App.getGameSession();
         if (session != null) {
             session.getEventBus().publish(new GameEvent.WavesCompleted());
-            session.getEventBus().publish(new GameEvent.GameWon());
         }
     }
 
@@ -79,6 +78,10 @@ public abstract class LevelBehavior {
 
     public boolean isAutoWinOnWavesClear() {
         return autoWinOnWavesClear;
+    }
+
+    public boolean isLevelCompleted() {
+        return levelCompleted;
     }
 
     public void tick(GameSession session, double deltaTime) {

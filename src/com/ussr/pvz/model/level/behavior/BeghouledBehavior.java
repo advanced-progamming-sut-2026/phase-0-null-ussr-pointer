@@ -85,7 +85,7 @@ public class BeghouledBehavior extends LevelBehavior {
     public void checkWinCondition(GameSession session) {
         if (isWon()) {
             session.killAllZombies();
-            session.getEventBus().publish(new GameEvent.GameWon());
+            onComplete(session.getLevel());
         }
     }
 
