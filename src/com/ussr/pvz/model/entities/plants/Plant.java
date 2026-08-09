@@ -6,15 +6,18 @@ import com.ussr.pvz.model.engine.GameClock;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
+import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +61,7 @@ public class Plant extends GameEntity implements Damageable {
     private PlantArmor armor;
 
     private double lifetime = Double.MAX_VALUE;
+    private int remainingSmashes = -1;
 
     public String getPamPath() {
         return pamPath;
@@ -108,7 +112,8 @@ public class Plant extends GameEntity implements Damageable {
 
     private PlantState state;
 
-    private final List<String> rawUpgrades = new ArrayList<>();
+    private final EnumMap<SpecialUpgrade, Double> specialUpgrades =
+            new EnumMap<>(SpecialUpgrade.class);
     private List<Vec2> shootingVectors = new ArrayList<>();
 
     public Plant() {
@@ -117,9 +122,10 @@ public class Plant extends GameEntity implements Damageable {
     public Plant(Plant blueprint) {
         this.id = blueprint.id;
         this.name = blueprint.name;
+        this.level = blueprint.level;
         this.type = blueprint.type;
         this.tags.addAll(blueprint.tags);
-        this.rawUpgrades.addAll(blueprint.rawUpgrades);
+        this.specialUpgrades.putAll(blueprint.specialUpgrades);
         this.state = PlantState.ACTIVE;
         this.location = blueprint.location;
         this.actStrategy = blueprint.actStrategy;
@@ -133,7 +139,10 @@ public class Plant extends GameEntity implements Damageable {
         this.damage = blueprint.damage;
         this.actionInterval = blueprint.actionInterval;
         this.recharge = blueprint.recharge;
+        this.maxRecharge = blueprint.maxRecharge;
         this.abilityValue = blueprint.abilityValue;
+        this.lifetime = blueprint.lifetime;
+        this.remainingSmashes = blueprint.remainingSmashes;
 
         this.hpStat = new ModifiableStat(this.hp);
         this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
@@ -190,6 +199,7 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     private void killPlant() {
+        applySpecialDeathEffect();
         isAlive = false;
 
         App.getGameSession()
@@ -201,6 +211,18 @@ public class Plant extends GameEntity implements Damageable {
                 ));
     }
 
+    private void applySpecialDeathEffect() {
+        int radius = getSpecialUpgradeInt(SpecialUpgrade.DEATH_EXPLOSION_AOE);
+        GameSession session = App.getGameSession();
+        if (radius <= 0 || session == null || getPosition() == null) return;
+        for (Zombie zombie : session.getZombies()) {
+            if (zombie != null && zombie.isAlive()
+                    && zombie.getPosition().distanceTo(getPosition()) <= radius + 0.5) {
+                zombie.takeDamage(500, this);
+            }
+        }
+    }
+
     private void updateStats(float delta) {
         if (hpStat != null) {
             hpStat.update(delta);
@@ -210,9 +232,6 @@ public class Plant extends GameEntity implements Damageable {
             actionIntervalStat.update(delta);
         }
 
-        if (growthTracker != null) {
-            growthTracker.update(delta);
-        }
     }
 
     private void updatePlantFood(float delta) {
@@ -279,11 +298,24 @@ public class Plant extends GameEntity implements Damageable {
             int newHp = getHp() - remainingDamage;
             if (newHp <= 0) {
                 if (name.equalsIgnoreCase("Hypno-shroom")) {
-                    if (dealer instanceof Zombie zombie)
+                    if (dealer instanceof Zombie zombie) {
+                        double hpMultiplier = getSpecialUpgradeValue(
+                                SpecialUpgrade.ZOMBIE_HEALTH_MULTIPLIER);
+                        double damageMultiplier = getSpecialUpgradeValue(
+                                SpecialUpgrade.ZOMBIE_DAMAGE_MULTIPLIER);
+                        if (hpMultiplier > 0) {
+                            zombie.setMaxHp((int) Math.round(zombie.getMaxHp() * hpMultiplier));
+                            zombie.setHp((int) Math.round(zombie.getHp() * hpMultiplier));
+                        }
+                        if (damageMultiplier > 0) {
+                            zombie.setEatDps(zombie.getEatDps() * damageMultiplier);
+                        }
                         zombie.hypnotize();
+                    }
                 } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
                     wallNutStrategy.onDie(this);
                 }
+                applySpecialDeathEffect();
                 setHp(0);
                 isAlive = false;
             } else {
@@ -293,7 +325,11 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void updateGrowth(double deltaTimeSeconds) {
-        if (growthTracker != null) growthTracker.update(deltaTimeSeconds);
+        if (growthTracker != null) {
+            double reduction = getSpecialUpgradeValue(SpecialUpgrade.GROW_TIME_REDUCTION);
+            double speedMultiplier = reduction < 0 ? 1.0 + (-reduction / 24.0) : 1.0;
+            growthTracker.update(deltaTimeSeconds * speedMultiplier);
+        }
     }
 
     // Getters and Setters
@@ -410,10 +446,6 @@ public class Plant extends GameEntity implements Damageable {
 
     public ArrayList<Tag> getTags() {
         return tags;
-    }
-
-    public List<String> getRawUpgrades() {
-        return rawUpgrades;
     }
 
     public void setActStrategy(ActStrategy actStrategy) {
@@ -611,5 +643,42 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setLifetime(double lifetime) {
         this.lifetime = lifetime;
+    }
+
+    public double getLifetime() {
+        return lifetime;
+    }
+
+    public void addSpecialUpgrade(SpecialUpgrade upgrade, double value) {
+        if (upgrade == null) {
+            return;
+        }
+
+        specialUpgrades.merge(upgrade, value, Double::sum);
+    }
+
+    public boolean hasSpecialUpgrade(SpecialUpgrade upgrade) {
+        return specialUpgrades.containsKey(upgrade);
+    }
+
+    public double getSpecialUpgradeValue(SpecialUpgrade upgrade) {
+        return specialUpgrades.getOrDefault(upgrade, 0.0);
+    }
+
+    public int getSpecialUpgradeInt(SpecialUpgrade upgrade) {
+        return (int) Math.round(getSpecialUpgradeValue(upgrade));
+    }
+
+    public Map<SpecialUpgrade, Double> getSpecialUpgrades() {
+        return Map.copyOf(specialUpgrades);
+    }
+
+    public boolean consumeSmashCharge() {
+        if (remainingSmashes < 0) {
+            remainingSmashes = 1
+                    + getSpecialUpgradeInt(SpecialUpgrade.BONUS_SMASH_CHARGES);
+        }
+        remainingSmashes--;
+        return remainingSmashes > 0;
     }
 }

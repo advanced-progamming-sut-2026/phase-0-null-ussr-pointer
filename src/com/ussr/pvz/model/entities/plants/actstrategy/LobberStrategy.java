@@ -3,11 +3,13 @@ package com.ussr.pvz.model.entities.plants.actstrategy;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.*;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
+import com.badlogic.gdx.math.MathUtils;
 
 
 public class LobberStrategy implements ActStrategy {
@@ -42,9 +44,19 @@ public class LobberStrategy implements ActStrategy {
 
     private HitEffectStrategy buildHitEffect(Plant user) {
         int areaLength = user.getTags().contains(Tag.AOE) ? 3 : 1;
+        if (user.getName().equalsIgnoreCase("kernel-pult")) {
+            double butterChance = 0.25
+                    + user.getSpecialUpgradeValue(SpecialUpgrade.BUTTER_CHANCE_BUFF);
+            if (MathUtils.random() < Math.min(1.0, butterChance)) {
+                return new ButterHit(areaLength);
+            }
+        }
         if (user.getTags().contains(Tag.FIRE)) return new FireHit(areaLength);
         if (user.getTags().contains(Tag.ICE)) return new IceHit(areaLength);
-        if (user.getTags().contains(Tag.POISON)) return new PoisonHit(areaLength);
+        if (user.getTags().contains(Tag.POISON)) {
+            return new PoisonHit(areaLength,
+                    user.getSpecialUpgradeInt(SpecialUpgrade.POISON_TICK_BUFF));
+        }
         return new NormalHit(areaLength);
     }
 

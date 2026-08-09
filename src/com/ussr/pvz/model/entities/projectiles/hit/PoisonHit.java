@@ -11,9 +11,15 @@ import java.util.ArrayList;
 
 public class PoisonHit implements HitEffectStrategy {
     private int areaLength;
+    private final int tickDamageBonus;
 
     public PoisonHit(int areaLength) {
+        this(areaLength, 0);
+    }
+
+    public PoisonHit(int areaLength, int tickDamageBonus) {
         this.areaLength = areaLength;
+        this.tickDamageBonus = tickDamageBonus;
     }
     @Override
     public void apply(ArrayList<GameEntity> entities, Projectile projectile) {
@@ -31,7 +37,10 @@ public class PoisonHit implements HitEffectStrategy {
                 case Zombie zombie -> {
                     zombie.takeDamage(damageAmount, true);
 
-                    zombie.setStatus(Zombie.Status.POISONED);
+                    zombie.applyPoison(
+                            5 + tickDamageBonus,
+                            Zombie.DEFAULT_POISON_DURATION
+                    );
                 }
                 case Plant plant -> plant.takeDamage(damageAmount);
                 case InteractableStructure structure -> structure.takeDamage(damageAmount);

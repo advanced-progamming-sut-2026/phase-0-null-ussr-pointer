@@ -10,6 +10,10 @@ public class ArcMove implements MoveStrategy {
     private final double gravity;
     private double groundY;
     private boolean landed = false;
+    private Damageable target;
+    private double verticalVelocity;
+    private double flightHeight;
+    private boolean launched;
 
     private static final double HORIZONTAL_SPEED = 4.0;
 
@@ -31,28 +35,40 @@ public class ArcMove implements MoveStrategy {
             return;
         }
 
-        double newSpeedY =
-                speed.y() + gravity * delta;
+        double horizontalSpeed = speed.x();
+        double trackedTargetX = Double.NaN;
+        double remainingFlightTime = Double.POSITIVE_INFINITY;
+        if (target instanceof GameEntity targetEntity
+                && target.isAlive()
+                && targetEntity.getPosition() != null) {
+            remainingFlightTime = calculateTimeToGround();
+            trackedTargetX = targetEntity.getPosition().x();
+            if (remainingFlightTime > 0.001) {
+                horizontalSpeed =
+                        (trackedTargetX - position.x()) / remainingFlightTime;
+            }
+        }
 
-        Vec2 newSpeed = new Vec2(
-                speed.x(),
-                newSpeedY
-        );
+        verticalVelocity -= gravity * delta;
+        flightHeight += verticalVelocity * delta;
+        double newX = !Double.isNaN(trackedTargetX) && delta >= remainingFlightTime
+                ? trackedTargetX
+                : position.x() + horizontalSpeed * delta;
 
-        Vec2 newPosition = position.add(
-                newSpeed.scale(delta)
-        );
+        projectile.setSpeed(Vec2.of(horizontalSpeed, 0));
+        projectile.setPosition(Vec2.of(newX, groundY));
+        projectile.setVisualHeight(flightHeight);
 
-        projectile.setSpeed(newSpeed);
-        projectile.setPosition(newPosition);
-
-        if (newPosition.y() >= groundY) {
+        if (launched && flightHeight <= 0) {
+            flightHeight = 0;
+            projectile.setVisualHeight(0);
             landed = true;
         }
     }
 
     @Override
     public void initialize(Projectile projectile, Damageable target) {
+        this.target = target;
         Vec2 startPos = projectile.getPosition();
         if (startPos == null) return;
 
@@ -60,9 +76,7 @@ public class ArcMove implements MoveStrategy {
 
         if (target instanceof GameEntity targetEntity) {
             Vec2 targetPos = targetEntity.getPosition();
-            Vec2 targetSpeed = targetEntity.getSpeed();
-
-            if (targetPos != null && targetSpeed != null) {
+            if (targetPos != null) {
 
                 double distanceX = targetPos.x() - startPos.x();
 
@@ -70,13 +84,27 @@ public class ArcMove implements MoveStrategy {
 
                 if (timeOfFlight > 0) {
 
-                    double initialVelocityY = -0.5 * gravity * timeOfFlight;
-
-                    Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
-                    projectile.setSpeed(initialVelocity);
+                    verticalVelocity = 0.5 * gravity * timeOfFlight;
+                    flightHeight = 0;
+                    launched = true;
+                    projectile.setVisualHeight(0);
+                    projectile.setSpeed(Vec2.of(HORIZONTAL_SPEED, 0));
                 }
             }
         }
+        if (!launched) {
+            verticalVelocity = gravity * 0.5;
+            flightHeight = 0;
+            launched = true;
+            projectile.setSpeed(Vec2.of(HORIZONTAL_SPEED, 0));
+        }
+    }
+
+    private double calculateTimeToGround() {
+        if (gravity == 0) return 0;
+        double discriminant = verticalVelocity * verticalVelocity
+                + 2.0 * gravity * Math.max(0.0, flightHeight);
+        return (verticalVelocity + Math.sqrt(discriminant)) / gravity;
     }
 
     public boolean hasLanded() {

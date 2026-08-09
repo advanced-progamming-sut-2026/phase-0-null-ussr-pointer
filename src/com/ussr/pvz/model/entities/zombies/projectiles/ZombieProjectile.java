@@ -9,6 +9,7 @@ public abstract class ZombieProjectile extends GameEntity {
     protected Vec2 targetPosition;
     protected double flightTime;
     protected double elapsedTimer = 0.0;
+    private double visualHeight;
 
     protected String sourceZombieAlias;
 
@@ -29,11 +30,20 @@ public abstract class ZombieProjectile extends GameEntity {
 
         if (progress >= 1.0) {
             this.setPosition(targetPosition);
+            this.visualHeight = 0.0;
             onDestinationReached(com.ussr.pvz.model.App.getGameSession());
             this.isAlive = false;
         } else {
             updateFlightPath(progress);
         }
+    }
+
+    public double getVisualHeight() {
+        return visualHeight;
+    }
+
+    protected void setVisualHeight(double visualHeight) {
+        this.visualHeight = Math.max(0.0, visualHeight);
     }
 
     protected abstract void updateFlightPath(double progress);

@@ -4,6 +4,8 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.badlogic.gdx.math.MathUtils;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 
 public class SunProduceStrategy implements ActStrategy {
     private boolean isInstantBurst;
@@ -28,7 +30,14 @@ public class SunProduceStrategy implements ActStrategy {
             return;
         }
 
-        int sunValue = (int) user.getAbilityValue();
+        int sunValue = (int) Math.round(
+                user.getAbilityValue()
+                        + user.getSpecialUpgradeValue(SpecialUpgrade.SUN_AMOUNT_BUFF)
+        );
+        double doubleChance = user.getSpecialUpgradeValue(SpecialUpgrade.DOUBLE_SUN_CHANCE);
+        if (doubleChance > 0 && MathUtils.random() < Math.min(1.0, doubleChance)) {
+            sunValue *= 2;
+        }
         ProducedSun sun = null;
         if(isInstantBurst) {
             sun = new ProducedSun(x , y , sunValue , user.getName());

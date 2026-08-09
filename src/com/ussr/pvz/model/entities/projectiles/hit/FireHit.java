@@ -42,7 +42,7 @@ public class FireHit implements HitEffectStrategy {
                     if (zombie.getMoveBehavior() instanceof ProspectorMove prospectorMove) {
                         prospectorMove.litDynamite();
                     }
-                    zombie.setStatus(Zombie.Status.FIRED);
+                    zombie.setStatus(Zombie.Status.FIRED, Zombie.DEFAULT_FIRE_DURATION);
                 }
                 case Plant plant -> plant.takeDamage(damageAmount);
                 case InteractableStructure structure -> structure.takeDamage(damageAmount);

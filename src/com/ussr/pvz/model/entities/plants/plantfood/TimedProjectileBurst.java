@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.plants.plantfood;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.*;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
@@ -41,7 +42,11 @@ public class TimedProjectileBurst implements PlantFoodEffect {
             int targetRow = user.getLocation().y();
             for (Zombie zombie : session.getZombies()) {
                 if (zombie.isAlive() && (int) zombie.getPosition().y() == targetRow) {
-                    zombie.setStatus(Zombie.Status.FREEZE);
+                    double extraDuration = user.getSpecialUpgradeValue(
+                            SpecialUpgrade.FREEZE_DURATION_EXT)
+                            + user.getSpecialUpgradeValue(SpecialUpgrade.CHILL_DURATION_EXT);
+                    zombie.setStatus(Zombie.Status.FREEZE,
+                            Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
                 }
             }
         }

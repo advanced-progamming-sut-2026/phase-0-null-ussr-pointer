@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.plants.plantfood;
 
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class MapWideFreeze implements PlantFoodEffect {
@@ -11,7 +12,11 @@ public class MapWideFreeze implements PlantFoodEffect {
 
         for (Zombie zombie : session.getZombies()) {
             if (zombie != null && zombie.isAlive()) {
-                zombie.setStatus(Zombie.Status.FREEZE);
+                double extraDuration = user.getSpecialUpgradeValue(
+                        SpecialUpgrade.FREEZE_DURATION_EXT)
+                        + user.getSpecialUpgradeValue(SpecialUpgrade.CHILL_DURATION_EXT);
+                zombie.setStatus(Zombie.Status.FREEZE,
+                        Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
             }
         }
     }

@@ -19,6 +19,7 @@ import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
@@ -241,6 +242,11 @@ public class GameService {
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
             session.addPlant(plant);
+            if (plant.hasSpecialUpgrade(SpecialUpgrade.AUTO_PLANTFOOD_ON_ENTER)
+                    && plant.getPlantFoodEffect() != null) {
+                plant.setBuffed(true);
+                session.notifyPlantFoodUsed(plant);
+            }
             if (conveyorPacket) {
                 conveyor.consume(request.type());
             } else {

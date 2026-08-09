@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.plants;
 
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 
 public class PlantArmor {
     private int hp;
@@ -34,8 +35,10 @@ public class PlantArmor {
     }
 
     public void handleReflection(Zombie dealer, Plant user) {
-        if (dealer != null && this.reflectiveDamage > 0 && this.hp > 0) {
-            dealer.takeDamage(this.reflectiveDamage, user);
+        int effectiveReflection = this.reflectiveDamage
+                + user.getSpecialUpgradeInt(SpecialUpgrade.REFLECT_DAMAGE_BUFF);
+        if (dealer != null && effectiveReflection > 0 && this.hp > 0) {
+            dealer.takeDamage(effectiveReflection, user);
         }
     }
 

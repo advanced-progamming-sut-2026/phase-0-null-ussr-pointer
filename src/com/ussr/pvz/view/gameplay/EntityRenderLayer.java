@@ -423,12 +423,14 @@ public class EntityRenderLayer extends Group {
 
             if (!proj.isAlive() && actor.phase == ProjectilePamActor.Phase.FLYING) {
                 float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                float hy = LawnGridLayout.worldY(proj.getPosition().y());
+                float hy = LawnGridLayout.worldY(proj.getPosition().y())
+                        + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
                 actor.triggerHit(hx, hy);
             } else if (proj.isAlive()) {
                 actor.setPosition(
                         LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f,
                         LawnGridLayout.worldY(proj.getPosition().y())
+                                + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT
                 );
             }
         }
@@ -442,7 +444,8 @@ public class EntityRenderLayer extends Group {
                 if (actor.phase == ProjectilePamActor.Phase.FLYING) {
                     Projectile proj = entry.getKey();
                     float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                    float hy = LawnGridLayout.worldY(proj.getPosition().y());
+                    float hy = LawnGridLayout.worldY(proj.getPosition().y())
+                            + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
                     actor.triggerHit(hx, hy);
                 } else if (actor.isDone()) {
                     actor.remove();
@@ -462,7 +465,8 @@ public class EntityRenderLayer extends Group {
 
             float screenX = LawnGridLayout.worldX((float) proj.getPosition().x())
                     + LawnGridLayout.CELL_WIDTH / 2f;
-            float screenY = LawnGridLayout.worldY((float) proj.getPosition().y());
+            float screenY = LawnGridLayout.worldY((float) proj.getPosition().y())
+                    + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
 
             // BoneProjectile is atlas-only
             if (proj instanceof BoneProjectile) {

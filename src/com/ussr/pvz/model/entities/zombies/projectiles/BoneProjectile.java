@@ -17,9 +17,8 @@ public class BoneProjectile extends ZombieProjectile {
         double currentX = startPosition.x() + (targetPosition.x() - startPosition.x()) * progress;
         double currentY = startPosition.y() + (targetPosition.y() - startPosition.y()) * progress;
 
-        double visualY = currentY - (arcHeight * Math.sin(progress * Math.PI));
-
-        this.setPosition(Vec2.of(currentX, visualY));
+        this.setPosition(Vec2.of(currentX, currentY));
+        this.setVisualHeight(arcHeight * Math.sin(progress * Math.PI));
     }
 
     @Override

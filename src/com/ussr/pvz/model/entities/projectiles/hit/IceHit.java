@@ -6,6 +6,7 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.effect.FireEffect;
@@ -48,7 +49,18 @@ public class IceHit implements HitEffectStrategy {
                         prospectorMove.extinguishDynamite();
                     }
 
-                    zombie.setStatus(Zombie.Status.FREEZE);
+                    double bonusDuration = 0.0;
+                    Plant source = projectile.getUser();
+                    if (source != null) {
+                        bonusDuration += source.getSpecialUpgradeValue(
+                                SpecialUpgrade.CHILL_DURATION_EXT);
+                        bonusDuration += source.getSpecialUpgradeValue(
+                                SpecialUpgrade.FREEZE_DURATION_EXT);
+                    }
+                    zombie.setStatus(
+                            Zombie.Status.FREEZE,
+                            Zombie.DEFAULT_FREEZE_DURATION + bonusDuration
+                    );
                 }
                 case Plant plant -> {
                     plant.takeDamage(damageAmount);

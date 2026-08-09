@@ -22,6 +22,8 @@ public class Projectile extends GameEntity {
     private Damageable target;
     private boolean isStunning;
     private final Plant user;
+    private Vec2 previousPosition;
+    private double visualHeight;
 
     private MoveStrategy moveStrategy;
     private HitEffectStrategy hitEffectStrategy;
@@ -57,9 +59,19 @@ public class Projectile extends GameEntity {
         this.isStunning = isStunning;
     }
 
+    public double getVisualHeight() {
+        return visualHeight;
+    }
+
+    public void setVisualHeight(double visualHeight) {
+        this.visualHeight = Math.max(0.0, visualHeight);
+    }
+
     @Override
     public void update(float delta) {
         if (!isAlive) return;
+
+        previousPosition = getPosition();
 
         if (moveStrategy != null) {
             moveStrategy.move(this, delta);
@@ -100,7 +112,7 @@ public class Projectile extends GameEntity {
         for (InteractableStructure structure : interactableStructures) {
             if (!structure.isAlive()) continue;
             if (structure.getPosition() == null) continue;
-            if (this.getPosition().distanceTo(structure.getPosition()) < 0.2) {
+            if (crossedEntity(structure.getPosition(), 0.2)) {
                 physicalImpactTarget = structure;
                 break;
             }
@@ -110,7 +122,7 @@ public class Projectile extends GameEntity {
             List<Zombie> zombies = session.getZombies();
             for (Zombie zombie : zombies) {
                 if (!zombie.isAlive()) continue;
-                if (this.getPosition().distanceTo(zombie.getPosition()) < 0.2) {
+                if (crossedEntity(zombie.getPosition(), 0.2)) {
                     if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense
                             .JesterDefense jester) {
                         if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy()
@@ -133,7 +145,34 @@ public class Projectile extends GameEntity {
             return null;
         }
 
+        if (physicalImpactTarget.getPosition() != null) {
+            setPosition(physicalImpactTarget.getPosition());
+        }
         return targetFinder(interactableStructures, session);
+    }
+
+    private boolean crossedEntity(Vec2 entityPosition, double radius) {
+        Vec2 currentPosition = getPosition();
+        if (currentPosition == null || entityPosition == null) return false;
+        if (previousPosition == null) {
+            return currentPosition.distanceTo(entityPosition) < radius;
+        }
+
+        double dx = currentPosition.x() - previousPosition.x();
+        double dy = currentPosition.y() - previousPosition.y();
+        double lengthSquared = dx * dx + dy * dy;
+        if (lengthSquared == 0) {
+            return currentPosition.distanceTo(entityPosition) < radius;
+        }
+
+        double projection = ((entityPosition.x() - previousPosition.x()) * dx
+                + (entityPosition.y() - previousPosition.y()) * dy) / lengthSquared;
+        projection = Math.max(0.0, Math.min(1.0, projection));
+        Vec2 closestPoint = Vec2.of(
+                previousPosition.x() + projection * dx,
+                previousPosition.y() + projection * dy
+        );
+        return closestPoint.distanceTo(entityPosition) < radius;
     }
 
     private ArrayList<GameEntity> checkPlantCollision(GameSession session) {

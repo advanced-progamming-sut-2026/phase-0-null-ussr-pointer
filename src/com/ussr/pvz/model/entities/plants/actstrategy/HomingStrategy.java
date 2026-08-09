@@ -3,6 +3,7 @@ package com.ussr.pvz.model.entities.plants.actstrategy;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
 import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
@@ -22,7 +23,10 @@ public class HomingStrategy implements ActStrategy {
         if (zombies.isEmpty()) return;
 
         boolean isMagic = user.getTags().contains(Tag.MAGIC);
-        Zombie target = isMagic ? randomTarget(zombies) : nearestTarget(user, zombies);
+        Zombie target = findPriorityTarget(user, zombies);
+        if (target == null) {
+            target = isMagic ? randomTarget(zombies) : nearestTarget(user, zombies);
+        }
         if (target == null) return;
 
         session.addProjectile(buildProjectile(user, target, isMagic));
@@ -46,6 +50,28 @@ public class HomingStrategy implements ActStrategy {
                 user.getPosition(), velocity, target,
                 user.getDamage(), new StraightMove(), new NormalHit(1),user
         );
+    }
+
+    private Zombie findPriorityTarget(Plant user, List<Zombie> zombies) {
+        if (!user.hasSpecialUpgrade(SpecialUpgrade.PRIORITIZE_GARGANTUARS)) {
+            return null;
+        }
+
+        Zombie nearestGargantuar = null;
+        double shortest = Double.MAX_VALUE;
+        for (Zombie zombie : zombies) {
+            if (zombie == null || !zombie.isAlive() || zombie.getAlias() == null
+                    || !zombie.getAlias().toLowerCase().contains("gargantuar")) {
+                continue;
+            }
+
+            double distance = zombie.getPosition().distanceTo(user.getPosition());
+            if (distance < shortest) {
+                shortest = distance;
+                nearestGargantuar = zombie;
+            }
+        }
+        return nearestGargantuar;
     }
 
     private Zombie randomTarget(List<Zombie> zombies) {

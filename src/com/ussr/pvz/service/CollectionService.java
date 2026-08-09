@@ -6,7 +6,8 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
-
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,9 +27,11 @@ public class CollectionService {
         public int level;
         public int ownedPackets;
         public int cost;
-        public int damage;
-        public int baseHp;
-        public int recharge;
+        public double damage;
+        public double baseHp;
+        public double recharge;
+        public double actionInterval;
+        public double abilityValue;
         public String pamPath;
         public boolean isBoosted = false; // always false for now
     }
@@ -91,6 +94,10 @@ public class CollectionService {
         Map<String, Integer> userPlants = current != null ? current.getAdventureProgress().getPlantLvls() : null;
         Map<String, Integer> userPackets = current != null ? current.getAdventureProgress().getSeedPackets() : null;
 
+        if (App.getCachedPlantsData() == null) {
+            App.loadPlantsDataToMemory();
+        }
+
         List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
         List<PlantData> result = new ArrayList<>();
 
@@ -107,10 +114,34 @@ public class CollectionService {
             }
 
             data.ownedPackets = (userPackets != null) ? userPackets.getOrDefault(data.id, 0) : 0;
-            data.cost = ((Double) plantMap.getOrDefault("cost", 0.0)).intValue();
-            data.damage = ((Double) plantMap.getOrDefault("damage", 0.0)).intValue();
-            data.baseHp = ((Double) plantMap.getOrDefault("baseHp", 0.0)).intValue();
-            data.recharge = ((Double) plantMap.getOrDefault("recharge", 0.0)).intValue();
+            int previewLevel = Math.max(1, data.level);
+
+            try {
+                Plant plantWithUpgrades =
+                        PlantFactory.createPlantByName(data.name, previewLevel);
+
+                data.cost = plantWithUpgrades.getCost();
+                data.damage = plantWithUpgrades.getDamage();
+                data.baseHp = plantWithUpgrades.getHp();
+                data.recharge = plantWithUpgrades.getMaxRecharge();
+                data.actionInterval = plantWithUpgrades.getActionInterval();
+                data.abilityValue = plantWithUpgrades.getAbilityValue();
+            } catch (Exception exception) {
+                System.err.println(
+                        "Could not calculate menu stats for " + data.name
+                                + ": " + exception.getMessage()
+                );
+
+                // Base-value fallback
+                data.cost = ((Number) plantMap.get("cost")).intValue();
+                data.damage = ((Number) plantMap.get("damage")).doubleValue();
+                data.baseHp = ((Number) plantMap.get("baseHp")).doubleValue();
+                data.recharge = ((Number) plantMap.get("recharge")).doubleValue();
+                data.actionInterval =
+                        ((Number) plantMap.get("actionInterval")).doubleValue();
+                data.abilityValue =
+                        ((Number) plantMap.getOrDefault("abilityValue", 0.0)).doubleValue();
+            }
 
             if (plantMap.containsKey("pamLocation")) {
                 data.pamPath = plantMap.get("pamLocation").toString();
