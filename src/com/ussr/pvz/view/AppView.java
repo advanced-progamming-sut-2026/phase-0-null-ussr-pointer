@@ -9,6 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
+import com.ussr.pvz.audio.AudioManager;
+import com.ussr.pvz.audio.AudioSettings;
+import com.ussr.pvz.audio.GdxAudioManager;
+import com.ussr.pvz.audio.GameplayMusicCue;
+import com.ussr.pvz.audio.GameplayMusicResolver;
+import com.ussr.pvz.audio.MenuMusicResolver;
+import com.ussr.pvz.audio.MusicTrack;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
@@ -54,6 +61,7 @@ public class AppView implements ApplicationListener {
     private Skin skin;
     private NotificationOverlay notificationOverlay;
     private LoadingOverlay loadingOverlay;
+    private AudioManager audioManager;
 
     private Table screenRoot;
     private GlobalMenuHud globalMenuHud;
@@ -108,6 +116,7 @@ public class AppView implements ApplicationListener {
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
+        audioManager = new GdxAudioManager(new AudioSettings());
         installMissingSkinStyles();
 
         screenRoot = new Table();
@@ -239,6 +248,7 @@ public class AppView implements ApplicationListener {
         refreshGlobalHudCurrencies();
 
         stage.act(delta);
+        audioManager.update(delta);
         stage.setDebugAll(DebugOverlay.isHitboxEnabled());
         stage.draw();
 
@@ -278,12 +288,16 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void pause() {
-
+        if (audioManager != null) {
+            audioManager.pause();
+        }
     }
 
     @Override
     public void resume() {
-
+        if (audioManager != null) {
+            audioManager.resume();
+        }
     }
 
     private void showMenu(MenuState state) {
@@ -325,7 +339,11 @@ public class AppView implements ApplicationListener {
                             new PamPlayer(gameTextures, assetsFolder);
 
                     screenRoot.add(new com.ussr.pvz.view.gameplay.ActiveGameplayView(
-                            skin, gameTextures, gamePamPlayer)).grow();
+                            skin,
+                            gameTextures,
+                            gamePamPlayer,
+                            audioManager
+                    )).grow();
                 } else {
                     screenRoot.add(new GameMenu(skin)).grow();
                 }
@@ -365,6 +383,39 @@ public class AppView implements ApplicationListener {
         }
 
         configureGlobalHud(state);
+        updateMenuMusic(state);
+    }
+
+    private void updateMenuMusic(MenuState state) {
+        if (state == MenuState.GAME && App.getGameSession() != null) {
+            return;
+        }
+
+        if (state == MenuState.CHOOSE_PLANT) {
+            var chapter = App.getLevelManager().getCurrentChapter();
+            GameplayMusicResolver.Selection selection = chapter == null
+                    ? null
+                    : GameplayMusicResolver.resolve(
+                            chapter.getId(),
+                            GameplayMusicCue.CHOOSE
+                    );
+
+            if (selection != null && selection.hasLoop()) {
+                audioManager.playMusicSequence(
+                        selection.intro(),
+                        selection.loop(),
+                        0.6f
+                );
+                return;
+            }
+        }
+
+        MusicTrack track = MenuMusicResolver.resolve(state);
+        if (track == null) {
+            audioManager.stopMusic(0.6f);
+            return;
+        }
+        audioManager.playMusic(track, true, 0.6f);
     }
 
     private void disposeCurrentScreen() {
@@ -517,6 +568,10 @@ public class AppView implements ApplicationListener {
     @Override
     public void dispose() {
         NotificationCenter.clear();
+
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
 
         if (stage != null) {
             disposeCurrentScreen();

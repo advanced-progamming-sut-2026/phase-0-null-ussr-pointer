@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
+import com.ussr.pvz.audio.AudioManager;
+import com.ussr.pvz.audio.GameplayMusicDirector;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
@@ -32,15 +34,21 @@ public class ActiveGameplayView extends Table implements Disposable {
     private final GameplayController controller;
     private final InGameHud inGameHud;
     private final EntityRenderLayer entityLayer;
+    private final GameplayMusicDirector musicDirector;
 
     public ActiveGameplayView(
             Skin skin,
             TextureBank textures,
-            PamPlayer pamPlayer
+            PamPlayer pamPlayer,
+            AudioManager audioManager
     ) {
         setFillParent(true);
 
         this.controller = new GameplayController();
+        this.musicDirector = new GameplayMusicDirector(
+                audioManager,
+                App.getGameSession()
+        );
 
         Image background = createBackground(textures);
 
