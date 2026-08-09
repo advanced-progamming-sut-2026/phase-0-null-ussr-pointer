@@ -140,7 +140,7 @@ public class Plant extends GameEntity implements Damageable {
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodTimer = blueprint.plantFoodTimer;
         this.armor = blueprint.armor;
-        this.plantFoodEffect =  blueprint.plantFoodEffect;
+        this.plantFoodEffect = blueprint.plantFoodEffect;
         this.projectilePam = blueprint.projectilePam;
         this.hitPam = blueprint.hitPam;
         this.plantFoodHitPam = blueprint.plantFoodHitPam;
@@ -159,7 +159,7 @@ public class Plant extends GameEntity implements Damageable {
         if (!isAlive && state != PlantState.DYING) {
             return; // Allow DYING state to process for explosive animations
         }
-        if(state == PlantState.INCAPACITATED){
+        if (state == PlantState.INCAPACITATED) {
             currentClip = "idle";
             return;
         }
@@ -181,7 +181,7 @@ public class Plant extends GameEntity implements Damageable {
 
         updateStats(delta);
         updatePlantFood(delta);
-
+        updateGrowth(delta);
         if (isBuffed || actStrategy == null) {
             return;
         }
@@ -260,8 +260,8 @@ public class Plant extends GameEntity implements Damageable {
 //            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
         if (!isAlive) return;
 
-        if(this.actStrategy instanceof WallNutStrategy strategy)
-            strategy.onDamageAct(this , dealer);
+        if (this.actStrategy instanceof WallNutStrategy strategy)
+            strategy.onDamageAct(this, dealer);
 
         int remainingDamage = damage;
 
@@ -278,11 +278,10 @@ public class Plant extends GameEntity implements Damageable {
         if (remainingDamage > 0) {
             int newHp = getHp() - remainingDamage;
             if (newHp <= 0) {
-                if(name.equalsIgnoreCase("Hypno-shroom")) {
-                    if(dealer instanceof Zombie zombie)
+                if (name.equalsIgnoreCase("Hypno-shroom")) {
+                    if (dealer instanceof Zombie zombie)
                         zombie.hypnotize();
-                }
-                else if(this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
+                } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
                     wallNutStrategy.onDie(this);
                 }
                 setHp(0);
@@ -526,36 +525,49 @@ public class Plant extends GameEntity implements Damageable {
         this.chillLevel = chillLevel;
     }
 
-    public double getPlantFoodTimer() { return plantFoodTimer; }
+    public double getPlantFoodTimer() {
+        return plantFoodTimer;
+    }
 
-    public void setPlantFoodTimer(double duration) { this.plantFoodTimer = duration; }
+    public void setPlantFoodTimer(double duration) {
+        this.plantFoodTimer = duration;
+    }
 
-    public int getStackNumber() { return this.stackNumber; }
+    public int getStackNumber() {
+        return this.stackNumber;
+    }
 
-    public void setArmor(PlantArmor armor) { this.armor = armor; }
+    public void setArmor(PlantArmor armor) {
+        this.armor = armor;
+    }
 
-    public PlantArmor getArmor() { return this.armor; }
+    public PlantArmor getArmor() {
+        return this.armor;
+    }
 
-    public boolean isBuffed() { return this.isBuffed; }
+    public boolean isBuffed() {
+        return this.isBuffed;
+    }
 
     public void setBuffed(boolean isBuffed) {
         this.isBuffed = isBuffed;
-        if(isBuffed) {
-            if(this.plantFoodEffect != null) {
+        if (isBuffed) {
+            if (this.plantFoodEffect != null) {
                 plantFoodEffect.applyStatusModifiers(this);
-                plantFoodEffect.triggerSuperpower(this , App.getGameSession());
+                plantFoodEffect.triggerSuperpower(this, App.getGameSession());
             }
         }
     }
+
     /**
      * Call this from your ActStrategy (e.g., when Peashooter shoots or Sunflower drops sun).
      * It will play the "attack" clip for the specified duration before returning to "idle".
      */
     public void triggerActionAnimation(float duration) {
-        if(this.getType().equals(PlantType.SUN_PRODUCER)){
+        if (this.getType().equals(PlantType.SUN_PRODUCER)) {
             this.currentClip = "special";
-        }else
-          this.currentClip = "attack";
+        } else
+            this.currentClip = "attack";
         this.animationTimer = duration;
     }
 
@@ -597,5 +609,7 @@ public class Plant extends GameEntity implements Damageable {
         return currentClip;
     }
 
-    public void setLifetime(double lifetime) { this.lifetime = lifetime; }
+    public void setLifetime(double lifetime) {
+        this.lifetime = lifetime;
+    }
 }

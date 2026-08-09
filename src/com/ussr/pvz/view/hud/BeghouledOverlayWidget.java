@@ -42,7 +42,7 @@ public class BeghouledOverlayWidget extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         GameSession session = App.getGameSession();
         if (session == null) return;
-        LevelBehavior behavior = (LevelBehavior) session.getLevel().getBehavior();
+        LevelBehavior behavior = session.getLevel().getBehavior();
         if (!(behavior instanceof BeghouledBehavior)) return;
 
         TextureRegion highlight = textures.region(REGION_HIGHLIGHT);

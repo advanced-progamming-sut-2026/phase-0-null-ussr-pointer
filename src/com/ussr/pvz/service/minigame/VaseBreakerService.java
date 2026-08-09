@@ -52,11 +52,11 @@ public class VaseBreakerService {
 
         try {
             Plant newPlant = com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(targetPack.getPlantId(), 1);
-            newPlant.setLocation(new Plant.Location(x, y));
-            newPlant.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
-
-            cell.setPlant(newPlant);
-            session.addPlant(newPlant);
+            Plant plant = new Plant(newPlant);
+            plant.setLocation(new Plant.Location(x, y));
+            plant.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
+            cell.setPlant(plant);
+            session.addPlant(plant);
 
             targetPack.setAlive(false); // consume the seedpack
 
