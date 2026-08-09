@@ -29,7 +29,7 @@ public class DebugToolsWidget extends Table {
             }
         });
 
-        TextButton gridDebugBtn = new TextButton("Grid Debug", skin, "default");
+        TextButton gridDebugBtn = new TextButton("Grid", skin, "default");
         gridDebugBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -37,7 +37,7 @@ public class DebugToolsWidget extends Table {
             }
         });
 
-        TextButton hitboxDebugBtn = new TextButton("Hitbox Debug", skin, "default");
+        TextButton hitboxDebugBtn = new TextButton("Hitbox", skin, "default");
         hitboxDebugBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

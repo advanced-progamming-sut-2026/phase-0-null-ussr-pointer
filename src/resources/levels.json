@@ -229,7 +229,7 @@
           "order": 4,
           "menuRegion": "IMAGE_WORLDMAP_ZOMBOSS_NODE_EGYPT_ZOMBOSS_NODE_EGYPT_914X994",
           "deliveryStrategy": "conveyor",
-          "sunFalling": true,
+          "sunFalling": false,
           "timeLimitSeconds": 0,
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
@@ -237,7 +237,17 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossEgypt",
           "lockedPlants": [],
-          "seedPlants": ["Peashooter", "Sunflower", "Wall-nut", "Repeater", "Cherry Bomb"],
+          "seedPlants": [
+            "Peashooter",
+            "Repeater",
+            "Threepeater",
+            "Rotobaga",
+            "Caulipower",
+            "Wall-nut",
+            "Repeater",
+            "Cherry Bomb",
+            ""
+          ],
           "rewardPlantAliases": [
             "Fire Peashooter",
             "Hot Potato",
@@ -459,7 +469,7 @@
           "order": 4,
           "menuRegion": "IMAGE_WORLDMAP_ZOMBOSS_NODE_ICEAGE_ZOMBOSS_NODE_ICEAGE_1055X1280",
           "deliveryStrategy": "conveyor",
-          "sunFalling": true,
+          "sunFalling": false,
           "timeLimitSeconds": 0,
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
@@ -467,7 +477,21 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossMammoth",
           "lockedPlants": [],
-          "seedPlants": ["Snow Pea", "Sunflower", "Wall-nut", "Iceberg Lettuce", "Cabbage-pult"],
+          "seedPlants": [
+            "Snow Pea",
+            "Sunflower",
+            "Wall-nut",
+            "Iceberg Lettuce",
+            "Cabbage-pult",
+            "Peashooter",
+            "Repeater",
+            "Threepeater",
+            "Rotobaga",
+            "Caulipower",
+            "Wall-nut",
+            "Repeater",
+            "Cherry Bomb"
+          ],
           "rewardPlantAliases": [
             "Fume-shroom",
             "Magnet-shroom",
@@ -706,7 +730,21 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossDragon",
           "lockedPlants": [],
-          "seedPlants": ["Peashooter", "Sunflower", "Wall-nut", "Doom-shroom", "Torchwood"],
+          "seedPlants": [
+            "Peashooter",
+            "Sunflower",
+            "Wall-nut",
+            "Doom-shroom",
+            "Torchwood",
+            "Peashooter",
+            "Repeater",
+            "Threepeater",
+            "Rotobaga",
+            "Caulipower",
+            "Wall-nut",
+            "Repeater",
+            "Cherry Bomb"
+          ],
           "rewardPlantAliases": [
             "Garlic",
             "Lily Pad",
@@ -890,18 +928,22 @@
           ],
           "allowedZombies": [
             {
-              "id": "ZombieBeachFisherman",
-              "weight": 500
+              "id": "ZombieDefault",
+              "weight": 100
             },
             {
-              "id": "ZombieBeachOctopus",
-              "weight": 400
+              "id": "ZombieBeachSnorkel",
+              "weight": 300
             }
           ],
           "waves": [
             {
               "waveNumber": 1,
               "cost": 1600
+            },
+            {
+              "waveNumber": 2,
+              "cost": 2100
             }
           ]
         },
@@ -957,7 +999,7 @@
           "order": 4,
           "menuRegion": "IMAGE_WORLDMAP_ZOMBOSS_NODE_BEACH_ZOMBOSS_NODE_BEACH_905X1096",
           "deliveryStrategy": "conveyor",
-          "sunFalling": true,
+          "sunFalling": false,
           "timeLimitSeconds": 0,
           "deadlineColumn": -1,
           "allowedPlantsLost": -1,
@@ -965,7 +1007,21 @@
           "behavior": "BossBehavior",
           "zombossAlias": "ZombossShark",
           "lockedPlants": [],
-          "seedPlants": ["Peashooter", "Sunflower", "Tangle Kelp", "Wall-nut", "Melon-pult"],
+          "seedPlants": [
+            "Peashooter",
+            "Sunflower",
+            "Tangle Kelp",
+            "Wall-nut",
+            "Melon-pult",
+            "Peashooter",
+            "Repeater",
+            "Threepeater",
+            "Rotobaga",
+            "Caulipower",
+            "Wall-nut",
+            "Repeater",
+            "Cherry Bomb"
+          ],
           "rewardPlantAliases": [
             "Cat-tail",
             "Cherry Bomb",

@@ -6,6 +6,7 @@ import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.Level;
 
 import java.util.ArrayList;
@@ -35,13 +36,11 @@ public class SaveOurSeedsBehavior extends LevelBehavior {
         Lawn lawn = session.getLawn();
 
         for (TargetSeed target : seedsToSpawn) {
-            Plant specialPlant = new Plant();
-            specialPlant.setName(target.plantName());
+            Plant specialPlant = PlantFactory.createPlantByName("WallNut",1);
             specialPlant.setHp(300);
             specialPlant.setAlive(true);
             specialPlant.setState(Plant.PlantState.ACTIVE);
             specialPlant.setLocation(new Plant.Location(target.col(), target.row()));
-
             if (session.getPlants() != null) {
                 session.getPlants().add(specialPlant);
             }

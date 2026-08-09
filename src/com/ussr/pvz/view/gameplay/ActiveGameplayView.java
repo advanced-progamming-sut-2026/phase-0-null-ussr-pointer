@@ -12,12 +12,17 @@ import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
+import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
+import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
 import com.ussr.pvz.view.hud.InGameHud;
+
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
 import com.ussr.pvz.view.hud.LawnWidget;
-import com.ussr.pvz.view.gameplay.ItemRenderLayer;
+import com.ussr.pvz.view.hud.VaseBreakerOverlayWidget;
 
 public class ActiveGameplayView extends Table implements Disposable {
 
@@ -39,33 +44,22 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         Image background = createBackground(textures);
 
-        this.entityLayer =
-                new EntityRenderLayer(pamPlayer, textures);
+        this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
 
-        TerrainRenderLayer terrainLayer =
-                new TerrainRenderLayer(pamPlayer, textures);
+        TerrainRenderLayer terrainLayer = new TerrainRenderLayer(pamPlayer, textures);
 
-        this.inGameHud =
-                new InGameHud(skin, textures, controller);
+        this.inGameHud = new InGameHud(skin, textures, controller);
 
-        LawnWidget lawnWidget =
-                new LawnWidget(controller);
+        LawnWidget lawnWidget = new LawnWidget(controller);
 
-        HoverCursorWidget hoverCursor =
-                new HoverCursorWidget(
-                        textures,
-                        controller
-                );
+        HoverCursorWidget hoverCursor = new HoverCursorWidget(textures, controller);
+
+        SunRenderLayer sunLayer        = new SunRenderLayer(pamPlayer);
+        ItemRenderLayer itemLayer      = new ItemRenderLayer(pamPlayer);
+        StormRenderLayer stormRearLayer = new StormRenderLayer(pamPlayer, true);
+        StormRenderLayer stormTopLayer  = new StormRenderLayer(pamPlayer, false);
 
         Stack layers = new Stack();
-// in your GameplayScreen or wherever the stage is assembled
-        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer); // suns
-        ItemRenderLayer itemLayer = new ItemRenderLayer(pamPlayer); // coins, diamonds, plant food, seed packs
-        StormRenderLayer stormRearLayer =
-                new StormRenderLayer(pamPlayer, true);
-        StormRenderLayer stormTopLayer =
-                new StormRenderLayer(pamPlayer, false);
-
         layers.add(background);
         layers.add(terrainLayer);
         layers.add(stormRearLayer);
@@ -73,18 +67,47 @@ public class ActiveGameplayView extends Table implements Disposable {
         layers.add(sunLayer);
         layers.add(itemLayer);
         layers.add(stormTopLayer);
-        layers.add(lawnWidget);
+
+        // ── Minigame overlays ─────────────────────────────────────────────────
+        // These sit above the entity/item layers so they can intercept input
+        // and draw highlights, but below the HUD so the HUD always reads on top.
+        addMinigameOverlays(layers, textures, skin);
+
+        layers.add(lawnWidget);   // invisible click target — must stay here for
+        // standard gameplay clicks; overlays above it
+        // consume their own clicks first.
         layers.add(inGameHud);
         layers.add(hoverCursor);
 
         add(layers).grow();
     }
 
+    /**
+     * Inspects the current level's behavior and inserts the appropriate
+     * overlay widget into the layer stack.  Only one overlay is added per session.
+     */
+    private void addMinigameOverlays(Stack layers, TextureBank textures, Skin skin) {
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLevel() == null) return;
+
+        LevelBehavior behavior = (LevelBehavior) session.getLevel().getBehavior();
+
+        if (behavior instanceof BeghouledBehavior) {
+            layers.add(new BeghouledOverlayWidget(textures, controller));
+
+        } else if (behavior instanceof VaseBreakerBehavior) {
+            layers.add(new VaseBreakerOverlayWidget(textures, controller));
+        }
+        // WallnutBowling and IZombie don't need a separate overlay —
+        // their input already flows through GameplayController / GameController.
+    }
+
     private Image createBackground(TextureBank textures) {
         Chapter currentChapter = App.getLevelManager().getCurrentChapter();
 
-        // Dynamically fetch the lawn region defined in your JSON
-        String regionKey = currentChapter != null ? currentChapter.getLawnRegion() : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
+        String regionKey = currentChapter != null
+                ? currentChapter.getLawnRegion()
+                : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
 
         Image bg = new Image();
         if (regionKey != null && textures.region(regionKey) != null) {

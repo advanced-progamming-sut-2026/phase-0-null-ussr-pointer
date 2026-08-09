@@ -21,7 +21,7 @@ public class LevelFactory {
         BEHAVIOR_REGISTRY.put("NormalBehavior", NormalBehavior::new);
         BEHAVIOR_REGISTRY.put("VaseBreakerBehavior", VaseBreakerBehavior::new);
         BEHAVIOR_REGISTRY.put("MeowBehavior", MeowBehavior::new);
-
+        BEHAVIOR_REGISTRY.put("BossBehavior", BossBehavior::new);
     }
 
     public static Level create(JsonContainer.JsonLevelData data) {
@@ -83,6 +83,7 @@ public class LevelFactory {
                 int limit = data.allowedPlantsLost > 0 ? data.allowedPlantsLost : 5;
                 yield new LoveYourPlantsBehavior(limit);
             }
+            case "BossBehavior" -> new BossBehavior();
             default -> {
                 Supplier<LevelBehavior> supplier = BEHAVIOR_REGISTRY.get(data.behavior.trim());
                 if (supplier != null) yield supplier.get();
