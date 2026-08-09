@@ -15,9 +15,11 @@ import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 import com.ussr.pvz.model.entities.zombies.projectiles.*;
+import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.animation.PlantPamActor;
 import com.ussr.pvz.view.animation.ProjectilePamActor;
@@ -246,6 +248,7 @@ public class EntityRenderLayer extends Group {
      */
     private void syncZombies(GameSession session, Set<Object> live, float delta) {
         for (Zombie zombie : session.getZombies()) {
+            if (zombie.isBossMirror()) continue;
             if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
             live.add(zombie);
 
@@ -259,17 +262,26 @@ public class EntityRenderLayer extends Group {
             String currentClip = resolveZombieCurrentClip(zombie, actor);
 
             if (actor instanceof ZombiePamActor zombieActor) {
-                if (!zombieActor.isPlayingSpecial()) {
-                    String animEvent = zombie.pollAnimEvent();
-                    if (animEvent != null) {
-                        zombieActor.playOnce(animEvent, currentClip);
-                    } else {
-                        zombieActor.setClip(currentClip);
-                    }
-                }
+                ZombossController boss = zombie.getZombossController();
 
-                if (zombie.getState() == com.ussr.pvz.model.entities.zombies.ZombieActivity.DEAD) {
-                    zombieActor.setClip(currentClip);
+                if (zombie.getState() == ZombieActivity.DEAD) {
+                    if (!zombieActor.isPlayingSpecial()) {
+                        List<String> deathSeq = zombie.pollAnimSequence();
+                        if (deathSeq != null) {
+                            zombieActor.playSequence(deathSeq, null, true);
+                        } else {
+                            String deathClip = boss != null ? boss.resolveClip("die") : currentClip;
+                            zombieActor.setClip(deathClip, true);
+                        }
+                    }
+                } else {
+                    boolean bossStunned = boss != null && boss.isStunned();
+                    String idleClip = bossStunned ? boss.getStunClip() : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                    if (!zombieActor.isPlayingSpecial()) {
+                        List<String> animSeq = zombie.pollAnimSequence();
+                        if (animSeq != null) zombieActor.playSequence(animSeq, idleClip, false);
+                        else zombieActor.setClip(idleClip);
+                    }
                 }
 
                 zombieActor.setArmor(zombie.getArmor());

@@ -7,6 +7,8 @@ import com.ussr.pvz.model.entities.zombies.zomboss.ZombossFactory;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 
+import java.util.List;
+
 public class BossBehavior extends LevelBehavior {
 
     private static final double CONVEYOR_INTERVAL = 12.0;
@@ -43,6 +45,14 @@ public class BossBehavior extends LevelBehavior {
         try {
             this.controller = ZombossFactory.spawn(alias, primaryRow, spawnCol, session);
             this.bossSpawned = true;
+
+            List<String> introSequence = this.controller.getIntroSequence();
+            if (!introSequence.isEmpty()) this.controller.getPrimary().queueAnimSequence(introSequence);
+
+            String introClip = this.controller.getIntroClip();
+            if (introClip != null && !introClip.isBlank()) {
+                this.controller.getPrimary().queueAnimEvent(introClip);
+            }
         } catch (Exception e) {
             System.err.println("[BossBehavior] Failed to spawn zomboss \"" + alias + "\": " + e.getMessage());
         }

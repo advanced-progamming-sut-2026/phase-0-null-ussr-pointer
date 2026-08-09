@@ -76,7 +76,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/LNY_CONEHEAD_ZOMBIE/LNY_CONEHEAD_ZOMBIE.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -151,7 +151,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/LNY_BUCKETHEAD_ZOMBIE/LNY_BUCKETHEAD_ZOMBIE.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -226,7 +226,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_FUTURE_BASIC_BRICK/ZOMBIE_FUTURE_BASIC_BRICK.PAM",
-    "textureRegion":"",
+    "textureRegion": "",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -576,7 +576,7 @@
         "z": 0.8
       },
       "Size": "imp",
-      "Speed": 0.50,
+      "Speed": 0.5,
       "WavePointCost": 100,
       "Weight": 1000,
       "ZombieStats": [
@@ -1725,7 +1725,7 @@
     ],
     "objclass": "ZombieDarkKingProps",
     "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_DARK_KING/ZOMBIE_DARK_KING.PAM",
-    "textureRegion":"IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_KING",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_DARK_KING",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -2938,24 +2938,58 @@
         {
           "name": "EgyptRocket",
           "weight": 400,
-          "cooldown": 9.0
+          "cooldown": 9.0,
+          "clips": [
+            "missile_start",
+            "rocket_launch"
+          ]
         },
         {
           "name": "ForwardDash",
           "weight": 250,
-          "cooldown": 14.0
+          "cooldown": 14.0,
+          "clips": [
+            "walk_forward",
+            "stomp",
+            "walk_backwards"
+          ]
         },
         {
           "name": "SpawnMinions",
           "weight": 250,
-          "cooldown": 16.0
+          "cooldown": 16.0,
+          "clips": [
+            "zombie_portal_start",
+            "zombie_portal_loop",
+            "zombie_portal_end"
+          ]
         },
         {
           "name": "RowSwitch",
           "weight": 100,
-          "cooldown": 12.0
+          "cooldown": 12.0,
+          "clips": [
+            "walk_up",
+            "walk_down"
+          ]
         }
-      ]
+      ],
+      "ZombossPreIntroClip": "Pre_Intro",
+      "ZombossIntroClip": "intro",
+      "ZombossStunStartClip": "stun_start",
+      "ZombossStunClip": "stun_loop",
+      "ZombossStunEndClip": "stun_end",
+      "ZombossClipOverrides": {
+        "walk": "idle",
+        "eat": "idle"
+      },
+      "ZombossDieSequence": [
+        "die",
+        "die_idle",
+        "die_talk",
+        "die_exit"
+      ],
+      "ZombossDeathAnimSeconds": 6.0
     }
   },
   {
@@ -3030,19 +3064,52 @@
         {
           "name": "IceRocket",
           "weight": 400,
-          "cooldown": 8.0
+          "cooldown": 8.0,
+          "clips": [
+            "slingshot"
+          ]
         },
         {
           "name": "IceWind",
           "weight": 300,
-          "cooldown": 11.0
+          "cooldown": 11.0,
+          "clips": [
+            "wind_1",
+            "wind_2",
+            "wind_3",
+            "wind_4"
+          ],
+          "clipMode": "random"
         },
         {
           "name": "ColumnFreeze",
           "weight": 300,
-          "cooldown": 13.0
+          "cooldown": 13.0,
+          "clips": [
+            "glacier_column_1",
+            "glacier_column_2",
+            "glacier_column_3",
+            "glacier_column_4",
+            "glacier_column_5",
+            "glacier_column_6"
+          ],
+          "clipMode": "random"
         }
-      ]
+      ],
+      "ZombossPreIntroClip": "reveal",
+      "ZombossIntroClip": "intro",
+      "ZombossStunStartClip": "cover_up",
+      "ZombossStunClip": "stun",
+      "ZombossClipOverrides": {
+        "walk": "idle",
+        "eat": "idle"
+      },
+      "ZombossDieSequence": [
+        "die",
+        "die_talk",
+        "die_exit"
+      ],
+      "ZombossDeathAnimSeconds": 6.0
     }
   },
   {
@@ -3123,24 +3190,51 @@
           "name": "FireballBarrage",
           "weight": 350,
           "cooldown": 10.0,
-          "count": 3
+          "count": 3,
+          "clips": [
+            "fire_bomb",
+            "fire_bomb_loop",
+            "fire_bomb_end"
+          ]
         },
         {
           "name": "RowIgnite",
           "weight": 300,
-          "cooldown": 15.0
+          "cooldown": 15.0,
+          "clips": [
+            "fire_attack",
+            "fire_attack_idle",
+            "fire_attack_end"
+          ]
         },
         {
           "name": "SpawnMinions",
           "weight": 250,
-          "cooldown": 16.0
+          "cooldown": 16.0,
+          "clips": [
+            "summoning"
+          ]
         },
         {
           "name": "RowSwitch",
           "weight": 100,
           "cooldown": 12.0
         }
-      ]
+      ],
+      "ZombossIntroClip": "intro",
+      "ZombossStunStartClip": "stun_start",
+      "ZombossStunClip": "stun_loop",
+      "ZombossStunEndClip": "stun_end",
+      "ZombossClipOverrides": {
+        "walk": "idle",
+        "eat": "idle"
+      },
+      "ZombossDieSequence": [
+        "die",
+        "die_talk",
+        "die_exit"
+      ],
+      "ZombossDeathAnimSeconds": 6.0
     }
   },
   {
@@ -3221,24 +3315,50 @@
           "name": "BabySharks",
           "weight": 350,
           "cooldown": 9.0,
-          "count": 4
+          "count": 4,
+          "clips": [
+            "submerge",
+            "emerge"
+          ]
         },
         {
           "name": "Turbine",
           "weight": 300,
-          "cooldown": 13.0
+          "cooldown": 13.0,
+          "clips": [
+            "suction_on",
+            "suction_loop",
+            "suction_off"
+          ]
         },
         {
           "name": "SpawnMinions",
           "weight": 250,
-          "cooldown": 16.0
+          "cooldown": 16.0,
+          "clips": [
+            "spawn"
+          ]
         },
         {
           "name": "RowSwitch",
           "weight": 100,
           "cooldown": 12.0
         }
-      ]
+      ],
+      "ZombossIntroClip": "intro",
+      "ZombossStunStartClip": "stun_start",
+      "ZombossStunClip": "stun_loop",
+      "ZombossStunEndClip": "stun_end",
+      "ZombossClipOverrides": {
+        "walk": "idle",
+        "eat": "idle"
+      },
+      "ZombossDieSequence": [
+        "die",
+        "die_talk",
+        "die_exit"
+      ],
+      "ZombossDeathAnimSeconds": 6.0
     }
   }
 ]

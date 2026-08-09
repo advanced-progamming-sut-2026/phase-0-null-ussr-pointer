@@ -18,12 +18,11 @@ import com.ussr.pvz.model.entities.zombies.move.HypnotizedMoveBehavior;
 import com.ussr.pvz.model.entities.zombies.move.JumpMove;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
+import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.util.Vec2;
 
-import java.util.Random;
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.*;
 
 public class Zombie extends GameEntity implements Damageable {
 
@@ -50,12 +49,17 @@ public class Zombie extends GameEntity implements Damageable {
     private java.util.List<String> damageWhileSubmergedPlantfoodOnly;
     private String pamPath;
     private boolean bossMirror = false;
+    // Render-only backref to the boss controller when this zombie is a Zomboss
+    // primary or mirror body. NOT set as effectStatus (that stays primary-only,
+    // set in ZombossFactory) so it never gets ticked twice per frame — this is
+    // purely so EntityRenderLayer can ask "is my boss stunned / what's my death clip".
+    private ZombossController zombossController;
     private float deathTimer = -1f; // -1 means not dying yet
     // Some zombie PAM death clips are longer than two seconds. Keeping the
     // entity for four seconds lets both the body fall and the late head drop
     // finish before EntityRenderLayer removes its actor.
     private static final float DEATH_ANIM_DURATION = 4.0f;
-    private final Queue<String> pendingAnimEvents = new ArrayDeque<>();
+    private final Queue<java.util.List<String>> pendingAnimEvents = new ArrayDeque<>();
 
     private static final float SLIPPERY_SLIDE_DURATION = 2.25f;
 
@@ -65,18 +69,21 @@ public class Zombie extends GameEntity implements Damageable {
     private double slipperyTargetRow;
 
     public void queueAnimEvent(String clipName) {
-        if (clipName != null && !clipName.isBlank()) {
-            pendingAnimEvents.offer(clipName);
-        }
+        if (clipName != null && !clipName.isBlank()) pendingAnimEvents.offer(List.of(clipName));
+    }
+
+    public void queueAnimSequence(List<String> clips) {
+        if (clips == null || clips.isEmpty()) return;
+        List<String> f = new ArrayList<>();
+        for (String c : clips) if (c != null && !c.isBlank()) f.add(c);
+        if (!f.isEmpty()) pendingAnimEvents.offer(f);
     }
 
     /** View calls this — read and clear in one shot */
-    public String pollAnimEvent() {
-        return pendingAnimEvents.poll();
-    }
-    public void startDeathTimer() {
-        if (deathTimer < 0) deathTimer = DEATH_ANIM_DURATION;
-    }
+    public List<String> pollAnimSequence() { return pendingAnimEvents.poll(); }
+    public void startDeathTimer() { startDeathTimer(DEATH_ANIM_DURATION); }
+
+    public void startDeathTimer(float duration) { if (deathTimer < 0) deathTimer = duration; }
 
     public boolean isDeathAnimDone() {
         return deathTimer == 0f;
@@ -144,6 +151,14 @@ public class Zombie extends GameEntity implements Damageable {
 
     public void setBossMirror(boolean bossMirror) {
         this.bossMirror = bossMirror;
+    }
+
+    public ZombossController getZombossController() {
+        return zombossController;
+    }
+
+    public void setZombossController(ZombossController zombossController) {
+        this.zombossController = zombossController;
     }
 
     public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
@@ -535,6 +550,8 @@ public class Zombie extends GameEntity implements Damageable {
     public void setDamageWhileSubmergedPlantfoodOnly(java.util.List<String> damageWhileSubmergedPlantfoodOnly) {
         this.damageWhileSubmergedPlantfoodOnly = damageWhileSubmergedPlantfoodOnly;
     }
+
+    public void setState(ZombieActivity state) { this.state = state; }
 
     public boolean isSlidingBetweenRows() {
         return slidingBetweenRows;

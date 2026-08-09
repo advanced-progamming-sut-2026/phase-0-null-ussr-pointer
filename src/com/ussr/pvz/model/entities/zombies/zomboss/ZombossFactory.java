@@ -26,6 +26,9 @@ public final class ZombossFactory {
         primary.setDefenseBehavior(new ZombossDefense(controller));
         mirror.setDefenseBehavior(new ZombossDefense(controller));
 
+        primary.setZombossController(controller);
+        mirror.setZombossController(controller);
+
         session.spawnZombie(primary);
         session.spawnZombie(mirror);
 

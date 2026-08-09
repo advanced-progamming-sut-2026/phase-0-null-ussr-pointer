@@ -2,12 +2,14 @@ package com.ussr.pvz.model.entities.zombies.zomboss;
 
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.effect.EffectStatus;
 import com.ussr.pvz.model.entities.zombies.factory.BehaviorSpec;
 import com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,14 +23,18 @@ public class ZombossController implements EffectStatus {
         final String name;
         final ZombossMove move;
         final int weight;
+        final List<String> clips;
+        final boolean randomVariant;
         final double cooldown;
         double cooldownRemaining;
 
-        MoveEntry(String name, ZombossMove move, int weight, double cooldown) {
+        MoveEntry(String name, ZombossMove move, int weight, double cooldown, List<String> clips, boolean randomVariant) {
             this.name = name;
             this.move = move;
             this.weight = weight;
             this.cooldown = cooldown;
+            this.clips = clips;
+            this.randomVariant = randomVariant;
         }
     }
 
@@ -51,6 +57,19 @@ public class ZombossController implements EffectStatus {
 
     private final List<MoveEntry> moves = new ArrayList<>();
 
+    // -------------------------------------------------------------------
+    // Animation config — all optional/data-driven from the zombie JSON.
+    // -------------------------------------------------------------------
+    private final Map<String, String> clipOverrides;
+    private final String stunClip;
+    private final String stunStartClip;
+    private final String stunEndClip;
+    private final String preIntroClip;
+    private final String introClip;
+    private final List<String> dieSequence;
+    private final double deathAnimSeconds;
+    private boolean wasStunned = false;
+
     public ZombossController(Zombie primary, Zombie mirror, Map<String, Object> data) {
         this.primary = primary;
         this.mirror = mirror;
@@ -67,6 +86,15 @@ public class ZombossController implements EffectStatus {
         this.moveIntervalMin = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMin", 4.0);
         this.moveIntervalMax = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMax", 7.0);
         this.nextMoveTimer = randomInterval();
+
+        this.stunClip = BehaviorSpec.getString(data, "ZombossStunClip", "idle");
+        this.stunStartClip = BehaviorSpec.getString(data, "ZombossStunStartClip", null);
+        this.stunEndClip = BehaviorSpec.getString(data, "ZombossStunEndClip", null);
+        this.introClip = BehaviorSpec.getString(data, "ZombossIntroClip", null);
+        this.clipOverrides = loadClipOverrides(data);
+        this.preIntroClip = BehaviorSpec.getString(data, "ZombossPreIntroClip", null);
+        this.dieSequence = BehaviorSpec.getStringList(data, "ZombossDieSequence");
+        this.deathAnimSeconds = BehaviorSpec.getDouble(data, "ZombossDeathAnimSeconds", 6.0);
 
         loadMoves(data);
     }
@@ -85,8 +113,28 @@ public class ZombossController implements EffectStatus {
             ZombossMove move = ZombossMoveRegistry.create(name, entry, data);
             int weight = BehaviorSpec.getInt(entry, "weight", 100);
             double cooldown = BehaviorSpec.getDouble(entry, "cooldown", 5.0);
-            moves.add(new MoveEntry(name, move, weight, cooldown));
+            List<String> clips = BehaviorSpec.getStringList(entry, "clips");
+            if (clips.isEmpty()) {
+                String legacy = BehaviorSpec.getString(entry, "clip", null);
+                if (legacy != null && !legacy.isBlank()) clips = List.of(legacy);
+            }
+            boolean randomVariant = "random".equalsIgnoreCase(BehaviorSpec.getString(entry, "clipMode", "sequence"));
+            moves.add(new MoveEntry(name, move, weight, cooldown, clips, randomVariant));
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> loadClipOverrides(Map<String, Object> data) {
+        Map<String, String> overrides = new HashMap<>();
+        Object raw = data.get("ZombossClipOverrides");
+        if (raw instanceof Map<?, ?> m) {
+            for (Map.Entry<?, ?> e : m.entrySet()) {
+                if (e.getKey() instanceof String k && e.getValue() instanceof String v) {
+                    overrides.put(k, v);
+                }
+            }
+        }
+        return overrides;
     }
 
     private double randomInterval() {
@@ -101,7 +149,15 @@ public class ZombossController implements EffectStatus {
         syncMirrorPosition();
         tickMoveCooldowns(delta);
 
-        if (isStunned()) return;
+        boolean stunnedNow = isStunned();
+        if (stunnedNow && !wasStunned && stunStartClip != null && !stunStartClip.isBlank()) {
+            primary.queueAnimEvent(stunStartClip);
+        } else if (!stunnedNow && wasStunned && stunEndClip != null && !stunEndClip.isBlank()) {
+            primary.queueAnimEvent(stunEndClip);
+        }
+        wasStunned = stunnedNow;
+
+        if (stunnedNow) return;
 
         nextMoveTimer -= delta;
         if (nextMoveTimer <= 0) {
@@ -138,6 +194,10 @@ public class ZombossController implements EffectStatus {
         for (MoveEntry entry : ready) {
             cumulative += Math.max(entry.weight, 0);
             if (roll < cumulative) {
+                if (!entry.clips.isEmpty()) {
+                    if (entry.randomVariant) primary.queueAnimEvent(entry.clips.get(RAND.nextInt(entry.clips.size())));
+                    else primary.queueAnimSequence(entry.clips);
+                }
                 entry.move.execute(this, session);
                 entry.cooldownRemaining = entry.cooldown;
                 return;
@@ -180,9 +240,14 @@ public class ZombossController implements EffectStatus {
     }
 
     private void die(GameSession session) {
+        primary.setState(ZombieActivity.DEAD);
         primary.setAlive(false);
+        primary.startDeathTimer((float) deathAnimSeconds);
+        if (!dieSequence.isEmpty()) primary.queueAnimSequence(dieSequence);
         if (mirror != null) {
+            mirror.setState(ZombieActivity.DEAD);
             mirror.setAlive(false);
+            mirror.startDeathTimer((float) deathAnimSeconds);
         }
         session.notifyZombieDied(primary);
     }
@@ -230,5 +295,25 @@ public class ZombossController implements EffectStatus {
 
     public int getCurrentSegment() {
         return currentSegment;
+    }
+
+    public String resolveClip(String baseClip) {
+        return clipOverrides.getOrDefault(baseClip, baseClip);
+    }
+
+    public String getStunClip() {
+        return stunClip;
+    }
+
+    public String getIntroClip() {
+        return introClip;
+    }
+
+    public String getPreIntroClip() { return preIntroClip; }
+    public List<String> getIntroSequence() {
+        List<String> seq = new ArrayList<>(2);
+        if (preIntroClip != null && !preIntroClip.isBlank()) seq.add(preIntroClip);
+        if (introClip != null && !introClip.isBlank()) seq.add(introClip);
+        return seq;
     }
 }

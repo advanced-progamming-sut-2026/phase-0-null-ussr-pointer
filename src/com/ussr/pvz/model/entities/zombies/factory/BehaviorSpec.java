@@ -1,6 +1,8 @@
 package com.ussr.pvz.model.entities.zombies.factory;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
@@ -54,5 +56,13 @@ public final class BehaviorSpec {
     public static String getString(Map<String, Object> params, String key, String fallback) {
         Object v = params.get(key);
         return (v instanceof String s) ? s : fallback;
+    }
+
+    public static List<String> getStringList(Map<String, Object> params, String key) {
+        Object v = params.get(key);
+        if (!(v instanceof List<?> list)) return Collections.emptyList();
+        List<String> result = new ArrayList<>(list.size());
+        for (Object o : list) if (o instanceof String s && !s.isBlank()) result.add(s);
+        return result;
     }
 }

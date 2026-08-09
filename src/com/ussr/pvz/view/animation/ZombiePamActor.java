@@ -7,6 +7,7 @@ import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class ZombiePamActor extends PamActor {
@@ -15,6 +16,11 @@ public class ZombiePamActor extends PamActor {
     private boolean armorPartsResolved;
     private String returnToClip;
     private boolean playingSpecial;
+    private List<String> sequenceQueue;
+    private int sequenceIndex;
+    private String sequenceRestClip;
+    private boolean sequenceRestOneShot;
+    private boolean playingSequence;
 
     // -------------------------------------------------------------------------
     // Glow & danger state (view-only — driven by EntityRenderLayer each frame)
@@ -90,6 +96,18 @@ public class ZombiePamActor extends PamActor {
             glowTime += delta;
         }
 
+        if (playingSequence && !playing) {
+            sequenceIndex++;
+            if (sequenceQueue != null && sequenceIndex < sequenceQueue.size()) {
+                advanceSequenceClip();
+            } else {
+                String restClip = sequenceRestClip; boolean restOneShot = sequenceRestOneShot;
+                playingSequence = false; playingSpecial = false; sequenceQueue = null;
+                if (restClip != null) { currentClipName = null; setClip(restClip, restOneShot); }
+            }
+            return;
+        }
+
         // Special-clip return logic (unchanged from original)
         if (playingSpecial && !playing) {
             String nextClip = returnToClip;
@@ -146,6 +164,22 @@ public class ZombiePamActor extends PamActor {
         this.stateTime = 0f;
         this.playing = true;
         this.playingSpecial = true;
+        setLooping(false);
+    }
+
+    public void playSequence(java.util.List<String> clips, String restClip, boolean restOneShot) {
+        if (playingSequence || clips == null || clips.isEmpty()) return;
+        java.util.List<String> valid = new java.util.ArrayList<>();
+        for (String c : clips) if (hasClip(c)) valid.add(c);
+        if (valid.isEmpty()) return;
+        sequenceQueue = valid; sequenceIndex = 0; sequenceRestClip = restClip;
+        sequenceRestOneShot = restOneShot; playingSequence = true; playingSpecial = true;
+        advanceSequenceClip();
+    }
+    private void advanceSequenceClip() {
+        String clip = sequenceQueue.get(sequenceIndex);
+        clipRef = player.getClip(pamPath, clip);
+        returnToClip = null; currentClipName = clip; stateTime = 0f; playing = true;
         setLooping(false);
     }
 
@@ -216,7 +250,18 @@ public class ZombiePamActor extends PamActor {
 
     @Override
     public void setClip(String clipName) {
-        if (playingSpecial && !"die".equals(clipName)) {
+        boolean isOneShot = "die".equals(clipName) || "newspaper_defeat".equals(clipName);
+        setClip(clipName, isOneShot);
+    }
+
+    /**
+     * Sets the clip with an explicit one-shot flag, instead of relying on the
+     * hardcoded "die"/"newspaper_defeat" name check. Used for boss death clips
+     * (e.g. "die_idle") that don't match those literal names but should still
+     * freeze on the last frame rather than loop.
+     */
+    public void setClip(String clipName, boolean oneShot) {
+        if (playingSpecial && !oneShot) {
             return;
         }
         if (playingSpecial) {
@@ -227,8 +272,6 @@ public class ZombiePamActor extends PamActor {
             return;
         }
         super.setClip(clipName);
-        boolean isOneShot = "die".equals(currentClipName)
-                || "newspaper_defeat".equals(currentClipName);
-        setLooping(!isOneShot);
+        setLooping(!oneShot);
     }
 }
