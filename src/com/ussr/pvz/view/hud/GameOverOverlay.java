@@ -10,9 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.engine.session.GameSession;
+import pvz.libpvz.textures.TextureBank;
 
 /** Displays distinct, persistent victory and defeat actions. */
 public class GameOverOverlay extends Table {
@@ -21,15 +23,17 @@ public class GameOverOverlay extends Table {
     private static final String BUTTON_DRAWABLE =
             "image_ui_generic_brownbutton_10";
     private static final String NEXT_ICON =
-            "IMAGE_UI_MAINMENU_MM_ARROW_RIGHT";
+            "IMAGE_UI_ALMANAC_STATS_SCREEN_NAV_ARROW_NEXT";
     private static final String NEXT_ICON_DOWN =
-            "IMAGE_UI_MAINMENU_MM_ARROW_RIGHT_DOWN";
+            null;
     private static final String REPLAY_ICON =
-            "IMAGE_WORLDMAP_COMMON_UPGRADE_PLANTFOOD_REFRESH";
+            "IMAGE_UI_HUD_WORLDMAP_BUTTONS_HUD_BACK_NORMAL";
+    private static final String REPLAY_ICON_DOWN =
+            "IMAGE_UI_HUD_WORLDMAP_BUTTONS_HUD_BACK_SELECTED";
     private static final String MENU_ICON =
-            "IMAGE_UI_MAINMENU_BACK_BTN_NORMAL";
+            "IMAGE_UI_HUD_WORLDMAP_BUTTONS_HUD_MENU_NORMAL";
     private static final String MENU_ICON_DOWN =
-            "IMAGE_UI_MAINMENU_BACK_BTN_PRESSED";
+            "IMAGE_UI_HUD_WORLDMAP_BUTTONS_HUD_MENU_SELECTED";
 
     private final Label titleLabel;
     private final Label messageLabel;
@@ -38,7 +42,7 @@ public class GameOverOverlay extends Table {
     private final Actor nextLevelButton;
     private Boolean showingVictory;
 
-    public GameOverOverlay(Skin skin) {
+    public GameOverOverlay(Skin skin, TextureBank textures) {
         setFillParent(true);
         setTouchable(Touchable.enabled);
         setBackground(skin.newDrawable(
@@ -64,8 +68,8 @@ public class GameOverOverlay extends Table {
         dialog.add(titleLabel).padBottom(18f).row();
         dialog.add(messageLabel).padBottom(34f).row();
 
-        victoryActions = buildVictoryActions(skin);
-        defeatActions = buildDefeatActions(skin);
+        victoryActions = buildVictoryActions(skin, textures);
+        defeatActions = buildDefeatActions(skin, textures);
         nextLevelButton = victoryActions.getChildren().first();
 
         Stack actionStack = new Stack();
@@ -77,11 +81,12 @@ public class GameOverOverlay extends Table {
         setVisible(false);
     }
 
-    private Table buildVictoryActions(Skin skin) {
+    private Table buildVictoryActions(Skin skin, TextureBank textures) {
         Table actions = new Table();
         actions.defaults().width(180f).height(145f).pad(8f);
         actions.add(createImageActionButton(
                 skin,
+                textures,
                 "Next Level",
                 NEXT_ICON,
                 NEXT_ICON_DOWN,
@@ -89,13 +94,15 @@ public class GameOverOverlay extends Table {
         ));
         actions.add(createImageActionButton(
                 skin,
+                textures,
                 "Replay Level",
                 REPLAY_ICON,
-                null,
+                REPLAY_ICON_DOWN,
                 this::replayLevel
         ));
         actions.add(createImageActionButton(
                 skin,
+                textures,
                 "Game Menu",
                 MENU_ICON,
                 MENU_ICON_DOWN,
@@ -104,18 +111,20 @@ public class GameOverOverlay extends Table {
         return actions;
     }
 
-    private Table buildDefeatActions(Skin skin) {
+    private Table buildDefeatActions(Skin skin, TextureBank textures) {
         Table actions = new Table();
         actions.defaults().width(190f).height(145f).pad(10f);
         actions.add(createImageActionButton(
                 skin,
+                textures,
                 "Retry",
                 REPLAY_ICON,
-                null,
+                REPLAY_ICON_DOWN,
                 this::replayLevel
         ));
         actions.add(createImageActionButton(
                 skin,
+                textures,
                 "Exit to Map",
                 MENU_ICON,
                 MENU_ICON_DOWN,
@@ -126,6 +135,7 @@ public class GameOverOverlay extends Table {
 
     private Actor createImageActionButton(
             Skin skin,
+            TextureBank textures,
             String text,
             String iconKey,
             String pressedIconKey,
@@ -138,12 +148,12 @@ public class GameOverOverlay extends Table {
                 background,
                 new Color(0.76f, 0.76f, 0.76f, 1f)
         );
-        Drawable icon = skin.has(iconKey, Drawable.class)
-                ? skin.getDrawable(iconKey)
+        Drawable icon = textures.region(iconKey) != null
+                ? new TextureRegionDrawable(textures.region(iconKey))
                 : skin.getDrawable("white-pixel");
         Drawable pressedIcon = pressedIconKey != null
-                && skin.has(pressedIconKey, Drawable.class)
-                ? skin.getDrawable(pressedIconKey)
+                && textures.region(pressedIconKey) != null
+                ? new TextureRegionDrawable(textures.region(pressedIconKey))
                 : skin.newDrawable(
                         icon,
                         new Color(0.8f, 0.8f, 0.8f, 1f)

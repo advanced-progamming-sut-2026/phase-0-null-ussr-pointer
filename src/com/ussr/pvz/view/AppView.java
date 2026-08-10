@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.AudioSettings;
@@ -33,6 +34,9 @@ import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
@@ -66,6 +70,7 @@ public class AppView implements ApplicationListener {
     private Table screenRoot;
     private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
+    private boolean displayedActiveGameplay;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
     private static final long LOADING_FADE_IN_TIME_MS = 180L;
@@ -112,10 +117,11 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void create() {
-        Viewport viewport = new ScreenViewport();
+        Viewport viewport = new FitViewport(1280f, 720f);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
+        configureFontRendering();
         audioManager = new GdxAudioManager(new AudioSettings());
         installMissingSkinStyles();
 
@@ -135,6 +141,25 @@ public class AppView implements ApplicationListener {
         showMenu(App.getMenuState());
 
         Gdx.input.setInputProcessor(stage);
+    }
+
+    /**
+     * PvzSkin uses bitmap fonts. The stage is designed at 1280x720 and is
+     * enlarged on higher-resolution displays, so nearest filtering exposes
+     * the individual font texels. Linear filtering keeps scaled glyph edges
+     * smooth, while non-integer placement avoids fullscreen rounding jitter.
+     */
+    private void configureFontRendering() {
+        for (BitmapFont font
+                : skin.getAll(BitmapFont.class).values()) {
+            font.setUseIntegerPositions(false);
+            font.getRegions().forEach(region ->
+                    region.getTexture().setFilter(
+                            Texture.TextureFilter.Linear,
+                            Texture.TextureFilter.Linear
+                    )
+            );
+        }
     }
 
     private void installMissingSkinStyles() {
@@ -226,32 +251,6 @@ public class AppView implements ApplicationListener {
         if (stage != null) {
             stage.getViewport().update(width, height, true);
         }
-        upgradeToNativeFullscreenIfMaximized(width, height);
-    }
-
-    /**
-     * Clicking a window's native "fullscreen"/maximize icon behaves differently per OS: on
-     * Windows/Linux it usually triggers a clean resize, but on macOS the native Space-based
-     * fullscreen transition can leave GLFW compositing a stretched/blurred frame instead of a
-     * true resize. Rather than relying on the OS to do this cleanly, we detect that the window
-     * has grown to (essentially) fill the display and force a real native-resolution fullscreen
-     * switch ourselves, which works the same way on every platform.
-     */
-    private void upgradeToNativeFullscreenIfMaximized(int width, int height) {
-        if (Gdx.graphics.isFullscreen()) {
-            return;
-        }
-
-        Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode();
-
-        // Allow a little slack: taskbars/menu bars/window decorations mean a "maximized"
-        // window is rarely pixel-identical to the full display resolution.
-        boolean fillsWidth = width >= displayMode.width - 8;
-        boolean fillsHeight = height >= displayMode.height - 48;
-
-        if (fillsWidth && fillsHeight) {
-            Gdx.graphics.setFullscreenMode(displayMode);
-        }
     }
 
     @Override
@@ -267,8 +266,15 @@ public class AppView implements ApplicationListener {
         Gdx.gl.glClearColor(0.08f, 0.1f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        boolean gameplayModeChanged =
+                App.getMenuState() == MenuState.GAME
+                        && displayedMenu == MenuState.GAME
+                        && displayedActiveGameplay
+                        != (App.getGameSession() != null);
+
         if (!transitioning
-                && App.getMenuState() != displayedMenu) {
+                && (App.getMenuState() != displayedMenu
+                || gameplayModeChanged)) {
             transitionTo(App.getMenuState());
         }
         refreshGlobalHudCurrencies();
@@ -410,6 +416,8 @@ public class AppView implements ApplicationListener {
 
         configureGlobalHud(state);
         updateMenuMusic(state);
+        displayedActiveGameplay = state == MenuState.GAME
+                && App.getGameSession() != null;
     }
 
     private void updateMenuMusic(MenuState state) {
@@ -422,9 +430,9 @@ public class AppView implements ApplicationListener {
             GameplayMusicResolver.Selection selection = chapter == null
                     ? null
                     : GameplayMusicResolver.resolve(
-                    chapter.getId(),
-                    GameplayMusicCue.CHOOSE
-            );
+                            chapter.getId(),
+                            GameplayMusicCue.CHOOSE
+                    );
 
             if (selection != null && selection.hasLoop()) {
                 audioManager.playMusicSequence(

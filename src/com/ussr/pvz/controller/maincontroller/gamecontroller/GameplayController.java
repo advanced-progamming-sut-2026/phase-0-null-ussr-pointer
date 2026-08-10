@@ -25,7 +25,8 @@ public class GameplayController {
     private final BeghouledService beghouledService = new BeghouledService();
     private final VaseBreakerService vaseBreakerService = new VaseBreakerService();
 
-    private boolean paused              = false;
+    private boolean manuallyPaused;
+    private boolean dialoguePaused;
     private boolean shovelModeActive    = false;
     private boolean plantFoodModeActive = false;
     private String  selectedSeedKey     = null;
@@ -44,18 +45,36 @@ public class GameplayController {
     // ── Pause / modes ─────────────────────────────────────────────────────────
 
     public void togglePauseMenu() {
-        this.paused = !this.paused;
-        NotificationCenter.info(this.paused ? "Game Paused" : "Game Resumed");
+        manuallyPaused = !manuallyPaused;
+
+        NotificationCenter.info(
+                manuallyPaused ? "Game Paused" : "Game Resumed"
+        );
     }
 
-    public boolean isPaused() { return this.paused; }
+    public boolean isPauseMenuOpen() {
+        return manuallyPaused;
+    }
+
+    public void setDialoguePaused(boolean paused) {
+        dialoguePaused = paused;
+    }
+
+    public boolean isPaused() {
+        return manuallyPaused || dialoguePaused;
+    }
 
     public void toggleShovelMode(boolean active) {
-        this.shovelModeActive = active;
+        shovelModeActive = active;
         if (active) {
-            this.plantFoodModeActive = false;
-            this.selectedSeedKey = null;
-            if (onPlantFoodDeactivated != null) onPlantFoodDeactivated.run();
+            plantFoodModeActive = false;
+            selectedSeedKey = null;
+            if (onPlantFoodDeactivated != null) {
+                onPlantFoodDeactivated.run();
+            }
+            if (onPlantingCompleted != null) {
+                onPlantingCompleted.run();
+            }
         }
     }
 
@@ -87,7 +106,7 @@ public class GameplayController {
     // ── Main click entry point (called by LawnWidget) ─────────────────────────
 
     public void handleGridClick(int gridX, int gridY) {
-        if (this.paused) return;
+        if (isPaused()) return;
 
         GameSession session = App.getGameSession();
         if (session != null && session.getLevel() != null) {
@@ -220,7 +239,7 @@ public class GameplayController {
     }
 
     public void plantAt(String plantKey, int gridX, int gridY) {
-        if (this.paused || plantKey == null) return;
+        if (isPaused() || plantKey == null) return;
         String result = executeSelectedPlant(plantKey, gridX, gridY);
         if (result.contains("placed") || result.contains("Rolled")) {
             NotificationCenter.success(result);
