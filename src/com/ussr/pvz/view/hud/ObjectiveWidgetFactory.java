@@ -70,7 +70,7 @@ public class ObjectiveWidgetFactory {
             this.session = session;
             setTouchable(Touchable.disabled);
             // TODO-ASSET: image_ui_hud_deadline_line, replace with real red-line atlas region
-            this.redLine = textures.region("IMAGE_UI_HUD_DEADLINE_LINE");
+            this.redLine = textures.region("IMAGE_PLANT_REDSTINGER_REDSTINGER_71X460");
         }
 
         @Override

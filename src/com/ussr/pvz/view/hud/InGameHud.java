@@ -20,6 +20,8 @@ public class InGameHud extends Table implements Disposable {
     private final WaveProgressBar waveProgressBar;
     private final PauseMenuAssets pauseMenuAssets;
     private final ConveyorBeltWidget conveyorBeltWidget;
+    private final NukeMinionWidget nukeMinionWidget;
+    private final ResetTerrainWidget resetTerrainWidget;
 
     public InGameHud(Skin skin, TextureBank textures, GameplayController controller) {
         setFillParent(true);
@@ -42,6 +44,9 @@ public class InGameHud extends Table implements Disposable {
         plantFoodWidget = new PlantFoodWidget(skin, textures, controller);
 
         waveProgressBar = new WaveProgressBar(skin, textures);
+
+        nukeMinionWidget   = new NukeMinionWidget(skin, textures);
+        resetTerrainWidget = new ResetTerrainWidget(skin, textures);
 
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
@@ -83,9 +88,11 @@ public class InGameHud extends Table implements Disposable {
                 .padTop(65f)
                 .padLeft(12f);
 
-        // Bottom Row: [plant food] ... [shovel]
-        // Plant food sits to the left of the shovel so both are thumb-reachable.
+        // Bottom Row: [nuke | reset terrain] ... [plant food] [shovel]
+        // Cheat buttons sit at the far left; action buttons stay right.
         Table bottomRow = new Table();
+        bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
+        bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
         bottomRow.add().expandX();
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
