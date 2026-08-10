@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.AudioSettings;
@@ -32,8 +31,9 @@ import com.ussr.pvz.view.mainmenu.gamemenu.GraphicalLevelSelectionMenu;
 import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.view.mainmenu.profile.ProfileMenu;
@@ -112,7 +112,7 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void create() {
-        Viewport viewport = new FitViewport(1280f, 720f);
+        Viewport viewport = new ScreenViewport();
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
@@ -225,6 +225,32 @@ public class AppView implements ApplicationListener {
     public void resize(int width, int height) {
         if (stage != null) {
             stage.getViewport().update(width, height, true);
+        }
+        upgradeToNativeFullscreenIfMaximized(width, height);
+    }
+
+    /**
+     * Clicking a window's native "fullscreen"/maximize icon behaves differently per OS: on
+     * Windows/Linux it usually triggers a clean resize, but on macOS the native Space-based
+     * fullscreen transition can leave GLFW compositing a stretched/blurred frame instead of a
+     * true resize. Rather than relying on the OS to do this cleanly, we detect that the window
+     * has grown to (essentially) fill the display and force a real native-resolution fullscreen
+     * switch ourselves, which works the same way on every platform.
+     */
+    private void upgradeToNativeFullscreenIfMaximized(int width, int height) {
+        if (Gdx.graphics.isFullscreen()) {
+            return;
+        }
+
+        Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode();
+
+        // Allow a little slack: taskbars/menu bars/window decorations mean a "maximized"
+        // window is rarely pixel-identical to the full display resolution.
+        boolean fillsWidth = width >= displayMode.width - 8;
+        boolean fillsHeight = height >= displayMode.height - 48;
+
+        if (fillsWidth && fillsHeight) {
+            Gdx.graphics.setFullscreenMode(displayMode);
         }
     }
 
@@ -396,9 +422,9 @@ public class AppView implements ApplicationListener {
             GameplayMusicResolver.Selection selection = chapter == null
                     ? null
                     : GameplayMusicResolver.resolve(
-                            chapter.getId(),
-                            GameplayMusicCue.CHOOSE
-                    );
+                    chapter.getId(),
+                    GameplayMusicCue.CHOOSE
+            );
 
             if (selection != null && selection.hasLoop()) {
                 audioManager.playMusicSequence(
