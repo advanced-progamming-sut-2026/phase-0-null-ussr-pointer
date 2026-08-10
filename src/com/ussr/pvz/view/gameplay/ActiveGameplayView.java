@@ -86,6 +86,13 @@ public class ActiveGameplayView extends Table implements Disposable {
         // consume their own clicks first.
         layers.add(inGameHud);
         layers.add(hoverCursor);
+        layers.add(new LevelIntroOverlay(
+                skin,
+                textures,
+                pamPlayer,
+                controller,
+                App.getGameSession()
+        ));
 
         add(layers).grow();
     }

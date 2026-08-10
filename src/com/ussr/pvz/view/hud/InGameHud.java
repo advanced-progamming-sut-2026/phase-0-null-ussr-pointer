@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import pvz.libpvz.textures.TextureBank;
@@ -58,9 +59,15 @@ public class InGameHud extends Table implements Disposable {
                 ObjectiveWidgetFactory.create(skin, textures);
 
         // Pause Menu Trigger
-        ImageButton pauseButton = new ImageButton(
-                pauseMenuAssets.sliderBoltDrawable()
-        );
+        ImageButton.ImageButtonStyle pauseStyle =
+                new ImageButton.ImageButtonStyle();
+        pauseStyle.imageUp = new TextureRegionDrawable(textures.region(
+                "IMAGE_UI_HUD_INGAME_PAUSE_BUTTON"
+        ));
+        pauseStyle.imageDown = new TextureRegionDrawable(textures.region(
+                "IMAGE_UI_HUD_INGAME_PAUSE_BUTTON_DOWN"
+        ));
+        ImageButton pauseButton = new ImageButton(pauseStyle);
         pauseButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -74,7 +81,7 @@ public class InGameHud extends Table implements Disposable {
         topRow.add(objectives.topBarWidget()).center().expandX();
         topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
         topRow.add(debugTools).right().padRight(15f);
-        topRow.add(pauseButton).right().top().pad(15f);
+        topRow.add(pauseButton).size(72f).right().top().pad(15f);
 
         //conveyor table
         Table conveyorLayer = new Table();
@@ -110,7 +117,7 @@ public class InGameHud extends Table implements Disposable {
         // High priority overlays
         PauseMenuOverlay pauseOverlay =
                 new PauseMenuOverlay(skin, pauseMenuAssets, controller);
-        GameOverOverlay gameOverOverlay = new GameOverOverlay(skin);
+        GameOverOverlay gameOverOverlay = new GameOverOverlay(skin, textures);
 
         // Root stack
         Stack rootStack = new Stack();

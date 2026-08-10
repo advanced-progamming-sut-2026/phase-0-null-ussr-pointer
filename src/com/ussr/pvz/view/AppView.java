@@ -33,6 +33,8 @@ import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
@@ -66,6 +68,7 @@ public class AppView implements ApplicationListener {
     private Table screenRoot;
     private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
+    private boolean displayedActiveGameplay;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
     private static final long LOADING_FADE_IN_TIME_MS = 180L;
@@ -116,6 +119,7 @@ public class AppView implements ApplicationListener {
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
+        configureFontRendering();
         audioManager = new GdxAudioManager(new AudioSettings());
         installMissingSkinStyles();
 
@@ -135,6 +139,25 @@ public class AppView implements ApplicationListener {
         showMenu(App.getMenuState());
 
         Gdx.input.setInputProcessor(stage);
+    }
+
+    /**
+     * PvzSkin uses bitmap fonts. The stage is designed at 1280x720 and is
+     * enlarged on higher-resolution displays, so nearest filtering exposes
+     * the individual font texels. Linear filtering keeps scaled glyph edges
+     * smooth, while non-integer placement avoids fullscreen rounding jitter.
+     */
+    private void configureFontRendering() {
+        for (BitmapFont font
+                : skin.getAll(BitmapFont.class).values()) {
+            font.setUseIntegerPositions(false);
+            font.getRegions().forEach(region ->
+                    region.getTexture().setFilter(
+                            Texture.TextureFilter.Linear,
+                            Texture.TextureFilter.Linear
+                    )
+            );
+        }
     }
 
     private void installMissingSkinStyles() {
@@ -241,8 +264,15 @@ public class AppView implements ApplicationListener {
         Gdx.gl.glClearColor(0.08f, 0.1f, 0.08f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        boolean gameplayModeChanged =
+                App.getMenuState() == MenuState.GAME
+                        && displayedMenu == MenuState.GAME
+                        && displayedActiveGameplay
+                        != (App.getGameSession() != null);
+
         if (!transitioning
-                && App.getMenuState() != displayedMenu) {
+                && (App.getMenuState() != displayedMenu
+                || gameplayModeChanged)) {
             transitionTo(App.getMenuState());
         }
         refreshGlobalHudCurrencies();
@@ -384,6 +414,8 @@ public class AppView implements ApplicationListener {
 
         configureGlobalHud(state);
         updateMenuMusic(state);
+        displayedActiveGameplay = state == MenuState.GAME
+                && App.getGameSession() != null;
     }
 
     private void updateMenuMusic(MenuState state) {

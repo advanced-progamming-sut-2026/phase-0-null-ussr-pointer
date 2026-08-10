@@ -320,7 +320,7 @@ public final class PauseMenuOverlay extends WidgetGroup {
 
         boolean shouldOpen =
                 App.getGameSession() != null
-                        && controller.isPaused();
+                        && controller.isPauseMenuOpen();
 
         if (!stateInitialized) {
             stateInitialized = true;

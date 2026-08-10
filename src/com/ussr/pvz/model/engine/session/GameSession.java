@@ -54,6 +54,7 @@ public class GameSession {
     private Lawn lawn;
     private boolean gameOver = false;
     private GameOutcome outcome = GameOutcome.IN_PROGRESS;
+    private boolean levelIntroShown;
     private List<String> selectedPlants = new ArrayList<>();
     private final List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
@@ -374,6 +375,14 @@ public class GameSession {
 
     public boolean isVictory() {
         return outcome == GameOutcome.VICTORY;
+    }
+
+    public boolean isLevelIntroShown() {
+        return levelIntroShown;
+    }
+
+    public void markLevelIntroShown() {
+        levelIntroShown = true;
     }
 
     public void concludeVictory() {
