@@ -3,10 +3,14 @@ package com.ussr.pvz.model.account;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
+import com.ussr.pvz.model.level.Chapter;
+import com.ussr.pvz.model.level.GameMode;
+import com.ussr.pvz.model.level.Level;
 
 import java.util.*;
 
 public class AdventureProgress {
+    public static final int MAX_PLANT_LEVEL = 4;
     private int coin;
     private int gem;
     private int currentChapter;
@@ -43,7 +47,11 @@ public class AdventureProgress {
         if (rawPlantLvls != null) {
             for (Map.Entry<String, Integer> entry : rawPlantLvls.entrySet()) {
                 if (entry.getKey() != null) {
-                    this.plantLvls.put(normalizeKey(entry.getKey()), entry.getValue());
+                    int savedLevel = entry.getValue() == null ? 0 : entry.getValue();
+                    this.plantLvls.put(
+                            normalizeKey(entry.getKey()),
+                            Math.max(0, Math.min(savedLevel, MAX_PLANT_LEVEL))
+                    );
                 }
             }
         }
@@ -89,7 +97,8 @@ public class AdventureProgress {
     public void upgradePlant(String plantName) {
         String key = normalizeKey(plantName);
         if (plantLvls.containsKey(key)) {
-            plantLvls.put(key, plantLvls.get(key) + 1);
+            int currentLevel = plantLvls.getOrDefault(key, 0);
+            plantLvls.put(key, Math.min(currentLevel + 1, MAX_PLANT_LEVEL));
             populateAccountPlants();
         }
     }
@@ -107,6 +116,44 @@ public class AdventureProgress {
 
     public boolean isLevelCompleted(String levelId) {
         return levelId != null && this.completedLevels.contains(levelId);
+    }
+
+    /**
+     * Adventure chapters form one ordered road. The first chapter is open;
+     * every later chapter requires every level in the previous chapter.
+     */
+    public boolean isChapterUnlocked(Chapter chapter, List<Chapter> allChapters) {
+        if (chapter == null) return false;
+        if (chapter.getGameMode() != GameMode.ADVENTURE) return true;
+        if (allChapters == null) return false;
+
+        List<Chapter> adventureChapters = allChapters.stream()
+                .filter(candidate -> candidate.getGameMode() == GameMode.ADVENTURE)
+                .toList();
+        int chapterIndex = adventureChapters.indexOf(chapter);
+        if (chapterIndex < 0) return false;
+        if (chapterIndex == 0) return true;
+
+        Chapter previousChapter = adventureChapters.get(chapterIndex - 1);
+        return !previousChapter.getLevels().isEmpty()
+                && previousChapter.getLevels().stream()
+                .allMatch(level -> isLevelCompleted(level.getId()));
+    }
+
+    /** The first level is open with its chapter; later levels require the previous level. */
+    public boolean isLevelUnlocked(Chapter chapter, Level level, List<Chapter> allChapters) {
+        if (chapter == null || level == null || !isChapterUnlocked(chapter, allChapters)) {
+            return false;
+        }
+        if (isLevelCompleted(level.getId())) return true;
+
+        List<Level> orderedLevels = chapter.getLevels().stream()
+                .sorted(Comparator.comparingInt(Level::getOrder))
+                .toList();
+        int levelIndex = orderedLevels.indexOf(level);
+        if (levelIndex < 0) return false;
+        return levelIndex == 0
+                || isLevelCompleted(orderedLevels.get(levelIndex - 1).getId());
     }
     // ------------------------------------------
 

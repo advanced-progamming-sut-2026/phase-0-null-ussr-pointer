@@ -99,14 +99,24 @@ public class GameSession {
     private void applyReward(){
         if (this.progressTracked) {
             Account account = App.getAccount();
+            boolean firstClear = account != null
+                    && level != null
+                    && level.getId() != null
+                    && !account.getAdventureProgress().isLevelCompleted(level.getId());
+
             App.getLevelManager().completeCurrentLevel();
-            if (account != null) {
+            if (firstClear) {
+                account.getAdventureProgress().addCompletedLevel(level.getId());
                 account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
 
                 for (String plantAlias : level.getRewardPlantAliases()) {
                     account.getAdventureProgress().upgradePlant(plantAlias);
+                }
+
+                if (!level.getRewardPlantAliases().isEmpty()) {
                     NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
                 }
+                NewsObserver.triggerNewLevel(level);
             }
 
             try {
@@ -114,7 +124,7 @@ public class GameSession {
             } catch (IllegalStateException e) {
                 System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
             }
-            if (App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
+            if (firstClear && App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
                 NewsObserver.triggerNewMiniGame(this.level);
             }
 

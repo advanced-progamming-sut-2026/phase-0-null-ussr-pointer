@@ -8,4 +8,12 @@ public interface HitEffectStrategy {
     // todo: handle area length in all classes right now it is useless
     void apply(ArrayList<GameEntity> entities , Projectile projectile);
     int getAreaLength();
+
+    default boolean canHit(GameEntity target) {
+        return true;
+    }
+
+    default boolean continuesAfterHit() {
+        return false;
+    }
 }

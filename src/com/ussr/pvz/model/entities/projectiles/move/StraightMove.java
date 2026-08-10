@@ -67,4 +67,14 @@ public class StraightMove implements MoveStrategy {
     public void setSpeedMagnitude(double speedMagnitude) {
         this.speedMagnitude = speedMagnitude;
     }
+
+    @Override
+    public void onTargetHit(
+            Projectile projectile,
+            Damageable hitTarget
+    ) {
+        if (target == hitTarget) {
+            target = null;
+        }
+    }
 }

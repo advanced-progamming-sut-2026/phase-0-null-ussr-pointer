@@ -13,4 +13,11 @@ public interface MoveStrategy {
             Projectile projectile,
             Damageable target
     );
+
+    /** Stops tracking a target once this projectile has already hit it. */
+    default void onTargetHit(
+            Projectile projectile,
+            Damageable hitTarget
+    ) {
+    }
 }

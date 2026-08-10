@@ -16,6 +16,12 @@ public class ProjectilePamActor extends PamActor {
         this.hitPamPath = hitPamPath;
         this.pamScale = 0.4f;
         this.offsetY = 0f;
+
+        // EntityRenderLayer supplies the projectile's exact visual centre.
+        // PamActor normally adds half of its 80x80 layout size while drawing,
+        // which made both flying and impact animations appear 40 px away from
+        // the model collision point.
+        setSize(0f, 0f);
     }
 
     /** Call this when the projectile has hit something */

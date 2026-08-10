@@ -46,7 +46,7 @@ public class PierceHit implements HitEffectStrategy {
                 if (hitZombies.size() < pierceNumber) {
                     zombie.takeDamage(damageAmount, projectile);
                     hitZombies.add(zombie);
-                    System.out.println("hittidam");
+                    projectile.notifyTargetHit(zombie);
                 }
                 return hitZombies.size() >= pierceNumber;
             }
@@ -64,5 +64,15 @@ public class PierceHit implements HitEffectStrategy {
     @Override
     public int getAreaLength() {
         return 1;
+    }
+
+    @Override
+    public boolean canHit(GameEntity target) {
+        return !(target instanceof Zombie zombie) || !hitZombies.contains(zombie);
+    }
+
+    @Override
+    public boolean continuesAfterHit() {
+        return true;
     }
 }
