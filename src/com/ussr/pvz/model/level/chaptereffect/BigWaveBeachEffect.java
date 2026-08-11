@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
@@ -28,6 +29,11 @@ public class BigWaveBeachEffect implements ChapterEffect {
 
         Level.TideEvent nextEvent = schedule.get(nextIndex);
         if (session.getElapsedSeconds() >= nextEvent.triggerTimeSeconds()) {
+            session.getEventBus().publish(
+                    new GameEvent.SpecialLevelAnnouncement(
+                            "THE TIDE IS CHANGING!"
+                    )
+            );
             applyTide(session, level, nextEvent.targetColumn());
             level.setNextTideIndex(nextIndex + 1);
         }

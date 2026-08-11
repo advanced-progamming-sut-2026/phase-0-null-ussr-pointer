@@ -18,12 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Projectile extends GameEntity {
+    private static final float VISUAL_LAUNCH_BLEND_SECONDS = 0.25f;
+
     private int damage;
     private Damageable target;
     private boolean isStunning;
     private final Plant user;
     private Vec2 previousPosition;
     private double visualHeight;
+    private Vec2 visualLaunchOrigin = Vec2.of(0.5, 0.0);
+    private float visualAge;
 
     private MoveStrategy moveStrategy;
     private HitEffectStrategy hitEffectStrategy;
@@ -43,6 +47,9 @@ public class Projectile extends GameEntity {
         this.hitEffectStrategy = hitEffectStrategy;
         this.isStunning = false;
         this.user = user;
+        if (user != null) {
+            this.visualLaunchOrigin = user.getProjectileOrigin(0);
+        }
         if (moveStrategy != null) {
             switch (moveStrategy) {
                 case ArcMove arcMove -> arcMove.setGroundY(position.y());
@@ -67,9 +74,28 @@ public class Projectile extends GameEntity {
         this.visualHeight = Math.max(0.0, visualHeight);
     }
 
+    public Vec2 getVisualLaunchOrigin() {
+        return visualLaunchOrigin;
+    }
+
+    public void setVisualLaunchOrigin(Vec2 visualLaunchOrigin) {
+        if (visualLaunchOrigin != null) {
+            this.visualLaunchOrigin = visualLaunchOrigin;
+        }
+    }
+
+    public float getVisualLaunchBlend() {
+        return Math.max(
+                0f,
+                1f - visualAge / VISUAL_LAUNCH_BLEND_SECONDS
+        );
+    }
+
     @Override
     public void update(float delta) {
         if (!isAlive) return;
+
+        visualAge += delta;
 
         previousPosition = getPosition();
 

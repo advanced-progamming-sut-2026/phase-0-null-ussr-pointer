@@ -32,6 +32,7 @@ public class MeleeStrategy implements ActStrategy {
         }
         if (actedOnZombies || !structureTargets.isEmpty()) {
             user.setInternalTimer(0.0);
+            user.triggerActionAnimation(0.25f);
         }
     }
 

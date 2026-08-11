@@ -36,21 +36,24 @@ public class ShootStrategy implements ActStrategy {
 
         HitEffectStrategy hitEffect = buildHitEffect(user);
 
-        for (Vec2 direction : vectors) {
+        for (int index = 0; index < vectors.size(); index++) {
+            Vec2 direction = vectors.get(index);
             GameEntity target = findTargetAlongVector(user, direction, session);
 
             // Kept at 6.0 to prevent the bullet from tunneling over the target!
             Vec2 velocity = direction.normalize().scale(6.0);
             MoveStrategy moveStrategy = buildMoveStrategy(user);
 
-            session.addProjectile(new Projectile(
+            Projectile projectile = new Projectile(
                     (Damageable) target, // Cast the GameEntity to Damageable
                     user.getPosition(),
                     velocity,
                     user.getDamage(),
                     moveStrategy,
                     hitEffect,user
-            ));
+            );
+            projectile.setVisualLaunchOrigin(user.getProjectileOrigin(index));
+            session.addProjectile(projectile);
         }
         user.triggerActionAnimation(0.5f);
         double autoFoodChance = user.getSpecialUpgradeValue(

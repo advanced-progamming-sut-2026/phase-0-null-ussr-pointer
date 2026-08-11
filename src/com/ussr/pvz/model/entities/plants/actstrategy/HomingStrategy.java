@@ -29,8 +29,11 @@ public class HomingStrategy implements ActStrategy {
         }
         if (target == null) return;
 
-        session.addProjectile(buildProjectile(user, target, isMagic));
+        Projectile projectile = buildProjectile(user, target, isMagic);
+        projectile.setVisualLaunchOrigin(user.getProjectileOrigin(0));
+        session.addProjectile(projectile);
         user.setInternalTimer(0.0);
+        user.triggerActionAnimation(0.5f);
     }
 
     private Projectile buildProjectile(Plant user, Zombie target, boolean isMagic) {

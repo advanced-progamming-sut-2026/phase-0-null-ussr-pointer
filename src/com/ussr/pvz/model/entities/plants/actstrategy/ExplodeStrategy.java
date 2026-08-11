@@ -1,6 +1,7 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
@@ -192,10 +193,13 @@ public class ExplodeStrategy implements ActStrategy {
     private void handleGraveDestroy(Plant user , GameSession session) {
         Vec2 userPos = user.getPosition();
 
-        InteractableStructure structure = session.getLawn().getCell((int) userPos.y() ,
-                (int) userPos.x()).getInteractableStructure();
+        Cell cell = session.getLawn().getCell((int) userPos.y(),
+                (int) userPos.x());
+        InteractableStructure structure = cell.getInteractableStructure();
         if(structure != null) {
             structure.setAlive(false);
+            structure.onDestroy(session);
+            cell.setStructure(null);
             session.getEventBus().publish(new GameEvent.StructureDestroyed(structure.toString() ,
                     (int) structure.getPosition().y() , (int) structure.getPosition().x()));
         }
@@ -229,5 +233,12 @@ public class ExplodeStrategy implements ActStrategy {
             }
         }
         user.setAlive(false);
+
+        Vec2 userPos = user.getPosition();
+        Cell cell = session.getLawn().getCell((int) userPos.y(),
+                (int) userPos.x());
+        if (cell != null && cell.getPlant() == user) {
+            cell.setPlant(null);
+        }
     }
 }

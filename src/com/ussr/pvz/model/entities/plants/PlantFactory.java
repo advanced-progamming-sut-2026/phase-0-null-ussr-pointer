@@ -6,6 +6,7 @@ import com.ussr.pvz.model.entities.plants.factory.PlantFoodEffectRegistry;
 import com.ussr.pvz.model.entities.plants.factory.ShootingVectorRegistry;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,7 @@ public class PlantFactory {
         List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
         plant.setWrampUp(wrampUp);
         plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
+        plant.setProjectileOrigins(parseProjectileOrigins(data));
         plant.setActStrategy(ActStrategyRegistry.create(data));
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
         if (plant.getName().equalsIgnoreCase("puff-shroom")
@@ -113,6 +115,27 @@ public class PlantFactory {
                     + plant.getSpecialUpgradeValue(SpecialUpgrade.LIFESPAN_EXT));
         }
         return plant;
+    }
+
+    private static List<Vec2> parseProjectileOrigins(Map<String, Object> data) {
+        Object rawOrigins = data.get("projectileOrigins");
+        if (!(rawOrigins instanceof List<?> originList)) {
+            return List.of();
+        }
+
+        List<Vec2> origins = new java.util.ArrayList<>();
+        for (Object rawOrigin : originList) {
+            if (!(rawOrigin instanceof Map<?, ?> originMap)) {
+                continue;
+            }
+
+            Object rawX = originMap.get("x");
+            Object rawY = originMap.get("y");
+            if (rawX instanceof Number x && rawY instanceof Number y) {
+                origins.add(Vec2.of(x.doubleValue(), y.doubleValue()));
+            }
+        }
+        return origins;
     }
 
     private static Result getResult(int level, Map<String, Object> data, Plant plant) {

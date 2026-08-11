@@ -2,7 +2,7 @@ package com.ussr.pvz.model.entities.plants;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.Damageable;
-import com.ussr.pvz.model.engine.GameClock;
+import com.ussr.pvz.model.entities.plants.animation.PlantAnimationController;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
@@ -48,14 +48,15 @@ public class Plant extends GameEntity implements Damageable {
     private double abilityValue;
     private int chillLevel = 0;
     private GrowthTracker growthTracker;
+    private List<Vec2> projectileOrigins = new ArrayList<>();
     private String pamPath;
     private String projectilePam;
     private String hitPam;
     private String plantFoodProjectilePam;
     private String plantFoodHitPam;
     // Animation State Manager Variables
-    private String currentClip = "idle";
-    private float animationTimer = 0f;
+    private final PlantAnimationController animationController =
+            new PlantAnimationController();
     private double plantFoodTimer = 0.0;
 
     private PlantArmor armor;
@@ -133,6 +134,7 @@ public class Plant extends GameEntity implements Damageable {
         this.setWrampUp(blueprint.getWrampUp());
         this.plantFoodType = blueprint.plantFoodType;
         this.shootingVectors = new ArrayList<>(blueprint.shootingVectors);
+        this.projectileOrigins = new ArrayList<>(blueprint.projectileOrigins);
 
         this.hp = blueprint.hp;
         this.cost = blueprint.cost;
@@ -168,19 +170,12 @@ public class Plant extends GameEntity implements Damageable {
         if (!isAlive && state != PlantState.DYING) {
             return; // Allow DYING state to process for explosive animations
         }
+        animationController.update(delta);
+
         if (state == PlantState.INCAPACITATED) {
-            currentClip = "idle";
+            animationController.playIncapacitated();
             return;
         }
-
-        // --- NEW: Tick the animation timer ---
-        if (animationTimer > 0) {
-            animationTimer -= delta;
-            if (animationTimer <= 0) {
-                currentClip = "idle";
-            }
-        }
-        // -------------------------------------
 
         lifetime -= delta;
         if (lifetime < 0) {
@@ -541,6 +536,25 @@ public class Plant extends GameEntity implements Damageable {
         shootingVectors.add(vec2);
     }
 
+    public List<Vec2> getProjectileOrigins() {
+        return projectileOrigins;
+    }
+
+    public void setProjectileOrigins(List<Vec2> projectileOrigins) {
+        this.projectileOrigins = projectileOrigins != null
+                ? new ArrayList<>(projectileOrigins)
+                : new ArrayList<>();
+    }
+
+    public Vec2 getProjectileOrigin(int index) {
+        if (projectileOrigins.isEmpty()) {
+            return Vec2.of(0.5, 0.0);
+        }
+
+        int safeIndex = Math.max(0, Math.min(index, projectileOrigins.size() - 1));
+        return projectileOrigins.get(safeIndex);
+    }
+
     public void setState(PlantState state) {
         this.state = state;
     }
@@ -591,18 +605,17 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
-    /**
-     * Call this from your ActStrategy (e.g., when Peashooter shoots or Sunflower drops sun).
-     * It will play the "attack" clip for the specified duration before returning to "idle".
-     */
     public void triggerActionAnimation(float duration) {
-        if (this.getType().equals(PlantType.SUN_PRODUCER)) {
-            this.currentClip = "special";
-        } else
-            this.currentClip = "attack";
-        this.animationTimer = duration;
+        animationController.playAttack(name, getCurrentStage(), duration);
     }
 
+    public void triggerProduceAnimation(float duration) {
+        animationController.playProduce(name, duration);
+    }
+
+    public PlantAnimationController getAnimationController() {
+        return animationController;
+    }
     /**
      * Evaluates the plant's current situation and returns the correct PAM clip.
      */
@@ -638,7 +651,7 @@ public class Plant extends GameEntity implements Damageable {
         }
 
         // 5. Default Action or Idle State
-        return currentClip;
+        return animationController.getCurrentClip();
     }
 
     public void setLifetime(double lifetime) {

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
+import com.ussr.pvz.model.App;
 import pvz.libpvz.textures.TextureBank;
 
 /**
@@ -40,7 +41,11 @@ public class InGameHud extends Table implements Disposable {
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
 
-        GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
+        GameEventAnnouncer eventAnnouncer =
+                new GameEventAnnouncer(
+                        skin,
+                        App.getGameSession()
+                );
         DebugToolsWidget   debugTools     = new DebugToolsWidget(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);

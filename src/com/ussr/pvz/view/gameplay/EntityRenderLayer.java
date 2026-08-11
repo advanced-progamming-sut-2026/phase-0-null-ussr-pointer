@@ -21,6 +21,7 @@ import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 import com.ussr.pvz.model.entities.zombies.projectiles.*;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
+import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.animation.PlantPamActor;
 import com.ussr.pvz.view.animation.ProjectilePamActor;
@@ -419,9 +420,9 @@ public class EntityRenderLayer extends Group {
                 String hitPam = user != null ? user.getHitPam() : null;
                 ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
 
-                float startX = LawnGridLayout.worldX(p.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                float startY = LawnGridLayout.worldY(p.getPosition().y())
-                        + (float) p.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                float[] start = plantProjectileScreenPosition(p);
+                float startX = start[0];
+                float startY = start[1];
                 pa.setPosition(startX, startY);
                 plantProjectileRenderTargets.put(p, new float[]{startX, startY});
 
@@ -444,9 +445,9 @@ public class EntityRenderLayer extends Group {
                 actor.triggerHit(hx, hy);
                 plantProjectileRenderTargets.remove(proj);
             } else if (proj.isAlive()) {
-                float targetX = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                float targetY = LawnGridLayout.worldY(proj.getPosition().y())
-                        + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                float[] target = plantProjectileScreenPosition(proj);
+                float targetX = target[0];
+                float targetY = target[1];
 
                 float[] lastTarget = plantProjectileRenderTargets.get(proj);
                 if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != targetY) {
@@ -478,6 +479,20 @@ public class EntityRenderLayer extends Group {
                 }
             }
         }
+    }
+
+    private float[] plantProjectileScreenPosition(Projectile projectile) {
+        Vec2 origin = projectile.getVisualLaunchOrigin();
+        float blend = projectile.getVisualLaunchBlend();
+
+        float x = LawnGridLayout.worldX(projectile.getPosition().x())
+                + LawnGridLayout.CELL_WIDTH / 2f
+                + ((float) origin.x() - 0.5f) * LawnGridLayout.CELL_WIDTH * blend;
+        float y = LawnGridLayout.worldY(projectile.getPosition().y())
+                + (float) projectile.getVisualHeight() * LawnGridLayout.CELL_HEIGHT
+                + (float) origin.y() * LawnGridLayout.CELL_HEIGHT * blend;
+
+        return new float[]{x, y};
     }
 
     // ---- Zombie projectiles -------------------------------------------------
