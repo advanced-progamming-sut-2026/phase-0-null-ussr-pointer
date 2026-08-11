@@ -14,8 +14,8 @@ public class ProjectilePamActor extends PamActor {
     public ProjectilePamActor(PamPlayer player, String projectilePamPath, String hitPamPath) {
         super(player, projectilePamPath != null ? projectilePamPath : "", "idle");
         this.hitPamPath = hitPamPath;
-        this.pamScale = 0.4f;
-        this.offsetY = 0f;
+        this.pamScale = 1f;
+        this.offsetY = 40f;
     }
 
     /** Call this when the projectile has hit something */

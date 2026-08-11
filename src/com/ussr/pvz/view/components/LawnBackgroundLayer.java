@@ -15,23 +15,21 @@ public class LawnBackgroundLayer extends Actor {
     private final TextureRegion rightRegion;
 
     private final OrthographicCamera camera = new OrthographicCamera();
-    private final Float fixedLeftWidth; // non-null => gameplay mode
     private boolean showRight = false;
 
-    private LawnBackgroundLayer(TextureBank textures, String mainRegionKey, Float fixedLeftWidth) {
+    private LawnBackgroundLayer(TextureBank textures, String mainRegionKey) {
         setTouchable(Touchable.disabled);
-        this.fixedLeftWidth = fixedLeftWidth;
         this.mainRegion = resolveRegion(textures, mainRegionKey);
         this.leftRegion = resolveSideRegion(textures, mainRegionKey, "_LEFT");
         this.rightRegion = resolveSideRegion(textures, mainRegionKey, "_RIGHT");
     }
 
-    public static LawnBackgroundLayer forGameplay(TextureBank textures, String mainRegionKey, float leftPanelWidth) {
-        return new LawnBackgroundLayer(textures, mainRegionKey, leftPanelWidth);
+    public static LawnBackgroundLayer forGameplay(TextureBank textures, String mainRegionKey, float unusedPanelWidth) {
+        return new LawnBackgroundLayer(textures, mainRegionKey);
     }
 
     public static LawnBackgroundLayer forMenuPreview(TextureBank textures, String mainRegionKey) {
-        return new LawnBackgroundLayer(textures, mainRegionKey, null);
+        return new LawnBackgroundLayer(textures, mainRegionKey);
     }
 
     public void setShowRight(boolean showRight) {
@@ -80,38 +78,9 @@ public class LawnBackgroundLayer extends Actor {
         }
 
         batch.end();
-        if (fixedLeftWidth != null) {
-            drawFixedAligned(batch, destWidth, destHeight);
-        } else {
-            drawZoomToFit(batch, destWidth, destHeight);
-        }
+        drawZoomToFit(batch, destWidth, destHeight);
         batch.setProjectionMatrix(getStage().getCamera().combined);
         batch.begin();
-    }
-
-    private void drawFixedAligned(Batch batch, float destWidth, float destHeight) {
-        Vector2 stagePos = localToStageCoordinates(new Vector2(0, 0));
-
-        camera.setToOrtho(false, destWidth, destHeight);
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-
-        float leftWidth = Math.min(fixedLeftWidth, destWidth);
-        float mainWidth = destWidth - leftWidth;
-
-        // Render LEFT panel from stagePos.x covering full destination height
-        if (leftRegion != null && leftWidth > 0f) {
-            batch.draw(leftRegion, stagePos.x, stagePos.y, leftWidth, destHeight);
-        } else if (leftWidth > 0f && mainRegion != null) {
-            batch.draw(mainRegion, stagePos.x, stagePos.y, leftWidth, destHeight);
-        }
-
-        // Render MAIN panel filling the remaining width and covering full destination height
-        if (mainWidth > 0f) {
-            batch.draw(mainRegion, stagePos.x + leftWidth, stagePos.y, mainWidth, destHeight);
-        }
-        batch.end();
     }
 
     private void drawZoomToFit(Batch batch, float destWidth, float destHeight) {
