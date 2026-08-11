@@ -1,12 +1,11 @@
 package com.ussr.pvz.view.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
@@ -21,15 +20,16 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class SeedBankHud extends Table {
-    private static final int SLOT_W = 64;
-    private static final int SLOT_H = 82;
+    // Increased width and decreased height for seed packets
+    private static final int SLOT_W = 100;
+    private static final int SLOT_H = 95;
 
     private final Skin skin;
     private final TextureBank textures;
 
     private final Label sunLabel;
     private final Label plantFoodLabel;
-    private final Table seedRow;
+    private final Table seedColumn;
 
     private final Map<String, SeedPacketWidget> packets = new LinkedHashMap<>();
     private String selectedKey = null;
@@ -50,22 +50,20 @@ public class SeedBankHud extends Table {
                 "IMAGE_UI_ALMANAC_STAT_ICON_SUNCOST_LAYER_1"
         );
 
-        // NOTE: no plant-food icon exists yet in the asset pack as far as I
-        // could tell — this key is a placeholder. Swap it for the real one;
-        // buildCounter() degrades gracefully (icon just omitted) if missing.
         Table plantFoodCounter = buildCounter(
                 plantFoodLabel,
                 "IMAGE_UI_HUD_INGAME_PLANTFOOD_ICON"
         );
 
-        seedRow = new Table();
-        seedRow.left();
+        seedColumn = new Table();
+        seedColumn.top().left();
 
-        add(sunCounter).height(48f).pad(6f);
-        add(plantFoodCounter).height(48f).pad(6f);
-        add(seedRow).height(SLOT_H).padLeft(10f).left();
+        // Stack counters and seed packets vertically on the left side
+        add(sunCounter).width(100f).height(38f).padBottom(4f).left().row();
+        add(plantFoodCounter).width(100f).height(38f).padBottom(6f).left().row();
+        add(seedColumn).top().left().row();
 
-        setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.childrenOnly);
+        setTouchable(Touchable.childrenOnly);
     }
 
     public void setOnPlantSelected(Consumer<String> callback) {
@@ -83,9 +81,9 @@ public class SeedBankHud extends Table {
 
         TextureRegion iconRegion = textures.region(iconKey);
         if (iconRegion != null) {
-            counter.add(new Image(iconRegion)).size(28f).padLeft(8f).padRight(5f);
+            counter.add(new Image(iconRegion)).size(24f).padLeft(6f).padRight(4f);
         }
-        counter.add(valueLabel).minWidth(50f).padRight(10f);
+        counter.add(valueLabel).minWidth(40f).padRight(6f);
         return counter;
     }
 
@@ -131,7 +129,7 @@ public class SeedBankHud extends Table {
     }
 
     private void rebuildSeedRow(GameSession session) {
-        seedRow.clearChildren();
+        seedColumn.clearChildren();
         packets.clear();
         selectedKey = null;
 
@@ -152,7 +150,7 @@ public class SeedBankHud extends Table {
                     () -> selectPlant(key)
             );
             packets.put(key, widget);
-            seedRow.add(widget).size(SLOT_W, SLOT_H).pad(2f);
+            seedColumn.add(widget).size(SLOT_W, SLOT_H).padBottom(3f).left().row();
         }
     }
 

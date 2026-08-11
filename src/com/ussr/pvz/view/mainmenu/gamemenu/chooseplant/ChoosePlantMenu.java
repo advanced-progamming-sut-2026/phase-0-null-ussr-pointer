@@ -5,16 +5,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.service.CollectionService.PlantData;
 import com.ussr.pvz.view.FadingMenu;
+import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.components.PlantCard;
 import pvz.libpvz.textures.TextureBank;
 
@@ -32,13 +35,11 @@ public class ChoosePlantMenu extends FadingMenu {
     private final TextureBank textures;
     private final ChoosePlantService service;
 
-    // UI regions we reuse
-    private Table selectedSlotsRow;   // top bar — 8 selected slots
-    private Table plantGrid;          // scrollable grid
-    private Label slotCountLbl;       // "3 / 8"
-    private Table detailPanel;        // right-side detail panel
+    private Table selectedSlotsRow;
+    private Table plantGrid;
+    private Label slotCountLbl;
+    private Table detailPanel;
 
-    // Currently focused card for detail panel
     private PlantData focusedPlant = null;
 
     public ChoosePlantMenu(Skin skin) {
@@ -52,9 +53,13 @@ public class ChoosePlantMenu extends FadingMenu {
 
     private void buildUI() {
         setFillParent(true);
-        applyBackground();
 
-        // Root: [left: grid+slots] [right: detail panel]
+        Stack layers = new Stack();
+        layers.setFillParent(true);
+
+        layers.add(createBackground());
+        layers.add(createDimLayer());
+
         Table root = new Table();
         root.setFillParent(true);
         root.pad(12);
@@ -62,15 +67,27 @@ public class ChoosePlantMenu extends FadingMenu {
         root.add(buildLeftPanel()).expand().fill();
         root.add(buildDetailPanel()).width(210).fillY().padLeft(10);
 
-        addActor(root);
+        layers.add(root);
+        addActor(layers);
     }
 
-    private void applyBackground() {
-        TextureRegion bg = textures.region("image_ui_dialog_asset_dialogborder");
-        if (bg != null) setBackground(new TextureRegionDrawable(bg));
+    private LawnBackgroundLayer createBackground() {
+        Chapter currentChapter = App.getLevelManager().getCurrentChapter();
+        String regionKey = currentChapter != null && currentChapter.getLawnRegion() != null
+                ? currentChapter.getLawnRegion()
+                : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
+
+        return LawnBackgroundLayer.forMenuPreview(textures, regionKey);
     }
 
-    // ── Left panel: selected slots + scrollable grid ──────────────────────────
+    private Image createDimLayer() {
+        Image dim = new Image(skin.newDrawable(
+                "white-pixel",
+                new Color(0f, 0f, 0f, 0.45f)
+        ));
+        dim.setTouchable(Touchable.disabled);
+        return dim;
+    }
 
     private Actor buildLeftPanel() {
         Table left = new Table();

@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.AudioSettings;
@@ -36,7 +35,6 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
@@ -117,7 +115,13 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void create() {
-        Viewport viewport = new FitViewport(1280f, 720f);
+        // ScreenViewport maps 1 world unit = 1 screen pixel, so UI elements
+        // stay pixel-identical in size no matter the window/display size.
+        // Going fullscreen or resizing the window just reveals more canvas
+        // (screenRoot uses setFillParent(true), so it grows to fill that
+        // extra space) instead of scaling every element up like FitViewport
+        // did.
+        Viewport viewport = new ScreenViewport();
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
@@ -430,9 +434,9 @@ public class AppView implements ApplicationListener {
             GameplayMusicResolver.Selection selection = chapter == null
                     ? null
                     : GameplayMusicResolver.resolve(
-                            chapter.getId(),
-                            GameplayMusicCue.CHOOSE
-                    );
+                    chapter.getId(),
+                    GameplayMusicCue.CHOOSE
+            );
 
             if (selection != null && selection.hasLoop()) {
                 audioManager.playMusicSequence(

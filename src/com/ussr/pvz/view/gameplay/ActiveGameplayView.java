@@ -1,13 +1,10 @@
 package com.ussr.pvz.view.gameplay;
 
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.GameplayMusicDirector;
@@ -17,6 +14,7 @@ import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
+import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
 import com.ussr.pvz.view.hud.InGameHud;
 
@@ -50,7 +48,7 @@ public class ActiveGameplayView extends Table implements Disposable {
                 App.getGameSession()
         );
 
-        Image background = createBackground(textures);
+        Actor background = createBackground(textures);
 
         this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
 
@@ -117,23 +115,14 @@ public class ActiveGameplayView extends Table implements Disposable {
         // their input already flows through GameplayController / GameController.
     }
 
-    private Image createBackground(TextureBank textures) {
+    private Actor createBackground(TextureBank textures) {
         Chapter currentChapter = App.getLevelManager().getCurrentChapter();
 
         String regionKey = currentChapter != null
                 ? currentChapter.getLawnRegion()
                 : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
 
-        Image bg = new Image();
-        if (regionKey != null && textures.region(regionKey) != null) {
-            bg.setDrawable(new TextureRegionDrawable(textures.region(regionKey)));
-        } else {
-            System.err.println("[ActiveGameplayView] Warning: Missing texture region for " + regionKey);
-        }
-
-        bg.setScaling(Scaling.fill);
-        bg.setTouchable(Touchable.disabled);
-        return bg;
+        return LawnBackgroundLayer.forGameplay(textures, regionKey, LawnGridLayout.OFFSET_X);
     }
 
     @Override

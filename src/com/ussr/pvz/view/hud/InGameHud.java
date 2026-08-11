@@ -29,8 +29,7 @@ public class InGameHud extends Table implements Disposable {
         setTouchable(Touchable.childrenOnly);
 
         pauseMenuAssets = new PauseMenuAssets();
-        conveyorBeltWidget =
-                new ConveyorBeltWidget(skin, textures, controller);
+        conveyorBeltWidget = new ConveyorBeltWidget(skin, textures, controller);
 
         // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
@@ -59,8 +58,7 @@ public class InGameHud extends Table implements Disposable {
                 ObjectiveWidgetFactory.create(skin, textures);
 
         // Pause Menu Trigger
-        ImageButton.ImageButtonStyle pauseStyle =
-                new ImageButton.ImageButtonStyle();
+        ImageButton.ImageButtonStyle pauseStyle = new ImageButton.ImageButtonStyle();
         pauseStyle.imageUp = new TextureRegionDrawable(textures.region(
                 "IMAGE_UI_HUD_INGAME_PAUSE_BUTTON"
         ));
@@ -75,15 +73,25 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: seed bank | objectives | wave bar | debug | pause
+        // Top Row: Vertical seed bank (left) | objectives (center) | wave bar | debug | pause (right)
         Table topRow = new Table();
-        topRow.add(seedBankHud).left().expandX();
-        topRow.add(objectives.topBarWidget()).center().expandX();
-        topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
-        topRow.add(debugTools).right().padRight(15f);
-        topRow.add(pauseButton).size(72f).right().top().pad(15f);
+        topRow.setTouchable(Touchable.childrenOnly);
+        topRow.top().left();
 
-        //conveyor table
+        // Flush top row directly to upper edge (padTop 0) to eliminate black strip
+        topRow.add(seedBankHud).top().left().pad(2f, 4f, 0f, 0f);
+        topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
+
+        Table topRightControls = new Table();
+        topRightControls.setTouchable(Touchable.childrenOnly);
+        topRightControls.top().right();
+        topRightControls.add(waveProgressBar).right().top().padTop(2f).padRight(12f).row();
+        topRightControls.add(debugTools).right().padTop(4f).padRight(12f).row();
+        topRightControls.add(pauseButton).size(64f).right().top().padTop(4f).padRight(12f);
+
+        topRow.add(topRightControls).top().right();
+
+        // Conveyor table
         Table conveyorLayer = new Table();
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
@@ -92,24 +100,26 @@ public class InGameHud extends Table implements Disposable {
         conveyorLayer.add(conveyorBeltWidget)
                 .top()
                 .left()
-                .padTop(65f)
-                .padLeft(12f);
+                .padTop(2f)
+                .padLeft(4f);
 
         // Bottom Row: [nuke | reset terrain] ... [plant food] [shovel]
-        // Cheat buttons sit at the far left; action buttons stay right.
         Table bottomRow = new Table();
-        bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
-        bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
+        bottomRow.setTouchable(Touchable.childrenOnly);
+        bottomRow.add(nukeMinionWidget).bottom().left().padLeft(12f).padBottom(12f);
+        bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(12f);
         bottomRow.add().expandX();
-        bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
-        bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
+        bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(12f);
+        bottomRow.add(shovelWidget).bottom().right().padRight(20f).padBottom(12f);
 
         // Center overlay (objectives lawn widget, etc.)
         Stack lawnStack = new Stack();
+        lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
 
         // Standard game layer
         Table mainGameLayer = new Table();
+        mainGameLayer.setTouchable(Touchable.childrenOnly);
         mainGameLayer.add(topRow).growX().top().row();
         mainGameLayer.add(lawnStack).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
@@ -121,6 +131,7 @@ public class InGameHud extends Table implements Disposable {
 
         // Root stack
         Stack rootStack = new Stack();
+        rootStack.setTouchable(Touchable.childrenOnly);
         rootStack.add(mainGameLayer);
         rootStack.add(conveyorLayer);
         rootStack.add(pauseOverlay);
