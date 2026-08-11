@@ -4,28 +4,29 @@ public final class LawnGridLayout {
     public static final int COLUMNS = 9;
     public static final int ROWS = 5;
 
-    public static final float OFFSET_X = 320f;
-    public static final float OFFSET_Y = 80f;
-    public static final float CELL_WIDTH = 100f;
-    public static final float CELL_HEIGHT = 115f;
+    // Modify these offsets freely to align entity hitboxes/anims with background grass
+    public static final float OFFSET_X = 785f;
+    public static final float OFFSET_Y = 105f;
+    public static final float CELL_WIDTH = 121f;
+    public static final float CELL_HEIGHT = 130f;
 
     public static final float PLANT_DRAW_OFFSET_X = -40f;
-    public static final float PLANT_DRAW_OFFSET_Y = -40f;
+    public static final float PLANT_DRAW_OFFSET_Y = 40f;
 
-    public static final float ZOMBIE_DRAW_OFFSET_X = -40f;
-    public static final float ZOMBIE_DRAW_OFFSET_Y = -30f;
+    public static final float ZOMBIE_DRAW_OFFSET_X = 50f;
+    public static final float ZOMBIE_DRAW_OFFSET_Y = 60f;
 
     public static final float MOWER_DRAW_OFFSET_X = -60f;
-    public static final float MOWER_DRAW_OFFSET_Y = -60f;
+    public static final float MOWER_DRAW_OFFSET_Y = 20f;
 
-    public static final float GRAVE_DRAW_OFFSET_X = -0f;
-    public static final float GRAVE_DRAW_OFFSET_Y = -60f;
+    public static final float GRAVE_DRAW_OFFSET_X = 0f;
+    public static final float GRAVE_DRAW_OFFSET_Y = 0f;
 
-    public static final float TILE_DRAW_OFFSET_X = 20f;   // nudge right
-    public static final float TILE_DRAW_OFFSET_Y = -90f;  // nudge down
+    public static final float TILE_DRAW_OFFSET_X = 20f;
+    public static final float TILE_DRAW_OFFSET_Y = -90f;
 
-    public static final float WATER_DRAW_OFFSET_X = 25f;  // 8 px left of other tiles
-    public static final float WATER_DRAW_OFFSET_Y = -82f; // 8 px above other tiles
+    public static final float WATER_DRAW_OFFSET_X = 25f;
+    public static final float WATER_DRAW_OFFSET_Y = -82f;
     public static final float WATER_DRAW_WIDTH = CELL_WIDTH + 12f;
     public static final float WATER_DRAW_HEIGHT = CELL_HEIGHT + 12f;
     public static final float WATER_TOP_ROW_EXTENSION = 18f;

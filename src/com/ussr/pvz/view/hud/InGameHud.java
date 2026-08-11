@@ -29,13 +29,21 @@ public class InGameHud extends Table implements Disposable {
         setFillParent(true);
         setTouchable(Touchable.childrenOnly);
 
-        pauseMenuAssets    = new PauseMenuAssets();
+        pauseMenuAssets = new PauseMenuAssets();
         conveyorBeltWidget = new ConveyorBeltWidget(skin, textures, controller);
 
+        // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
-        shovelWidget = new ShovelWidget(skin, textures, controller, this::clearPlantSelection);
+        shovelWidget = new ShovelWidget(
+                skin,
+                textures,
+                controller,
+                this::clearPlantSelection
+        );
 
+        // Plant food button — wires itself to controller.setOnPlantFoodDeactivated
         plantFoodWidget = new PlantFoodWidget(skin, textures, controller);
+
         waveProgressBar = new WaveProgressBar(skin, textures);
 
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
@@ -46,7 +54,8 @@ public class InGameHud extends Table implements Disposable {
                         skin,
                         App.getGameSession()
                 );
-        DebugToolsWidget   debugTools     = new DebugToolsWidget(skin);
+        DebugToolsWidget debugTools = new DebugToolsWidget(skin);
+        LawnGridDebugOverlay lawnGridDebugOverlay = new LawnGridDebugOverlay(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
         controller.setOnPlantingCompleted(this::clearPlantSelection);
@@ -69,24 +78,37 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: seed bank | objectives | [spacer] | upgrade panel | wave bar | debug | pause
+        // Top Row: Vertical seed bank (left) | objectives (center) | controls (right)
         Table topRow = new Table();
-        topRow.add(seedBankHud).left().expandX();
-        topRow.add(objectives.topBarWidget()).center();          // boss HP bar (if any)
-        topRow.add().expandX();                                  // push upgrade panel / controls right
-        topRow.add(upgradePanel).right().height(82f).padRight(6f);
-        topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
-        topRow.add(debugTools).right().padRight(15f);
-        topRow.add(pauseButton).size(72f).right().top().pad(15f);
+        topRow.setTouchable(Touchable.childrenOnly);
+        topRow.top().left();
 
-        // Conveyor layer
+        topRow.add(seedBankHud).top().left().pad(0f, 4f, 0f, 0f);
+        topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
+
+        Table topRightControls = new Table();
+        topRightControls.setTouchable(Touchable.childrenOnly);
+        topRightControls.top().right();
+        topRightControls.add(waveProgressBar).right().top().padTop(2f).padRight(12f).row();
+        topRightControls.add(debugTools).right().padTop(4f).padRight(12f).row();
+        topRightControls.add(pauseButton).size(64f).right().top().padTop(4f).padRight(12f);
+
+        topRow.add(topRightControls).top().right();
+
+        // Conveyor table
         Table conveyorLayer = new Table();
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
         conveyorLayer.top().left();
         conveyorLayer.add(conveyorBeltWidget).top().left().padTop(65f).padLeft(12f);
 
-        // Bottom Row
+        conveyorLayer.add(conveyorBeltWidget)
+                .top()
+                .left()
+                .padTop(2f)
+                .padLeft(4f);
+
+        // Bottom Row: [nuke | reset terrain] ... [plant food] [shovel]
         Table bottomRow = new Table();
         bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
         bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
@@ -94,24 +116,29 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Center lawn overlay (deadline line, etc.)
+        // Center overlay (objectives lawn widget, etc.)
         Stack lawnStack = new Stack();
+        lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
 
         // Main game layer
         Table mainGameLayer = new Table();
+        mainGameLayer.setTouchable(Touchable.childrenOnly);
         mainGameLayer.add(topRow).growX().top().row();
         mainGameLayer.add(lawnStack).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
 
-        // High-priority overlays
-        PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
-        GameOverOverlay  gameOverOverlay = new GameOverOverlay(skin, textures);
+        // High priority overlays
+        PauseMenuOverlay pauseOverlay =
+                new PauseMenuOverlay(skin, pauseMenuAssets, controller);
+        GameOverOverlay gameOverOverlay = new GameOverOverlay(skin, textures);
 
         // Root stack
         Stack rootStack = new Stack();
+        rootStack.setTouchable(Touchable.childrenOnly);
         rootStack.add(mainGameLayer);
         rootStack.add(conveyorLayer);
+        rootStack.add(lawnGridDebugOverlay);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
         rootStack.add(eventAnnouncer);
@@ -119,7 +146,9 @@ public class InGameHud extends Table implements Disposable {
         add(rootStack).grow();
     }
 
-    public SeedBankHud getSeedBankHud() { return seedBankHud; }
+    public SeedBankHud getSeedBankHud() {
+        return seedBankHud;
+    }
 
     private void clearPlantSelection() {
         seedBankHud.clearSelection();
@@ -127,8 +156,12 @@ public class InGameHud extends Table implements Disposable {
     }
 
     /** Exposed so HoverCursorWidget can read plant-food mode state. */
-    public PlantFoodWidget getPlantFoodWidget() { return plantFoodWidget; }
+    public PlantFoodWidget getPlantFoodWidget() {
+        return plantFoodWidget;
+    }
 
     @Override
-    public void dispose() { pauseMenuAssets.dispose(); }
+    public void dispose() {
+        pauseMenuAssets.dispose();
+    }
 }

@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GraphicalLevelSelectionMenu extends Table {
+
     private static final String BACKGROUND_REGION = "IMAGE_MAINMENU_BACKGROUND";
 
     private final Skin skin;
@@ -54,15 +55,15 @@ public class GraphicalLevelSelectionMenu extends Table {
         }
 
         Stack layers = new Stack();
-        layers.add(createBackground());
+        layers.add(createMenuBackground());
         layers.add(createDimLayer());
         layers.add(createContent(chapter));
         add(layers).grow();
     }
 
-    private Image createBackground() {
-        TextureRegion region = textures.region(BACKGROUND_REGION);
-        Image background = region == null ? new Image() : new Image(region);
+    private Image createMenuBackground() {
+        TextureRegion bgRegion = textures.region(BACKGROUND_REGION);
+        Image background = bgRegion != null ? new Image(bgRegion) : new Image();
         background.setScaling(Scaling.fill);
         background.setTouchable(Touchable.disabled);
         return background;

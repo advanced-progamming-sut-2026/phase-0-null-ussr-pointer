@@ -1,33 +1,41 @@
 package com.ussr.pvz.view.gameplay;
 
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Scaling;
-import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.GameplayMusicDirector;
+import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
+import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
 import com.ussr.pvz.view.hud.InGameHud;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
+import com.ussr.pvz.view.hud.InGameHud;
 import com.ussr.pvz.view.hud.LawnWidget;
 import com.ussr.pvz.view.hud.VaseBreakerOverlayWidget;
+import pvz.libpvz.pam.PamPlayer;
+import pvz.libpvz.textures.TextureBank;
 
 public class ActiveGameplayView extends Table implements Disposable {
 
     static final float TICK_RATE = 0.1f;
+
+    /**
+     * Fixed pixel width of the left lawn panel (house/sidebar area) in the background texture.
+     * Decoupled from LawnGridLayout.OFFSET_X so background aspect ratio remains stable.
+     */
+    private static final float BACKGROUND_LEFT_PANEL_WIDTH = 280f;
+
     private float accumulator = 0f;
 
     private final GameplayController controller;
@@ -49,7 +57,7 @@ public class ActiveGameplayView extends Table implements Disposable {
                 App.getGameSession()
         );
 
-        Image background = createBackground(textures);
+        Actor background = createBackground(textures);
 
         this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
 
@@ -61,10 +69,10 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         HoverCursorWidget hoverCursor = new HoverCursorWidget(textures, controller);
 
-        SunRenderLayer sunLayer        = new SunRenderLayer(pamPlayer);
-        ItemRenderLayer itemLayer      = new ItemRenderLayer(pamPlayer);
+        SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);
+        ItemRenderLayer itemLayer = new ItemRenderLayer(pamPlayer);
         StormRenderLayer stormRearLayer = new StormRenderLayer(pamPlayer, true);
-        StormRenderLayer stormTopLayer  = new StormRenderLayer(pamPlayer, false);
+        StormRenderLayer stormTopLayer = new StormRenderLayer(pamPlayer, false);
 
         Stack layers = new Stack();
         layers.add(background);
@@ -116,23 +124,15 @@ public class ActiveGameplayView extends Table implements Disposable {
         // their input already flows through GameplayController / GameController.
     }
 
-    private Image createBackground(TextureBank textures) {
+    private Actor createBackground(TextureBank textures) {
         Chapter currentChapter = App.getLevelManager().getCurrentChapter();
 
         String regionKey = currentChapter != null
                 ? currentChapter.getLawnRegion()
                 : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
 
-        Image bg = new Image();
-        if (regionKey != null && textures.region(regionKey) != null) {
-            bg.setDrawable(new TextureRegionDrawable(textures.region(regionKey)));
-        } else {
-            System.err.println("[ActiveGameplayView] Warning: Missing texture region for " + regionKey);
-        }
-
-        bg.setScaling(Scaling.fill);
-        bg.setTouchable(Touchable.disabled);
-        return bg;
+        // Pass fixed background width instead of LawnGridLayout.OFFSET_X
+        return LawnBackgroundLayer.forGameplay(textures, regionKey, BACKGROUND_LEFT_PANEL_WIDTH);
     }
 
     @Override
