@@ -180,7 +180,7 @@
           "id": "egypt_1_3",
           "order": 3,
           "menuRegion": "IMAGE_WORLDMAP_EGYPT_ISLAND16",
-          "deliveryStrategy": "regular",
+          "deliveryStrategy": "conveyor",
           "sunFalling": true,
           "timeLimitSeconds": 0,
           "deadlineColumn": -1,
@@ -188,7 +188,17 @@
           "environment": "AncientEgyptEnvironment",
           "behavior": "NormalBehavior",
           "lockedPlants": [],
-          "seedPlants": [],
+          "seedPlants": [
+            "Explode-o-nut",
+            "Snow Pea",
+            "Tall-nut",
+            "Threepeater",
+            "Bonk Choy",
+            "Cabbage-pult",
+            "Grave Buster",
+            "Repeater",
+            "Twin Sunflower"
+          ],
           "rewardPlantAliases": [
             "Jalapeno",
             "Melon-pult",

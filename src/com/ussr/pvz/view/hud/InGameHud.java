@@ -28,29 +28,20 @@ public class InGameHud extends Table implements Disposable {
         setFillParent(true);
         setTouchable(Touchable.childrenOnly);
 
-        pauseMenuAssets = new PauseMenuAssets();
-        conveyorBeltWidget =
-                new ConveyorBeltWidget(skin, textures, controller);
+        pauseMenuAssets    = new PauseMenuAssets();
+        conveyorBeltWidget = new ConveyorBeltWidget(skin, textures, controller);
 
-        // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
-        shovelWidget = new ShovelWidget(
-                skin,
-                textures,
-                controller,
-                this::clearPlantSelection
-        );
+        shovelWidget = new ShovelWidget(skin, textures, controller, this::clearPlantSelection);
 
-        // Plant food button — wires itself to controller.setOnPlantFoodDeactivated
         plantFoodWidget = new PlantFoodWidget(skin, textures, controller);
-
         waveProgressBar = new WaveProgressBar(skin, textures);
 
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
 
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
-        DebugToolsWidget debugTools = new DebugToolsWidget(skin);
+        DebugToolsWidget   debugTools     = new DebugToolsWidget(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
         controller.setOnPlantingCompleted(this::clearPlantSelection);
@@ -58,15 +49,13 @@ public class InGameHud extends Table implements Disposable {
         ObjectiveWidgetFactory.ObjectiveWidgets objectives =
                 ObjectiveWidgetFactory.create(skin, textures);
 
-        // Pause Menu Trigger
-        ImageButton.ImageButtonStyle pauseStyle =
-                new ImageButton.ImageButtonStyle();
-        pauseStyle.imageUp = new TextureRegionDrawable(textures.region(
-                "IMAGE_UI_HUD_INGAME_PAUSE_BUTTON"
-        ));
-        pauseStyle.imageDown = new TextureRegionDrawable(textures.region(
-                "IMAGE_UI_HUD_INGAME_PAUSE_BUTTON_DOWN"
-        ));
+        // Beghouled upgrade panel — self-hides when not in a Beghouled level.
+        BeghouledUpgradePanel upgradePanel = new BeghouledUpgradePanel(skin, controller);
+
+        // Pause button
+        ImageButton.ImageButtonStyle pauseStyle = new ImageButton.ImageButtonStyle();
+        pauseStyle.imageUp   = new TextureRegionDrawable(textures.region("IMAGE_UI_HUD_INGAME_PAUSE_BUTTON"));
+        pauseStyle.imageDown = new TextureRegionDrawable(textures.region("IMAGE_UI_HUD_INGAME_PAUSE_BUTTON_DOWN"));
         ImageButton pauseButton = new ImageButton(pauseStyle);
         pauseButton.addListener(new ChangeListener() {
             @Override
@@ -75,28 +64,24 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: seed bank | objectives | wave bar | debug | pause
+        // Top Row: seed bank | objectives | [spacer] | upgrade panel | wave bar | debug | pause
         Table topRow = new Table();
         topRow.add(seedBankHud).left().expandX();
-        topRow.add(objectives.topBarWidget()).center().expandX();
+        topRow.add(objectives.topBarWidget()).center();          // boss HP bar (if any)
+        topRow.add().expandX();                                  // push upgrade panel / controls right
+        topRow.add(upgradePanel).right().height(82f).padRight(6f);
         topRow.add(waveProgressBar).right().top().padTop(12f).padRight(15f);
         topRow.add(debugTools).right().padRight(15f);
         topRow.add(pauseButton).size(72f).right().top().pad(15f);
 
-        //conveyor table
+        // Conveyor layer
         Table conveyorLayer = new Table();
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
         conveyorLayer.top().left();
+        conveyorLayer.add(conveyorBeltWidget).top().left().padTop(65f).padLeft(12f);
 
-        conveyorLayer.add(conveyorBeltWidget)
-                .top()
-                .left()
-                .padTop(65f)
-                .padLeft(12f);
-
-        // Bottom Row: [nuke | reset terrain] ... [plant food] [shovel]
-        // Cheat buttons sit at the far left; action buttons stay right.
+        // Bottom Row
         Table bottomRow = new Table();
         bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
         bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
@@ -104,20 +89,19 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Center overlay (objectives lawn widget, etc.)
+        // Center lawn overlay (deadline line, etc.)
         Stack lawnStack = new Stack();
         lawnStack.add(objectives.lawnOverlayWidget());
 
-        // Standard game layer
+        // Main game layer
         Table mainGameLayer = new Table();
         mainGameLayer.add(topRow).growX().top().row();
         mainGameLayer.add(lawnStack).grow().row();
         mainGameLayer.add(bottomRow).growX().bottom();
 
-        // High priority overlays
-        PauseMenuOverlay pauseOverlay =
-                new PauseMenuOverlay(skin, pauseMenuAssets, controller);
-        GameOverOverlay gameOverOverlay = new GameOverOverlay(skin, textures);
+        // High-priority overlays
+        PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
+        GameOverOverlay  gameOverOverlay = new GameOverOverlay(skin, textures);
 
         // Root stack
         Stack rootStack = new Stack();
@@ -130,9 +114,7 @@ public class InGameHud extends Table implements Disposable {
         add(rootStack).grow();
     }
 
-    public SeedBankHud getSeedBankHud() {
-        return seedBankHud;
-    }
+    public SeedBankHud getSeedBankHud() { return seedBankHud; }
 
     private void clearPlantSelection() {
         seedBankHud.clearSelection();
@@ -140,12 +122,8 @@ public class InGameHud extends Table implements Disposable {
     }
 
     /** Exposed so HoverCursorWidget can read plant-food mode state. */
-    public PlantFoodWidget getPlantFoodWidget() {
-        return plantFoodWidget;
-    }
+    public PlantFoodWidget getPlantFoodWidget() { return plantFoodWidget; }
 
     @Override
-    public void dispose() {
-        pauseMenuAssets.dispose();
-    }
+    public void dispose() { pauseMenuAssets.dispose(); }
 }

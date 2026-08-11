@@ -1,23 +1,39 @@
 package com.ussr.pvz.view.hud;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.view.gameplay.LevelIntroOverlay;
+import com.ussr.pvz.view.util.WhitePixel;
 import pvz.libpvz.textures.TextureBank;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Generates decoupled sub-widgets for arbitrary level behaviors preventing giant conditionals in the HUD.
+ * Generates decoupled sub-widgets for arbitrary level behaviors.
+ *
+ * <p>Text-only objectives (TimedWar, Endless, AllowedPlantsLost) are NOT
+ * rendered here anymore — they are shown in the {@link LevelIntroOverlay}
+ * after Crazy Dave's dialogue finishes so they never fight the seed-bank
+ * layout for horizontal space.</p>
+ *
+ * <p>Persistent visual widgets (BossHealthBar, DeadlineLine) still live
+ * on-lawn because they need to be visible throughout play.</p>
  */
 public class ObjectiveWidgetFactory {
 
     public record ObjectiveWidgets(Actor topBarWidget, Actor lawnOverlayWidget) {}
+
+    // -------------------------------------------------------------------------
+    // Public factory
+    // -------------------------------------------------------------------------
 
     public static ObjectiveWidgets create(Skin skin, TextureBank textures) {
         GameSession session = App.getGameSession();
@@ -33,44 +49,76 @@ public class ObjectiveWidgetFactory {
         LevelBehavior behavior = session.getLevel().getBehavior();
         if (behavior != null) {
             String behaviorName = behavior.getClass().getSimpleName();
-
             switch (behaviorName) {
-                case "TimedWarBehavior":
-                    topBar.add(new Label("Survive the timer!", skin, "medium_outline")).pad(10f);
-                    break;
-                case "EndlessBehavior":
-                case "MeowBehavior":
-                    topBar.add(new Label("Endless Mode Active", skin, "medium_outline")).pad(10f);
-                    break;
                 case "DeadlineBehavior":
-                    overlay.addActor(new DeadlineLineActor(session, textures));
+                    overlay.addActor(new DeadlineLineActor(session));
                     break;
                 case "BossBehavior":
                     topBar.add(new BossHealthBarActor(
                             (com.ussr.pvz.model.level.behavior.BossBehavior) behavior
-                    )).width(400f).height(28f).pad(10f);
+                    )).width(380f).height(26f).pad(10f);
+                    break;
+                // TimedWarBehavior, EndlessBehavior, MeowBehavior, AllowedPlantsLost →
+                // all communicated via LevelIntroOverlay, not the top bar.
+            }
+        }
+
+        return new ObjectiveWidgets(topBar, overlay);
+    }
+
+    // -------------------------------------------------------------------------
+    // Collect text objectives for LevelIntroOverlay
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the list of plain-text objective strings for a session.
+     * Empty when no text objective applies.  Called by LevelIntroOverlay.
+     */
+    public static List<String> collectTextObjectives(GameSession session) {
+        List<String> lines = new ArrayList<>();
+        if (session == null || session.getLevel() == null) return lines;
+
+        LevelBehavior behavior = session.getLevel().getBehavior();
+        if (behavior != null) {
+            String name = behavior.getClass().getSimpleName();
+            switch (name) {
+                case "TimedWarBehavior":
+                    lines.add("Survive the timer!");
+                    break;
+                case "EndlessBehavior":
+                case "MeowBehavior":
+                    lines.add("Endless Mode — survive as long as you can!");
+                    break;
+                case "SaveOurSeedsBehavior":
+                    lines.add("Protect the marked plants!\nIf any of them die, you lose.");
                     break;
             }
         }
 
         try {
-            if (session.getLevel().getAllowedPlantsLost() != -1) {
-                topBar.add(new Label("Don't lose more than " + session.getLevel().getAllowedPlantsLost() + " plants!", skin, "medium_outline")).padLeft(15f);
+            int lost = session.getLevel().getAllowedPlantsLost();
+            if (lost != -1) {
+                lines.add("Don't lose more than " + lost + " plant" + (lost == 1 ? "!" : "s!"));
             }
         } catch (Exception ignored) {}
 
-        return new ObjectiveWidgets(topBar, overlay);
+        return lines;
     }
 
+    // =========================================================================
+    // DeadlineLineActor — clean red line rendered with WhitePixel
+    // =========================================================================
     private static class DeadlineLineActor extends Actor {
-        private final GameSession session;
-        private final TextureRegion redLine;
+        private static final float LINE_WIDTH = 4f;
+        private static final Color LINE_COLOR  = new Color(0.92f, 0.10f, 0.10f, 0.88f);
+        private static final Color GLOW_COLOR  = new Color(1.00f, 0.30f, 0.20f, 0.32f);
+        private static final float GLOW_EXTRA  = 6f; // extra width on each side for soft glow
 
-        public DeadlineLineActor(GameSession session, TextureBank textures) {
+        private final GameSession session;
+
+        DeadlineLineActor(GameSession session) {
             this.session = session;
             setTouchable(Touchable.disabled);
-            // TODO-ASSET: image_ui_hud_deadline_line, replace with real red-line atlas region
-            this.redLine = textures.region("IMAGE_PLANT_REDSTINGER_REDSTINGER_71X460");
         }
 
         @Override
@@ -81,54 +129,80 @@ public class ObjectiveWidgetFactory {
 
                 float cellW = getParent().getWidth() / 9f;
                 float lineX = getParent().getX() + col * cellW;
+                float lineY = getParent().getY();
+                float lineH = getParent().getHeight();
 
-                if (redLine != null) {
-                    batch.draw(redLine, lineX, getParent().getY(), 10f, getParent().getHeight());
-                }
+                // Soft glow pass
+                Color old = batch.getColor().cpy();
+                batch.setColor(GLOW_COLOR.r, GLOW_COLOR.g, GLOW_COLOR.b, GLOW_COLOR.a * parentAlpha);
+                batch.draw(WhitePixel.get(), lineX - GLOW_EXTRA, lineY,
+                        LINE_WIDTH + GLOW_EXTRA * 2f, lineH);
+
+                // Solid line pass
+                batch.setColor(LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b, LINE_COLOR.a * parentAlpha);
+                batch.draw(WhitePixel.get(), lineX, lineY, LINE_WIDTH, lineH);
+
+                batch.setColor(old);
             } catch (Exception ignored) {}
         }
     }
 
+    // =========================================================================
+    // BossHealthBarActor — styled after WaveProgressBar; three HP segments
+    // =========================================================================
     private static class BossHealthBarActor extends Actor {
+        private static final Color COLOR_TRACK    = new Color(0.10f, 0.10f, 0.10f, 0.88f);
+        private static final Color COLOR_BORDER   = new Color(0.00f, 0.00f, 0.00f, 1.00f);
+        private static final Color COLOR_FILL     = new Color(0.88f, 0.12f, 0.12f, 1.00f);
+        private static final Color COLOR_STUNNED  = new Color(0.55f, 0.70f, 0.88f, 1.00f);
+        private static final Color COLOR_DIVIDER  = new Color(0.00f, 0.00f, 0.00f, 1.00f);
+        private static final Color COLOR_SHINE    = new Color(1.00f, 1.00f, 1.00f, 0.18f);
+
+        private static final float BORDER = 2f;
+        private static final float DIVIDER_W = 2f;
+
         private final com.ussr.pvz.model.level.behavior.BossBehavior bossBehavior;
 
-        BossHealthBarActor(com.ussr.pvz.model.level.behavior.BossBehavior bossBehavior) {
-            this.bossBehavior = bossBehavior;
+        BossHealthBarActor(com.ussr.pvz.model.level.behavior.BossBehavior b) {
+            this.bossBehavior = b;
             setTouchable(Touchable.disabled);
         }
 
         @Override
         public void draw(Batch batch, float parentAlpha) {
-            var controller = bossBehavior.getController();
-            if (controller == null) return;
+            var ctrl = bossBehavior.getController();
+            if (ctrl == null) return;
 
-            float width = getWidth();
-            float height = getHeight();
-            float x = getX();
-            float y = getY();
+            float x = getX(), y = getY(), w = getWidth(), h = getHeight();
+            float a = parentAlpha;
 
-            // Background track
-            drawRect(batch, x, y, width, height, 0.15f, 0.15f, 0.15f, 0.9f);
+            // Border / track background
+            rect(batch, x - BORDER, y - BORDER, w + BORDER * 2f, h + BORDER * 2f,
+                    COLOR_BORDER, a);
+            rect(batch, x, y, w, h, COLOR_TRACK, a);
 
-            // Filled portion, proportional to current HP
-            float pct = controller.getMaxHp() <= 0
+            // HP fill
+            float pct = ctrl.getMaxHp() <= 0
                     ? 0f
-                    : (float) controller.getCurrentHp() / controller.getMaxHp();
-            float fillColor = controller.isStunned() ? 0.6f : 0.85f;
-            drawRect(batch, x, y, width * pct, height,
-                    fillColor, controller.isStunned() ? 0.75f : 0.1f, 0.1f, 1f);
+                    : Math.max(0f, Math.min(1f, (float) ctrl.getCurrentHp() / ctrl.getMaxHp()));
+            Color fill = ctrl.isStunned() ? COLOR_STUNNED : COLOR_FILL;
+            rect(batch, x, y, w * pct, h, fill, a);
 
-            // Two divider lines marking the 3 segment boundaries
-            drawRect(batch, x + width / 3f - 1f, y, 2f, height, 0f, 0f, 0f, 1f);
-            drawRect(batch, x + (2 * width) / 3f - 1f, y, 2f, height, 0f, 0f, 0f, 1f);
+            // Top shine strip (upper 25% of bar)
+            float shineH = h * 0.25f;
+            rect(batch, x, y + h - shineH, w * pct, shineH, COLOR_SHINE, a);
+
+            // Segment dividers at 1/3 and 2/3
+            rect(batch, x + w / 3f - DIVIDER_W / 2f, y, DIVIDER_W, h, COLOR_DIVIDER, a);
+            rect(batch, x + 2f * w / 3f - DIVIDER_W / 2f, y, DIVIDER_W, h, COLOR_DIVIDER, a);
         }
 
-        private void drawRect(Batch batch, float x, float y, float w, float h,
-                              float r, float g, float b, float a) {
+        private void rect(Batch batch, float x, float y, float w, float h,
+                          Color c, float parentAlpha) {
             if (w <= 0 || h <= 0) return;
-            com.badlogic.gdx.graphics.Color old = batch.getColor().cpy();
-            batch.setColor(r, g, b, a);
-            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(), x, y, w, h);
+            Color old = batch.getColor().cpy();
+            batch.setColor(c.r, c.g, c.b, c.a * parentAlpha);
+            batch.draw(WhitePixel.get(), x, y, w, h);
             batch.setColor(old);
         }
     }
