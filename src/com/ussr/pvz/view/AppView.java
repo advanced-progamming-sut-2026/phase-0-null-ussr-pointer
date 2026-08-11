@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.AudioSettings;
@@ -121,7 +123,7 @@ public class AppView implements ApplicationListener {
         // (screenRoot uses setFillParent(true), so it grows to fill that
         // extra space) instead of scaling every element up like FitViewport
         // did.
-        Viewport viewport = new ScreenViewport();
+        Viewport viewport = new ExtendViewport(1920f, 1080f);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();

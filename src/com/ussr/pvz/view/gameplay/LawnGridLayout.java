@@ -5,10 +5,10 @@ public final class LawnGridLayout {
     public static final int ROWS = 5;
 
     // Modify these offsets freely to align entity hitboxes/anims with background grass
-    public static final float OFFSET_X = 785f;
-    public static final float OFFSET_Y = 105f;
-    public static final float CELL_WIDTH = 121f;
-    public static final float CELL_HEIGHT = 130f;
+    public static final float OFFSET_X = 833f;
+    public static final float OFFSET_Y = 113f;
+    public static final float CELL_WIDTH = 130f;
+    public static final float CELL_HEIGHT = 137f;
 
     public static final float PLANT_DRAW_OFFSET_X = -40f;
     public static final float PLANT_DRAW_OFFSET_Y = 40f;
