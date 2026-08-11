@@ -13,7 +13,6 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.notification.NotificationCenter;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.List;
@@ -70,10 +69,7 @@ public class NukeMinionWidget extends Stack {
         });
 
         if (!killed.isEmpty()) {
-            NotificationCenter.success("Nuke released — " + killed.size() + " zombie(s) eliminated!");
             flashTimer = FLASH_DURATION;
-        } else {
-            NotificationCenter.info("No minions to nuke.");
         }
     }
 

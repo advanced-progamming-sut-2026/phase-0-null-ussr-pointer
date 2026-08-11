@@ -13,7 +13,6 @@ import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
 import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
-import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.game.GameService;
 import com.ussr.pvz.service.minigame.BeghouledService;
 import com.ussr.pvz.service.minigame.VaseBreakerService;
@@ -46,10 +45,6 @@ public class GameplayController {
 
     public void togglePauseMenu() {
         manuallyPaused = !manuallyPaused;
-
-        NotificationCenter.info(
-                manuallyPaused ? "Game Paused" : "Game Resumed"
-        );
     }
 
     public boolean isPauseMenuOpen() {
@@ -141,17 +136,11 @@ public class GameplayController {
             // First click — select
             beghouledSelectedRow = row;
             beghouledSelectedCol = col;
-            NotificationCenter.info("Selected (" + row + ", " + col + ") — click adjacent cell to swap");
         } else {
             // Second click — attempt swap
-            String result = beghouledService.swapPlants(
+            beghouledService.swapPlants(
                     beghouledSelectedRow, beghouledSelectedCol, row, col);
 
-            if (result.contains("successfully") || result.contains("Swapped")) {
-                NotificationCenter.success(result);
-            } else {
-                NotificationCenter.warning(result);
-            }
             beghouledSelectedRow = -1;
             beghouledSelectedCol = -1;
         }
@@ -176,10 +165,7 @@ public class GameplayController {
             int sY = (int) heldSeedPack.getLocation().y();
             String result = vaseBreakerService.plantFromSeedPack(sX, sY, col, row);
             if (result.contains("Successfully")) {
-                NotificationCenter.success(result);
                 heldSeedPack = null;
-            } else {
-                NotificationCenter.warning(result);
             }
             return;
         }
@@ -198,7 +184,6 @@ public class GameplayController {
             float dx = clickX - iX, dy = clickY - iY;
             if (dx * dx + dy * dy < 75f * 75f) {   // 75 stage-unit radius
                 heldSeedPack = (SeedPackDrop) item;
-                NotificationCenter.info("Seed pack picked up — click a tile to plant");
                 return;
             }
         }
@@ -208,9 +193,7 @@ public class GameplayController {
         if (cell != null
                 && cell.getInteractableStructure() instanceof Vase vase
                 && vase.isAlive()) {
-            String result = vaseBreakerService.smashVase(col, row);
-            if (result.contains("smashed")) NotificationCenter.success(result);
-            else                             NotificationCenter.warning(result);
+            vaseBreakerService.smashVase(col, row);
         }
     }
 
@@ -223,30 +206,22 @@ public class GameplayController {
         LocationRequest req = new LocationRequest(String.valueOf(x), String.valueOf(y));
         String result = gameService.pluckPlant(req);
         if (result.contains("plucked")) {
-            NotificationCenter.success(result);
             toggleShovelMode(false);
-        } else {
-            NotificationCenter.error(result);
         }
     }
 
     private void executePlantFoodAction(int x, int y) {
         LocationRequest req = new LocationRequest(String.valueOf(x), String.valueOf(y));
-        String result = gameService.feedPlant(req);
+        gameService.feedPlant(req);
         togglePlantFoodMode(false);
-        if (result.contains("fed")) NotificationCenter.success(result);
-        else                        NotificationCenter.warning(result);
     }
 
     public void plantAt(String plantKey, int gridX, int gridY) {
         if (isPaused() || plantKey == null) return;
         String result = executeSelectedPlant(plantKey, gridX, gridY);
         if (result.contains("placed") || result.contains("Rolled")) {
-            NotificationCenter.success(result);
             setSelectedSeed(null);
             if (onPlantingCompleted != null) onPlantingCompleted.run();
-        } else {
-            NotificationCenter.warning(result);
         }
     }
 
@@ -277,12 +252,7 @@ public class GameplayController {
      */
     public void upgradeBeghouledPlant(String plantType) {
         if (isPaused()) return;
-        String result = beghouledService.upgradePlant(plantType);
-        if (result.startsWith("Successfully")) {
-            NotificationCenter.success(result);
-        } else {
-            NotificationCenter.warning(result);
-        }
+        beghouledService.upgradePlant(plantType);
     }
 
     public boolean isShovelModeActive()    { return shovelModeActive; }

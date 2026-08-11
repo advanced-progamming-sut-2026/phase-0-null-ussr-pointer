@@ -9,7 +9,7 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
         GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected,
         GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling,
         GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied,
-        GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned {
+        GameEvent.ZombieReachedHouse, GameEvent.SpecialLevelAnnouncement, GameEvent.ZombieSpawned {
 
 
     record ZombieSpawned(String alias, int lane, int col, boolean isGlowing) implements GameEvent {
@@ -98,5 +98,8 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
     }
 
     record FreezingWindTriggered() implements GameEvent {
+    }
+
+    record SpecialLevelAnnouncement(String message) implements GameEvent {
     }
 }

@@ -20,13 +20,16 @@ public class StrikeStrategy implements ActStrategy {
 
         int pierceCount = (int) user.getAbilityValue();
         if(user.isBuffed()) pierceCount = Integer.MAX_VALUE;
-        session.addProjectile(new Projectile(
+        Projectile projectile = new Projectile(
                 user.getPosition(),
                 new Vec2(6, 0), target,
                 user.getDamage(),
                 new StraightMove(),
                 new PierceHit(pierceCount),user
-        ));
+        );
+        projectile.setVisualLaunchOrigin(user.getProjectileOrigin(0));
+        session.addProjectile(projectile);
+        user.triggerActionAnimation(0.5f);
     }
 
 

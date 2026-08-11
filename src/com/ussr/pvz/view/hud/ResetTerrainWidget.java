@@ -16,7 +16,6 @@ import com.ussr.pvz.model.board.structures.Grave;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.notification.NotificationCenter;
 import pvz.libpvz.textures.TextureBank;
 
 /**
@@ -68,7 +67,6 @@ public class ResetTerrainWidget extends Stack {
 
         Lawn lawn = session.getLawn();
         if (lawn == null) {
-            NotificationCenter.warning("No lawn to reset.");
             return;
         }
 
@@ -90,10 +88,7 @@ public class ResetTerrainWidget extends Stack {
         }
 
         if (count > 0) {
-            NotificationCenter.success("Terrain reset — " + count + " tile(s) restored to Normal.");
             flashTimer = FLASH_DURATION;
-        } else {
-            NotificationCenter.info("All tiles are already Normal.");
         }
     }
 

@@ -19,6 +19,8 @@ import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.notification.Notification;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.notification.NotificationType;
+import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 
 public final class NotificationOverlay extends Table {
@@ -49,6 +51,16 @@ public final class NotificationOverlay extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
+
+        if (App.getMenuState() == MenuState.GAME) {
+            NotificationCenter.clear();
+            if (notificationList.getChildren().size > 0) {
+                notificationList.clearChildren();
+                notificationList.getCells().clear();
+                notificationList.invalidateHierarchy();
+            }
+            return;
+        }
 
         Notification notification;
 

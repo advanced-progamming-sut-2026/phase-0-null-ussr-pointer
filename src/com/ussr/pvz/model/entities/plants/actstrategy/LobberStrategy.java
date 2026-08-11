@@ -31,13 +31,15 @@ public class LobberStrategy implements ActStrategy {
 
         Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
         HitEffectStrategy hitEffect = buildHitEffect(user);
-        session.addProjectile(new Projectile(
+        Projectile projectile = new Projectile(
                 user.getPosition(),
                 initialVelocity, target,
                 user.getDamage(),
                 new ArcMove(GRAVITY),
                 hitEffect,user
-        ));
+        );
+        projectile.setVisualLaunchOrigin(user.getProjectileOrigin(0));
+        session.addProjectile(projectile);
         user.triggerActionAnimation(0.5f);
     }
 

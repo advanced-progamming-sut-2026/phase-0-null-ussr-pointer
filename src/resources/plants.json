@@ -223,6 +223,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/PEASHOOTER/PEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.9, "y": 0.0 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "upgrades": [
       {
@@ -264,6 +265,10 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/REPEATER/REPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
+    "projectileOrigins": [
+      { "x": 0.9, "y": 0.0 },
+      { "x": 0.9, "y": 0.0 }
+    ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "plantFoodProjectilePam": "768/INITIAL/EFFECTS/REPEATER_PLANTFOOD_GIANTPEA/REPEATER_PLANTFOOD_GIANTPEA.PAM",
     "plantFoodHitPam": "768/INITIAL/EFFECTS/SPLAT_GIANTPEA/SPLAT_GIANTPEA.PAM",
@@ -307,6 +312,11 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/THREEPEATER/THREEPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
+    "projectileOrigins": [
+      { "x": 0.72, "y": 0.2 },
+      { "x": 0.9, "y": 0.0 },
+      { "x": 0.80, "y": -0.2 }
+    ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "upgrades": [
       {
@@ -349,6 +359,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_SNOW_PEA/T_SNOW_PEA.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
     "hitPam": "768/INITIAL/EFFECTS/T_SPLAT_SNOW_PEA/T_SPLAT_SNOW_PEA.PAM",
     "upgrades": [
       {
@@ -388,6 +399,12 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/FULL/PLANT/ROTORUTABAGA/ROTORUTABAGA.PAM",
     "projectilePam": "768/FULL/EFFECTS/ROTORUTABAGA_PROJECTILE2/ROTORUTABAGA_PROJECTILE2.PAM",
+    "projectileOrigins": [
+      { "x": 0.68, "y": 0.68 },
+      { "x": 0.68, "y": 0.48 },
+      { "x": 0.32, "y": 0.68 },
+      { "x": 0.32, "y": 0.48 }
+    ],
     "hitPam": "768/FULL/EFFECTS/ROTORUTABAGA_PROJECTILE_HIT/ROTORUTABAGA_PROJECTILE_HIT.PAM",
     "upgrades": [
       {
@@ -430,6 +447,7 @@
     "plantFoodStrikeRate": 0.0,
     "pamLocation": "768/FULL/PLANT/PEAPOD/PEAPOD.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "plantFoodProjectilePam": "768/FULL/EFFECTS/PEAPOD_PLANTFOOD_GIANTPEA/PEAPOD_PLANTFOOD_GIANTPEA.PAM",
     "plantFoodHitPam": "768/INITIAL/EFFECTS/SPLAT_GIANTPEA/SPLAT_GIANTPEA.PAM",
@@ -473,6 +491,11 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/FULL/PLANT/SPLITPEA/SPLITPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
+    "projectileOrigins": [
+      { "x": 0.72, "y": 0.62 },
+      { "x": 0.28, "y": 0.66 },
+      { "x": 0.28, "y": 0.54 }
+    ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "upgrades": [
       {
@@ -514,6 +537,7 @@
     "plantFoodStrikeRate": 0.0,
     "pamLocation": "768/FULL/PLANT/CITRON/CITRON.PAM",
     "projectilePam": "768/FULL/EFFECTS/CITRON_CITRUS_ORB/CITRON_CITRUS_ORB.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.60 }],
     "hitPam": "768/FULL/EFFECTS/CITRON_CITRUS_ORB_HIT/CITRON_CITRUS_ORB_HIT.PAM",
     "plantFoodProjectilePam": "768/FULL/EFFECTS/CITRON_PLANTFOOD_ORB/CITRON_PLANTFOOD_ORB.PAM",
     "plantFoodHitPam": "768/FULL/EFFECTS/CITRON_PLANTFOOD_ORB_HIT/CITRON_PLANTFOOD_ORB_HIT.PAM",
@@ -557,6 +581,7 @@
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/CAULIPOWER/CAULIPOWER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/CAULIPOWER_PROJECTILE/CAULIPOWER_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.65, "y": 0.72 }],
     "upgrades": [
       {
         "level": 2,
@@ -596,6 +621,7 @@
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/ELECTRICBLUEBERRY/ELECTRICBLUEBERRY.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_FIRE_PEA_BLUE/T_FIRE_PEA_BLUE.PAM",
+    "projectileOrigins": [{ "x": 0.60, "y": 0.65 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_FIRE_PEA_BLUE/SPLAT_FIRE_PEA_BLUE.PAM",
     "upgrades": [
       {
@@ -637,6 +663,7 @@
     "plantFoodStrikeRate": 0.0,
     "pamLocation": "768/FULL/PLANT/BOWLINGBULB/BOWLINGBULB.PAM",
     "projectilePam": "768/FULL/EFFECTS/BOWLINGBULB_PROJECTILE2/BOWLINGBULB_PROJECTILE2.PAM",
+    "projectileOrigins": [{ "x": 0.70, "y": 0.58 }],
     "plantFoodProjectilePam": "768/FULL/EFFECTS/BOWLINGBULB_PLANTFOOD_PROJECTILE/BOWLINGBULB_PLANTFOOD_PROJECTILE.PAM",
     "upgrades": [
       {
@@ -676,6 +703,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/CACTUS/CACTUS.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_CACTUS_PROJECTILE/T_CACTUS_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.68, "y": 0.68 }],
     "hitPam": "768/INITIAL/EFFECTS/CACTUS_PROJECTILE_HIT/CACTUS_PROJECTILE_HIT.PAM",
     "upgrades": [
       {
@@ -718,6 +746,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/FIREPEASHOOTER/FIREPEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_FIRE_PEA/T_FIRE_PEA.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
     "hitPam": "768/INITIAL/EFFECTS/T_SPLAT_FIRE_PEA/T_SPLAT_FIRE_PEA.PAM",
     "upgrades": [
       {
@@ -757,6 +786,13 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/STARFRUIT/STARFRUIT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_STARFRUIT_PROJECTILE/T_STARFRUIT_PROJECTILE.PAM",
+    "projectileOrigins": [
+      { "x": 0.30, "y": 0.58 },
+      { "x": 0.50, "y": 0.78 },
+      { "x": 0.50, "y": 0.35 },
+      { "x": 0.68, "y": 0.68 },
+      { "x": 0.68, "y": 0.48 }
+    ],
     "hitPam": "768/INITIAL/EFFECTS/T_STARFRUIT_PROJECTILE_HIT/T_STARFRUIT_PROJECTILE_HIT.PAM",
     "upgrades": [
       {
@@ -798,6 +834,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/GOOPEASHOOTER/GOOPEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/GOOPEASHOOTER_PROJECTILES/GOOPEASHOOTER_PROJECTILES.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
     "plantFoodProjectilePam": "768/INITIAL/EFFECTS/GOOPEASHOOTER_PLANTFOOD/GOOPEASHOOTER_PLANTFOOD.PAM",
     "upgrades": [
       {
@@ -839,6 +876,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/MEGAGATLING/MEGAGATLING.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/MEGAGATLING_PROJECTILE/MEGAGATLING_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
     "upgrades": [
       {
         "level": 2,
@@ -880,6 +918,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/FULL/PLANT/SEASHROOM/SEASHROOM.PAM",
     "projectilePam": "768/FULL/EFFECTS/SEASHROOM_PROJECTILE/SEASHROOM_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.70, "y": 0.50 }],
     "upgrades": [
       {
         "level": 2,
@@ -920,6 +959,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/PUFFSHROOM/PUFFSHROOM.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PUFFSHROOM_PROJECTILE/T_PUFFSHROOM_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.68, "y": 0.55 }],
     "hitPam": "768/INITIAL/EFFECTS/T_PUFFSHROOM_HIT/T_PUFFSHROOM_HIT.PAM",
     "upgrades": [
       {
@@ -960,6 +1000,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/FUMESHROOM/FUMESHROOM.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/FUMESHROOM_BUBBLES/FUMESHROOM_BUBBLES.PAM",
+    "projectileOrigins": [{ "x": 0.68, "y": 0.60 }],
     "hitPam": "768/INITIAL/EFFECTS/FUMESHROOM_BUBBLES_HIT/FUMESHROOM_BUBBLES_HIT.PAM",
     "upgrades": [
       {
@@ -998,6 +1039,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/CABBAGEPULT/CABBAGEPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_CABBAGEPULT_PROJECTILE/T_CABBAGEPULT_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.55, "y": 0.76 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_CABBAGEPULT/SPLAT_CABBAGEPULT.PAM",
     "upgrades": [
       {
@@ -1036,6 +1078,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/KERNALPULT/KERNALPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_KERNALPULT_PROJECTILE/T_KERNALPULT_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.55, "y": 0.76 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_KERNALPULT_KERNAL/SPLAT_KERNALPULT_KERNAL.PAM",
     "upgrades": [
       {
@@ -1076,6 +1119,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/MELONPULT/MELONPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_MELON_PROJECTILE/T_MELON_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.55, "y": 0.78 }],
     "hitPAm": "768/INITIAL/EFFECTS/T_SPLAT_MELONPULT/T_SPLAT_MELONPULT.PAM",
     "upgrades": [
       {
@@ -1117,6 +1161,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/WINTERMELON/WINTERMELON.PAM",
     "projectilePam": "768/FULL/EFFECTS/T_WINTERMELON_PROJECTILE/T_WINTERMELON_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.55, "y": 0.78 }],
     "hitPam": "768/FULL/EFFECTS/T_SPLAT_WINTERMELON/T_SPLAT_WINTERMELON.PAM",
     "upgrades": [
       {
@@ -1158,6 +1203,7 @@
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/PEPPERPULT/PEPPERPULT.PAM",
     "projectilePam": "768/FULL/EFFECTS/PEPPERPULT_PROJECTILE/PEPPERPULT_PROJECTILE.PAM",
+    "projectileOrigins": [{ "x": 0.55, "y": 0.76 }],
     "hitPam": "768/FULL/EFFECTS/PEPPERPULT_PROJECTILE_SPLAT/PEPPERPULT_PROJECTILE_SPLAT.PAM",
     "upgrades": [
       {

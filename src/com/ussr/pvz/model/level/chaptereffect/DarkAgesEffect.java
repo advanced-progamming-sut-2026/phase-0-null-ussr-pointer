@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.Grave;
 import com.ussr.pvz.model.board.terrain.TileType;
+import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.Level;
@@ -54,6 +55,12 @@ public class DarkAgesEffect implements ChapterEffect {
             }
         }
         Collections.shuffle(activeGraves);
+        if (activeGraves.isEmpty()) return;
+        session.getEventBus().publish(
+                new GameEvent.SpecialLevelAnnouncement(
+                        "THE DEAD ARE RISING!"
+                )
+        );
         int spawned = 0;
         for (Grave grave : activeGraves) {
             if (spawned >= perWave) break;
