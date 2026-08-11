@@ -1,9 +1,7 @@
 package com.ussr.pvz.view.components;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import pvz.libpvz.textures.TextureBank;
@@ -14,7 +12,6 @@ public class LawnBackgroundLayer extends Actor {
     private final TextureRegion mainRegion;
     private final TextureRegion rightRegion;
 
-    private final OrthographicCamera camera = new OrthographicCamera();
     private boolean showRight = false;
 
     private LawnBackgroundLayer(TextureBank textures, String mainRegionKey) {
@@ -77,38 +74,36 @@ public class LawnBackgroundLayer extends Actor {
             return;
         }
 
-        batch.end();
-        drawZoomToFit(batch, destWidth, destHeight);
-        batch.setProjectionMatrix(getStage().getCamera().combined);
-        batch.begin();
+        drawInActorCoordinates(batch, destWidth, destHeight);
     }
 
-    private void drawZoomToFit(Batch batch, float destWidth, float destHeight) {
-        float leftWidth = leftRegion != null ? leftRegion.getRegionWidth() : 0f;
-        float mainWidth = mainRegion.getRegionWidth();
-        float rightWidth = (showRight && rightRegion != null) ? rightRegion.getRegionWidth() : 0f;
+    private void drawInActorCoordinates(Batch batch, float destWidth, float destHeight) {
+        float sourceLeftWidth = leftRegion != null ? leftRegion.getRegionWidth() : 0f;
+        float sourceMainWidth = mainRegion.getRegionWidth();
+        float sourceRightWidth =
+                showRight && rightRegion != null ? rightRegion.getRegionWidth() : 0f;
 
-        float worldWidth = leftWidth + mainWidth + rightWidth;
-        float worldHeight = mainRegion.getRegionHeight();
-        if (worldWidth <= 0f || worldHeight <= 0f) {
+        float sourceWidth = sourceLeftWidth + sourceMainWidth + sourceRightWidth;
+        if (sourceWidth <= 0f) {
             return;
         }
 
-        camera.setToOrtho(false, worldWidth, worldHeight);
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
+        float scaleX = destWidth / sourceWidth;
+        float x = getX();
+        float y = getY();
 
-        float x = 0f;
         if (leftRegion != null) {
-            batch.draw(leftRegion, x, 0f, leftWidth, worldHeight);
-            x += leftWidth;
+            float drawWidth = sourceLeftWidth * scaleX;
+            batch.draw(leftRegion, x, y, drawWidth, destHeight);
+            x += drawWidth;
         }
-        batch.draw(mainRegion, x, 0f, mainWidth, worldHeight);
-        x += mainWidth;
+
+        float mainDrawWidth = sourceMainWidth * scaleX;
+        batch.draw(mainRegion, x, y, mainDrawWidth, destHeight);
+        x += mainDrawWidth;
+
         if (showRight && rightRegion != null) {
-            batch.draw(rightRegion, x, 0f, rightWidth, worldHeight);
+            batch.draw(rightRegion, x, y, sourceRightWidth * scaleX, destHeight);
         }
-        batch.end();
     }
 }

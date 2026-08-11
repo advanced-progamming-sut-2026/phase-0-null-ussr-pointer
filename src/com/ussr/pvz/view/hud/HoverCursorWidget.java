@@ -97,7 +97,8 @@ public class HoverCursorWidget extends Actor {
 
     private Vector2 getLocalMousePosition() {
         Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        screenToLocalCoordinates(mouse);
+        getStage().getViewport().unproject(mouse);
+        stageToLocalCoordinates(mouse);
         return mouse;
     }
 

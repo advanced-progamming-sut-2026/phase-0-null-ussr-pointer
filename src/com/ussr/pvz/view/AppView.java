@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
@@ -37,7 +36,6 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.view.mainmenu.profile.ProfileMenu;
@@ -117,13 +115,10 @@ public class AppView implements ApplicationListener {
 
     @Override
     public void create() {
-        // ScreenViewport maps 1 world unit = 1 screen pixel, so UI elements
-        // stay pixel-identical in size no matter the window/display size.
-        // Going fullscreen or resizing the window just reveals more canvas
-        // (screenRoot uses setFillParent(true), so it grows to fill that
-        // extra space) instead of scaling every element up like FitViewport
-        // did.
-        Viewport viewport = new ExtendViewport(1920f, 1080f);
+        // The lawn background, entities, hitboxes and mouse input all share
+        // this fixed logical canvas. Different monitor sizes/aspect ratios only
+        // scale the complete canvas; they never change its world dimensions.
+        Viewport viewport = new FitViewport(1920f, 1080f);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
