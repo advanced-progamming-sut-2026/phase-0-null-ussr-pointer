@@ -10,7 +10,7 @@ public final class LawnGridLayout {
     public static final float CELL_HEIGHT = 115f;
 
     public static final float PLANT_DRAW_OFFSET_X = -40f;
-    public static final float PLANT_DRAW_OFFSET_Y = -30f;
+    public static final float PLANT_DRAW_OFFSET_Y = -40f;
 
     public static final float ZOMBIE_DRAW_OFFSET_X = -40f;
     public static final float ZOMBIE_DRAW_OFFSET_Y = -30f;

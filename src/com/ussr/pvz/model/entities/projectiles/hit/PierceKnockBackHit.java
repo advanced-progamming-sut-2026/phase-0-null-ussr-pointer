@@ -42,6 +42,7 @@ public class PierceKnockBackHit implements HitEffectStrategy{
 
                     hitZombies.add(zombie);
                     zombie.takeDamage(damageAmount,projectile);
+                    projectile.notifyTargetHit(zombie);
                     double newX = zombie.getPosition().x() + knockbackDistance;
                     // Cap the knockback so they don't fall off the right edge of the grid
                     newX = Math.min(newX, 9.5);
@@ -63,5 +64,15 @@ public class PierceKnockBackHit implements HitEffectStrategy{
     @Override
     public int getAreaLength() {
         return 1;
+    }
+
+    @Override
+    public boolean canHit(GameEntity target) {
+        return !(target instanceof Zombie zombie) || !hitZombies.contains(zombie);
+    }
+
+    @Override
+    public boolean continuesAfterHit() {
+        return true;
     }
 }

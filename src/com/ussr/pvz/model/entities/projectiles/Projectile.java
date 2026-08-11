@@ -112,6 +112,7 @@ public class Projectile extends GameEntity {
         for (InteractableStructure structure : interactableStructures) {
             if (!structure.isAlive()) continue;
             if (structure.getPosition() == null) continue;
+            if (hitEffectStrategy != null && !hitEffectStrategy.canHit(structure)) continue;
             if (crossedEntity(structure.getPosition(), 0.2)) {
                 physicalImpactTarget = structure;
                 break;
@@ -122,6 +123,7 @@ public class Projectile extends GameEntity {
             List<Zombie> zombies = session.getZombies();
             for (Zombie zombie : zombies) {
                 if (!zombie.isAlive()) continue;
+                if (hitEffectStrategy != null && !hitEffectStrategy.canHit(zombie)) continue;
                 if (crossedEntity(zombie.getPosition(), 0.2)) {
                     if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense
                             .JesterDefense jester) {
@@ -145,8 +147,14 @@ public class Projectile extends GameEntity {
             return null;
         }
 
-        if (physicalImpactTarget.getPosition() != null) {
+        if (physicalImpactTarget.getPosition() != null
+                && (hitEffectStrategy == null || !hitEffectStrategy.continuesAfterHit())) {
             setPosition(physicalImpactTarget.getPosition());
+        }
+        if (hitEffectStrategy != null && hitEffectStrategy.continuesAfterHit()) {
+            ArrayList<GameEntity> targets = new ArrayList<>();
+            targets.add(physicalImpactTarget);
+            return targets;
         }
         return targetFinder(interactableStructures, session);
     }
@@ -278,6 +286,12 @@ public class Projectile extends GameEntity {
 
     public Object getMoveStrategy() {
         return moveStrategy;
+    }
+
+    public void notifyTargetHit(Damageable hitTarget) {
+        if (moveStrategy != null && hitTarget != null) {
+            moveStrategy.onTargetHit(this, hitTarget);
+        }
     }
 
     public int getDamage() {

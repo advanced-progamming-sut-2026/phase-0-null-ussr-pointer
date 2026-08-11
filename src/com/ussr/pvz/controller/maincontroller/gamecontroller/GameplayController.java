@@ -267,6 +267,24 @@ public class GameplayController {
         gameService.collectSun(new LocationRequest(String.valueOf(x), String.valueOf(y)));
     }
 
+    // ── Beghouled upgrades ────────────────────────────────────────────────────
+
+    /**
+     * Called by {@link com.ussr.pvz.view.hud.BeghouledUpgradePanel} when the
+     * player clicks an upgrade button.
+     *
+     * @param plantType the current plant type key (lower-case), e.g. "peashooter"
+     */
+    public void upgradeBeghouledPlant(String plantType) {
+        if (isPaused()) return;
+        String result = beghouledService.upgradePlant(plantType);
+        if (result.startsWith("Successfully")) {
+            NotificationCenter.success(result);
+        } else {
+            NotificationCenter.warning(result);
+        }
+    }
+
     public boolean isShovelModeActive()    { return shovelModeActive; }
     public boolean isPlantFoodModeActive() { return plantFoodModeActive; }
     public String  getSelectedSeedKey()    { return selectedSeedKey; }

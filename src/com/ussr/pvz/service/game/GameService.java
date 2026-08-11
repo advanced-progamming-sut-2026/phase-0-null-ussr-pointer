@@ -64,8 +64,16 @@ public class GameService {
             return "Minigames can only be accessed from the Travel Log.";
         }
 
-        if (App.getLevelManager().findChapter(chapterId) == null) {
+        var chapter = App.getLevelManager().findChapter(chapterId);
+        if (chapter == null) {
             return "chapter not found: " + chapterId;
+        }
+
+        Account account = App.getAccount();
+        if (account == null || !account.getAdventureProgress().isChapterUnlocked(
+                chapter,
+                App.getLevelManager().getChapters())) {
+            return "chapter is locked: finish the previous chapter first.";
         }
 
         try {
@@ -116,8 +124,16 @@ public class GameService {
             return "world name cannot be null.";
         }
 
-        if (App.getLevelManager().findChapter(worldId) == null) {
+        var chapter = App.getLevelManager().findChapter(worldId);
+        if (chapter == null) {
             return "world not found: " + worldId;
+        }
+
+        Account account = App.getAccount();
+        if (account == null || !account.getAdventureProgress().isChapterUnlocked(
+                chapter,
+                App.getLevelManager().getChapters())) {
+            return "world is locked: finish the previous chapter first.";
         }
 
         try {

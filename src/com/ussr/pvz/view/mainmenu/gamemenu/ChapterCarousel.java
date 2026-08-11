@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.level.Chapter;
+import com.ussr.pvz.model.App;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.HashMap;
@@ -158,11 +159,12 @@ public class ChapterCarousel extends Group {
 
     private Table createCard(int index) {
         Chapter chapter = chapters.get(index);
+        boolean unlocked = isUnlocked(chapter);
         Table card = new Table();
         card.setSize(CARD_WIDTH, CARD_HEIGHT);
         card.setTransform(true);
         card.setOrigin(Align.center);
-        ImageButton image = createImageButton(chapter.getMenuRegion());
+        ImageButton image = createImageButton(chapter.getMenuRegion(), unlocked);
         image.addListener(listener(() -> clickCard(index)));
         Label title = new Label(chapter.getName(), skin, "medium_outline");
         title.setAlignment(Align.center);
@@ -170,22 +172,41 @@ public class ChapterCarousel extends Group {
         title.setTouchable(Touchable.disabled);
         card.add(image).width(170f).height(205f).row();
         card.add(title).width(180f).height(40f).padTop(4f);
+        if (!unlocked) {
+            Label locked = new Label("LOCKED", skin);
+            locked.setColor(Color.LIGHT_GRAY);
+            locked.setTouchable(Touchable.disabled);
+            card.row();
+            card.add(locked).padTop(2f);
+        }
         return card;
     }
 
-    private ImageButton createImageButton(String regionName) {
+    private ImageButton createImageButton(String regionName, boolean unlocked) {
         TextureRegion region = textures.region(regionName);
         if (region == null) {
             throw new IllegalArgumentException("Atlas region not found: " + regionName);
         }
-        TextureRegionDrawable normal = new TextureRegionDrawable(region);
-        Drawable pressed = normal.tint(new Color(0.8f, 0.8f, 0.8f, 1f));
+        TextureRegionDrawable source = new TextureRegionDrawable(region);
+        Drawable normal = unlocked
+                ? source
+                : source.tint(new Color(0.38f, 0.38f, 0.38f, 0.72f));
+        Drawable pressed = source.tint(new Color(0.8f, 0.8f, 0.8f, 1f));
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = normal;
         style.imageDown = pressed;
         ImageButton button = new ImageButton(style);
         button.getImage().setScaling(Scaling.fit);
         return button;
+    }
+
+    private boolean isUnlocked(Chapter chapter) {
+        return App.getAccount() != null
+                && App.getAccount().getAdventureProgress() != null
+                && App.getAccount().getAdventureProgress().isChapterUnlocked(
+                        chapter,
+                        App.getLevelManager().getChapters()
+                );
     }
 
     private void clickCard(int index) {

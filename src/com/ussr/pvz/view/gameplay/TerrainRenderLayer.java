@@ -12,6 +12,9 @@ import com.ussr.pvz.model.board.structures.*;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.behavior.SaveOurSeedsBehavior;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.chaptereffect.BigWaveBeachEffect;
 import com.ussr.pvz.view.animation.PamActor;
 import pvz.libpvz.pam.PamPlayer;
@@ -279,6 +282,40 @@ public class TerrainRenderLayer extends Group {
                     lawn
             );
         }
+
+        // SaveOurSeeds: draw a protective tile highlight under each endangered plant.
+        drawProtectTiles(batch, parentAlpha);
+    }
+
+    /**
+     * If the current level uses {@link SaveOurSeedsBehavior}, draws the
+     * IMAGE_BACKGROUNDS_PROTECT_TILE texture under each endangered plant cell.
+     */
+    private void drawProtectTiles(Batch batch, float parentAlpha) {
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLevel() == null) return;
+
+        LevelBehavior behavior = session.getLevel().getBehavior();
+        if (!(behavior instanceof SaveOurSeedsBehavior sos)) return;
+
+        TextureRegion tile = textures.region(
+                "IMAGE_BACKGROUNDS_PROTECT_TILE_PROTECT_TILE_112X125");
+        if (tile == null) return;
+
+        Color prev = new Color(batch.getColor());
+        batch.setColor(1f, 1f, 1f, parentAlpha);
+
+        for (Plant plant : sos.getEndangeredPlants()) {
+            if (plant == null || !plant.isAlive()) continue;
+            Plant.Location loc = plant.getLocation();
+            if (loc == null) continue;
+
+            float x = LawnGridLayout.cellX(loc.x()) + LawnGridLayout.TILE_DRAW_OFFSET_X;
+            float y = LawnGridLayout.cellY(loc.y()) + LawnGridLayout.TILE_DRAW_OFFSET_Y;
+            batch.draw(tile, x, y, LawnGridLayout.CELL_WIDTH, LawnGridLayout.CELL_HEIGHT);
+        }
+
+        batch.setColor(prev);
     }
 
     private void drawWaterTile(

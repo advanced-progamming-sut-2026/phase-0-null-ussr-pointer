@@ -13,12 +13,12 @@ public class LevelSelectionService {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         if (chapter == null) return "No chapter selected.";
 
-        int currentLvlProgress = App.getAccount().getAdventureProgress().getCurrentLvl();
         StringBuilder sb = new StringBuilder("--- Levels in " + chapter.getId() + " ---\n");
 
         List<Level> levels = chapter.getLevels();
         for (Level level : levels) {
-            boolean unlocked = level.getOrder() <= currentLvlProgress;
+            boolean unlocked = App.getAccount().getAdventureProgress()
+                    .isLevelUnlocked(chapter, level, App.getLevelManager().getChapters());
             sb.append("- ").append(level.getId())
                     .append(unlocked ? " [UNLOCKED]" : " [LOCKED]")
                     .append("\n");
@@ -40,10 +40,8 @@ public class LevelSelectionService {
 
         if (targetLevel == null) return "Level not found in this chapter.";
 
-        int currentLvlProgress = App.getAccount().getAdventureProgress().getCurrentLvl();
-
-        // Check if level is locked based on user order progress
-        if (targetLevel.getOrder() > currentLvlProgress) {
+        if (!App.getAccount().getAdventureProgress()
+                .isLevelUnlocked(chapter, targetLevel, App.getLevelManager().getChapters())) {
             pendingCheatLevelId = levelId;
             return "This level is locked! Do you want to use a cheat code to enter? (yes/no)";
         }

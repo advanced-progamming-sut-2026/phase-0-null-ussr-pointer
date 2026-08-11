@@ -166,10 +166,14 @@ public class GraphicalLevelSelectionMenu extends Table {
 
     private boolean isUnlocked(Level level) {
         Account account = App.getAccount();
+        Chapter chapter = App.getLevelManager().getCurrentChapter();
         return account != null
                 && account.getAdventureProgress() != null
-                && level.getOrder()
-                <= account.getAdventureProgress().getCurrentLvl();
+                && account.getAdventureProgress().isLevelUnlocked(
+                        chapter,
+                        level,
+                        App.getLevelManager().getChapters()
+                );
     }
 
     private boolean isZombossNode(Level level) {
