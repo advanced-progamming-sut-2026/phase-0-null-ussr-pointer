@@ -50,6 +50,7 @@ public class InGameHud extends Table implements Disposable {
 
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer();
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
+        LawnGridDebugOverlay lawnGridDebugOverlay = new LawnGridDebugOverlay(skin);
 
         seedBankHud.setOnPlantSelected(controller::setSelectedSeed);
         controller.setOnPlantingCompleted(this::clearPlantSelection);
@@ -73,13 +74,12 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: Vertical seed bank (left) | objectives (center) | wave bar | debug | pause (right)
+        // Top Row: Vertical seed bank (left) | objectives (center) | controls (right)
         Table topRow = new Table();
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
 
-        // Flush top row directly to upper edge (padTop 0) to eliminate black strip
-        topRow.add(seedBankHud).top().left().pad(2f, 4f, 0f, 0f);
+        topRow.add(seedBankHud).top().left().pad(0f, 4f, 0f, 0f);
         topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
 
         Table topRightControls = new Table();
@@ -112,7 +112,7 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(12f);
         bottomRow.add(shovelWidget).bottom().right().padRight(20f).padBottom(12f);
 
-        // Center overlay (objectives lawn widget, etc.)
+        // Center overlay
         Stack lawnStack = new Stack();
         lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
@@ -134,6 +134,7 @@ public class InGameHud extends Table implements Disposable {
         rootStack.setTouchable(Touchable.childrenOnly);
         rootStack.add(mainGameLayer);
         rootStack.add(conveyorLayer);
+        rootStack.add(lawnGridDebugOverlay);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
         rootStack.add(eventAnnouncer);
@@ -150,7 +151,6 @@ public class InGameHud extends Table implements Disposable {
         conveyorBeltWidget.clearSelection();
     }
 
-    /** Exposed so HoverCursorWidget can read plant-food mode state. */
     public PlantFoodWidget getPlantFoodWidget() {
         return plantFoodWidget;
     }
