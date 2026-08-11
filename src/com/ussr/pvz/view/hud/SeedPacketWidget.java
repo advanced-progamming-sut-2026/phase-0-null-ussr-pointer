@@ -1,7 +1,9 @@
 package com.ussr.pvz.view.hud;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -26,6 +28,7 @@ public class SeedPacketWidget extends Stack {
     private final Image portraitIcon;
     private final Label costLabel;
     private final CooldownOverlay cooldownOverlay;
+    private final Actor selectionFrame;
     private final boolean availabilityRestricted;
 
     private boolean affordable = true;
@@ -69,6 +72,14 @@ public class SeedPacketWidget extends Stack {
 
         cooldownOverlay = new CooldownOverlay();
         add(cooldownOverlay);
+
+        Drawable goldPixel = skin.has("white-pixel", Drawable.class)
+                ? skin.newDrawable("white-pixel", new Color(1f, 0.72f, 0.08f, 1f))
+                : null;
+        selectionFrame = new SelectionFrame(goldPixel);
+        selectionFrame.setTouchable(Touchable.disabled);
+        selectionFrame.setVisible(false);
+        add(selectionFrame);
 
         Table costLayer = new Table();
         costLayer.setTouchable(Touchable.disabled);
@@ -119,7 +130,12 @@ public class SeedPacketWidget extends Stack {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-        setY(selected ? 10f : 0f);
+        // This widget is positioned by SeedBankHud's Table. Changing Y here
+        // overrides the table layout and makes vertically stacked packets
+        // collapse onto one another after the first selection.
+        setOrigin(Align.center);
+        setScale(selected ? 1.05f : 1f);
+        selectionFrame.setVisible(selected);
     }
 
     public boolean isSelected() {
@@ -128,5 +144,29 @@ public class SeedPacketWidget extends Stack {
 
     public Plant getBlueprint() {
         return blueprint;
+    }
+
+    private static final class SelectionFrame extends Actor {
+        private static final float BORDER_WIDTH = 5f;
+        private final Drawable pixel;
+
+        private SelectionFrame(Drawable pixel) {
+            this.pixel = pixel;
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            if (pixel == null) return;
+
+            float x = getX();
+            float y = getY();
+            float width = getWidth();
+            float height = getHeight();
+
+            pixel.draw(batch, x, y, width, BORDER_WIDTH);
+            pixel.draw(batch, x, y + height - BORDER_WIDTH, width, BORDER_WIDTH);
+            pixel.draw(batch, x, y, BORDER_WIDTH, height);
+            pixel.draw(batch, x + width - BORDER_WIDTH, y, BORDER_WIDTH, height);
+        }
     }
 }

@@ -100,8 +100,6 @@ public class InGameHud extends Table implements Disposable {
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
         conveyorLayer.top().left();
-        conveyorLayer.add(conveyorBeltWidget).top().left().padTop(65f).padLeft(12f);
-
         conveyorLayer.add(conveyorBeltWidget)
                 .top()
                 .left()

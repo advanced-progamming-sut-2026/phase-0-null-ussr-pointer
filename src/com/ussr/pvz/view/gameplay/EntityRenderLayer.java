@@ -15,6 +15,7 @@ import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
@@ -438,11 +439,9 @@ public class EntityRenderLayer extends Group {
             }
 
             if (!proj.isAlive() && actor.phase == ProjectilePamActor.Phase.FLYING) {
-                float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                float hy = LawnGridLayout.worldY(proj.getPosition().y())
-                        + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                float[] impact = plantProjectileScreenPosition(proj);
                 actor.clearActions();
-                actor.triggerHit(hx, hy);
+                actor.triggerHit(impact[0], impact[1]);
                 plantProjectileRenderTargets.remove(proj);
             } else if (proj.isAlive()) {
                 float[] target = plantProjectileScreenPosition(proj);
@@ -466,11 +465,9 @@ public class EntityRenderLayer extends Group {
             if (!liveSet.contains(entry.getKey())) {
                 if (actor.phase == ProjectilePamActor.Phase.FLYING) {
                     Projectile proj = entry.getKey();
-                    float hx = LawnGridLayout.worldX(proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-                    float hy = LawnGridLayout.worldY(proj.getPosition().y())
-                            + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
+                    float[] impact = plantProjectileScreenPosition(proj);
                     actor.clearActions();
-                    actor.triggerHit(hx, hy);
+                    actor.triggerHit(impact[0], impact[1]);
                     plantProjectileRenderTargets.remove(proj);
                 } else if (actor.isDone()) {
                     actor.remove();
@@ -482,6 +479,15 @@ public class EntityRenderLayer extends Group {
     }
 
     private float[] plantProjectileScreenPosition(Projectile projectile) {
+        if (projectile.getMoveStrategy() instanceof ArcMove) {
+            float x = LawnGridLayout.worldX(projectile.getPosition().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f;
+            float y = LawnGridLayout.worldY(projectile.getPosition().y())
+                    + (float) projectile.getVisualHeight()
+                    * LawnGridLayout.CELL_HEIGHT;
+            return new float[]{x, y};
+        }
+
         Vec2 origin = projectile.getVisualLaunchOrigin();
         float blend = projectile.getVisualLaunchBlend();
 
@@ -490,7 +496,7 @@ public class EntityRenderLayer extends Group {
                 + ((float) origin.x() - 0.5f) * LawnGridLayout.CELL_WIDTH * blend;
         float y = LawnGridLayout.worldY(projectile.getPosition().y())
                 + (float) projectile.getVisualHeight() * LawnGridLayout.CELL_HEIGHT
-                + (float) origin.y() * LawnGridLayout.CELL_HEIGHT * blend;
+                + (float) origin.y() * LawnGridLayout.CELL_HEIGHT;
 
         return new float[]{x, y};
     }

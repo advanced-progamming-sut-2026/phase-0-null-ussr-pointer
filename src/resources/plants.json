@@ -223,7 +223,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/PEASHOOTER/PEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
-    "projectileOrigins": [{ "x": 0.9, "y": 0.0 }],
+    "projectileOrigins": [{ "x": 0.9, "y": 0.6 }],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "upgrades": [
       {
@@ -266,8 +266,8 @@
     "pamLocation": "768/INITIAL/PLANT/REPEATER/REPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
-      { "x": 0.9, "y": 0.0 },
-      { "x": 0.9, "y": 0.0 }
+      { "x": 0.9, "y": 0.6 },
+      { "x": 0.9, "y": 0.6 }
     ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "plantFoodProjectilePam": "768/INITIAL/EFFECTS/REPEATER_PLANTFOOD_GIANTPEA/REPEATER_PLANTFOOD_GIANTPEA.PAM",
@@ -313,9 +313,9 @@
     "pamLocation": "768/INITIAL/PLANT/THREEPEATER/THREEPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
-      { "x": 0.72, "y": 0.2 },
-      { "x": 0.9, "y": 0.0 },
-      { "x": 0.80, "y": -0.2 }
+      { "x": 0.62, "y": 0.8 },
+      { "x": 0.9, "y": 0.55 },
+      { "x": 0.40, "y": 0.45 }
     ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "upgrades": [
@@ -359,7 +359,7 @@
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_SNOW_PEA/T_SNOW_PEA.PAM",
-    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
+    "projectileOrigins": [{ "x": 0.9, "y": 0.6 }],
     "hitPam": "768/INITIAL/EFFECTS/T_SPLAT_SNOW_PEA/T_SPLAT_SNOW_PEA.PAM",
     "upgrades": [
       {

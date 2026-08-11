@@ -5,19 +5,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.service.CollectionService.PlantData;
 import com.ussr.pvz.view.FadingMenu;
-import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.components.PlantCard;
 import pvz.libpvz.textures.TextureBank;
 
@@ -53,12 +50,7 @@ public class ChoosePlantMenu extends FadingMenu {
 
     private void buildUI() {
         setFillParent(true);
-
-        Stack layers = new Stack();
-        layers.setFillParent(true);
-
-        layers.add(createBackground());
-        layers.add(createDimLayer());
+        applyBackground();
 
         Table root = new Table();
         root.setFillParent(true);
@@ -67,26 +59,14 @@ public class ChoosePlantMenu extends FadingMenu {
         root.add(buildLeftPanel()).expand().fill();
         root.add(buildDetailPanel()).width(210).fillY().padLeft(10);
 
-        layers.add(root);
-        addActor(layers);
+        addActor(root);
     }
 
-    private LawnBackgroundLayer createBackground() {
-        Chapter currentChapter = App.getLevelManager().getCurrentChapter();
-        String regionKey = currentChapter != null && currentChapter.getLawnRegion() != null
-                ? currentChapter.getLawnRegion()
-                : "IMAGE_BACKGROUNDS_EGYPT_TEXTURE";
-
-        return LawnBackgroundLayer.forMenuPreview(textures, regionKey);
-    }
-
-    private Image createDimLayer() {
-        Image dim = new Image(skin.newDrawable(
-                "white-pixel",
-                new Color(0f, 0f, 0f, 0.45f)
-        ));
-        dim.setTouchable(Touchable.disabled);
-        return dim;
+    private void applyBackground() {
+        TextureRegion background = textures.region("image_ui_dialog_asset_dialogborder");
+        if (background != null) {
+            setBackground(new TextureRegionDrawable(background));
+        }
     }
 
     private Actor buildLeftPanel() {

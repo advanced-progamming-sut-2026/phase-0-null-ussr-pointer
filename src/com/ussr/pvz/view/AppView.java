@@ -58,6 +58,10 @@ import static com.badlogic.gdx.Gdx.files;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class AppView implements ApplicationListener {
+    private static final float MENU_WORLD_WIDTH = 1280f;
+    private static final float MENU_WORLD_HEIGHT = 720f;
+    private static final float GAME_WORLD_WIDTH = 1920f;
+    private static final float GAME_WORLD_HEIGHT = 1080f;
     private final GlobalController globalController = new GlobalController();
     private Stage stage;
     private Skin skin;
@@ -118,7 +122,7 @@ public class AppView implements ApplicationListener {
         // The lawn background, entities, hitboxes and mouse input all share
         // this fixed logical canvas. Different monitor sizes/aspect ratios only
         // scale the complete canvas; they never change its world dimensions.
-        Viewport viewport = new FitViewport(1920f, 1080f);
+        Viewport viewport = new FitViewport(MENU_WORLD_WIDTH, MENU_WORLD_HEIGHT);
 
         stage = new Stage(viewport);
         skin = PvzSkin.get();
@@ -343,6 +347,8 @@ public class AppView implements ApplicationListener {
         disposeCurrentScreen();
         screenRoot.clearChildren();
 
+        configureViewportFor(state);
+
         switch (state) {
             case REGISTER ->
                     screenRoot.add(new RegisterMenu(skin)).grow();
@@ -419,6 +425,23 @@ public class AppView implements ApplicationListener {
         updateMenuMusic(state);
         displayedActiveGameplay = state == MenuState.GAME
                 && App.getGameSession() != null;
+    }
+
+    private void configureViewportFor(MenuState state) {
+        boolean activeGameplay = state == MenuState.GAME
+                && App.getGameSession() != null;
+        float worldWidth = activeGameplay ? GAME_WORLD_WIDTH : MENU_WORLD_WIDTH;
+        float worldHeight = activeGameplay ? GAME_WORLD_HEIGHT : MENU_WORLD_HEIGHT;
+
+        Viewport current = stage.getViewport();
+        if (current.getWorldWidth() == worldWidth
+                && current.getWorldHeight() == worldHeight) {
+            return;
+        }
+
+        Viewport viewport = new FitViewport(worldWidth, worldHeight);
+        stage.setViewport(viewport);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     private void updateMenuMusic(MenuState state) {

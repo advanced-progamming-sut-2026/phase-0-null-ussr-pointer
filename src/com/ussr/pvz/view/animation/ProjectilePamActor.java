@@ -14,8 +14,8 @@ public class ProjectilePamActor extends PamActor {
     public ProjectilePamActor(PamPlayer player, String projectilePamPath, String hitPamPath) {
         super(player, projectilePamPath != null ? projectilePamPath : "", "idle");
         this.hitPamPath = hitPamPath;
-        this.pamScale = 1f;
-        this.offsetY = 40f;
+        this.pamScale = 0.4f;
+        this.offsetY = 0f;
 
         // EntityRenderLayer supplies the projectile's exact visual centre.
         // PamActor normally adds half of its 80x80 layout size while drawing,

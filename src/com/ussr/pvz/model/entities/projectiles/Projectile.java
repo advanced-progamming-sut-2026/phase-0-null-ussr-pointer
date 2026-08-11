@@ -284,12 +284,12 @@ public class Projectile extends GameEntity {
     private ArrayList<GameEntity> checkArcCollision() {
         if (!(moveStrategy instanceof ArcMove arcMove)) return null;
 
+        GameSession session = App.getGameSession();
+        if (session == null) return null;
+
         if (!arcMove.hasLanded()) {
             return null;
         }
-
-        GameSession session = App.getGameSession();
-        if (session == null) return null;
 
         ArrayList<InteractableStructure> interactableStructures = session.getLawn().getAllInteractable();
 
