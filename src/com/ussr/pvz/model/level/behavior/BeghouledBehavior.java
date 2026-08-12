@@ -29,6 +29,9 @@ public class BeghouledBehavior extends LevelBehavior {
     public BeghouledBehavior(int targetMatches, List<String> startingPlants) {
         this.targetMatches = targetMatches;
         this.rootPlantTypes = startingPlants;
+        // Beghouled is won by reaching the match objective, never merely by
+        // clearing the current zombie waves.
+        this.autoWinOnWavesClear = false;
         for (String plant : startingPlants) {
             activePlantTypes.put(plant.toLowerCase(), plant.toLowerCase());
         }
@@ -76,6 +79,14 @@ public class BeghouledBehavior extends LevelBehavior {
     @Override
     public boolean isFailed(Level level) {
         return false;
+    }
+
+    @Override
+    public void tick(GameSession session, double deltaTime) {
+        super.tick(session, deltaTime);
+        if (!levelCompleted && !session.isGameOver()) {
+            checkWinCondition(session);
+        }
     }
 
     public boolean isWon() {

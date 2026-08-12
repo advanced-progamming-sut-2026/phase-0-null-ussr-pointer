@@ -241,6 +241,7 @@ public class ZombieFactory {
     private static void attachPushedStructureIfNeeded(Zombie zombie, Map<String, Object> data) {
         PushableType type = switch (zombie.getAlias()) {
             case "ZombieArcade" -> PushableType.ARCADE_CABINET;
+            case "ZombiePiano" -> PushableType.PIANO;
             case "ZombieIceAgeTroglobite" -> PushableType.ICE_BLOCK;
             case "ZombieBarrelRoller", "ZombieBarrel" -> PushableType.BARREL;
             default -> null;

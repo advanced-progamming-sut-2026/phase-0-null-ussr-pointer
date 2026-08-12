@@ -139,7 +139,13 @@ public class IZombieBehavior extends LevelBehavior {
         }
 
         // 2. Defeat Evaluation (Out of options entirely)
-        boolean outOfSun = session.getSunCount() < 50;
+        int cheapestZombieCost = session.getLevel().getAllowedZombies().stream()
+                .mapToInt(allowed -> com.ussr.pvz.model.entities.zombies.ZombieFactory
+                        .getZombieCost(allowed.id()))
+                .filter(cost -> cost > 0)
+                .min()
+                .orElse(50);
+        boolean cannotAffordZombie = session.getSunCount() < cheapestZombieCost;
         boolean anyAttackersAlive = session.getZombies().stream()
                 .filter(z -> !"SunProducerZombie".equals(z.getAlias()))
                 .anyMatch(GameEntity::isAlive);
@@ -147,7 +153,7 @@ public class IZombieBehavior extends LevelBehavior {
                 .filter(z -> "SunProducerZombie".equals(z.getAlias()))
                 .anyMatch(GameEntity::isAlive);
 
-        if (outOfSun && !anyAttackersAlive && !anyProducersAlive) {
+        if (cannotAffordZombie && !anyAttackersAlive && !anyProducersAlive) {
             this.missionFailed = true;
             session.getEventBus().publish(new GameEvent.GameOver());
         }

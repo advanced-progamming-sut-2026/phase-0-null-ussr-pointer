@@ -24,11 +24,22 @@ public class PushableStructure extends InteractableStructure implements Damageab
 
     @Override
     public void takeDamage(int damage) {
-        if (!this.isAlive()) return;
-        this.hp -= damage;
+        absorbDamage(damage);
+    }
+
+    /**
+     * Applies damage to this prop and returns only the amount left after it
+     * breaks, allowing a sufficiently strong hit to continue into its carrier.
+     */
+    public int absorbDamage(int damage) {
+        if (!this.isAlive() || damage <= 0) return Math.max(0, damage);
+        int absorbed = Math.min(this.hp, damage);
+        this.hp -= absorbed;
         if (this.hp <= 0) {
+            this.hp = 0;
             this.setAlive(false);
         }
+        return damage - absorbed;
     }
 
     @Override

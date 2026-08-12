@@ -26,7 +26,9 @@ public final class LawnGridLayout {
     public static final float TILE_DRAW_OFFSET_Y = -10f;
 
     public static final float WATER_DRAW_OFFSET_X = 10f;
-    public static final float WATER_DRAW_OFFSET_Y = -30f;
+    // Keep the 12 px overlap for a continuous surface, but move the complete
+    // sheet upward so it follows the lawn rows instead of hanging below them.
+    public static final float WATER_DRAW_OFFSET_Y = -10f;
     public static final float WATER_DRAW_WIDTH = CELL_WIDTH + 12f;
     public static final float WATER_DRAW_HEIGHT = CELL_HEIGHT + 12f;
     public static final float WATER_TOP_ROW_EXTENSION = 18f;

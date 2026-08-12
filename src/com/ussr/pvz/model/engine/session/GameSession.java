@@ -124,7 +124,11 @@ public class GameSession {
             } catch (IllegalStateException e) {
                 System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
             }
-            if (firstClear && App.getLevelManager().getCurrentChapter().getGameMode().equals(GameMode.MINIGAME)) {
+            com.ussr.pvz.model.level.Chapter completedChapter = level == null
+                    ? null
+                    : App.getLevelManager().findChapter(level.getChapter());
+            if (firstClear && completedChapter != null
+                    && completedChapter.getGameMode().equals(GameMode.MINIGAME)) {
                 NewsObserver.triggerNewMiniGame(this.level);
             }
 

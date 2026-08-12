@@ -125,7 +125,10 @@ public class ActiveGameplayView extends Table implements Disposable {
     }
 
     private Actor createBackground(TextureBank textures) {
-        Chapter currentChapter = App.getLevelManager().getCurrentChapter();
+        GameSession session = App.getGameSession();
+        Chapter currentChapter = session != null && session.getLevel() != null
+                ? App.getLevelManager().findChapter(session.getLevel().getChapter())
+                : App.getLevelManager().getCurrentChapter();
 
         String regionKey = currentChapter != null
                 ? currentChapter.getLawnRegion()

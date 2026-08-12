@@ -398,8 +398,12 @@ public class Zombie extends GameEntity implements Damageable {
     private void applyDamageCalculations(int damage, Object damageSource) {
         int remaining = damage;
 
-        if (armor != null && !armor.isDestroyed()) {
-            remaining = armor.takeDamage(damage);
+        if (pushedStructure != null && pushedStructure.isAlive()) {
+            remaining = pushedStructure.absorbDamage(remaining);
+        }
+
+        if (remaining > 0 && armor != null && !armor.isDestroyed()) {
+            remaining = armor.takeDamage(remaining);
         }
 
         if (remaining > 0) {

@@ -21,6 +21,12 @@ public class VaseBreakerBehavior extends LevelBehavior {
     private final List<Vase> vases = new ArrayList<>();
     private final Random rand = new Random();
 
+    public VaseBreakerBehavior() {
+        // Empty wave data must not complete Vasebreaker. It is won only after
+        // every vase is broken and every released zombie is defeated.
+        this.autoWinOnWavesClear = false;
+    }
+
     @Override
     public void onStart(Level level) {
         super.onStart(level);

@@ -191,8 +191,9 @@ public class TerrainRenderLayer extends Group {
     private PamActor createGraveActor(Grave grave) {
         String pamPath = grave.getContent().getPamLocation();
 
-        if (App.getLevelManager() != null && App.getLevelManager().getCurrentChapter() != null) {
-            String chapterId = App.getLevelManager().getCurrentChapter().getId();
+        GameSession session = App.getGameSession();
+        if (session != null && session.getLevel() != null) {
+            String chapterId = session.getLevel().getChapter();
             if ("ancient_egypt".equals(chapterId)) {
                 pamPath = "768/INITIAL/GRAVESTONES/EGYPT_HIEROGLYPH/EGYPT_HIEROGLYPH.PAM";
             }
@@ -257,6 +258,11 @@ public class TerrainRenderLayer extends Group {
             float parentAlpha,
             Lawn lawn
     ) {
+        int coastColumn = findCoastColumn(lawn);
+        if (coastColumn >= 0) {
+            drawContinuousWater(batch, parentAlpha, lawn, coastColumn);
+        }
+
         for (int row = 0; row < lawn.getRows(); row++) {
             for (int col = 0; col < lawn.getCols(); col++) {
                 Cell cell = lawn.getCell(row, col);
@@ -275,7 +281,7 @@ public class TerrainRenderLayer extends Group {
             }
         }
 
-        if (findCoastColumn(lawn) >= 0) {
+        if (coastColumn >= 0) {
             drawWaterLimitLine(
                     batch,
                     parentAlpha,
@@ -318,11 +324,11 @@ public class TerrainRenderLayer extends Group {
         batch.setColor(prev);
     }
 
-    private void drawWaterTile(
+    private void drawContinuousWater(
             Batch batch,
             float parentAlpha,
-            int col,
-            int row
+            Lawn lawn,
+            int coastColumn
     ) {
         TextureRegion water = textures.region(
                 "IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_174X209"
@@ -333,22 +339,23 @@ public class TerrainRenderLayer extends Group {
         }
 
         float x =
-                LawnGridLayout.cellX(col)
+                LawnGridLayout.cellX(coastColumn)
                         + LawnGridLayout.WATER_DRAW_OFFSET_X
                         + (LawnGridLayout.CELL_WIDTH
                         - LawnGridLayout.WATER_DRAW_WIDTH) / 2f;
 
         float y =
-                LawnGridLayout.cellY(row)
+                LawnGridLayout.cellY(0)
                         + LawnGridLayout.WATER_DRAW_OFFSET_Y
                         + (LawnGridLayout.CELL_HEIGHT
                         - LawnGridLayout.WATER_DRAW_HEIGHT) / 2f;
 
         Color previous = new Color(batch.getColor());
+        float drawWidth = LawnGridLayout.WATER_DRAW_WIDTH
+                + (lawn.getCols() - coastColumn - 1) * LawnGridLayout.CELL_WIDTH;
         float drawHeight = LawnGridLayout.WATER_DRAW_HEIGHT
-                + (row == LawnGridLayout.ROWS - 1
-                ? LawnGridLayout.WATER_TOP_ROW_EXTENSION
-                : 0f);
+                + (lawn.getRows() - 1) * LawnGridLayout.CELL_HEIGHT
+                + LawnGridLayout.WATER_TOP_ROW_EXTENSION;
 
         TextureRegion base = textures.region(
                 "IMAGE_BACKGROUNDS_WATER_UNDERLAYER_WATER_UNDERLAYER_1586X49"
@@ -359,7 +366,7 @@ public class TerrainRenderLayer extends Group {
                     base,
                     x,
                     y,
-                    LawnGridLayout.WATER_DRAW_WIDTH,
+                    drawWidth,
                     drawHeight
             );
         }
@@ -375,7 +382,7 @@ public class TerrainRenderLayer extends Group {
                 water,
                 x,
                 y,
-                LawnGridLayout.WATER_DRAW_WIDTH,
+                drawWidth,
                 drawHeight
         );
 
@@ -388,13 +395,6 @@ public class TerrainRenderLayer extends Group {
             int col,
             int row
     ) {
-        drawWaterTile(
-                batch,
-                parentAlpha,
-                col,
-                row
-        );
-
         TextureRegion coast = textures.region(
                 "IMAGE_EFFECTS_SHALLOW_PUDDLE_TILE_SHALLOW_PUDDLE_TILE_38X105"
         );
@@ -454,12 +454,7 @@ public class TerrainRenderLayer extends Group {
         }
 
         if (type == TileType.Water) {
-            drawWaterTile(
-                    batch,
-                    parentAlpha,
-                    col,
-                    row
-            );
+            // All water and coast cells are covered by one continuous sheet.
             return;
         }
 
@@ -592,12 +587,12 @@ public class TerrainRenderLayer extends Group {
         }
 
         float height = LawnGridLayout.CELL_HEIGHT * lawn.getRows();
-        float width = height
-                * marker.getRegionWidth()
-                / marker.getRegionHeight();
-        float x = LawnGridLayout.cellX(BigWaveBeachEffect.WATER_LIMIT_COLUMN)
-                + LawnGridLayout.TILE_DRAW_OFFSET_X
-                - width * 0.5f;
+        float width = LawnGridLayout.CELL_WIDTH * 0.45f;
+        float tideLimitX = LawnGridLayout.cellX(BigWaveBeachEffect.WATER_LIMIT_COLUMN)
+                + LawnGridLayout.WATER_DRAW_OFFSET_X;
+        // The right edge of this narrow marker is the furthest inland point
+        // that shallow water can reach.
+        float x = tideLimitX - width;
         float y = LawnGridLayout.cellY(0)
                 + LawnGridLayout.TILE_DRAW_OFFSET_Y;
 

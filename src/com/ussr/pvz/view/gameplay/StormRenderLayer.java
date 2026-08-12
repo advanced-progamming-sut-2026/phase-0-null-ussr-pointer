@@ -11,6 +11,11 @@ import pvz.libpvz.pam.PamPlayer;
 
 public class StormRenderLayer extends Group {
 
+    /** PamActor draws around the centre of its default 80x80 actor bounds. */
+    private static final float PAM_ACTOR_HALF_SIZE = 40f;
+    private static final float WIND_PAM_CANVAS_SIZE = 390f;
+    private static final float WIND_SCALE = 2.5f;
+
     private static final String SANDSTORM_REAR_PAM =
             "768/INITIAL/EFFECTS/SANDSTORM_REAR/SANDSTORM_REAR.PAM";
 
@@ -66,8 +71,12 @@ public class StormRenderLayer extends Group {
         actor.setTouchable(Touchable.disabled);
 
         actor.setPosition(
-                LawnGridLayout.cellX(event.column()),
-                LawnGridLayout.cellY(event.row()) - 50f
+                LawnGridLayout.cellX(event.column())
+                        + LawnGridLayout.CELL_WIDTH / 2f
+                        - PAM_ACTOR_HALF_SIZE,
+                LawnGridLayout.cellY(event.row())
+                        + LawnGridLayout.CELL_HEIGHT / 2f
+                        - PAM_ACTOR_HALF_SIZE
         );
 
         addActor(actor);
@@ -97,21 +106,23 @@ public class StormRenderLayer extends Group {
                 "animation"
         );
 
-        actor.setPamScale(2.5f);
+        actor.setPamScale(WIND_SCALE);
         actor.setLooping(false);
         actor.setTouchable(Touchable.disabled);
 
-        float startX =
-                LawnGridLayout.OFFSET_X
-                        + LawnGridLayout.COLUMNS
-                        * LawnGridLayout.CELL_WIDTH;
+        float lawnLeft = LawnGridLayout.cellX(0);
+        float lawnRight = LawnGridLayout.cellX(LawnGridLayout.COLUMNS);
+        float windHalfWidth = WIND_PAM_CANVAS_SIZE * WIND_SCALE / 2f;
 
-        float endX = LawnGridLayout.OFFSET_X;
+        // Actor coordinates are converted from desired PAM-centre positions.
+        // Start and finish completely outside the lawn so the whole gust
+        // visibly sweeps across every column.
+        float startX = lawnRight + windHalfWidth - PAM_ACTOR_HALF_SIZE;
+        float endX = lawnLeft - windHalfWidth - PAM_ACTOR_HALF_SIZE;
 
-        float y =
-                LawnGridLayout.OFFSET_Y
-                        + LawnGridLayout.ROWS
-                        * LawnGridLayout.CELL_HEIGHT / 2f;
+        float y = LawnGridLayout.cellY(0)
+                + LawnGridLayout.ROWS * LawnGridLayout.CELL_HEIGHT / 2f
+                - PAM_ACTOR_HALF_SIZE;
 
         actor.setPosition(startX, y);
         addActor(actor);

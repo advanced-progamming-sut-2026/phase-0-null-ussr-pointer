@@ -165,7 +165,10 @@ public class EntityRenderLayer extends Group {
             live.add(mower);
 
             PamActor actor = zombieGroupActors.computeIfAbsent(mower, m -> {
-                String pamPath = App.getLevelManager().getCurrentChapter().getMowerPam();
+                com.ussr.pvz.model.level.Chapter sessionChapter = session.getLevel() == null
+                        ? null
+                        : App.getLevelManager().findChapter(session.getLevel().getChapter());
+                String pamPath = sessionChapter != null ? sessionChapter.getMowerPam() : null;
                 PamActor pa = new PamActor(pamPlayer, pamPath, "idle");
                 pa.setPamScale(0.45f);
                 zombieGroup.addActor(pa);
@@ -354,6 +357,17 @@ public class EntityRenderLayer extends Group {
     }
 
     private String resolveZombieCurrentClip(Zombie zombie, PamActor actor) {
+        if ("ZombieBarrelRoller".equals(zombie.getAlias())
+                && (zombie.getPushedStructure() == null
+                || !zombie.getPushedStructure().isAlive())) {
+            return switch (zombie.getState()) {
+                case WALKING -> "walk2";
+                case EATING -> "eat2";
+                case DEAD -> "die2";
+                case null -> "idle2";
+            };
+        }
+
         Armor armor = zombie.getArmor();
         boolean hasNewspaper = armor != null
                 && armor.getArmorType() == ArmorType.NEWSPAPER

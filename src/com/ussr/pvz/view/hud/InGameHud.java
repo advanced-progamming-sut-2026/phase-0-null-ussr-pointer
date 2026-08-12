@@ -70,6 +70,7 @@ public class InGameHud extends Table implements Disposable {
 
         // Top Row: seed bank (left) | objectives (center, expands) | upgrade panel | controls (right)
         Table topRow = new Table();
+        topRow.setFillParent(true);
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
 
@@ -105,6 +106,9 @@ public class InGameHud extends Table implements Disposable {
 
         // Bottom Row
         Table bottomRow = new Table();
+        bottomRow.setFillParent(true);
+        bottomRow.bottom().left();
+        bottomRow.setTouchable(Touchable.childrenOnly);
         bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
         bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
         bottomRow.add().expandX();
@@ -113,15 +117,9 @@ public class InGameHud extends Table implements Disposable {
 
         // Center overlay
         Stack lawnStack = new Stack();
+        lawnStack.setFillParent(true);
         lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
-
-        // Main game layer
-        Table mainGameLayer = new Table();
-        mainGameLayer.setTouchable(Touchable.childrenOnly);
-        mainGameLayer.add(topRow).growX().top().row();
-        mainGameLayer.add(lawnStack).grow().row();
-        mainGameLayer.add(bottomRow).growX().bottom();
 
         // High priority overlays
         PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
@@ -130,14 +128,18 @@ public class InGameHud extends Table implements Disposable {
         // Root stack
         Stack rootStack = new Stack();
         rootStack.setTouchable(Touchable.childrenOnly);
-        rootStack.add(mainGameLayer);
+        // Keep HUD zones as independent full-screen overlays. Their positions
+        // must not depend on seed-bank height, dialogue text, or chapter art.
+        rootStack.add(lawnStack);
+        rootStack.add(topRow);
+        rootStack.add(bottomRow);
         rootStack.add(conveyorLayer);
         rootStack.add(lawnGridDebugOverlay);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
         rootStack.add(eventAnnouncer);
 
-        add(rootStack).grow();
+        add(rootStack).grow().minSize(0f);
     }
 
     public SeedBankHud getSeedBankHud() { return seedBankHud; }
