@@ -16,9 +16,6 @@ import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
 import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
-import com.ussr.pvz.view.hud.InGameHud;
-import pvz.libpvz.pam.PamPlayer;
-import pvz.libpvz.textures.TextureBank;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
 import com.ussr.pvz.view.hud.InGameHud;
 import com.ussr.pvz.view.hud.LawnWidget;
@@ -63,6 +60,8 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         TerrainRenderLayer terrainLayer = new TerrainRenderLayer(pamPlayer, textures);
 
+        GlacierRenderLayer glacierLayer = new GlacierRenderLayer(pamPlayer);
+
         this.inGameHud = new InGameHud(skin, textures, controller);
 
         LawnWidget lawnWidget = new LawnWidget(controller);
@@ -77,6 +76,7 @@ public class ActiveGameplayView extends Table implements Disposable {
         Stack layers = new Stack();
         layers.add(background);
         layers.add(terrainLayer);
+        layers.add(glacierLayer);
         layers.add(stormRearLayer);
         layers.add(entityLayer);
         layers.add(sunLayer);

@@ -58,6 +58,19 @@ public class ZombossController implements EffectStatus {
     private final List<MoveEntry> moves = new ArrayList<>();
 
     // -------------------------------------------------------------------
+    // Dash state — used by moves like ForwardDash to physically move the
+    // Zomboss's position forward and back instead of just applying effects
+    // in place.
+    // -------------------------------------------------------------------
+    private boolean dashing = false;
+    private double dashElapsed = 0;
+    private double dashOutDuration = 0.3;
+    private double dashHoldDuration = 0.15;
+    private double dashReturnDuration = 0.35;
+    private double dashDistance = 0;
+    private double dashBaseX = 0;
+
+    // -------------------------------------------------------------------
     // Animation config — all optional/data-driven from the zombie JSON.
     // -------------------------------------------------------------------
     private final Map<String, String> clipOverrides;
@@ -146,6 +159,7 @@ public class ZombossController implements EffectStatus {
     public void effect(Zombie zombie, GameSession session, float delta) {
         if (!primary.isAlive()) return;
 
+        updateDash(delta);
         syncMirrorPosition();
         tickMoveCooldowns(delta);
 
@@ -261,6 +275,40 @@ public class ZombossController implements EffectStatus {
         }
     }
 
+    public void startDash(double distance, double outDuration, double holdDuration, double returnDuration) {
+        if (primary.getPosition() == null) return;
+        this.dashDistance = distance;
+        this.dashOutDuration = Math.max(0.01, outDuration);
+        this.dashHoldDuration = Math.max(0, holdDuration);
+        this.dashReturnDuration = Math.max(0.01, returnDuration);
+        this.dashBaseX = primary.getPosition().x();
+        this.dashElapsed = 0;
+        this.dashing = true;
+    }
+
+    private void updateDash(float delta) {
+        if (!dashing || primary.getPosition() == null) return;
+
+        dashElapsed += delta;
+        double total = dashOutDuration + dashHoldDuration + dashReturnDuration;
+        double offset;
+
+        if (dashElapsed <= dashOutDuration) {
+            offset = -dashDistance * (dashElapsed / dashOutDuration);
+        } else if (dashElapsed <= dashOutDuration + dashHoldDuration) {
+            offset = -dashDistance;
+        } else if (dashElapsed <= total) {
+            double t = (dashElapsed - dashOutDuration - dashHoldDuration) / dashReturnDuration;
+            offset = -dashDistance * (1 - t);
+        } else {
+            offset = 0;
+            dashing = false;
+        }
+
+        Vec2 pos = primary.getPosition();
+        primary.setPosition(Vec2.of(dashBaseX + offset, pos.y()));
+    }
+
     public Zombie getPrimary() {
         return primary;
     }
@@ -310,6 +358,18 @@ public class ZombossController implements EffectStatus {
     }
 
     public String getPreIntroClip() { return preIntroClip; }
+
+    /**
+     * Called by EntityRenderLayer to determine the initial animation clip
+     * for this boss unit.
+     */
+    public String getPreferredClip() {
+        if (isStunned()) {
+            return getStunClip();
+        }
+        return resolveClip("idle");
+    }
+
     public List<String> getIntroSequence() {
         List<String> seq = new ArrayList<>(2);
         if (preIntroClip != null && !preIntroClip.isBlank()) seq.add(preIntroClip);
