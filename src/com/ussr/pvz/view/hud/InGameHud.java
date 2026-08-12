@@ -16,6 +16,8 @@ import pvz.libpvz.textures.TextureBank;
  */
 public class InGameHud extends Table implements Disposable {
 
+    private final IZombieHud iZombieHud;
+
     private final SeedBankHud seedBankHud;
     private final ShovelWidget shovelWidget;
     private final PlantFoodWidget plantFoodWidget;
@@ -32,28 +34,17 @@ public class InGameHud extends Table implements Disposable {
         pauseMenuAssets = new PauseMenuAssets();
         conveyorBeltWidget = new ConveyorBeltWidget(skin, textures, controller);
 
-        // Initialize components
         seedBankHud = new SeedBankHud(skin, textures);
-        shovelWidget = new ShovelWidget(
-                skin,
-                textures,
-                controller,
-                this::clearPlantSelection
-        );
+        this.iZombieHud = new IZombieHud(skin, textures, controller);
+        shovelWidget = new ShovelWidget(skin, textures, controller, this::clearPlantSelection);
 
-        // Plant food button — wires itself to controller.setOnPlantFoodDeactivated
         plantFoodWidget = new PlantFoodWidget(skin, textures, controller);
-
         waveProgressBar = new WaveProgressBar(skin, textures);
 
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
 
-        GameEventAnnouncer eventAnnouncer =
-                new GameEventAnnouncer(
-                        skin,
-                        App.getGameSession()
-                );
+        GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer(skin, App.getGameSession());
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
         LawnGridDebugOverlay lawnGridDebugOverlay = new LawnGridDebugOverlay(skin);
 
@@ -63,7 +54,6 @@ public class InGameHud extends Table implements Disposable {
         ObjectiveWidgetFactory.ObjectiveWidgets objectives =
                 ObjectiveWidgetFactory.create(skin, textures);
 
-        // Beghouled upgrade panel — self-hides when not in a Beghouled level.
         BeghouledUpgradePanel upgradePanel = new BeghouledUpgradePanel(skin, controller);
 
         // Pause button
@@ -78,13 +68,20 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: Vertical seed bank (left) | objectives (center) | controls (right)
+        // Top Row: seed bank (left) | objectives (center, expands) | upgrade panel | controls (right)
         Table topRow = new Table();
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
 
-        topRow.add(seedBankHud).top().left().pad(0f, 4f, 0f, 0f);
+        // SeedBankHud and IZombieHud share the same top-left slot.
+        // Each self-hides when its level type is not active, so only one shows at a time.
+        Stack leftHudStack = new Stack();
+        leftHudStack.add(seedBankHud);
+        leftHudStack.add(this.iZombieHud);
+
+        topRow.add(leftHudStack).top().left().pad(0f, 4f, 0f, 0f);
         topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
+        topRow.add(upgradePanel).top().right().height(82f).padRight(6f); // same height as seed packets
 
         Table topRightControls = new Table();
         topRightControls.setTouchable(Touchable.childrenOnly);
@@ -95,7 +92,7 @@ public class InGameHud extends Table implements Disposable {
 
         topRow.add(topRightControls).top().right();
 
-        // Conveyor table
+        // Conveyor layer — padTop reduced so it doesn't overlap the seed bank awkwardly
         Table conveyorLayer = new Table();
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
@@ -103,10 +100,10 @@ public class InGameHud extends Table implements Disposable {
         conveyorLayer.add(conveyorBeltWidget)
                 .top()
                 .left()
-                .padTop(2f)
-                .padLeft(4f);
+                .padTop(65f)
+                .padLeft(12f);
 
-        // Bottom Row: [nuke | reset terrain] ... [plant food] [shovel]
+        // Bottom Row
         Table bottomRow = new Table();
         bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
         bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
@@ -114,7 +111,7 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Center overlay (objectives lawn widget, etc.)
+        // Center overlay
         Stack lawnStack = new Stack();
         lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
@@ -127,9 +124,8 @@ public class InGameHud extends Table implements Disposable {
         mainGameLayer.add(bottomRow).growX().bottom();
 
         // High priority overlays
-        PauseMenuOverlay pauseOverlay =
-                new PauseMenuOverlay(skin, pauseMenuAssets, controller);
-        GameOverOverlay gameOverOverlay = new GameOverOverlay(skin, textures);
+        PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
+        GameOverOverlay  gameOverOverlay = new GameOverOverlay(skin, textures);
 
         // Root stack
         Stack rootStack = new Stack();
@@ -144,22 +140,16 @@ public class InGameHud extends Table implements Disposable {
         add(rootStack).grow();
     }
 
-    public SeedBankHud getSeedBankHud() {
-        return seedBankHud;
-    }
+    public SeedBankHud getSeedBankHud() { return seedBankHud; }
 
     private void clearPlantSelection() {
         seedBankHud.clearSelection();
         conveyorBeltWidget.clearSelection();
+        iZombieHud.clearSelection();
     }
 
-    /** Exposed so HoverCursorWidget can read plant-food mode state. */
-    public PlantFoodWidget getPlantFoodWidget() {
-        return plantFoodWidget;
-    }
+    public PlantFoodWidget getPlantFoodWidget() { return plantFoodWidget; }
 
     @Override
-    public void dispose() {
-        pauseMenuAssets.dispose();
-    }
+    public void dispose() { pauseMenuAssets.dispose(); }
 }

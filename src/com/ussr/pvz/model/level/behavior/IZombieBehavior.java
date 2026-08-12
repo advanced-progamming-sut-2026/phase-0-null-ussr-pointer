@@ -6,6 +6,8 @@ import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieSize;
 import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
@@ -70,7 +72,7 @@ public class IZombieBehavior extends LevelBehavior {
 
     public Brain getBrainInLane(int lane) {
         return brains.stream()
-                .filter(b -> (int)b.getPosition().y() == lane)
+                .filter(b -> (int) b.getPosition().y() == lane)
                 .findFirst()
                 .orElse(null);
     }
@@ -79,14 +81,13 @@ public class IZombieBehavior extends LevelBehavior {
         for (int r = 0; r < rows; r++) {
             for (int c = 1; c < redLineColumn; c++) {
                 int randomPlantId = random.nextInt(50) + 1;
-                com.ussr.pvz.model.entities.plants.Plant plant =
-                        com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(randomPlantId, 1);
-
-                plant.setLocation(new com.ussr.pvz.model.entities.plants.Plant.Location(c, r));
+                Plant plant = PlantFactory.createPlant(randomPlantId, 1);
+                Plant newPlant = new Plant(plant);
+                newPlant.setLocation(new com.ussr.pvz.model.entities.plants.Plant.Location(c, r));
                 Cell cell = session.getLawn().getCell(r, c);
                 if (cell != null) {
-                    cell.setPlant(plant);
-                    session.getPlants().add(plant);
+                    cell.setPlant(newPlant);
+                    session.getPlants().add(newPlant);
                 }
             }
         }

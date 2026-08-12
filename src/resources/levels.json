@@ -108,11 +108,19 @@
           "allowedZombies": [
             {
               "id": "ZombieDefault",
-              "weight": 1000
+              "weight": 100
             },
             {
               "id": "ZombieArmor1",
               "weight": 400
+            },
+            {
+              "id": "ZombieBarrelRoller",
+              "weight": 150
+            },
+            {
+              "id": "ZombieDarkKing",
+              "weight": 200
             }
           ],
           "sandstorms": [
@@ -180,7 +188,7 @@
           "id": "egypt_1_3",
           "order": 3,
           "menuRegion": "IMAGE_WORLDMAP_EGYPT_ISLAND16",
-          "deliveryStrategy": "conveyor",
+          "deliveryStrategy": "regular",
           "sunFalling": true,
           "timeLimitSeconds": 0,
           "deadlineColumn": -1,
@@ -188,17 +196,7 @@
           "environment": "AncientEgyptEnvironment",
           "behavior": "NormalBehavior",
           "lockedPlants": [],
-          "seedPlants": [
-            "Explode-o-nut",
-            "Snow Pea",
-            "Tall-nut",
-            "Threepeater",
-            "Bonk Choy",
-            "Cabbage-pult",
-            "Grave Buster",
-            "Repeater",
-            "Twin Sunflower"
-          ],
+          "seedPlants": [],
           "rewardPlantAliases": [
             "Jalapeno",
             "Melon-pult",
@@ -630,6 +628,10 @@
             {
               "id": "ZombieArmor4",
               "weight": 200
+            },
+            {
+              "id": "ZombieBarrelRoller",
+              "weight": 150
             }
           ],
           "waves": [

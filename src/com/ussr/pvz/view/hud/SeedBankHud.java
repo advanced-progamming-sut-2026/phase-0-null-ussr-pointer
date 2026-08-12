@@ -12,6 +12,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.service.ChoosePlantService;
 import pvz.libpvz.textures.TextureBank;
 
@@ -103,7 +104,12 @@ public class SeedBankHud extends Table {
                         && session.getLevel().getDeliveryStrategy()
                         instanceof ConveyorDeliveryStrategy;
 
-        if (conveyorLevel) {
+        boolean iZombieLevel =
+                session.getLevel() != null
+                        && session.getLevel().getBehavior()
+                        instanceof IZombieBehavior;
+
+        if (conveyorLevel || iZombieLevel) {
             setVisible(false);
             clearSelection();
             return;

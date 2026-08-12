@@ -124,6 +124,9 @@ public class BeghouledBehavior extends LevelBehavior {
         Plant p1 = cell1.getPlant();
         Plant p2 = cell2.getPlant();
 
+        // Both cells must have a plant — cannot swap with an empty cell.
+        if (p1 == null || p2 == null) return false;
+
         swapCells(cell1, cell2, p1, p2, r1, c1, r2, c2);
 
         // A swap can only be made if it creates a match
@@ -148,18 +151,22 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private void processMatches(GameSession session, boolean isCascade) {
         Lawn lawn = session.getLawn();
-        Set<Plant> matchedPlants = new HashSet<>();
 
-        int hMax = findHorizontalMatches(lawn, matchedPlants);
-        int vMax = findVerticalMatches(lawn, matchedPlants);
-        int maxGroupSize = Math.max(hMax, vMax);
+        // Collect each distinct match group with its own size so we can
+        // increment currentMatches and award sun per group, not per call.
+        List<MatchGroup> groups = findAllMatchGroups(lawn);
+        if (groups.isEmpty()) return;
 
-        if (matchedPlants.isEmpty()) return;
+        for (MatchGroup group : groups) {
+            applyMatchRewards(session, group.size(), isCascade, group.plants());
+            currentMatches++;
+        }
 
-        applyMatchRewards(session, maxGroupSize, isCascade, matchedPlants);
-        currentMatches++;
+        // Remove all matched plants (union of all groups)
+        Set<Plant> allMatched = new HashSet<>();
+        for (MatchGroup g : groups) allMatched.addAll(g.plants());
 
-        for (Plant p : matchedPlants) {
+        for (Plant p : allMatched) {
             p.setAlive(false);
             session.getPlants().remove(p);
             lawn.getCell(p.getLocation().y(), p.getLocation().x()).setPlant(null);
@@ -173,63 +180,70 @@ public class BeghouledBehavior extends LevelBehavior {
         }
     }
 
-    private int findHorizontalMatches(Lawn lawn, Set<Plant> matchedPlants) {
-        int maxGroupSize = 0;
+    /**
+     * Finds all distinct horizontal and vertical match groups (≥3) on the board.
+     * A plant can belong to multiple groups (e.g. an L-shape), but each linear
+     * run is its own group for scoring purposes.
+     */
+    private List<MatchGroup> findAllMatchGroups(Lawn lawn) {
+        List<MatchGroup> groups = new ArrayList<>();
 
+        // Horizontal runs
         for (int r = 0; r < lawn.getRows(); r++) {
-            for (int c = 0; c < lawn.getCols() - 2; c++) {
+            int c = 0;
+            while (c < lawn.getCols()) {
                 Plant p1 = lawn.getCell(r, c).getPlant();
-                if (p1 == null) continue;
+                if (p1 == null) { c++; continue; }
 
-                int matchLength = 1;
-                while (c + matchLength < lawn.getCols() && lawn.getCell(r, c + matchLength).getPlant() != null
-                        && lawn.getCell(r, c + matchLength).getPlant().getName().equals(p1.getName())) {
-                    matchLength++;
+                int len = 1;
+                while (c + len < lawn.getCols()) {
+                    Plant pn = lawn.getCell(r, c + len).getPlant();
+                    if (pn == null || !pn.getName().equals(p1.getName())) break;
+                    len++;
                 }
-
-                if (matchLength >= 3) {
-                    maxGroupSize = Math.max(maxGroupSize, matchLength);
-                    for (int i = 0; i < matchLength; i++) matchedPlants.add(lawn.getCell(r, c + i).getPlant());
-                    c += matchLength - 1;
+                if (len >= 3) {
+                    Set<Plant> plants = new HashSet<>();
+                    for (int i = 0; i < len; i++) plants.add(lawn.getCell(r, c + i).getPlant());
+                    groups.add(new MatchGroup(plants, len));
                 }
+                c += len;
             }
         }
-        return maxGroupSize;
-    }
 
-    private int findVerticalMatches(Lawn lawn, Set<Plant> matchedPlants) {
-        int maxGroupSize = 0;
+        // Vertical runs
         for (int c = 0; c < lawn.getCols(); c++) {
-            for (int r = 0; r < lawn.getRows() - 2; r++) {
+            int r = 0;
+            while (r < lawn.getRows()) {
                 Plant p1 = lawn.getCell(r, c).getPlant();
-                if (p1 == null) continue;
+                if (p1 == null) { r++; continue; }
 
-                int matchLength = 1;
-                while (r + matchLength < lawn.getRows() && lawn.getCell(r + matchLength, c).getPlant() != null
-                        && lawn.getCell(r + matchLength, c).getPlant().getName().equals(p1.getName())) {
-                    matchLength++;
+                int len = 1;
+                while (r + len < lawn.getRows()) {
+                    Plant pn = lawn.getCell(r + len, c).getPlant();
+                    if (pn == null || !pn.getName().equals(p1.getName())) break;
+                    len++;
                 }
-
-                if (matchLength >= 3) {
-                    maxGroupSize = Math.max(maxGroupSize, matchLength);
-                    for (int i = 0; i < matchLength; i++) matchedPlants.add(lawn.getCell(r + i, c).getPlant());
-                    r += matchLength - 1;
+                if (len >= 3) {
+                    Set<Plant> plants = new HashSet<>();
+                    for (int i = 0; i < len; i++) plants.add(lawn.getCell(r + i, c).getPlant());
+                    groups.add(new MatchGroup(plants, len));
                 }
+                r += len;
             }
         }
-        return maxGroupSize;
+
+        return groups;
     }
 
-    private void applyMatchRewards(GameSession session, int maxGroupSize, boolean isCascade, Set<Plant> matchedPlants) {
+    private record MatchGroup(Set<Plant> plants, int size) {}
+
+    private void applyMatchRewards(GameSession session, int groupSize, boolean isCascade, Set<Plant> matchedPlants) {
         int baseSun = 0;
 
-        // Match Document Logic Exactly:
-        // 3-match = 1 sun token
-        // 4-match = 2 sun tokens
-        // 5-match = 3 sun tokens
-        if (maxGroupSize == 3) baseSun = 1;
-        else if (maxGroupSize == 4) baseSun = 2;
-        else if (maxGroupSize >= 5) baseSun = 3;
+        // Per-doc: 3-match = 1 sun token, 4-match = 2, 5+-match = 3
+        if (groupSize == 3) baseSun = 1;
+        else if (groupSize == 4) baseSun = 2;
+        else if (groupSize >= 5) baseSun = 3;
 
         // Cascades add 1 bonus sun token
         if (isCascade) baseSun += 1;
@@ -250,45 +264,35 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private void dropPlants(GameSession session) {
         Lawn lawn = session.getLawn();
+        // Each column is processed independently. Craters are hard floors —
+        // plants cannot pass through them. We compact each crater-delimited
+        // segment downward so existing plants pile at the bottom, leaving
+        // empty cells at the top of each segment (filled later by fillBoard).
         for (int c = 0; c < lawn.getCols(); c++) {
+            int writeRow = lawn.getRows() - 1;
             for (int r = lawn.getRows() - 1; r >= 0; r--) {
                 Cell cell = lawn.getCell(r, c);
-                if (cell.getTile().getType() == TileType.Crater || cell.getPlant() != null) continue;
-
-                for (int aboveR = r - 1; aboveR >= 0; aboveR--) {
-                    Cell aboveCell = lawn.getCell(aboveR, c);
-                    if (aboveCell.getTile().getType() == TileType.Crater) break;
-                    if (aboveCell.getPlant() != null) {
-                        Plant fallingPlant = aboveCell.getPlant();
-                        aboveCell.setPlant(null);
-                        cell.setPlant(fallingPlant);
-                        fallingPlant.setLocation(new Plant.Location(c, r));
-                        fallingPlant.setPosition(Vec2.of(c, r));
-                        break;
+                if (cell.getTile().getType() == TileType.Crater) {
+                    writeRow = r - 1; // reset write head above this crater
+                    continue;
+                }
+                if (cell.getPlant() != null) {
+                    if (r != writeRow) {
+                        Plant p = cell.getPlant();
+                        cell.setPlant(null);
+                        Cell dest = lawn.getCell(writeRow, c);
+                        dest.setPlant(p);
+                        p.setLocation(new Plant.Location(c, writeRow));
+                        p.setPosition(Vec2.of(c, writeRow));
                     }
+                    writeRow--;
                 }
             }
         }
     }
 
     private boolean hasMatches(Lawn lawn) {
-        for (int r = 0; r < lawn.getRows(); r++) {
-            for (int c = 0; c < lawn.getCols() - 2; c++) {
-                if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r, c + 1), lawn.getCell(r, c + 2))) return true;
-            }
-        }
-        for (int c = 0; c < lawn.getCols(); c++) {
-            for (int r = 0; r < lawn.getRows() - 2; r++) {
-                if (isValidMatch(lawn.getCell(r, c), lawn.getCell(r + 1, c), lawn.getCell(r + 2, c))) return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isValidMatch(Cell c1, Cell c2, Cell c3) {
-        Plant p1 = c1.getPlant(), p2 = c2.getPlant(), p3 = c3.getPlant();
-        return p1 != null && p2 != null && p3 != null && p1.getName().equals(p2.getName()) && p2.getName()
-                .equals(p3.getName());
+        return !findAllMatchGroups(lawn).isEmpty();
     }
 
     private void ensurePossibleMoves(GameSession session) {
@@ -350,7 +354,7 @@ public class BeghouledBehavior extends LevelBehavior {
         for (int r = 0; r < lawn.getRows(); r++) {
             for (int c = 0; c < lawn.getCols(); c++) {
                 Cell cell = lawn.getCell(r, c);
-                if (cell.getPlant() != null && cell.getPlant().getName().equalsIgnoreCase(baseType)) {
+                if (cell.getPlant() != null && cell.getPlant().getName().toLowerCase().equals(baseType.toLowerCase())) {
                     cell.getPlant().setAlive(false);
                     session.getPlants().remove(cell.getPlant());
 

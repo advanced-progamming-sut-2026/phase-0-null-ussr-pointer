@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
-import com.ussr.pvz.view.gameplay.LevelIntroOverlay;
 import com.ussr.pvz.view.util.WhitePixel;
 import pvz.libpvz.textures.TextureBank;
 
@@ -58,6 +58,11 @@ public class ObjectiveWidgetFactory {
                             (com.ussr.pvz.model.level.behavior.BossBehavior) behavior
                     )).width(380f).height(26f).pad(10f);
                     break;
+                case "BeghouledBehavior":
+                    topBar.add(new BeghouledMatchCounter(
+                            (BeghouledBehavior) behavior, skin
+                    )).pad(10f);
+                    break;
                 // TimedWarBehavior, EndlessBehavior, MeowBehavior, AllowedPlantsLost →
                 // all communicated via LevelIntroOverlay, not the top bar.
             }
@@ -103,6 +108,29 @@ public class ObjectiveWidgetFactory {
         } catch (Exception ignored) {}
 
         return lines;
+    }
+
+    // =========================================================================
+    // BeghouledMatchCounter — live "X / Y matches" label shown in top bar
+    // =========================================================================
+    private static class BeghouledMatchCounter extends com.badlogic.gdx.scenes.scene2d.ui.Table {
+        private final BeghouledBehavior behavior;
+        private final com.badlogic.gdx.scenes.scene2d.ui.Label label;
+
+        BeghouledMatchCounter(BeghouledBehavior behavior,
+                              com.badlogic.gdx.scenes.scene2d.ui.Skin skin) {
+            this.behavior = behavior;
+            label = new com.badlogic.gdx.scenes.scene2d.ui.Label("", skin, "medium_outline");
+            label.setAlignment(com.badlogic.gdx.utils.Align.center);
+            label.setColor(new Color(1f, 0.95f, 0.3f, 1f));
+            add(label);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            label.setText(behavior.getCurrentMatches() + " / " + behavior.getTargetMatches() + " matches");
+        }
     }
 
     // =========================================================================

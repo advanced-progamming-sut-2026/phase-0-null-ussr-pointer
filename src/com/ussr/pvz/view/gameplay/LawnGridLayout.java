@@ -22,17 +22,17 @@ public final class LawnGridLayout {
     public static final float GRAVE_DRAW_OFFSET_X = 0f;
     public static final float GRAVE_DRAW_OFFSET_Y = 0f;
 
-    public static final float TILE_DRAW_OFFSET_X = 20f;
-    public static final float TILE_DRAW_OFFSET_Y = -90f;
+    public static final float TILE_DRAW_OFFSET_X = 10f;
+    public static final float TILE_DRAW_OFFSET_Y = -10f;
 
-    public static final float WATER_DRAW_OFFSET_X = 25f;
-    public static final float WATER_DRAW_OFFSET_Y = -82f;
+    public static final float WATER_DRAW_OFFSET_X = 10f;
+    public static final float WATER_DRAW_OFFSET_Y = -30f;
     public static final float WATER_DRAW_WIDTH = CELL_WIDTH + 12f;
     public static final float WATER_DRAW_HEIGHT = CELL_HEIGHT + 12f;
     public static final float WATER_TOP_ROW_EXTENSION = 18f;
 
     public static final float SLIPPERY_DRAW_OFFSET_X = TILE_DRAW_OFFSET_X;
-    public static final float SLIPPERY_DRAW_OFFSET_Y = TILE_DRAW_OFFSET_Y + 40f;
+    public static final float SLIPPERY_DRAW_OFFSET_Y = TILE_DRAW_OFFSET_Y + 50f;
 
     private LawnGridLayout() {
     }

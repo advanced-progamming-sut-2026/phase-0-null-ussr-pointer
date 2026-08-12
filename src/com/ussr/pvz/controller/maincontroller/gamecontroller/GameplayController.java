@@ -13,8 +13,10 @@ import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
 import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.service.game.GameService;
 import com.ussr.pvz.service.minigame.BeghouledService;
+import com.ussr.pvz.service.minigame.IZombieService;
 import com.ussr.pvz.service.minigame.VaseBreakerService;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 
@@ -23,6 +25,7 @@ public class GameplayController {
     private final GameService      gameService      = new GameService();
     private final BeghouledService beghouledService = new BeghouledService();
     private final VaseBreakerService vaseBreakerService = new VaseBreakerService();
+    private final IZombieService   iZombieService   = new IZombieService();
 
     private boolean manuallyPaused;
     private boolean dialoguePaused;
@@ -35,6 +38,9 @@ public class GameplayController {
     // ── Beghouled state ───────────────────────────────────────────────────────
     private int beghouledSelectedRow = -1;
     private int beghouledSelectedCol = -1;
+
+    // ── IZombie state ─────────────────────────────────────────────────────────
+    private String selectedZombieKey = null;
 
     // ── VaseBreaker state ─────────────────────────────────────────────────────
     private SeedPackDrop heldSeedPack = null;
@@ -113,6 +119,10 @@ public class GameplayController {
             }
             if (behavior instanceof VaseBreakerBehavior) {
                 handleVaseBreakerClick(gridX, gridY, session);
+                return;
+            }
+            if (behavior instanceof IZombieBehavior) {
+                handleIZombieClick(gridX, gridY);
                 return;
             }
         }
@@ -253,6 +263,18 @@ public class GameplayController {
     public void upgradeBeghouledPlant(String plantType) {
         if (isPaused()) return;
         beghouledService.upgradePlant(plantType);
+    }
+
+    // ── IZombie ───────────────────────────────────────────────────────────────
+
+    /** Called by IZombieHud when the player selects (or deselects) a zombie card. */
+    public void setSelectedZombieKey(String key) { this.selectedZombieKey = key; }
+    public String getSelectedZombieKey()         { return selectedZombieKey; }
+
+    private void handleIZombieClick(int col, int row) {
+        if (selectedZombieKey == null) return;
+        iZombieService.placeZombie(selectedZombieKey, col, row);
+        // Keep the selection — the player may want to place multiple of the same type.
     }
 
     public boolean isShovelModeActive()    { return shovelModeActive; }
