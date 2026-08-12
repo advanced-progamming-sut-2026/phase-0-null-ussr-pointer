@@ -57,6 +57,9 @@ public class ZombossController implements EffectStatus {
 
     private final List<MoveEntry> moves = new ArrayList<>();
 
+    // ------------------------------------------------------------------
+    private List<String> lastMoveClips = List.of();
+
     // -------------------------------------------------------------------
     // Dash state — used by moves like ForwardDash to physically move the
     // Zomboss's position forward and back instead of just applying effects
@@ -208,11 +211,19 @@ public class ZombossController implements EffectStatus {
         for (MoveEntry entry : ready) {
             cumulative += Math.max(entry.weight, 0);
             if (roll < cumulative) {
+                List<String> playingClips = List.of();
                 if (!entry.clips.isEmpty()) {
-                    if (entry.randomVariant) primary.queueAnimEvent(entry.clips.get(RAND.nextInt(entry.clips.size())));
-                    else primary.queueAnimSequence(entry.clips);
+                    if (entry.randomVariant) {
+                        String chosen = entry.clips.get(RAND.nextInt(entry.clips.size()));
+                        primary.queueAnimEvent(chosen);
+                        playingClips = List.of(chosen);
+                    } else {
+                        primary.queueAnimSequence(entry.clips);
+                        playingClips = entry.clips;
+                    }
                 }
-                entry.move.execute(this, session);
+                lastMoveClips = playingClips;
+                entry.move.execute(this, session, playingClips);
                 entry.cooldownRemaining = entry.cooldown;
                 return;
             }
@@ -358,6 +369,10 @@ public class ZombossController implements EffectStatus {
     }
 
     public String getPreIntroClip() { return preIntroClip; }
+
+    public List<String> getLastMoveClips() {
+        return lastMoveClips;
+    }
 
     /**
      * Called by EntityRenderLayer to determine the initial animation clip

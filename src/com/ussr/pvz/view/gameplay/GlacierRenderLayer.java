@@ -12,13 +12,19 @@ import pvz.libpvz.pam.PamPlayer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Manages rendering of Ice Age Zomboss glacier block structures and fogging arrival effects.
  */
 public class GlacierRenderLayer extends Group {
+
+    private static final Pattern GLACIER_CLIP_PATTERN = Pattern.compile("glacier_column_(\\d+)");
+    private static final int GLACIER_COLUMN_BASE = 7;
 
     private static final String GLACIER_BLOCK_PAM =
             "768/FULL/EFFECTS/ZOMBOSS_GLACIER_BLOCK/ZOMBOSS_GLACIER_BLOCK.PAM";
@@ -204,25 +210,27 @@ public class GlacierRenderLayer extends Group {
                 Actions.removeActor()
         ));
     }
-
     private void detectZombossColumnFreeze(Zombie zomboss) {
         if (zomboss == null || zomboss.getZombossController() == null) return;
 
-        String clip = zomboss.getZombossController().getPreferredClip();
-        if (clip != null && clip.startsWith("glacier_column_")) {
-            try {
-                int colNum = Integer.parseInt(clip.substring("glacier_column_".length()));
-                int colIndex = colNum - 1; // 1-indexed string converted to 0-indexed column
-                if (colIndex >= 0 && colIndex < LawnGridLayout.COLUMNS) {
-                    zombossFrozenColumns.add(colIndex);
+        List<String> clips = zomboss.getZombossController().getLastMoveClips();
+        if (clips == null) return;
+
+        for (String clip : clips) {
+            if (clip == null) continue;
+            Matcher m = GLACIER_CLIP_PATTERN.matcher(clip);
+            if (m.find()) {
+                try {
+                    int x = Integer.parseInt(m.group(1));
+                    int colIndex = GLACIER_COLUMN_BASE - x;
+                    if (colIndex >= 0 && colIndex < LawnGridLayout.COLUMNS) {
+                        zombossFrozenColumns.add(colIndex);
+                    }
+                } catch (NumberFormatException ignored) {
                 }
-            } catch (NumberFormatException ignored) {}
+            }
         }
     }
-
-    /**
-     * Safely queries the current HP percentage of the Zomboss to determine glacier degradation.
-     */
     private float getZombossHpRatio(Zombie zomboss) {
         if (zomboss == null) return 1f;
         try {
