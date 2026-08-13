@@ -20,6 +20,8 @@ public class FireballBarrageMove implements ZombossMove {
 
     @Override
     public void execute(ZombossController controller, GameSession session) {
+        if (!controller.hasEverBeenStunned()) return;
+
         for (int i = 0; i < count; i++) {
             int row = random.nextInt(session.getLawn().getRows());
             int col = random.nextInt(session.getLawn().getCols());

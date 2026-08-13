@@ -95,6 +95,7 @@ public class ZombossController implements EffectStatus {
     private final float drawOffsetY;
     private final float drawScale;
     private boolean wasStunned = false;
+    private boolean everStunned = false;
 
     public ZombossController(Zombie primary, List<Zombie> mirrors, Map<String, Object> data) {
         this.primary = primary;
@@ -265,6 +266,7 @@ public class ZombossController implements EffectStatus {
 
     private void stun() {
         if (isStunned()) return;
+        everStunned = true;
         primary.setMoveBehavior(new StunnedMoveBehavior(primary.getMoveBehavior(), stunDuration));
     }
 
@@ -506,5 +508,9 @@ public class ZombossController implements EffectStatus {
         if (preIntroClip != null && !preIntroClip.isBlank()) seq.add(preIntroClip);
         if (introClip != null && !introClip.isBlank()) seq.add(introClip);
         return seq;
+    }
+
+    public boolean hasEverBeenStunned() {
+        return everStunned;
     }
 }
