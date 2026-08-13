@@ -17,24 +17,45 @@ import java.util.Queue;
 
 public class GameEventAnnouncer extends Table {
 
-    private static final float DEFAULT_DURATION = 2.0f;
-    private static final float RESULT_DURATION = 3.0f;
+    private static final float DEFAULT_DURATION  = 2.0f;
+    private static final float RESULT_DURATION   = 3.0f;
+    private static final float MILESTONE_DURATION = 2.5f;
+
+    // Milestone label colours – must mirror MeowScoreWidget.MILESTONE_COLOURS
+    private static final Color[] MILESTONE_COLOURS = {
+            new Color(1f, 0.85f, 0.2f,  1f),   //  500
+            new Color(0.3f, 1f,  0.4f,  1f),   // 1000
+            new Color(0.2f, 0.8f, 1f,  1f),    // 2000
+            new Color(0.9f, 0.3f, 1f,  1f),    // 4000
+            new Color(1f,  0.4f, 0.1f, 1f),    // 8000
+            new Color(1f,  0.2f, 0.2f, 1f),    // 15000
+            new Color(1f,  1f,   1f,   1f),    // 30000
+    };
+
+    private static final String[] MILESTONE_LABELS = {
+            "NICE!",
+            "GREAT!",
+            "AMAZING!",
+            "AWESOME!!",
+            "UNSTOPPABLE!!!",
+            "LEGENDARY!!!!",
+            "∞ GODLIKE ∞",
+    };
 
     private record Announcement(
             String message,
-            float duration
-    ) {
-    }
+            float  duration,
+            Color  colour
+    ) {}
 
-    private final Queue<Announcement> queue =
-            new ArrayDeque<>();
+    private final Queue<Announcement> queue = new ArrayDeque<>();
 
-    private final Label messageLabel;
+    private final Label     messageLabel;
     private final Container<Label> messageContainer;
     private boolean showing;
 
     public GameEventAnnouncer(
-            Skin skin,
+            Skin        skin,
             GameSession session
     ) {
         setFillParent(true);
@@ -42,7 +63,6 @@ public class GameEventAnnouncer extends Table {
         center();
 
         messageLabel = new Label("", skin, "big_outline");
-        messageLabel.setColor(Color.RED);
         messageLabel.setFontScale(1.6f);
         messageLabel.setAlignment(Align.center);
         messageLabel.setWrap(true);
@@ -62,6 +82,7 @@ public class GameEventAnnouncer extends Table {
     }
 
     private void subscribe(GameSession session) {
+        // ── Standard game events ──────────────────────────────────────────────
         session.getEventBus().subscribe(
                 GameEvent.WaveStarted.class,
                 this::onWaveStarted
@@ -69,73 +90,67 @@ public class GameEventAnnouncer extends Table {
 
         session.getEventBus().subscribe(
                 GameEvent.GameWon.class,
-                event -> announce(
-                        "LEVEL COMPLETE!",
-                        RESULT_DURATION
-                )
+                event -> announce("LEVEL COMPLETE!", RESULT_DURATION, Color.RED)
         );
 
         session.getEventBus().subscribe(
                 GameEvent.GameOver.class,
-                event -> announce(
-                        "GAME OVER!",
-                        RESULT_DURATION
-                )
+                event -> announce("GAME OVER!", RESULT_DURATION, Color.RED)
         );
 
         session.getEventBus().subscribe(
                 GameEvent.SandstormTriggered.class,
-                event -> announce(
-                        "SANDSTORM!",
-                        DEFAULT_DURATION
-                )
+                event -> announce("SANDSTORM!", DEFAULT_DURATION, Color.RED)
         );
 
         session.getEventBus().subscribe(
                 GameEvent.FreezingWindTriggered.class,
-                event -> announce(
-                        "FREEZING WINDS!",
-                        DEFAULT_DURATION
-                )
+                event -> announce("FREEZING WINDS!", DEFAULT_DURATION, Color.RED)
         );
 
         session.getEventBus().subscribe(
                 GameEvent.SpecialLevelAnnouncement.class,
-                event -> announce(
-                        event.message(),
-                        DEFAULT_DURATION
-                )
+                event -> announce(event.message(), DEFAULT_DURATION, Color.RED)
+        );
+
+        // ── Meow score milestones ─────────────────────────────────────────────
+        session.getEventBus().subscribe(
+                GameEvent.MeowScoreMilestone.class,
+                this::onMeowMilestone
         );
     }
+
+    // ── Event handlers ────────────────────────────────────────────────────────
 
     private void onWaveStarted(GameEvent.WaveStarted event) {
         if (event.isFinalWave()) {
-            announce(
-                    "FINAL WAVE!",
-                    RESULT_DURATION
-            );
-            return;
+            announce("FINAL WAVE!", RESULT_DURATION, Color.RED);
+        } else {
+            announce("WAVE " + event.waveNumber(), DEFAULT_DURATION, Color.RED);
         }
-
-        announce(
-                "WAVE " + event.waveNumber(),
-                DEFAULT_DURATION
-        );
     }
 
-    private void announce(
-            String message,
-            float duration
-    ) {
-        if (message == null || message.isBlank()) {
-            return;
-        }
+    private void onMeowMilestone(GameEvent.MeowScoreMilestone event) {
+        int idx = event.milestoneIndex();
 
-        queue.add(new Announcement(message, duration));
+        String label = (idx >= 0 && idx < MILESTONE_LABELS.length)
+                ? MILESTONE_LABELS[idx]
+                : "SCORE MILESTONE!";
 
-        if (!showing) {
-            showNext();
-        }
+        Color colour = (idx >= 0 && idx < MILESTONE_COLOURS.length)
+                ? MILESTONE_COLOURS[idx]
+                : new Color(1f, 0.85f, 0.2f, 1f);
+
+        String scoreText = formatScore(event.threshold());
+        announce(label + "\n" + scoreText + " pts", MILESTONE_DURATION, colour);
+    }
+
+    // ── Announce queue ────────────────────────────────────────────────────────
+
+    private void announce(String message, float duration, Color colour) {
+        if (message == null || message.isBlank()) return;
+        queue.add(new Announcement(message, duration, colour));
+        if (!showing) showNext();
     }
 
     private void showNext() {
@@ -148,8 +163,9 @@ public class GameEventAnnouncer extends Table {
         }
 
         showing = true;
-
         messageLabel.setText(next.message());
+        messageLabel.setColor(next.colour());
+
         messageContainer.clearActions();
         messageContainer.setVisible(true);
         messageContainer.setOrigin(Align.center);
@@ -159,23 +175,10 @@ public class GameEventAnnouncer extends Table {
         messageContainer.addAction(
                 Actions.sequence(
                         Actions.parallel(
-                                Actions.fadeIn(
-                                        0.3f,
-                                        Interpolation.fade
-                                ),
-                                Actions.scaleTo(
-                                        1.12f,
-                                        1.12f,
-                                        0.65f,
-                                        Interpolation.exp5Out
-                                )
+                                Actions.fadeIn(0.3f, Interpolation.fade),
+                                Actions.scaleTo(1.12f, 1.12f, 0.65f, Interpolation.exp5Out)
                         ),
-                        Actions.scaleTo(
-                                1f,
-                                1f,
-                                0.12f,
-                                Interpolation.sineOut
-                        ),
+                        Actions.scaleTo(1f, 1f, 0.12f, Interpolation.sineOut),
                         Actions.delay(next.duration()),
                         Actions.fadeOut(0.35f),
                         Actions.run(() -> {
@@ -184,5 +187,13 @@ public class GameEventAnnouncer extends Table {
                         })
                 )
         );
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static String formatScore(int score) {
+        if (score >= 1_000_000) return String.format("%.1fM", score / 1_000_000.0);
+        if (score >= 1_000)     return String.format("%.1fK", score / 1_000.0);
+        return String.valueOf(score);
     }
 }

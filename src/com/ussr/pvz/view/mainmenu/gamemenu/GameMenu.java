@@ -21,6 +21,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameController;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.service.game.GameService;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.List;
@@ -30,11 +31,13 @@ public class GameMenu extends Table {
     private final Skin skin;
 
     private final GameController controller;
+    private final GameService gameService;
     private final TextureBank textures;
 
     public GameMenu(Skin skin) {
         this.skin = skin;
         this.controller = new GameController();
+        this.gameService = new GameService();
 
         FileHandle assetsFolder = Gdx.files.local("pvz-assets");
         this.textures = new TextureBank("ATLASES", assetsFolder);
@@ -157,6 +160,7 @@ public class GameMenu extends Table {
         Table layer = new Table();
         layer.bottom();
 
+        // ── Shop banner ───────────────────────────────────────────────────────
         ImageButton travelLogButton = createBannerButton(
                 "image_ui_mainmenu_mainmenu_content_downloading"
         );
@@ -164,9 +168,69 @@ public class GameMenu extends Table {
 
         layer.add(createLabeledBanner(travelLogButton, "Shop"))
                 .size(270f, 108f)
+                .padBottom(24f)
+                .padRight(16f);
+
+        // ── Meow Mode button ──────────────────────────────────────────────────
+        // Reuse the same banner style but with a cat-paw–flavoured tint so it
+        // stands out next to the Shop banner without introducing new assets.
+        ImageButton meowButton = createBannerButton(
+                "image_ui_mainmenu_mainmenu_content_downloading"
+        );
+        meowButton.setColor(new Color(0.75f, 0.55f, 1f, 1f));   // soft purple tint
+        meowButton.addListener(listener(this::enterMeowMode));
+
+        Stack meowBanner = createLabeledBanner(meowButton, "Meow Mode 🐱");
+
+        // Badge showing the player's current high score (0 if none yet)
+        int best = bestMeowScore();
+        if (best > 0) {
+            Label bestLabel = new Label("Best: " + formatScore(best), skin, "default");
+            bestLabel.setFontScale(0.55f);
+            bestLabel.setColor(new Color(1f, 0.85f, 0.2f, 1f));
+            bestLabel.setTouchable(Touchable.disabled);
+
+            Table badgeLayer = new Table();
+            badgeLayer.top().right();
+            badgeLayer.add(bestLabel).padTop(6f).padRight(6f);
+            badgeLayer.setTouchable(Touchable.disabled);
+            meowBanner.add(badgeLayer);
+        }
+
+        layer.add(meowBanner)
+                .size(270f, 108f)
                 .padBottom(24f);
+
         return layer;
     }
+
+    // ── Meow Mode entry ───────────────────────────────────────────────────────
+
+    private void enterMeowMode() {
+        String result = gameService.menuEnterMeow();
+        if (App.getMenuState() == MenuState.LEVEL_SELECTION) {
+            // success — navigation already happened inside menuEnterMeow()
+            return;
+        }
+        // show error feedback if something went wrong
+        if (result != null && !result.isBlank()) {
+            NotificationCenter.error(result);
+        }
+    }
+
+    private static int bestMeowScore() {
+        var account = App.getAccount();
+        if (account == null || account.getScoreRecord() == null) return 0;
+        return account.getScoreRecord().getScore();
+    }
+
+    private static String formatScore(int score) {
+        if (score >= 1_000_000) return String.format("%.1fM", score / 1_000_000.0);
+        if (score >= 1_000)     return String.format("%.1fK", score / 1_000.0);
+        return String.valueOf(score);
+    }
+
+    // ── Leaderboard / collection / shop ──────────────────────────────────────
 
     private TextButton createLeaderboardButton() {
         TextButton button = new TextButton(
@@ -223,6 +287,8 @@ public class GameMenu extends Table {
     private void openShop() {
         App.setMenuState(MenuState.SHOP);
     }
+
+    // ── Banner helpers ────────────────────────────────────────────────────────
 
     private ImageButton createBannerButton(String drawableName) {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
@@ -326,5 +392,4 @@ public class GameMenu extends Table {
             }
         };
     }
-
 }

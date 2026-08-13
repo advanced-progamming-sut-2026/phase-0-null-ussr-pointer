@@ -44,6 +44,9 @@ public class InGameHud extends Table implements Disposable {
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
 
+        // ── Meow score widget (self-hides when not a Meow session) ────────────
+        MeowScoreWidget meowScoreWidget = new MeowScoreWidget(skin, textures);
+
         GameEventAnnouncer eventAnnouncer = new GameEventAnnouncer(skin, App.getGameSession());
         DebugToolsWidget debugTools = new DebugToolsWidget(skin);
         LawnGridDebugOverlay lawnGridDebugOverlay = new LawnGridDebugOverlay(skin);
@@ -68,32 +71,35 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // Top Row: seed bank (left) | objectives (center, expands) | upgrade panel | controls (right)
+        // ── Top Row: seed bank (left) | objectives (center) | upgrade | controls (right) ──
         Table topRow = new Table();
         topRow.setFillParent(true);
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
 
         // SeedBankHud and IZombieHud share the same top-left slot.
-        // Each self-hides when its level type is not active, so only one shows at a time.
         Stack leftHudStack = new Stack();
         leftHudStack.add(seedBankHud);
         leftHudStack.add(this.iZombieHud);
 
         topRow.add(leftHudStack).top().left().pad(0f, 4f, 0f, 0f);
         topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
-        topRow.add(upgradePanel).top().right().height(82f).padRight(6f); // same height as seed packets
+        topRow.add(upgradePanel).top().right().height(82f).padRight(6f);
 
+        // ── Top-right controls: wave bar · debug · pause · meow score ─────────
+        // MeowScoreWidget sits below the pause button and is invisible in
+        // non-Meow sessions, so it never disturbs the standard HUD layout.
         Table topRightControls = new Table();
         topRightControls.setTouchable(Touchable.childrenOnly);
         topRightControls.top().right();
         topRightControls.add(waveProgressBar).right().top().padTop(2f).padRight(12f).row();
         topRightControls.add(debugTools).right().padTop(4f).padRight(12f).row();
-        topRightControls.add(pauseButton).size(64f).right().top().padTop(4f).padRight(12f);
+        topRightControls.add(pauseButton).size(64f).right().top().padTop(4f).padRight(12f).row();
+        topRightControls.add(meowScoreWidget).right().top().padTop(6f).padRight(12f);
 
         topRow.add(topRightControls).top().right();
 
-        // Conveyor layer — padTop reduced so it doesn't overlap the seed bank awkwardly
+        // ── Conveyor layer ─────────────────────────────────────────────────────
         Table conveyorLayer = new Table();
         conveyorLayer.setFillParent(true);
         conveyorLayer.setTouchable(Touchable.childrenOnly);
@@ -104,7 +110,7 @@ public class InGameHud extends Table implements Disposable {
                 .padTop(65f)
                 .padLeft(12f);
 
-        // Bottom Row
+        // ── Bottom Row ─────────────────────────────────────────────────────────
         Table bottomRow = new Table();
         bottomRow.setFillParent(true);
         bottomRow.bottom().left();
@@ -115,21 +121,19 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Center overlay
+        // ── Center overlay ─────────────────────────────────────────────────────
         Stack lawnStack = new Stack();
         lawnStack.setFillParent(true);
         lawnStack.setTouchable(Touchable.childrenOnly);
         lawnStack.add(objectives.lawnOverlayWidget());
 
-        // High priority overlays
+        // ── High priority overlays ─────────────────────────────────────────────
         PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
         GameOverOverlay  gameOverOverlay = new GameOverOverlay(skin, textures);
 
-        // Root stack
+        // ── Root stack ─────────────────────────────────────────────────────────
         Stack rootStack = new Stack();
         rootStack.setTouchable(Touchable.childrenOnly);
-        // Keep HUD zones as independent full-screen overlays. Their positions
-        // must not depend on seed-bank height, dialogue text, or chapter art.
         rootStack.add(lawnStack);
         rootStack.add(topRow);
         rootStack.add(bottomRow);
