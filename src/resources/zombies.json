@@ -2922,6 +2922,9 @@
           "Value": "speed0"
         }
       ],
+      "ZombossDrawOffsetX": -120.0,
+      "ZombossDrawOffsetY": 150.0,
+      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,
@@ -3058,6 +3061,9 @@
           "Value": "speed0"
         }
       ],
+      "ZombossDrawOffsetX": -120.0,
+      "ZombossDrawOffsetY": 150.0,
+      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": false,
@@ -3178,6 +3184,9 @@
           "Value": "speed0"
         }
       ],
+      "ZombossDrawOffsetX": -120.0,
+      "ZombossDrawOffsetY": 150.0,
+      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,
@@ -3303,6 +3312,9 @@
           "Value": "speed0"
         }
       ],
+      "ZombossDrawOffsetX": -120.0,
+      "ZombossDrawOffsetY": 150.0,
+      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,

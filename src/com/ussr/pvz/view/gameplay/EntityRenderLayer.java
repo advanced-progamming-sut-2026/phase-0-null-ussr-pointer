@@ -283,9 +283,10 @@ public class EntityRenderLayer extends Group {
                 ZombiePamActor za = new ZombiePamActor(pamPlayer, z.getPamPath(), animation);
 
                 if (z.getZombossController() != null) {
-                    za.setPamScale(1f);
-                    za.setOffsetY(150f);
-                    za.setOffsetX(-120f);
+                    ZombossController zc = z.getZombossController();
+                    za.setPamScale(zc.getDrawScale());
+                    za.setOffsetX(zc.getDrawOffsetX());
+                    za.setOffsetY(zc.getDrawOffsetY());
                 }
 
                 zombieGroup.addActor(za);

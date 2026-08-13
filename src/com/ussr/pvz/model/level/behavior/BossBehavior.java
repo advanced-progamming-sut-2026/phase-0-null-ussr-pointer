@@ -48,11 +48,6 @@ public class BossBehavior extends LevelBehavior {
 
             List<String> introSequence = this.controller.getIntroSequence();
             if (!introSequence.isEmpty()) this.controller.getPrimary().queueAnimSequence(introSequence);
-
-            String introClip = this.controller.getIntroClip();
-            if (introClip != null && !introClip.isBlank()) {
-                this.controller.getPrimary().queueAnimEvent(introClip);
-            }
         } catch (Exception e) {
             System.err.println("[BossBehavior] Failed to spawn zomboss \"" + alias + "\": " + e.getMessage());
         }

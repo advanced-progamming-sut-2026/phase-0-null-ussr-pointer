@@ -91,6 +91,9 @@ public class ZombossController implements EffectStatus {
     private final String introClip;
     private final List<String> dieSequence;
     private final double deathAnimSeconds;
+    private final float drawOffsetX;
+    private final float drawOffsetY;
+    private final float drawScale;
     private boolean wasStunned = false;
 
     public ZombossController(Zombie primary, List<Zombie> mirrors, Map<String, Object> data) {
@@ -124,6 +127,9 @@ public class ZombossController implements EffectStatus {
         this.preIntroClip = BehaviorSpec.getString(data, "ZombossPreIntroClip", null);
         this.dieSequence = BehaviorSpec.getStringList(data, "ZombossDieSequence");
         this.deathAnimSeconds = BehaviorSpec.getDouble(data, "ZombossDeathAnimSeconds", 6.0);
+        this.drawOffsetX = (float) BehaviorSpec.getDouble(data, "ZombossDrawOffsetX", -120.0);
+        this.drawOffsetY = (float) BehaviorSpec.getDouble(data, "ZombossDrawOffsetY", 150.0);
+        this.drawScale = (float) BehaviorSpec.getDouble(data, "ZombossDrawScale", 1.0);
 
         loadMoves(data);
     }
@@ -475,6 +481,10 @@ public class ZombossController implements EffectStatus {
     }
 
     public String getPreIntroClip() { return preIntroClip; }
+
+    public float getDrawOffsetX() { return drawOffsetX; }
+    public float getDrawOffsetY() { return drawOffsetY; }
+    public float getDrawScale() { return drawScale; }
 
     public List<String> getLastMoveClips() {
         return lastMoveClips;
