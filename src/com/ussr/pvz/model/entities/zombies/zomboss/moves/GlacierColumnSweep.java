@@ -17,12 +17,17 @@ public class GlacierColumnSweep implements Tickable {
     private static final int FREEZE_STACKS = 3;
     private static final int GLACIER_BLOCK_HP = 600;
     private static final String BURIED_ZOMBIE_ALIAS = "ZombieArmor1";
-    private static final double COLUMN_ADVANCE_SECONDS = 1.0;
+
+    private static final double ROW_ADVANCE_SECONDS = 1.26;
+    private static final double COLUMN_HOLD_SECONDS = 3.5;
 
     private final GameSession session;
     private final Deque<Integer> remainingColumns;
-    private List<GlacierBlock> currentColumnBlocks = List.of();
-    private double elapsed = 0;
+    private List<GlacierBlock> currentColumnBlocks = new ArrayList<>();
+    private int currentColumn = -1;
+    private int nextRowToFreeze = 0;
+    private double rowTimer = 0;
+    private double holdTimer = 0;
     private boolean finished = false;
 
     public GlacierColumnSweep(GameSession session, List<Integer> columnsRightToLeft) {
@@ -35,9 +40,21 @@ public class GlacierColumnSweep implements Tickable {
     public void update(float delta) {
         if (finished) return;
 
-        elapsed += delta;
-        if (elapsed < COLUMN_ADVANCE_SECONDS) return;
-        elapsed = 0;
+        int totalRows = session.getLawn().getRows();
+
+        if (nextRowToFreeze < totalRows) {
+            rowTimer += delta;
+            if (rowTimer >= ROW_ADVANCE_SECONDS) {
+                rowTimer = 0;
+                freezeRow(currentColumn, nextRowToFreeze);
+                nextRowToFreeze++;
+            }
+            return;
+        }
+
+        holdTimer += delta;
+        if (holdTimer < COLUMN_HOLD_SECONDS) return;
+        holdTimer = 0;
 
         if (columnWasDamaged()) {
             finished = true;
@@ -63,31 +80,31 @@ public class GlacierColumnSweep implements Tickable {
             currentColumnBlocks = List.of();
             return;
         }
-        currentColumnBlocks = freezeColumn(session, col);
+        currentColumn = col;
+        currentColumnBlocks = new ArrayList<>();
+        nextRowToFreeze = 0;
+        rowTimer = 0;
+        holdTimer = 0;
     }
 
-    private List<GlacierBlock> freezeColumn(GameSession session, int col) {
-        List<GlacierBlock> blocks = new ArrayList<>();
-        for (int row = 0; row < session.getLawn().getRows(); row++) {
-            Cell cell = session.getLawn().getCell(row, col);
-            if (cell != null && cell.getPlant() != null) {
-                PlantFreezer.applyFreeze(session, cell.getPlant(), FREEZE_STACKS);
-            }
-
-            var tile = session.getLawn().getTile(row, col);
-            if (tile == null) continue;
-
-            TileType previousType = tile.getType();
-            tile.setType(TileType.Frozen);
-
-            GlacierBlock block = new GlacierBlock(GLACIER_BLOCK_HP, previousType, null, BURIED_ZOMBIE_ALIAS);
-            block.setPosition(Vec2.of(col, row));
-            if (cell != null) {
-                cell.setStructure(block);
-            }
-            session.registerStructure(block);
-            blocks.add(block);
+    private void freezeRow(int col, int row) {
+        Cell cell = session.getLawn().getCell(row, col);
+        if (cell != null && cell.getPlant() != null) {
+            PlantFreezer.applyFreeze(session, cell.getPlant(), FREEZE_STACKS);
         }
-        return blocks;
+
+        var tile = session.getLawn().getTile(row, col);
+        if (tile == null) return;
+
+        TileType previousType = tile.getType();
+        tile.setType(TileType.Frozen);
+
+        GlacierBlock block = new GlacierBlock(GLACIER_BLOCK_HP, previousType, null, BURIED_ZOMBIE_ALIAS);
+        block.setPosition(Vec2.of(col, row));
+        if (cell != null) {
+            cell.setStructure(block);
+        }
+        session.registerStructure(block);
+        currentColumnBlocks.add(block);
     }
 }
