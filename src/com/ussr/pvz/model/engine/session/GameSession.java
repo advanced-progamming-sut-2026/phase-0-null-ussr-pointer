@@ -7,6 +7,8 @@ import com.ussr.pvz.model.account.AccountState;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
+import com.ussr.pvz.model.board.terrain.Tile;
+import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.NewsObserver;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
@@ -24,6 +26,7 @@ import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.service.SaveService;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,6 +62,7 @@ public class GameSession {
     private final List<LawnMower> lawnMowers = new ArrayList<>();
     private final List<Projectile> projectiles = new ArrayList<>();
     private final List<ZombieProjectile> zombieProjectiles = new ArrayList<>();
+    private final List<BurningTile> burningTiles = new ArrayList<>();
 
     private List<String> boostedPlants = new ArrayList<>();
 
@@ -67,6 +71,23 @@ public class GameSession {
                 GameEvent.GameOver.class,
                 event -> markDefeat()
         );
+    }
+
+    /**
+     * Tracks a tile that was set to {@link TileType#Burning} temporarily
+     * (e.g. by the Dragon Zomboss's row-ignite move) so it can be reverted
+     * back to {@link TileType#Normal} once its timer runs out.
+     */
+    private static final class BurningTile {
+        final int row;
+        final int col;
+        float remaining;
+
+        BurningTile(int row, int col, float remaining) {
+            this.row = row;
+            this.col = col;
+            this.remaining = remaining;
+        }
     }
 
     public void initClock() {
@@ -355,6 +376,48 @@ public class GameSession {
         }
 
         return true;
+    }
+
+    public void igniteTileTemporarily(int row, int col, float durationSeconds) {
+        if (lawn == null || durationSeconds <= 0f) {
+            return;
+        }
+
+        Tile tile = lawn.getTile(row, col);
+        if (tile == null) {
+            return;
+        }
+
+        tile.setType(TileType.Burning);
+
+        for (BurningTile burning : burningTiles) {
+            if (burning.row == row && burning.col == col) {
+                burning.remaining = durationSeconds;
+                return;
+            }
+        }
+
+        burningTiles.add(new BurningTile(row, col, durationSeconds));
+    }
+
+    public void tickBurningTiles(float delta) {
+        if (burningTiles.isEmpty() || lawn == null) {
+            return;
+        }
+
+        Iterator<BurningTile> iterator = burningTiles.iterator();
+        while (iterator.hasNext()) {
+            BurningTile burning = iterator.next();
+            burning.remaining -= delta;
+
+            if (burning.remaining <= 0f) {
+                Tile tile = lawn.getTile(burning.row, burning.col);
+                if (tile != null && tile.getType() == TileType.Burning) {
+                    tile.setType(TileType.Normal);
+                }
+                iterator.remove();
+            }
+        }
     }
 
     public void triggerWaveStart(int waveNumber, boolean isFinalWave) {

@@ -42,6 +42,7 @@ public final class SessionUpdater {
         updateChapterEffect(delta);
         updateLevelBehavior(delta);
         updatePlantRecharge(delta);
+        updateBurningTiles(delta);
         updateGameState();
     }
 
@@ -126,6 +127,10 @@ public final class SessionUpdater {
                 : App.getAccount().getDifficultyLvl();
 
         return difficulty / 3.0;
+    }
+
+    private void updateBurningTiles(float delta) {
+        session.tickBurningTiles(delta);
     }
 
 

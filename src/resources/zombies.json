@@ -3208,6 +3208,14 @@
           ]
         },
         {
+          "name": "ColumnIgnite",
+          "weight": 250,
+          "cooldown": 17.0,
+          "clips": [
+            "intro"
+          ]
+        },
+        {
           "name": "SpawnMinions",
           "weight": 250,
           "cooldown": 16.0,

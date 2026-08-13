@@ -12,6 +12,7 @@ public final class ZombossMoveRegistry {
     static {
         register("FireballBarrage", (params, data) -> new FireballBarrageMove(params));
         register("RowIgnite", (params, data) -> new RowIgniteMove());
+        register("ColumnIgnite", (params, data) -> new ColumnIgniteMove());
         register("EgyptRocket", (params, data) -> new EgyptRocketMove());
         register("ForwardDash", (params, data) -> new ForwardDashMove());
         register("IceRocket", (params, data) -> new IceRocketMove());
