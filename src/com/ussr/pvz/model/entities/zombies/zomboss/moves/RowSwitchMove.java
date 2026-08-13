@@ -16,6 +16,6 @@ public class RowSwitchMove implements ZombossMove {
         if (maxRow < 0) return;
 
         int newRow = random.nextInt(maxRow + 1);
-        controller.relocateRows(newRow);
+        controller.relocateRows(newRow, session);
     }
 }

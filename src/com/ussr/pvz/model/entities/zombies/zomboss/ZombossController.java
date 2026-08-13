@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.zomboss;
 
+import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
@@ -352,11 +353,19 @@ public class ZombossController implements EffectStatus {
         session.notifyZombieDied(primary);
     }
 
-    public void relocateRows(int newPrimaryRow) {
+    public void relocateRows(int newPrimaryRow, GameSession session) {
         if (primary.getPosition() == null) return;
         Vec2 pos = primary.getPosition();
-        primary.setPosition(Vec2.of(pos.x(), newPrimaryRow));
-        syncMirrorPositions();
+        Vec2 target = Vec2.of(pos.x(), newPrimaryRow);
+
+        if (session != null) {
+            session.registerTickable(new SmoothMoveTickable(primary, target, 0.8));
+            for (Zombie mirror : mirrors) {
+                if (mirror == null || !mirror.isAlive()) continue;
+            }
+        } else {
+            primary.setPosition(target);
+        }
     }
 
     public void startDash(double distance, double outDuration, double holdDuration, double returnDuration) {

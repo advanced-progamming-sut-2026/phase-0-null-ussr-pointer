@@ -1,5 +1,6 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
+import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
@@ -43,12 +44,11 @@ public class PianistEffect implements EffectStatus {
             int newRow = currentRow + direction;
             pianist.queueAnimEvent("play");
             if (newRow >= 0 && newRow < maxRows) {
-                z.setPosition(Vec2.of(z.getPosition().x(), newRow));
+                session.registerTickable(new SmoothMoveTickable(z, Vec2.of(z.getPosition().x(), newRow), 0.5));
             } else {
-
                 newRow = currentRow - direction;
                 if (newRow >= 0 && newRow < maxRows) {
-                    z.setPosition(Vec2.of(z.getPosition().x(), newRow));
+                    session.registerTickable(new SmoothMoveTickable(z, Vec2.of(z.getPosition().x(), newRow), 0.5));
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.ussr.pvz.model.entities.zombies.effect;
 
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.engine.SmoothMoveTickable;
+import com.ussr.pvz.model.engine.Tickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Faction;
@@ -12,8 +14,12 @@ import java.util.List;
 import java.util.Random;
 
 public class FishermanEffect implements EffectStatus {
+    private static final double REEL_DURATION_SECONDS = 0.4;
+    private static final double REPOSITION_DURATION_SECONDS = 0.5;
+
     private final double delayBetweenCasting;
     private double timer;
+    private boolean repositioning = false;
     private static final Random RANDOM = new Random();
 
     public FishermanEffect(double delayBetweenCasting) {
@@ -31,8 +37,12 @@ public class FishermanEffect implements EffectStatus {
 
         if (zombie.getFaction() == Faction.ZOMBIES) {
             int rightmostCol = session.getLawn().getCols() - 1;
-            if (zombie.getPosition().x() < rightmostCol) {
-                zombie.setPosition(Vec2.of(rightmostCol, zombie.getPosition().y()));
+            if (!repositioning && zombie.getPosition().x() < rightmostCol) {
+                repositioning = true;
+                session.registerTickable(new RepositionWatcher(
+                        new SmoothMoveTickable(zombie, Vec2.of(rightmostCol, zombie.getPosition().y()), REPOSITION_DURATION_SECONDS),
+                        () -> repositioning = false
+                ));
             }
         }
 
@@ -80,7 +90,7 @@ public class FishermanEffect implements EffectStatus {
             currentCell.setPlant(null);
             targetCell.setPlant(hookedPlant);
             hookedPlant.setLocation(new Plant.Location(targetX, zRow));
-            hookedPlant.setPosition(Vec2.of(targetX, zRow));
+            session.registerTickable(new SmoothMoveTickable(hookedPlant, Vec2.of(targetX, zRow), REEL_DURATION_SECONDS));
             zombie.queueAnimEvent("reel");
             return true;
         }
@@ -97,5 +107,25 @@ public class FishermanEffect implements EffectStatus {
             }
         }
         return false;
+    }
+
+    private static class RepositionWatcher implements Tickable {
+        private final SmoothMoveTickable inner;
+        private final Runnable onFinished;
+        private boolean notified = false;
+
+        RepositionWatcher(SmoothMoveTickable inner, Runnable onFinished) {
+            this.inner = inner;
+            this.onFinished = onFinished;
+        }
+
+        @Override
+        public void update(float delta) {
+            inner.update(delta);
+            if (inner.isFinished() && !notified) {
+                notified = true;
+                onFinished.run();
+            }
+        }
     }
 }

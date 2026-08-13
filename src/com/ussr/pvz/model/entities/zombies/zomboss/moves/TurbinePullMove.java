@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies.zomboss.moves;
 
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TurbinePullMove implements ZombossMove {
+    private static final double PULL_DURATION_SECONDS = 0.6;
+
     @Override
     public void execute(ZombossController controller, GameSession session) {
         List<Integer> occupiedRows = controller.getOccupiedRows();
@@ -33,7 +36,8 @@ public class TurbinePullMove implements ZombossMove {
             if (controller.isBodyOf(zombie)) continue;
             int row = (int) zombie.getPosition().y();
             if (occupiedRows.contains(row)) {
-                zombie.setPosition(Vec2.of(controller.getPrimary().getPosition().x(), row));
+                Vec2 target = Vec2.of(controller.getPrimary().getPosition().x(), row);
+                session.registerTickable(new SmoothMoveTickable(zombie, target, PULL_DURATION_SECONDS));
             }
         }
     }
