@@ -544,13 +544,38 @@ public class GameService {
             );
         }
 
-        if (cell.getPlant() != null) {
-            throw new IllegalStateException(
-                    "a plant already occupies this cell"
-            );
-        }
+        validateLandStacking(cell, blueprint);
 
         return cell;
+    }
+
+    private void validateLandStacking(Cell cell, Plant blueprint) {
+        Plant existing = cell.getPlant();
+        if (existing == null) {
+            return;
+        }
+
+        boolean blueprintIsStacker = isLandStacker(blueprint);
+        boolean existingIsStacker = isLandStacker(existing);
+
+        if (blueprintIsStacker && !existingIsStacker) {
+            return;
+        }
+
+        if (existingIsStacker && !blueprintIsStacker) {
+            return;
+        }
+
+        throw new IllegalStateException(
+                "a plant already occupies this cell"
+        );
+    }
+
+    private boolean isLandStacker(Plant plant) {
+        return plant != null
+                && plant.getTags() != null
+                && plant.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.STACK)
+                && !plant.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.WATER);
     }
 
     private void validateWaterPlanting(
