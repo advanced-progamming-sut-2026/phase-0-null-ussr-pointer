@@ -26,10 +26,7 @@ public class ForwardDashMove implements ZombossMove {
 
     @Override
     public void execute(ZombossController controller, GameSession session) {
-        int r1 = controller.getPrimaryRow();
-        int r2 = controller.getMirrorRow();
-
-        for (int row : new int[]{r1, r2}) {
+        for (int row : controller.getOccupiedRows()) {
             if (row >= session.getLawn().getRows()) continue;
             for (int col = 0; col < session.getLawn().getCols(); col++) {
                 session.removePlantAt(col, row);

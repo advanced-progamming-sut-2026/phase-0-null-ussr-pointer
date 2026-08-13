@@ -13,13 +13,13 @@ import java.util.List;
 public class TurbinePullMove implements ZombossMove {
     @Override
     public void execute(ZombossController controller, GameSession session) {
-        int r1 = controller.getPrimaryRow();
-        int r2 = controller.getMirrorRow();
+        List<Integer> occupiedRows = controller.getOccupiedRows();
+
 
         List<Plant> plantsToRemove = new ArrayList<>();
         for (Plant plant : session.getPlants()) {
             int row = (int) plant.getLocation().y();
-            if (row == r1 || row == r2) {
+            if (occupiedRows.contains(row)) {
                 plantsToRemove.add(plant);
             }
         }
@@ -29,9 +29,9 @@ public class TurbinePullMove implements ZombossMove {
         }
 
         for (Zombie zombie : session.getZombies()) {
-            if (zombie == controller.getPrimary() || zombie == controller.getMirror()) continue;
+            if (controller.isBodyOf(zombie)) continue;
             int row = (int) zombie.getPosition().y();
-            if (row == r1 || row == r2) {
+            if (occupiedRows.contains(row)) {
                 zombie.setPosition(Vec2.of(controller.getPrimary().getPosition().x(), row));
             }
         }

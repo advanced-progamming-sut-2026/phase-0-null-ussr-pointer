@@ -1,6 +1,5 @@
 package com.ussr.pvz.model.entities.zombies.zomboss.moves;
 
-import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFreezer;
@@ -55,12 +54,6 @@ public class IceWindMove implements ZombossMove {
         for (Plant plant : session.getPlants()) {
             if (plant.getLocation() != null && plant.getLocation().y() == row) {
                 PlantFreezer.applyFreeze(session, plant, FREEZE_STACKS);
-            }
-        }
-
-        for (int col = 0; col < session.getLawn().getCols(); col++) {
-            if (session.getLawn().getTile(row, col) != null) {
-                session.getLawn().getTile(row, col).setType(TileType.Frozen);
             }
         }
     }

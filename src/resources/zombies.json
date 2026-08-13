@@ -3020,6 +3020,10 @@
         "mX": 0,
         "mY": 0
       },
+      "ZombossOccupiedRows": 3,
+      "ZombossOccupiedCols": 3,
+      "ZombossHasGlacierShield": true,
+      "ZombossGlacierShieldBlockHp": 1200,
       "Hitpoints": 6500,
       "ScaledProps": [
         {

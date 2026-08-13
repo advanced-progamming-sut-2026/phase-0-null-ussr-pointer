@@ -9,6 +9,7 @@ import com.ussr.pvz.model.entities.zombies.move.StunnedMoveBehavior;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +40,10 @@ public class ZombossController implements EffectStatus {
     }
 
     private final Zombie primary;
-    private final Zombie mirror;
-    private final int mirrorRowOffset = 1;
+    private final List<Zombie> mirrors;
+
+    private final int occupiedRows;
+    private final int occupiedCols;
 
     private final int maxHp;
     private final int segmentSize;
@@ -50,6 +53,10 @@ public class ZombossController implements EffectStatus {
     private final double stunDuration;
     private final boolean canSpawnZombies;
     private final boolean canSwitchRows;
+
+    private final boolean hasGlacierShield;
+    private final int glacierShieldBlockHp;
+    private int glacierShieldBlocksRemaining = 0;
 
     private final double moveIntervalMin;
     private final double moveIntervalMax;
@@ -86,9 +93,12 @@ public class ZombossController implements EffectStatus {
     private final double deathAnimSeconds;
     private boolean wasStunned = false;
 
-    public ZombossController(Zombie primary, Zombie mirror, Map<String, Object> data) {
+    public ZombossController(Zombie primary, List<Zombie> mirrors, Map<String, Object> data) {
         this.primary = primary;
-        this.mirror = mirror;
+        this.mirrors = mirrors == null ? List.of() : List.copyOf(mirrors);
+
+        this.occupiedRows = Math.max(1, BehaviorSpec.getInt(data, "ZombossOccupiedRows", 2));
+        this.occupiedCols = Math.max(1, BehaviorSpec.getInt(data, "ZombossOccupiedCols", 2));
 
         this.maxHp = BehaviorSpec.getInt(data, "Hitpoints", primary.getMaxHp());
         this.segmentSize = Math.max(1, maxHp / SEGMENTS);
@@ -98,6 +108,9 @@ public class ZombossController implements EffectStatus {
         this.stunDuration = BehaviorSpec.getDouble(data, "ZombossStunDuration", 3.0);
         this.canSpawnZombies = BehaviorSpec.getBoolean(data, "ZombossCanSpawnZombies", true);
         this.canSwitchRows = BehaviorSpec.getBoolean(data, "ZombossCanSwitchRows", true);
+
+        this.hasGlacierShield = BehaviorSpec.getBoolean(data, "ZombossHasGlacierShield", false);
+        this.glacierShieldBlockHp = BehaviorSpec.getInt(data, "ZombossGlacierShieldBlockHp", 1200);
 
         this.moveIntervalMin = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMin", 4.0);
         this.moveIntervalMax = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMax", 7.0);
@@ -163,7 +176,7 @@ public class ZombossController implements EffectStatus {
         if (!primary.isAlive()) return;
 
         updateDash(delta);
-        syncMirrorPosition();
+        syncMirrorPositions();
         tickMoveCooldowns(delta);
 
         boolean stunnedNow = isStunned();
@@ -171,6 +184,9 @@ public class ZombossController implements EffectStatus {
             primary.queueAnimEvent(stunStartClip);
         } else if (!stunnedNow && wasStunned && stunEndClip != null && !stunEndClip.isBlank()) {
             primary.queueAnimEvent(stunEndClip);
+            if (hasGlacierShield) {
+                spawnGlacierShield(session);
+            }
         }
         wasStunned = stunnedNow;
 
@@ -183,10 +199,17 @@ public class ZombossController implements EffectStatus {
         }
     }
 
-    private void syncMirrorPosition() {
-        if (mirror == null || !mirror.isAlive() || primary.getPosition() == null) return;
+    private void syncMirrorPositions() {
+        if (primary.getPosition() == null || mirrors.isEmpty()) return;
         Vec2 pos = primary.getPosition();
-        mirror.setPosition(Vec2.of(pos.x(), pos.y() + mirrorRowOffset));
+        for (int i = 0; i < mirrors.size(); i++) {
+            Zombie mirror = mirrors.get(i);
+            if (mirror == null || !mirror.isAlive()) continue;
+            int gridIndex = i + 1; // 0 is primary
+            int dRow = gridIndex / occupiedCols;
+            int dCol = gridIndex % occupiedCols;
+            mirror.setPosition(Vec2.of(pos.x() + dCol, pos.y() + dRow));
+        }
     }
 
     private void tickMoveCooldowns(float delta) {
@@ -256,6 +279,49 @@ public class ZombossController implements EffectStatus {
         }
     }
 
+    public void spawnGlacierShield(GameSession session) {
+        if (!hasGlacierShield || session == null || session.getLawn() == null) return;
+
+        List<Integer> rows = getOccupiedRows();
+        List<Integer> cols = getOccupiedColumns();
+        glacierShieldBlocksRemaining = rows.size() * cols.size();
+
+        for (int row : rows) {
+            for (int col : cols) {
+                if (row < 0 || row >= session.getLawn().getRows()) continue;
+                if (col < 0 || col >= session.getLawn().getCols()) continue;
+
+                var tile = session.getLawn().getTile(row, col);
+                if (tile == null) continue;
+
+                com.ussr.pvz.model.board.terrain.TileType previousType = tile.getType();
+                tile.setType(com.ussr.pvz.model.board.terrain.TileType.Frozen);
+
+                com.ussr.pvz.model.board.structures.GlacierBlock block =
+                        new com.ussr.pvz.model.board.structures.GlacierBlock(
+                                glacierShieldBlockHp, previousType, this::onGlacierShieldBlockDestroyed);
+                block.setPosition(Vec2.of(col, row));
+
+                var cell = session.getLawn().getCell(row, col);
+                if (cell != null) {
+                    cell.setStructure(block);
+                }
+                session.registerStructure(block);
+            }
+        }
+    }
+
+    private void onGlacierShieldBlockDestroyed() {
+        glacierShieldBlocksRemaining = Math.max(0, glacierShieldBlocksRemaining - 1);
+        if (glacierShieldBlocksRemaining == 0) {
+            stun();
+        }
+    }
+
+    public boolean hasGlacierShield() {
+        return hasGlacierShield;
+    }
+
     private int computeSegment(int hp) {
         if (hp <= 0) return -1;
         for (int s = SEGMENTS - 1; s >= 0; s--) {
@@ -269,7 +335,8 @@ public class ZombossController implements EffectStatus {
         primary.setAlive(false);
         primary.startDeathTimer((float) deathAnimSeconds);
         if (!dieSequence.isEmpty()) primary.queueAnimSequence(dieSequence);
-        if (mirror != null) {
+        for (Zombie mirror : mirrors) {
+            if (mirror == null) continue;
             mirror.setState(ZombieActivity.DEAD);
             mirror.setAlive(false);
             mirror.startDeathTimer((float) deathAnimSeconds);
@@ -281,9 +348,7 @@ public class ZombossController implements EffectStatus {
         if (primary.getPosition() == null) return;
         Vec2 pos = primary.getPosition();
         primary.setPosition(Vec2.of(pos.x(), newPrimaryRow));
-        if (mirror != null) {
-            mirror.setPosition(Vec2.of(pos.x(), newPrimaryRow + mirrorRowOffset));
-        }
+        syncMirrorPositions();
     }
 
     public void startDash(double distance, double outDuration, double holdDuration, double returnDuration) {
@@ -324,16 +389,57 @@ public class ZombossController implements EffectStatus {
         return primary;
     }
 
+    @Deprecated
     public Zombie getMirror() {
-        return mirror;
+        return mirrors.isEmpty() ? null : mirrors.get(0);
+    }
+
+    public List<Zombie> getMirrors() {
+        return mirrors;
+    }
+
+    public boolean isBodyOf(Zombie zombie) {
+        if (zombie == primary) return true;
+        return mirrors.contains(zombie);
     }
 
     public int getPrimaryRow() {
         return (int) primary.getPosition().y();
     }
 
+    public int getPrimaryCol() {
+        return (int) primary.getPosition().x();
+    }
+
+    @Deprecated
     public int getMirrorRow() {
-        return getPrimaryRow() + mirrorRowOffset;
+        return getPrimaryRow() + 1;
+    }
+
+    public int getOccupiedRowCount() {
+        return occupiedRows;
+    }
+
+    public int getOccupiedColCount() {
+        return occupiedCols;
+    }
+
+    public List<Integer> getOccupiedRows() {
+        int base = getPrimaryRow();
+        List<Integer> rows = new ArrayList<>(occupiedRows);
+        for (int i = 0; i < occupiedRows; i++) {
+            rows.add(base + i);
+        }
+        return Collections.unmodifiableList(rows);
+    }
+
+    public List<Integer> getOccupiedColumns() {
+        int base = getPrimaryCol();
+        List<Integer> cols = new ArrayList<>(occupiedCols);
+        for (int i = 0; i < occupiedCols; i++) {
+            cols.add(base + i);
+        }
+        return Collections.unmodifiableList(cols);
     }
 
     public boolean canSpawnZombies() {
