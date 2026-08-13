@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.zomboss.moves;
 
+import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -15,7 +17,6 @@ public class TurbinePullMove implements ZombossMove {
     public void execute(ZombossController controller, GameSession session) {
         List<Integer> occupiedRows = controller.getOccupiedRows();
 
-
         List<Plant> plantsToRemove = new ArrayList<>();
         for (Plant plant : session.getPlants()) {
             int row = (int) plant.getLocation().y();
@@ -25,7 +26,7 @@ public class TurbinePullMove implements ZombossMove {
         }
 
         for (Plant plant : plantsToRemove) {
-            session.removePlantAt((int) plant.getLocation().x(), (int) plant.getLocation().y());
+            removePlant(plant, session);
         }
 
         for (Zombie zombie : session.getZombies()) {
@@ -33,6 +34,28 @@ public class TurbinePullMove implements ZombossMove {
             int row = (int) zombie.getPosition().y();
             if (occupiedRows.contains(row)) {
                 zombie.setPosition(Vec2.of(controller.getPrimary().getPosition().x(), row));
+            }
+        }
+    }
+
+    private void removePlant(Plant plant, GameSession session) {
+        int col = (int) plant.getLocation().x();
+        int row = (int) plant.getLocation().y();
+        Cell cell = session.getLawn().getCell(row, col);
+
+        if (cell != null && cell.getPlant() == plant) {
+            session.removePlantAt(col, row);
+            return;
+        }
+
+        plant.setAlive(false);
+        session.getPlants().remove(plant);
+        session.notifyPlantPlucked(plant);
+
+        if (cell != null) {
+            InteractableStructure structure = cell.getInteractableStructure();
+            if (structure != null) {
+                structure.setAlive(false);
             }
         }
     }

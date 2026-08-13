@@ -45,7 +45,7 @@ public class OctopusThrowEffect implements EffectStatus {
                 if (cell != null && cell.getPlant() != null && cell.getPlant().isAlive()) {
                     Vec2 targetPos = Vec2.of(cell.getPlant().getLocation().x(), cell.getPlant().getLocation().y());
                     zombie.queueAnimEvent("toss");
-                    session.addZombieProjectile(new OctopusProjectile(startPos, targetPos, 1.5));
+                    session.addZombieProjectile(new OctopusProjectile(startPos, targetPos, 1.5, zombie));
                     return true;
                 }
             }
@@ -54,7 +54,7 @@ public class OctopusThrowEffect implements EffectStatus {
                 if (target.isAlive() && target.getFaction() == Faction.ZOMBIES
                         && (int) target.getPosition().y() == zRow && target.getPosition().x() > zCol) {
                     zombie.queueAnimEvent("toss");
-                    session.addZombieProjectile(new OctopusProjectile(startPos, target.getPosition(), 1.5));
+                    session.addZombieProjectile(new OctopusProjectile(startPos, target.getPosition(), 1.5, zombie));
                     return true;
                 }
             }

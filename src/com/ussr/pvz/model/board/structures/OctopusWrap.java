@@ -4,15 +4,18 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class OctopusWrap extends InteractableStructure implements Damageable {
     private final Plant boundPlant;
+    private final Zombie sourceZombie;
     private int hp;
     private final String pamLocation = "768/FULL/EFFECTS/ZOMBIE_OCTOPUS_PROJECTILE/ZOMBIE_OCTOPUS_PROJECTILE.PAM";
 
-    public OctopusWrap(Plant boundPlant, int initialHp) {
+    public OctopusWrap(Plant boundPlant, int initialHp, Zombie sourceZombie) {
         this.boundPlant = boundPlant;
         this.hp = initialHp;
+        this.sourceZombie = sourceZombie;
         this.setAlive(true);
         // Automatically disable the plant when applied
         this.boundPlant.setState(Plant.PlantState.INCAPACITATED);
@@ -40,13 +43,16 @@ public class OctopusWrap extends InteractableStructure implements Damageable {
             if (targetCell != null) {
                 targetCell.setPlant(boundPlant);
             }
-            //session.getPlants().add(boundPlant);
         }
     }
 
     @Override
     public void update(float delta) {
         if (boundPlant == null || !boundPlant.isAlive()) {
+            this.setAlive(false);
+            return;
+        }
+        if (sourceZombie != null && !sourceZombie.isAlive()) {
             this.setAlive(false);
         }
     }
