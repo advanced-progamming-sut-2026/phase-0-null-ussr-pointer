@@ -8,6 +8,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.engine.NewsObserver;
+import com.ussr.pvz.model.engine.Tickable;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.items.GroundItem;
@@ -153,6 +154,12 @@ public class GameSession {
             updater.registerEntity(structure);
         }
     }
+
+    public void registerTickable(Tickable tickable) {
+        if (tickable != null) {
+                updater.registerEntity(tickable);
+            }
+        }
 
     public void spawnZombie(Zombie zombie) {
         if (!zombie.isGlowing() && Math.random() < 0.05) {
