@@ -5,6 +5,7 @@ import com.ussr.pvz.model.board.structures.InteractableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
+import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 import java.util.Random;
@@ -23,9 +24,15 @@ public class WallNutStrategy implements ActStrategy {
 
         if((int) user.getAbilityValue() == 3) {
             Vec2 userPos = user.getPosition();
-            for(Zombie zombie : App.getGameSession().getZombies()) {
-                if(userPos.distanceTo(zombie.getPosition()) < ATTRACT_RADIUS)
-                    zombie.setPosition(new Vec2(zombie.getPosition().x() , userPos.y()));
+            for(Zombie zombie : session.getZombies()) {
+                if (!zombie.isAlive()) continue;
+                Vec2 zombiePos = zombie.getPosition();
+                double rowDistance = Math.abs(zombiePos.y() - userPos.y());
+                double horizontalDistance = Math.abs(zombiePos.x() - userPos.x());
+                if (rowDistance > 0.5 && rowDistance <= 1.5
+                        && horizontalDistance <= ATTRACT_RADIUS) {
+                    zombie.setPosition(new Vec2(zombiePos.x(), userPos.y()));
+                }
             }
         }
         user.setInternalTimer(0.0);
@@ -47,22 +54,32 @@ public class WallNutStrategy implements ActStrategy {
         zombie.setPosition(new Vec2(zomPos.x(), zomPos.y() + dy));
     }
 
-    public void onDamageAct(Plant user , Zombie dealer) {
+    public void onDamageAct(Plant user, Zombie dealer, int receivedDamage) {
         if(dealer == null) return;
 
         switch ((int) user.getAbilityValue()) {
             case 1 :
-                dealer.takeDamage(user.getDamage() , user);
+                dealer.takeDamage(user.getDamage()
+                        + user.getSpecialUpgradeInt(SpecialUpgrade.REFLECT_DAMAGE_BUFF), user);
                 break;
             case 2 :
-                divertZombie(dealer);
+                double eatDps = Math.max(1.0, dealer.getEatDps());
+                double secondsEaten = receivedDamage / eatDps;
+                if (user.addAndConsumeDefensiveCharge(
+                        secondsEaten, Math.max(0.1, user.getActionInterval())) > 0) {
+                    divertZombie(dealer);
+                }
                 break;
             case 3 :
                 return;
             case 4 :
                 return;
             case 5 :
-                App.getGameSession().addSun(5);
+                int rewards = user.addAndConsumeDefensiveCharge(receivedDamage, 100.0);
+                if (rewards > 0) {
+                    App.getGameSession().addSun(rewards * (5
+                            + user.getSpecialUpgradeInt(SpecialUpgrade.SUN_DROP_INCREMENT)));
+                }
 
         }
 

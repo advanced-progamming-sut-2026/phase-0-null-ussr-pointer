@@ -23,12 +23,6 @@ public class ExplodeStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
 
-        // Arming Delay logic: If it's a delayed explosive (like Potato Mine)
-        // and hasn't matured yet, use the action interval as its arming countdown.
-        if (user.getTags().contains(Tag.DELAYED) && user.getCurrentStage() < 2) {
-            return;
-        }
-
         ArrayList<Zombie> targets = null;
         switch ((int) user.getAbilityValue()) {
             case 1:
@@ -66,12 +60,18 @@ public class ExplodeStrategy implements ActStrategy {
         }
 
         if (targets == null || targets.isEmpty()) return;
-        userAct(user, targets);
         if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
+            userAct(user, targets);
+            user.triggerActionAnimation(0.5f);
             user.setInternalTimer(0.0);
             return;
         }
-        user.setAlive(false); // Detonate and clear the plant entity
+        // Keep the entity rendered long enough for its one-shot explosion PAM
+        // clip to reach its impact frame. DYING plants no longer run their
+        // strategy, so the delayed damage cannot trigger twice.
+        ArrayList<Zombie> impactTargets = new ArrayList<>(targets);
+        user.beginDeathAnimation(2.0f, 1.75f,
+                () -> userAct(user, impactTargets));
     }
 
     private boolean isZombieTouch(Plant user, GameSession session) {
@@ -232,13 +232,6 @@ public class ExplodeStrategy implements ActStrategy {
                 }
             }
         }
-        user.setAlive(false);
-
-        Vec2 userPos = user.getPosition();
-        Cell cell = session.getLawn().getCell((int) userPos.y(),
-                (int) userPos.x());
-        if (cell != null && cell.getPlant() == user) {
-            cell.setPlant(null);
-        }
+        user.beginDeathAnimation(2.0f);
     }
 }

@@ -301,10 +301,10 @@ public class EntityRenderLayer extends Group {
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> deathSeq = zombie.pollAnimSequence();
                         if (deathSeq != null) {
-                            zombieActor.playSequence(deathSeq, null, true);
+                            zombieActor.playDeathSequence(deathSeq);
                         } else {
                             String deathClip = boss != null ? boss.resolveClip("die") : currentClip;
-                            zombieActor.setClip(deathClip, true);
+                            zombieActor.playDeath(deathClip);
                         }
                     }
                 } else {

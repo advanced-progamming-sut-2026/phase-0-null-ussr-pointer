@@ -212,6 +212,7 @@ public final class SessionUpdater {
             Lawn lawn
     ) {
         if (plant.isAlive()
+                || plant.getState() == Plant.PlantState.DYING
                 || plant.getLocation() == null) {
             return;
         }
@@ -328,7 +329,8 @@ public final class SessionUpdater {
 
     private void cleanupDeadGridStructures() {
         session.getPlants()
-                .removeIf(plant -> !plant.isAlive());
+                .removeIf(plant -> !plant.isAlive()
+                        && plant.getState() != Plant.PlantState.DYING);
 
         session.getZombies().removeIf(zombie -> !zombie.isAlive() && zombie.isDeathAnimDone());
         session.getItems()

@@ -45,12 +45,10 @@ public final class ShootingVectorRegistry {
 
         String name = (String) data.get("name");
 
-        // Handle dynamically stacked vectors, e.g. Pea Pod
+        // Pea Pod starts with one head. Additional firing vectors are added
+        // when another Pea Pod packet is planted on the same tile.
         if ("Pea Pod".equals(name)) {
-            int count = Math.max(1, ((Number) data.getOrDefault("abilityValue", 1)).intValue());
-            List<Vec2> vectors = new ArrayList<>();
-            for (int i = 0; i < count; i++) vectors.add(Vec2.of(1, 0));
-            return vectors;
+            return List.of(Vec2.of(1, 0));
         }
 
         return REGISTRY.getOrDefault(name, List.of(Vec2.of(1, 0)));

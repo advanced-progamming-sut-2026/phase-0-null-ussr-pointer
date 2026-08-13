@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Plant extends GameEntity implements Damageable {
+    public static final int MAX_PEA_POD_STACK = 5;
     private int id;
     private String name;
     private int level = 1;
     private int hp;
+    private int maxHp;
     private double maxRecharge;
     private double recharge;
     private double actionInterval;
@@ -112,6 +114,12 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     private PlantState state;
+    private float deathAnimationTimer;
+    private float deathImpactTimer;
+    private Runnable deathImpactAction;
+    private boolean mineArmed;
+    private float mineRecoverTimer;
+    private double defensiveReactionCharge;
 
     private final EnumMap<SpecialUpgrade, Double> specialUpgrades =
             new EnumMap<>(SpecialUpgrade.class);
@@ -137,6 +145,7 @@ public class Plant extends GameEntity implements Damageable {
         this.projectileOrigins = new ArrayList<>(blueprint.projectileOrigins);
 
         this.hp = blueprint.hp;
+        this.maxHp = blueprint.maxHp;
         this.cost = blueprint.cost;
         this.damage = blueprint.damage;
         this.actionInterval = blueprint.actionInterval;
@@ -171,6 +180,29 @@ public class Plant extends GameEntity implements Damageable {
             return; // Allow DYING state to process for explosive animations
         }
         animationController.update(delta);
+
+        if (state == PlantState.DYING) {
+            deathAnimationTimer -= delta;
+            if (deathImpactAction != null) {
+                deathImpactTimer -= delta;
+                if (deathImpactTimer <= 0f) {
+                    Runnable impact = deathImpactAction;
+                    deathImpactAction = null;
+                    impact.run();
+                }
+            }
+            if (deathAnimationTimer <= 0f) {
+                if (deathImpactAction != null) {
+                    Runnable impact = deathImpactAction;
+                    deathImpactAction = null;
+                    impact.run();
+                }
+                deathAnimationTimer = 0f;
+                isAlive = false;
+                state = PlantState.ACTIVE;
+            }
+            return;
+        }
 
         if (state == PlantState.INCAPACITATED) {
             animationController.playIncapacitated();
@@ -257,6 +289,27 @@ public class Plant extends GameEntity implements Damageable {
                 ? actionIntervalStat.getValue()
                 : actionInterval;
 
+        if (isPotatoMine()) {
+            if (!mineArmed) {
+                if (internalTimer >= interval) {
+                    mineArmed = true;
+                    mineRecoverTimer = 0.83f;
+                    internalTimer = 0.0;
+                }
+                return;
+            }
+
+            if (mineRecoverTimer > 0f) {
+                mineRecoverTimer = Math.max(0f, mineRecoverTimer - delta);
+                return;
+            }
+
+            // Once armed, mines must test their trigger radius every update;
+            // actionInterval is their one-time arming duration, not a cooldown.
+            actStrategy.act(this, App.getGameSession());
+            return;
+        }
+
         if (internalTimer >= interval) {
             actStrategy.act(this, App.getGameSession());
             internalTimer -= interval;
@@ -272,10 +325,7 @@ public class Plant extends GameEntity implements Damageable {
 //        System.out.println("o yeah");
 //        if(dealer != null)
 //            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
-        if (!isAlive) return;
-
-        if (this.actStrategy instanceof WallNutStrategy strategy)
-            strategy.onDamageAct(this, dealer);
+        if (!isAlive || state == PlantState.DYING) return;
 
         int remainingDamage = damage;
 
@@ -290,6 +340,9 @@ public class Plant extends GameEntity implements Damageable {
 
 
         if (remainingDamage > 0) {
+            if (this.actStrategy instanceof WallNutStrategy strategy) {
+                strategy.onDamageAct(this, dealer, Math.min(getHp(), remainingDamage));
+            }
             int newHp = getHp() - remainingDamage;
             if (newHp <= 0) {
                 if (name.equalsIgnoreCase("Hypno-shroom")) {
@@ -307,12 +360,18 @@ public class Plant extends GameEntity implements Damageable {
                         }
                         zombie.hypnotize();
                     }
-                } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy) {
+                } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy
+                        && !"Explode-o-nut".equalsIgnoreCase(name)) {
                     wallNutStrategy.onDie(this);
                 }
                 applySpecialDeathEffect();
                 setHp(0);
-                isAlive = false;
+                if ("Explode-o-nut".equalsIgnoreCase(name)) {
+                    WallNutStrategy strategy = (WallNutStrategy) actStrategy;
+                    beginDeathAnimation(1.0f, 0.85f, () -> strategy.onDie(this));
+                } else {
+                    isAlive = false;
+                }
             } else {
                 setHp(newHp);
             }
@@ -369,11 +428,14 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setHp(int hp) {
         this.hp = hp;
+        if (maxHp <= 0 || hp > maxHp) {
+            maxHp = hp;
+        }
         if (hpStat != null) hpStat.setBaseValue(hp);
     }
 
     public int getMaxHp() {
-        return hp;
+        return maxHp;
     }
 
     public double getRecharge() {
@@ -404,6 +466,14 @@ public class Plant extends GameEntity implements Damageable {
 
     public double getActionInterval() {
         return actionIntervalStat != null ? actionIntervalStat.getValue() : actionInterval;
+    }
+
+    public int addAndConsumeDefensiveCharge(double amount, double threshold) {
+        if (amount <= 0 || threshold <= 0) return 0;
+        defensiveReactionCharge += amount;
+        int triggers = (int) (defensiveReactionCharge / threshold);
+        defensiveReactionCharge -= triggers * threshold;
+        return triggers;
     }
 
     public void setActionInterval(double actionInterval) {
@@ -536,6 +606,11 @@ public class Plant extends GameEntity implements Damageable {
         shootingVectors.add(vec2);
     }
 
+    private boolean isPotatoMine() {
+        return "Potato Mine".equalsIgnoreCase(name)
+                || "Primal Potato Mine".equalsIgnoreCase(name);
+    }
+
     public List<Vec2> getProjectileOrigins() {
         return projectileOrigins;
     }
@@ -557,6 +632,18 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setState(PlantState state) {
         this.state = state;
+    }
+
+    public void beginDeathAnimation(float duration) {
+        beginDeathAnimation(duration, duration, null);
+    }
+
+    public void beginDeathAnimation(float duration, float impactDelay, Runnable impactAction) {
+        state = PlantState.DYING;
+        deathAnimationTimer = Math.max(0.1f, duration);
+        deathImpactTimer = Math.max(0f, Math.min(impactDelay, deathAnimationTimer));
+        deathImpactAction = impactAction;
+        animationController.playDying(deathAnimationTimer);
     }
 
     public PlantState getState() {
@@ -581,6 +668,17 @@ public class Plant extends GameEntity implements Damageable {
 
     public int getStackNumber() {
         return this.stackNumber;
+    }
+
+    public boolean addPeaPodStack() {
+        if (!"Pea Pod".equalsIgnoreCase(name)
+                || stackNumber >= MAX_PEA_POD_STACK) {
+            return false;
+        }
+
+        stackNumber++;
+        shootingVectors.add(Vec2.of(1, 0));
+        return true;
     }
 
     public void setArmor(PlantArmor armor) {
@@ -620,14 +718,24 @@ public class Plant extends GameEntity implements Damageable {
      * Evaluates the plant's current situation and returns the correct PAM clip.
      */
     public String getAnimationClip() {
-        // 1. Plant Food State
-        if (plantFoodTimer > 0 || isBuffed) {
-            return "plantfood"; // Note: If your PamActor uses "plantfood_on" as a fallback, handle that inside PlantPamActor.
+        // 1. Explosive / Dying State (e.g., Cherry Bomb)
+        if (state == PlantState.DYING) {
+            if ("Doom-shroom".equalsIgnoreCase(name)) {
+                int stage = Math.max(1, Math.min(3, getCurrentStage()));
+                return "stage" + stage + "_explode";
+            }
+            if ("Squash".equalsIgnoreCase(name)) {
+                return "jump_down_left";
+            }
+            if ("Explode-o-nut".equalsIgnoreCase(name)) {
+                return "damage3";
+            }
+            return "attack";
         }
 
-        // 2. Explosive / Dying State (e.g., Cherry Bomb)
-        if (state == PlantState.DYING) {
-            return "attack";
+        // 2. Plant Food State
+        if (plantFoodTimer > 0 || isBuffed) {
+            return "plantfood"; // Note: If your PamActor uses "plantfood_on" as a fallback, handle that inside PlantPamActor.
         }
 
         // 3. Prepping State (Mints intro, or Potato Mine charging)
@@ -642,16 +750,46 @@ public class Plant extends GameEntity implements Damageable {
         if (this.actStrategy instanceof WallNutStrategy) {
             float hpPercent = (float) getHp() / (float) getMaxHp();
 
-            if (hpPercent <= 0.33f) {
-                return "damage2"; // Heavy damage
-            } else if (hpPercent <= 0.66f) {
-                return "damage1"; // Light damage
+            if ("Sweet Potato".equalsIgnoreCase(name)) {
+                if (hpPercent <= 0.15f) return "idle_damage3";
+                if (hpPercent <= 0.40f) return "idle_damage2";
+                if (hpPercent <= 0.70f) return "idle_damage";
+            } else if ("Wall-nut".equalsIgnoreCase(name)
+                    || "Explode-o-nut".equalsIgnoreCase(name)
+                    || "Endurian".equalsIgnoreCase(name)) {
+                if (hpPercent <= 0.15f) return "damage3";
+                if (hpPercent <= 0.40f) return "damage2";
+                if (hpPercent <= 0.70f) return "damage";
+            } else if ("Tall-nut".equalsIgnoreCase(name)) {
+                if (hpPercent <= 0.40f) return "damage2";
+                if (hpPercent <= 0.70f) return "damage";
+            } else if ("Garlic".equalsIgnoreCase(name)) {
+                if (hpPercent <= 0.40f) return "idle_damage2";
+                if (hpPercent <= 0.70f) return "idle_damage";
+            } else if ("Pumpkin".equalsIgnoreCase(name)) {
+                if (hpPercent <= 0.40f) return "idle3";
+                if (hpPercent <= 0.70f) return "idle2";
             }
-            // If above 66%, it falls through to return currentClip (idle)
+        }
+
+        if (isPotatoMine()) {
+            if (!mineArmed) return "plant_idle";
+            if (mineRecoverTimer > 0f) return "recover";
+            return "idle";
         }
 
         // 5. Default Action or Idle State
-        return animationController.getCurrentClip();
+        String currentClip = animationController.getCurrentClip();
+        if ("Pea Pod".equalsIgnoreCase(name)) {
+            int visiblePods = Math.max(1, Math.min(MAX_PEA_POD_STACK, stackNumber));
+            if ("idle".equals(currentClip)) {
+                return visiblePods == 1 ? "idle" : "idle" + visiblePods;
+            }
+            if ("attack".equals(currentClip)) {
+                return visiblePods == 1 ? "attack" : "attack " + visiblePods;
+            }
+        }
+        return currentClip;
     }
 
     public void setLifetime(double lifetime) {

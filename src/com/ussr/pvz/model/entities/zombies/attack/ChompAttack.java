@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.zombies.attack;
 
 import com.ussr.pvz.model.engine.Damageable;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 
 public class ChompAttack implements AttackBehavior {
@@ -30,7 +31,11 @@ public class ChompAttack implements AttackBehavior {
             return;
         }
 
-        target.takeDamage(damage);
+        if (target instanceof Plant plant) {
+            plant.takeDamage(damage, zombie);
+        } else {
+            target.takeDamage(damage);
+        }
         pendingDamage -= damage;
     }
 }

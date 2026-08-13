@@ -447,7 +447,13 @@
     "plantFoodStrikeRate": 0.0,
     "pamLocation": "768/FULL/PLANT/PEAPOD/PEAPOD.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
-    "projectileOrigins": [{ "x": 0.72, "y": 0.62 }],
+    "projectileOrigins": [
+      { "x": 0.72, "y": 0.25 },
+      { "x": 0.50, "y": 0.35 },
+      { "x": 0.90, "y": 0.30 },
+      { "x": 0.72, "y": 0.55 },
+      { "x": 0.87, "y": 0.75 }
+    ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_PEA/SPLAT_PEA.PAM",
     "plantFoodProjectilePam": "768/FULL/EFFECTS/PEAPOD_PLANTFOOD_GIANTPEA/PEAPOD_PLANTFOOD_GIANTPEA.PAM",
     "plantFoodHitPam": "768/INITIAL/EFFECTS/SPLAT_GIANTPEA/SPLAT_GIANTPEA.PAM",

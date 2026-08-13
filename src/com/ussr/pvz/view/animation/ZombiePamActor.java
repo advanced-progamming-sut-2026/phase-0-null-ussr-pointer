@@ -2,6 +2,7 @@ package com.ussr.pvz.view.animation;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Matrix4;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
@@ -21,6 +22,16 @@ public class ZombiePamActor extends PamActor {
     private String sequenceRestClip;
     private boolean sequenceRestOneShot;
     private boolean playingSequence;
+    private boolean deathPlaybackStarted;
+    private final java.util.Set<String> detachableBodyParts = new java.util.HashSet<>();
+    private boolean hasDetachedHeadPart;
+    private boolean detachedDeathPlaying;
+    private float detachedDeathTime;
+    private String bodyDeathClip;
+
+    private static final float DETACHED_PART_DURATION = 1.30f;
+    private static final float HEAD_IMPACT_TIME = 0.84f;
+    private static final float ARM_IMPACT_TIME = 0.82f;
 
     // -------------------------------------------------------------------------
     // Glow & danger state (view-only — driven by EntityRenderLayer each frame)
@@ -98,6 +109,15 @@ public class ZombiePamActor extends PamActor {
             glowTime += delta;
         }
 
+        if (detachedDeathPlaying) {
+            detachedDeathTime += delta;
+            if (detachedDeathTime >= DETACHED_PART_DURATION) {
+                detachedDeathPlaying = false;
+                currentClipName = null;
+                setClip(bodyDeathClip, true);
+            }
+        }
+
         if (playingSequence && !playing) {
             sequenceIndex++;
             if (sequenceQueue != null && sequenceIndex < sequenceQueue.size()) {
@@ -141,6 +161,11 @@ public class ZombiePamActor extends PamActor {
         // --- 2. Normal sprite draw ---
         super.draw(batch, parentAlpha);
 
+        if (detachedDeathPlaying) {
+            drawDetachedPart(batch, "particle_head", true);
+            drawDetachedPart(batch, "particle_arm", false);
+        }
+
         // --- 3. Red danger flicker (rendered ON TOP of the sprite) ---
         if (dangerAlpha > 0f) {
             Color prev = batch.getColor().cpy();
@@ -148,6 +173,44 @@ public class ZombiePamActor extends PamActor {
             super.draw(batch, parentAlpha);
             batch.setColor(prev);
         }
+    }
+
+    private void drawDetachedPart(Batch batch, String partName, boolean head) {
+        float t = detachedDeathTime;
+        float impactTime = head ? HEAD_IMPACT_TIME : ARM_IMPACT_TIME;
+        float fallingTime = Math.min(t, impactTime);
+        float dx = head ? -45f * fallingTime : 28f * fallingTime;
+        float floorY = head
+                ? 55f * impactTime - 265f * impactTime * impactTime
+                : 35f * impactTime - 245f * impactTime * impactTime;
+        float dy;
+        if (t < impactTime) {
+            dy = head
+                    ? 55f * t - 265f * t * t
+                    : 35f * t - 245f * t * t;
+        } else {
+            float timeAfterImpact = t - impactTime;
+            float bounceVelocity = head ? 85f : 65f;
+            float bounceHeight = bounceVelocity * timeAfterImpact
+                    - 310f * timeAfterImpact * timeAfterImpact;
+            // Once the bounce returns to the lawn, keep the part resting there.
+            dy = floorY + Math.max(0f, bounceHeight);
+        }
+
+        float centerX = getX() + getWidth() / 2f + offsetX;
+        float centerY = getY() + getHeight() / 2f + offsetY;
+        Matrix4 oldTransform = batch.getTransformMatrix().cpy();
+        Matrix4 transform = oldTransform.cpy();
+        transform.translate(centerX, centerY, 0f);
+        transform.scale(pamScale, pamScale, 1f);
+        transform.translate(dx, dy, 0f);
+        batch.setTransformMatrix(transform);
+        try {
+            player.drawPart(batch, pamPath, "particles", 0f, 0f, 0f, partName);
+        } catch (RuntimeException ignored) {
+            // Zombies without this optional detached part keep their PAM death clip.
+        }
+        batch.setTransformMatrix(oldTransform);
     }
 
     // -------------------------------------------------------------------------
@@ -178,6 +241,41 @@ public class ZombiePamActor extends PamActor {
         sequenceRestOneShot = restOneShot; playingSequence = true; playingSpecial = true;
         advanceSequenceClip();
     }
+
+    /**
+     * Plays the complete zombie death. Regular zombie PAMs only provide static
+     * head and arm particle artwork, so their falling motion is supplied here.
+     * Zombies such as King, whose head fall is already baked into "die", keep
+     * using that native clip unchanged.
+     */
+    public void playDeath(String deathClip) {
+        if (deathPlaybackStarted) {
+            return;
+        }
+        resolveArmorParts();
+        deathPlaybackStarted = true;
+        if (hasDetachedHeadPart && hasClip(deathClip) && hasClip("particles")) {
+            bodyDeathClip = deathClip;
+            detachedDeathTime = 0f;
+            detachedDeathPlaying = true;
+            playingSpecial = true;
+            for (String partName : detachableBodyParts) {
+                armorVisibility.put(partName, false);
+            }
+            partVisibility = armorVisibility;
+            return;
+        }
+        setClip(deathClip, true);
+    }
+
+    public void playDeathSequence(List<String> clips) {
+        if (deathPlaybackStarted) {
+            return;
+        }
+        deathPlaybackStarted = true;
+        playSequence(clips, null, true);
+    }
+
     private void advanceSequenceClip() {
         String clip = sequenceQueue.get(sequenceIndex);
         clipRef = player.getClip(pamPath, clip);
@@ -239,6 +337,16 @@ public class ZombiePamActor extends PamActor {
         String lowerName = part.name == null
                 ? ""
                 : part.name.toLowerCase(Locale.ROOT);
+        if (lowerName.equals("particle_head")) {
+            hasDetachedHeadPart = true;
+        }
+        if (lowerName.equals("zombie_skull")
+                || lowerName.equals("zombie_jaw")
+                || lowerName.contains("hand_outer")
+                || lowerName.contains("arm_outer")
+                || lowerName.contains("arms_outer")) {
+            detachableBodyParts.add(part.name);
+        }
         if (lowerName.contains("armor")
                 && (lowerName.endsWith("_norm")
                 || lowerName.endsWith("_damage_01")

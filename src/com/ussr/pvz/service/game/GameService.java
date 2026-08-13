@@ -255,6 +255,24 @@ public class GameService {
             if (!conveyorPacket) {
                 checkRechargeAndSpendSun(session, blueprint);
             }
+
+            Plant existing = cell.getPlant();
+            if (isPeaPod(blueprint) && isPeaPod(existing)) {
+                if (!existing.addPeaPodStack()) {
+                    throw new IllegalStateException(
+                            "Pea Pod already has five heads"
+                    );
+                }
+
+                if (conveyorPacket) {
+                    conveyor.consume(request.type());
+                } else {
+                    applyPlantRecharge(blueprint);
+                }
+                return "plant Pea Pod placed at (" + x + ", " + y
+                        + ") - stack " + existing.getStackNumber();
+            }
+
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
             session.addPlant(plant);
@@ -555,6 +573,15 @@ public class GameService {
             return;
         }
 
+        if (isPeaPod(blueprint) && isPeaPod(existing)) {
+            if (existing.getStackNumber() >= Plant.MAX_PEA_POD_STACK) {
+                throw new IllegalStateException(
+                        "Pea Pod already has five heads"
+                );
+            }
+            return;
+        }
+
         boolean blueprintIsStacker = isLandStacker(blueprint);
         boolean existingIsStacker = isLandStacker(existing);
 
@@ -576,6 +603,11 @@ public class GameService {
                 && plant.getTags() != null
                 && plant.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.STACK)
                 && !plant.getTags().contains(com.ussr.pvz.model.entities.plants.Tag.WATER);
+    }
+
+    private boolean isPeaPod(Plant plant) {
+        return plant != null
+                && "Pea Pod".equalsIgnoreCase(plant.getName());
     }
 
     private void validateWaterPlanting(
