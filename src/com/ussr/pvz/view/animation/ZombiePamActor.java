@@ -64,7 +64,9 @@ public class ZombiePamActor extends PamActor {
         this.pamScale = 0.65f;
         this.offsetY = -40f;
         boolean isOneShot = "die".equals(preferredClip)
-                || "newspaper_defeat".equals(preferredClip);
+                || "newspaper_defeat".equals(preferredClip)
+                || "intro".equals(preferredClip)
+                || "Pre_Intro".equals(preferredClip);
         setLooping(!isOneShot);
     }
 
@@ -250,7 +252,10 @@ public class ZombiePamActor extends PamActor {
 
     @Override
     public void setClip(String clipName) {
-        boolean isOneShot = "die".equals(clipName) || "newspaper_defeat".equals(clipName);
+        boolean isOneShot = "die".equals(clipName)
+                || "newspaper_defeat".equals(clipName)
+                || "intro".equals(clipName)
+                || "Pre_Intro".equals(clipName);
         setClip(clipName, isOneShot);
     }
 

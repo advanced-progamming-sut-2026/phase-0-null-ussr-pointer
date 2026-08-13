@@ -18,6 +18,7 @@ public class PamActor extends Actor {
     protected boolean playing = true;
     protected float pamScale = 0.4f;
     protected float offsetY = 0f;
+    protected float offsetX = 0f;
     protected boolean looping = true;
     protected String currentClipName;
     protected Map<String, Boolean> partVisibility;
@@ -94,6 +95,10 @@ public class PamActor extends Actor {
         this.offsetY = offsetY;
     }
 
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -118,7 +123,7 @@ public class PamActor extends Actor {
             if (clipRef == null) return;
         }
 
-        float centerX = getX() + getWidth() / 2f;
+        float centerX = getX() + getWidth() / 2f + offsetX;
         float centerY = getY() + getHeight() / 2f + offsetY;
 
         Matrix4 oldTransform = batch.getTransformMatrix().cpy();

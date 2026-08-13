@@ -69,6 +69,7 @@ public class EntityRenderLayer extends Group {
     // of re-snapping the actor to the same spot every render frame.
     private final Map<Projectile, float[]> plantProjectileRenderTargets = new HashMap<>();
     private final Map<ZombieProjectile, float[]> zombieProjectileRenderTargets = new HashMap<>();
+    private final Map<Zombie, float[]> zombieRenderTargets = new HashMap<>();
 
     // Pending immediate draw calls (atlas textures, not actors)
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
@@ -147,6 +148,7 @@ public class EntityRenderLayer extends Group {
         // Also clean newspaper state and danger timers for dead zombies
         newspaperPhase.keySet().removeIf(z -> !session.getZombies().contains(z));
         dangerTime.keySet().removeIf(z -> !session.getZombies().contains(z));
+        zombieRenderTargets.keySet().removeIf(z -> !session.getZombies().contains(z));
 
         // Y-sort each group independently
         sortByY(plantGroup);
@@ -265,15 +267,27 @@ public class EntityRenderLayer extends Group {
             if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
             live.add(zombie);
 
-            PamActor actor = zombieGroupActors.computeIfAbsent(zombie, z -> {
-                String animation = resolveZombieClip(zombie);
+            boolean isNewActor = !zombieGroupActors.containsKey(zombie);
+            PamActor actor = zombieGroupActors.computeIfAbsent(zombie, key -> {
+                Zombie z = (Zombie) key;
+                String animation = resolveZombieClip(z);
+                if (z.getZombossController() != null) {
+                    animation = z.getZombossController().getPreferredClip();
+                }
                 // SunProducerZombie has no PAM yet — use a placeholder actor.
-                if ("SunProducerZombie".equals(zombie.getAlias())) {
+                if ("SunProducerZombie".equals(z.getAlias())) {
                     SunProducerPlaceholderActor ph = new SunProducerPlaceholderActor();
                     zombieGroup.addActor(ph);
                     return ph;
                 }
-                ZombiePamActor za = new ZombiePamActor(pamPlayer, zombie.getPamPath(), animation);
+                ZombiePamActor za = new ZombiePamActor(pamPlayer, z.getPamPath(), animation);
+
+                if (z.getZombossController() != null) {
+                    za.setPamScale(1f);
+                    za.setOffsetY(150f);
+                    za.setOffsetX(-120f);
+                }
+
                 zombieGroup.addActor(za);
                 return za;
             });
@@ -298,8 +312,12 @@ public class EntityRenderLayer extends Group {
                     String idleClip = bossStunned ? boss.getStunClip() : (boss != null ? boss.resolveClip(currentClip) : currentClip);
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> animSeq = zombie.pollAnimSequence();
-                        if (animSeq != null) zombieActor.playSequence(animSeq, idleClip, false);
-                        else zombieActor.setClip(idleClip);
+                        if (animSeq != null) {
+                            zombieActor.playSequence(animSeq, idleClip, false);
+                        } else if (!isNewActor) {
+                            // Guard against re-setting clip on initial spawn frame to prevent double intro playback
+                            zombieActor.setClip(idleClip);
+                        }
                     }
                 }
 
@@ -337,13 +355,31 @@ public class EntityRenderLayer extends Group {
                 actor.setClip(currentClip);
             }
 
-            actor.setPosition(
-                    LawnGridLayout.worldX(zombie.getPosition().x())
-                            + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X,
-                    LawnGridLayout.worldY(zombie.getPosition().y())
-                            + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y
-            );
+            float targetX = LawnGridLayout.worldX(zombie.getPosition().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f
+                    + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X;
+
+            float logicalY = (float) zombie.getPosition().y();
+            if ("ZombossMammoth".equals(zombie.getAlias())) {
+                logicalY = (LawnGridLayout.ROWS / 2) - 0.5f;
+            }
+            float targetY = LawnGridLayout.worldY(logicalY)
+                    + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y;
+
+            // Interpolate position for Boss/dashing units to prevent tick-stepping jumps
+            if (zombie.getZombossController() != null) {
+                float[] lastTarget = zombieRenderTargets.get(zombie);
+                if (lastTarget == null) {
+                    actor.setPosition(targetX, targetY);
+                    zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
+                } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
+                    actor.clearActions();
+                    actor.addAction(Actions.moveTo(targetX, targetY, ActiveGameplayView.TICK_RATE));
+                    zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
+                }
+            } else {
+                actor.setPosition(targetX, targetY);
+            }
         }
     }
 
