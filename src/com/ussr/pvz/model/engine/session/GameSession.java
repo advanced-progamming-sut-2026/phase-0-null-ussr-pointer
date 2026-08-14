@@ -31,7 +31,10 @@ import java.util.Optional;
 public class GameSession {
     private boolean progressTracked = true;
     private double skySunTimer = 0.0;
+    private boolean outroShown = false;
 
+    public boolean isOutroShown()      { return outroShown; }
+    public void    markOutroShown()    { outroShown = true; }
     private static final int LEVEL_COMPLETE_COIN_REWARD = 1000;
 
     private final GameEventBus eventBus = new GameEventBus();

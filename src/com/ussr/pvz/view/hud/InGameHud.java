@@ -111,12 +111,23 @@ public class InGameHud extends Table implements Disposable {
                 .padLeft(12f);
 
         // ── Bottom Row ─────────────────────────────────────────────────────────
+        InGameCurrencyHud currencyHud = new InGameCurrencyHud(skin);
+
+// Left column: currency stacked above the nuke/reset buttons
+        Table leftBottomColumn = new Table();
+        leftBottomColumn.bottom().left();
+        leftBottomColumn.add(currencyHud).left().padLeft(15f).padBottom(6f).row();
+
+        Table leftButtonsRow = new Table();
+        leftButtonsRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
+        leftButtonsRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
+        leftBottomColumn.add(leftButtonsRow).left().row();
+
         Table bottomRow = new Table();
         bottomRow.setFillParent(true);
         bottomRow.bottom().left();
         bottomRow.setTouchable(Touchable.childrenOnly);
-        bottomRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);
-        bottomRow.add(resetTerrainWidget).bottom().left().padLeft(8f).padBottom(20f);
+        bottomRow.add(leftBottomColumn).bottom().left().expandY();
         bottomRow.add().expandX();
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);

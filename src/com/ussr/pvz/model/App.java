@@ -34,6 +34,26 @@ public class App {
     static {
         loadPlantsDataToMemory();
     }
+    // --- in App.java ---
+
+    // Debug flags (both default off)
+    private static boolean debugModeEnabled = false;
+    private static boolean gridEnabled      = false;
+
+    public static boolean isDebugModeEnabled() { return debugModeEnabled; }
+    public static void setDebugModeEnabled(boolean v) { debugModeEnabled = v; }
+
+    public static boolean isGridEnabled() { return gridEnabled; }
+    public static void setGridEnabled(boolean v)     { gridEnabled = v; }
+
+    // Call this when a game session ends (wherever you null out gameSession)
+    public static void setGameSession(GameSession gameSession) {
+        App.gameSession = gameSession;
+        if (gameSession == null) {
+            // Grid/hitbox overlays are only meaningful during gameplay
+            gridEnabled = false;
+        }
+    }
 
     public static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -104,10 +124,6 @@ public class App {
 
     public static GameSession getGameSession() {
         return App.gameSession;
-    }
-
-    public static void setGameSession(GameSession gameSession) {
-        App.gameSession = gameSession;
     }
 
     public static ShopManager getShopManager() {

@@ -30,7 +30,7 @@ public class LawnGridDebugOverlay extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        if (!DebugOverlay.isHitboxEnabled()) {
+        if (!DebugOverlay.isGridEnabled()) {  // was isHitboxEnabled()
             return;
         }
 
@@ -81,5 +81,11 @@ public class LawnGridDebugOverlay extends Actor {
 
         font.getData().setScale(originalScaleX, originalScaleY);
         batch.setColor(oldColor);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        setVisible(DebugOverlay.isGridEnabled());
     }
 }
