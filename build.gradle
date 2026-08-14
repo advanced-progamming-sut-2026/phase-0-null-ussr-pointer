@@ -70,7 +70,7 @@ dependencies {
     // ---------- Your existing libraries ----------
     implementation 'com.google.code.gson:gson:2.14.0'
 
-    implementation 'com.github.pizpizi:libPVZ:v0.1.5'
+    implementation 'com.github.pizpizi:libPVZ:v0.1.6'
     implementation 'com.github.pizpizi:pvz-skin:v0.1.0'
     implementation 'com.github.raeleus.TenPatch:tenpatch:5.2.3'
 
