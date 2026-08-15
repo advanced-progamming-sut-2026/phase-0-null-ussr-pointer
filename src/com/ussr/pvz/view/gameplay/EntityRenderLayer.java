@@ -34,6 +34,8 @@ import pvz.libpvz.textures.TextureBank;
 import java.util.*;
 
 public class EntityRenderLayer extends Group {
+    private static final String CHILL_PLANT_PAM =
+            "768/FULL/EFFECTS/FROSTBITE_CHILL_PLANT/FROSTBITE_CHILL_PLANT.PAM";
 
     private final PamPlayer pamPlayer;
     private final TextureBank textures;
@@ -59,7 +61,8 @@ public class EntityRenderLayer extends Group {
 
     // Entity → actor maps
     private final Map<Plant, PamActor> plantActors = new HashMap<>();
-    private final Map<Object, PamActor> overlayActors = new HashMap<>(); // IceBlock, OctopusWrap keyed by structure
+    // Chill effects are keyed by Plant; IceBlock and OctopusWrap are keyed by structure.
+    private final Map<Object, PamActor> overlayActors = new HashMap<>();
     private final Map<Projectile, ProjectilePamActor> projectileActors = new HashMap<>();
     private final Map<Object, PamActor> zombieGroupActors = new HashMap<>(); // Zombie, LawnMower, PushableStructure
     private final Map<ZombieProjectile, PamActor> zombieProjActors = new HashMap<>();
@@ -215,6 +218,8 @@ public class EntityRenderLayer extends Group {
     private void syncOverlays(GameSession session, Set<Object> live) {
         if (session.getLawn() == null) return;
 
+        syncChillOverlays(session, live);
+
         for (int row = 0; row < session.getLawn().getRows(); row++) {
             for (int col = 0; col < session.getLawn().getCols(); col++) {
                 var cell = session.getLawn().getCell(row, col);
@@ -244,6 +249,34 @@ public class EntityRenderLayer extends Group {
                     positionLikePlant(actor, col, row);
                 }
             }
+        }
+    }
+
+    private void syncChillOverlays(GameSession session, Set<Object> live) {
+        if (session.getPlants() == null) return;
+
+        for (Plant plant : session.getPlants()) {
+            int chillLevel = plant.getChillLevel();
+            if (!plant.isAlive() || plant.getLocation() == null
+                    || chillLevel < 1 || chillLevel >= Plant.MAX_CHILL_LEVEL) {
+                continue;
+            }
+
+            live.add(plant);
+            PamActor actor = overlayActors.computeIfAbsent(plant, key -> {
+                PamActor pamActor = new PamActor(
+                        pamPlayer,
+                        CHILL_PLANT_PAM,
+                        "chill_stage1"
+                );
+                pamActor.setPamScale(0.55f);
+                pamActor.setOffsetY(-20f);
+                overlayGroup.addActor(pamActor);
+                return pamActor;
+            });
+
+            actor.setClip(chillLevel == 1 ? "chill_stage1" : "chill_stage2");
+            positionLikePlant(actor, plant.getLocation().x(), plant.getLocation().y());
         }
     }
 

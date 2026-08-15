@@ -1,14 +1,14 @@
 package com.ussr.pvz.model.level.chaptereffect;
 
-import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFreezer;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.level.Level;
-import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.model.engine.event.GameEvent;
 
 public class FrostbiteCavesEffect implements ChapterEffect {
+    private static final int FIRE_THAW_DAMAGE_PER_SECOND = 60;
 
     @Override
     public void onTick(GameSession session, Level level, double deltaTime) {
@@ -63,10 +63,7 @@ public class FrostbiteCavesEffect implements ChapterEffect {
                 int ty = target.getLocation().y();
 
                 if (Math.abs(fx - tx) <= 1 && Math.abs(fy - ty) <= 1 && target.getChillLevel() > 0) {
-                    target.setChillLevel(target.getChillLevel() - 1);
-                    if (target.getChillLevel() < 3 && target.getState() == Plant.PlantState.INCAPACITATED) {
-                        target.setState(Plant.PlantState.ACTIVE);
-                    }
+                    PlantFreezer.thawOneLevel(session, target, FIRE_THAW_DAMAGE_PER_SECOND);
                 }
             }
         }
@@ -83,15 +80,7 @@ public class FrostbiteCavesEffect implements ChapterEffect {
         System.out.println("A freezing wind sweeps through the lawn!");
 
         for (Plant plant : session.getPlants()) {
-            if (!plant.isAlive() || plant.getTags().contains(Tag.FIRE)) continue;
-
-            plant.setChillLevel(Math.min(3, plant.getChillLevel() + stacks));
-            if (plant.getChillLevel() == 3 && plant.getState() != Plant.PlantState.INCAPACITATED) {
-                IceBlock iceBlock = new IceBlock(plant, 600); // 600 HP matches rule document
-                iceBlock.setPosition(Vec2.of(plant.getLocation().x(), plant.getLocation().y()));
-                session.getLawn().getCell(plant.getLocation().y(), plant.getLocation().x()).setStructure(iceBlock);
-                session.registerStructure(iceBlock);
-            }
+            PlantFreezer.applyFreeze(session, plant, stacks);
         }
     }
 }

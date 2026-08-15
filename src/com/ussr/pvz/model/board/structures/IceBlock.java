@@ -14,6 +14,9 @@ public class IceBlock extends InteractableStructure implements Damageable {
         this.boundPlant = boundPlant;
         this.hp = initialHp;
         this.setAlive(true);
+        if (this.boundPlant != null) {
+            this.boundPlant.setState(Plant.PlantState.INCAPACITATED);
+        }
     }
 
     @Override

@@ -23,6 +23,9 @@ import java.util.Map;
 
 public class Plant extends GameEntity implements Damageable {
     public static final int MAX_PEA_POD_STACK = 5;
+    public static final int MAX_CHILL_LEVEL = 3;
+    private static final double CHILL_LEVEL_ONE_INTERVAL_MULTIPLIER = 1.5;
+    private static final double CHILL_LEVEL_TWO_INTERVAL_MULTIPLIER = 2.0;
     private int id;
     private String name;
     private int level = 1;
@@ -285,9 +288,7 @@ public class Plant extends GameEntity implements Damageable {
     private void updateAction(float delta) {
         internalTimer += delta;
 
-        double interval = actionIntervalStat != null
-                ? actionIntervalStat.getValue()
-                : actionInterval;
+        double interval = getActionInterval() * getChillIntervalMultiplier();
 
         if (isPotatoMine()) {
             if (!mineArmed) {
@@ -653,7 +654,15 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void setChillLevel(int chillLevel) {
-        this.chillLevel = chillLevel;
+        this.chillLevel = Math.max(0, Math.min(MAX_CHILL_LEVEL, chillLevel));
+    }
+
+    private double getChillIntervalMultiplier() {
+        return switch (chillLevel) {
+            case 1 -> CHILL_LEVEL_ONE_INTERVAL_MULTIPLIER;
+            case 2 -> CHILL_LEVEL_TWO_INTERVAL_MULTIPLIER;
+            default -> 1.0;
+        };
     }
 
     public double getPlantFoodTimer() {

@@ -8,6 +8,9 @@ import pvz.libpvz.textures.TextureBank;
 
 public class LawnBackgroundLayer extends Actor {
 
+    private static final String FROSTBITE_CAVES_MAIN_REGION =
+            "IMAGE_BACKGROUNDS_ICEAGE_TEXTURE";
+
     private final TextureRegion leftRegion;
     private final TextureRegion mainRegion;
     private final TextureRegion rightRegion;
@@ -16,9 +19,12 @@ public class LawnBackgroundLayer extends Actor {
 
     private LawnBackgroundLayer(TextureBank textures, String mainRegionKey) {
         setTouchable(Touchable.disabled);
-        this.mainRegion = resolveRegion(textures, mainRegionKey);
         this.leftRegion = resolveSideRegion(textures, mainRegionKey, "_LEFT");
         this.rightRegion = resolveSideRegion(textures, mainRegionKey, "_RIGHT");
+        this.mainRegion = normalizeMainRegionHeight(
+                resolveRegion(textures, mainRegionKey),
+                mainRegionKey,
+                leftRegion);
     }
 
     public static LawnBackgroundLayer forGameplay(TextureBank textures, String mainRegionKey, float unusedPanelWidth) {
@@ -64,6 +70,28 @@ public class LawnBackgroundLayer extends Actor {
             System.err.println("[LawnBackgroundLayer] Warning: Missing main texture region for " + key);
         }
         return region;
+    }
+
+    private static TextureRegion normalizeMainRegionHeight(
+            TextureRegion main,
+            String mainRegionKey,
+            TextureRegion heightReference) {
+        if (!FROSTBITE_CAVES_MAIN_REGION.equals(mainRegionKey)
+                || main == null
+                || heightReference == null
+                || main.getRegionHeight() <= heightReference.getRegionHeight()) {
+            return main;
+        }
+
+        // The Caves atlas gives the main section vertical overscan (785 px versus
+        // 768 px on the side section). Cropping that overscan makes its tile art
+        // render about 2.2% taller without changing the shared grid or hitboxes.
+        return new TextureRegion(
+                main,
+                0,
+                0,
+                main.getRegionWidth(),
+                heightReference.getRegionHeight());
     }
 
     @Override

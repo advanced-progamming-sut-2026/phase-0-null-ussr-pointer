@@ -1,9 +1,9 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
 import com.ussr.pvz.model.board.Cell;
-import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.plants.PlantFreezer;
 import com.ussr.pvz.model.util.Vec2;
 
 public class SnowballProjectile extends ZombieProjectile {
@@ -28,25 +28,7 @@ public class SnowballProjectile extends ZombieProjectile {
         Cell targetCell = session.getLawn().getCell(targetRow, targetCol);
         if (targetCell != null && targetCell.getPlant() != null && targetCell.getPlant().isAlive()) {
             Plant targetPlant = targetCell.getPlant();
-
-            if (targetPlant.getState() != Plant.PlantState.INCAPACITATED) {
-                targetPlant.setChillLevel(targetPlant.getChillLevel() + 1);
-
-                // If it hits 3 stacks, freeze it completely
-                if (targetPlant.getChillLevel() >= 3) {
-                    IceBlock iceBlock = new IceBlock(targetPlant, 500);
-                    iceBlock.setPosition(Vec2.of(targetCol, targetRow));
-
-                    // Register the ice block structure
-                    targetCell.setStructure(iceBlock);
-                    session.registerStructure(iceBlock);
-
-                    // Suspend the plant: remove from cell and session without killing it
-                    targetCell.setPlant(null);
-                    targetPlant.setState(Plant.PlantState.INCAPACITATED);
-                    //session.getPlants().remove(targetPlant);
-                }
-            }
+            PlantFreezer.applyFreeze(session, targetPlant, 1);
         }
     }
 
