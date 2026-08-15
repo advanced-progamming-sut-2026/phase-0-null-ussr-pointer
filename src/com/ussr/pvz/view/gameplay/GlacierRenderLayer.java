@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.board.structures.GlacierBlock;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.view.animation.PamActor;
@@ -12,19 +13,13 @@ import pvz.libpvz.pam.PamPlayer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Manages rendering of Ice Age Zomboss glacier block structures and fogging arrival effects.
  */
 public class GlacierRenderLayer extends Group {
-
-    private static final Pattern GLACIER_CLIP_PATTERN = Pattern.compile("glacier_column_(\\d+)");
-    private static final int GLACIER_COLUMN_BASE = 7;
 
     private static final String GLACIER_BLOCK_PAM =
             "768/FULL/EFFECTS/ZOMBOSS_GLACIER_BLOCK/ZOMBOSS_GLACIER_BLOCK.PAM";
@@ -78,7 +73,7 @@ public class GlacierRenderLayer extends Group {
             triggerArrivalFogging();
         }
 
-        detectZombossColumnFreeze(zomboss);
+        detectZombossColumnFreeze(session);
 
         float hpRatio = getZombossHpRatio(zomboss);
         int zombossState = hpRatio > 0.66f ? 0 : (hpRatio > 0.33f ? 1 : 2);
@@ -210,24 +205,20 @@ public class GlacierRenderLayer extends Group {
                 Actions.removeActor()
         ));
     }
-    private void detectZombossColumnFreeze(Zombie zomboss) {
-        if (zomboss == null || zomboss.getZombossController() == null) return;
 
-        List<String> clips = zomboss.getZombossController().getLastMoveClips();
-        if (clips == null) return;
+    private void detectZombossColumnFreeze(GameSession session) {
+        if (session == null || session.getLawn() == null) return;
 
-        for (String clip : clips) {
-            if (clip == null) continue;
-            Matcher m = GLACIER_CLIP_PATTERN.matcher(clip);
-            if (m.find()) {
-                try {
-                    int x = Integer.parseInt(m.group(1));
-                    int colIndex = GLACIER_COLUMN_BASE - x;
-                    if (colIndex >= 0 && colIndex < LawnGridLayout.COLUMNS) {
-                        zombossFrozenColumns.add(colIndex);
-                    }
-                } catch (NumberFormatException ignored) {
-                }
+        zombossFrozenColumns.clear();
+        for (var structure : session.getLawn().getAllInteractable()) {
+            if (!(structure instanceof GlacierBlock) || !structure.isAlive()) {
+                continue;
+            }
+            var pos = structure.getPosition();
+            if (pos == null) continue;
+            int col = (int) pos.x();
+            if (col >= 0 && col < LawnGridLayout.COLUMNS) {
+                zombossFrozenColumns.add(col);
             }
         }
     }

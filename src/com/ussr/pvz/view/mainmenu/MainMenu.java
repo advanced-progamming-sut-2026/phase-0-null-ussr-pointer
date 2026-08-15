@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.view.mainmenu.news.UnreadBadge;
 import pvz.libpvz.textures.TextureBank;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
@@ -36,7 +37,7 @@ public class MainMenu extends Table {
     private final TextureBank textures;
     private final Table drawer;
     private boolean drawerOpen;
-
+    private UnreadBadge newsBadge;
     public MainMenu(Skin skin) {
         this.skin = skin;
         FileHandle assetsFolder = Gdx.files.local("pvz-assets");
@@ -280,7 +281,25 @@ public class MainMenu extends Table {
                 .height(52f)
                 .row();
 
-        drawer.add(newsButton)
+        // In configureDrawer(), replace the newsButton cell with:
+
+        newsBadge = new UnreadBadge(skin);
+
+        Stack newsButtonStack = new Stack();
+        newsButtonStack.add(newsButton);
+
+// Anchor table: pushes the badge to top-right corner of the 52px button
+        Table badgeAnchor = new Table();
+        badgeAnchor.setTouchable(Touchable.disabled);
+        badgeAnchor.top().right();
+// pad: -8 top so badge overlaps edge, -8 right for same
+        badgeAnchor.add(newsBadge)
+                .size(24f, 24f)
+                .padTop(-8f)
+                .padRight(-8f);
+        newsButtonStack.add(badgeAnchor);
+
+        drawer.add(newsButtonStack)
                 .growX()
                 .height(52f)
                 .padTop(6f)

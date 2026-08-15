@@ -34,7 +34,6 @@ public class FireballProjectile extends ZombieBossProjectile {
 
     @Override
     public void onDestinationReached() {
-
     }
 
     @Override

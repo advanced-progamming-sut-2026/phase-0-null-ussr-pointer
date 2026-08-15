@@ -1,5 +1,8 @@
 package com.ussr.pvz.model.entities.zombies.zomboss.moves;
 
+import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -15,19 +18,18 @@ public class TurbinePullMove implements ZombossMove {
 
     @Override
     public void execute(ZombossController controller, GameSession session) {
-        int r1 = controller.getPrimaryRow();
-        int r2 = controller.getMirrorRow();
+        List<Integer> occupiedRows = controller.getOccupiedRows();
 
         List<Plant> plantsToRemove = new ArrayList<>();
         for (Plant plant : session.getPlants()) {
             int row = (int) plant.getLocation().y();
-            if (row == r1 || row == r2) {
+            if (occupiedRows.contains(row)) {
                 plantsToRemove.add(plant);
             }
         }
 
         for (Plant plant : plantsToRemove) {
-            session.removePlantAt((int) plant.getLocation().x(), (int) plant.getLocation().y());
+            removePlant(plant, session);
         }
 
         for (Zombie zombie : session.getZombies()) {

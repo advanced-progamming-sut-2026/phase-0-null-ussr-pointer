@@ -74,20 +74,58 @@ public final class SettingMenu extends Table {
 
         addDifficultySetting(card);
         addSpeedSetting(card);
-        addToggleSetting(
+        addGridToggle(card);
+        addDebugModeToggle(card);
+
+        return card;
+    }
+    private void addGridToggle(Table card) {
+        addSettingDescription(
                 card,
                 "Show lawn grid",
                 "Display red grid lines during gameplay."
         );
-        addToggleSetting(
+
+        CheckBox checkBox = createLargeCheckBox();
+        checkBox.setChecked(App.isGridEnabled());
+        updateCheckBoxText(checkBox);
+
+        card.add(checkBox)
+                .colspan(2)
+                .left()
+                .height(52f)
+                .padBottom(16f)
+                .row();
+
+        checkBox.addListener(ProfileUiFactory.listener(() -> {
+            App.setGridEnabled(checkBox.isChecked());
+            updateCheckBoxText(checkBox);
+        }));
+    }
+
+    private void addDebugModeToggle(Table card) {
+        addSettingDescription(
                 card,
                 "Debug mode",
                 "Show currency and gameplay resource controls."
         );
 
-        return card;
-    }
+        CheckBox checkBox = createLargeCheckBox();
+        checkBox.setChecked(App.isDebugModeEnabled());
+        updateCheckBoxText(checkBox);
 
+        card.add(checkBox)
+                .colspan(2)
+                .left()
+                .height(52f)
+                .padBottom(16f)
+                .row();
+
+        checkBox.addListener(ProfileUiFactory.listener(() -> {
+            App.setDebugModeEnabled(checkBox.isChecked());
+            updateCheckBoxText(checkBox);
+        }));
+    }
     private void addDifficultySetting(Table card) {
         SelectBox<String> selector = new SelectBox<>(skin);
         selector.setItems(DIFFICULTIES);

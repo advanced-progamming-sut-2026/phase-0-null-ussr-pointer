@@ -101,6 +101,12 @@ public class ActiveGameplayView extends Table implements Disposable {
                 App.getGameSession()
         ));
 
+        layers.add(new PostGameDialogueOverlay(   // ← add this
+                skin,
+                textures,
+                pamPlayer
+        ));
+
         add(layers).grow();
     }
 

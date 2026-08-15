@@ -188,7 +188,8 @@ public class GameOverOverlay extends Table {
         super.act(delta);
 
         GameSession session = App.getGameSession();
-        if (session == null || !session.isGameOver()) {
+        // Wait until the post-game dialogue has finished before showing
+        if (session == null || !session.isGameOver() || !session.isOutroShown()) {
             setVisible(false);
             return;
         }

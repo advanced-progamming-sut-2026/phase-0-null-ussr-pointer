@@ -4,14 +4,17 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.OctopusWrap;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
 
 public class OctopusProjectile extends ZombieProjectile {
 
     private final double arcHeight = 2.5;
+    private final Zombie sourceZombie;
 
-    public OctopusProjectile(Vec2 startPosition, Vec2 targetPosition, double flightTime) {
+    public OctopusProjectile(Vec2 startPosition, Vec2 targetPosition, double flightTime, Zombie sourceZombie) {
         super(startPosition, targetPosition, flightTime, "OctopusZombie");
+        this.sourceZombie = sourceZombie;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class OctopusProjectile extends ZombieProjectile {
             Plant targetPlant = targetCell.getPlant();
 
             if (targetPlant.getState() != Plant.PlantState.INCAPACITATED) {
-                OctopusWrap wrap = new OctopusWrap(targetPlant, 800);
+                OctopusWrap wrap = new OctopusWrap(targetPlant, 800, sourceZombie);
                 wrap.setPosition(Vec2.of(targetCol, targetRow));
 
                 targetCell.setStructure(wrap);
@@ -42,14 +45,12 @@ public class OctopusProjectile extends ZombieProjectile {
 
                 targetCell.setPlant(null);
                 targetPlant.setState(Plant.PlantState.INCAPACITATED);
-                //session.getPlants().remove(targetPlant);
             }
         }
     }
 
     @Override
     public void onDestinationReached() {
-
     }
 
     @Override

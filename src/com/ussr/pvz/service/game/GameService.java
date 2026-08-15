@@ -26,6 +26,7 @@ import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.quest.QuestRewardApplier;
 import com.ussr.pvz.model.quest.QuestType;
+import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.service.ChoosePlantService;
 
 public class GameService {
@@ -712,6 +713,7 @@ public class GameService {
         }
         Plant plant = new Plant(blueprint);
         plant.setLocation(new Plant.Location(x, y));
+        plant.setPosition(Vec2.of(x, y));
         plant.setState(Plant.PlantState.ACTIVE);
         plant.setAlive(true);
         return plant;

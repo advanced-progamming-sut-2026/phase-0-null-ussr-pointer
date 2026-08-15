@@ -23,6 +23,7 @@ import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.DebugOverlay;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
+import com.ussr.pvz.view.hud.MenuDebugHud;
 import com.ussr.pvz.view.loading.LoadingOverlay;
 import com.ussr.pvz.view.mainmenu.*;
 import com.ussr.pvz.view.mainmenu.gamemenu.chooseplant.ChoosePlantMenu;
@@ -68,7 +69,7 @@ public class AppView implements ApplicationListener {
     private NotificationOverlay notificationOverlay;
     private LoadingOverlay loadingOverlay;
     private AudioManager audioManager;
-
+    private MenuDebugHud menuDebugHud;
     private Table screenRoot;
     private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
@@ -142,7 +143,8 @@ public class AppView implements ApplicationListener {
 
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
-
+        menuDebugHud = new MenuDebugHud(skin);
+        stage.addActor(menuDebugHud);
         showMenu(App.getMenuState());
 
         Gdx.input.setInputProcessor(stage);
@@ -350,23 +352,17 @@ public class AppView implements ApplicationListener {
         configureViewportFor(state);
 
         switch (state) {
-            case REGISTER ->
-                    screenRoot.add(new RegisterMenu(skin)).grow();
+            case REGISTER -> screenRoot.add(new RegisterMenu(skin)).grow();
 
-            case LOGIN ->
-                    screenRoot.add(new LoginMenu(skin)).grow();
+            case LOGIN -> screenRoot.add(new LoginMenu(skin)).grow();
 
-            case PROFILE ->
-                    screenRoot.add(new ProfileMenu(skin)).grow();
+            case PROFILE -> screenRoot.add(new ProfileMenu(skin)).grow();
 
-            case MAIN ->
-                    screenRoot.add(new MainMenu(skin)).grow();
+            case MAIN -> screenRoot.add(new MainMenu(skin)).grow();
 
-            case NEWS ->
-                    screenRoot.add(createNewsScreen()).grow();
+            case NEWS -> screenRoot.add(createNewsScreen()).grow();
 
-            case SETTING ->
-                    screenRoot.add(new SettingMenu(skin)).grow();
+            case SETTING -> screenRoot.add(new SettingMenu(skin)).grow();
 
             case GAME -> {
                 if (App.getGameSession() != null) {
@@ -388,37 +384,30 @@ public class AppView implements ApplicationListener {
                 }
             }
 
-            case LEVEL_SELECTION ->
-                    screenRoot.add(
-                            new GraphicalLevelSelectionMenu(skin)
-                    ).grow();
+            case LEVEL_SELECTION -> screenRoot.add(
+                    new GraphicalLevelSelectionMenu(skin)
+            ).grow();
 
-            case GREENHOUSE ->
-                    screenRoot.add(new GreenHouseMenu(skin)).grow();
+            case GREENHOUSE -> screenRoot.add(new GreenHouseMenu(skin)).grow();
 
-            case SHOP ->
-                    screenRoot.add(new ShopMenu(skin)).grow();
+            case SHOP -> screenRoot.add(new ShopMenu(skin)).grow();
 
-            case TRAVEL_LOG ->
-                    screenRoot.add(new TravelLogMenu(skin)).grow();
+            case TRAVEL_LOG -> screenRoot.add(new TravelLogMenu(skin)).grow();
 
-            case LEADERBOARD ->
-                    screenRoot.add(new LeaderBoardMenu(skin)).grow();
+            case LEADERBOARD -> screenRoot.add(new LeaderBoardMenu(skin)).grow();
 
-            case COLLECTION ->
-                    screenRoot.add(new CollectionMenu(
-                            skin
-                    )).grow();
+            case COLLECTION -> screenRoot.add(new CollectionMenu(
+                    skin
+            )).grow();
             case CHOOSE_PLANT -> screenRoot.add(new ChoosePlantMenu(skin)).grow();
 
-            default ->
-                    screenRoot.add(
-                            new Label(
-                                    state.getName(),
-                                    skin,
-                                    "big_outline"
-                            )
-                    );
+            default -> screenRoot.add(
+                    new Label(
+                            state.getName(),
+                            skin,
+                            "big_outline"
+                    )
+            );
         }
 
         configureGlobalHud(state);

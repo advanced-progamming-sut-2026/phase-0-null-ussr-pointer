@@ -3,7 +3,10 @@ package com.ussr.pvz.model.entities.zombies.zomboss;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.entities.zombies.factory.BehaviorSpec;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public final class ZombossFactory {
@@ -17,20 +20,34 @@ public final class ZombossFactory {
             throw new IllegalArgumentException("Unknown zomboss alias: " + alias);
         }
 
-        Zombie primary = ZombieFactory.create(alias, primaryRow, col);
-        Zombie mirror = ZombieFactory.create(alias, primaryRow + 1, col);
-        mirror.setBossMirror(true);
+        int occupiedRows = Math.max(1, BehaviorSpec.getInt(data, "ZombossOccupiedRows", 2));
+        int occupiedCols = Math.max(1, BehaviorSpec.getInt(data, "ZombossOccupiedCols", 2));
 
-        ZombossController controller = new ZombossController(primary, mirror, data);
+        Zombie primary = ZombieFactory.create(alias, primaryRow, col);
+
+        List<Zombie> mirrors = new ArrayList<>();
+        for (int r = 0; r < occupiedRows; r++) {
+            for (int c = 0; c < occupiedCols; c++) {
+                if (r == 0 && c == 0) continue; // primary's own cell
+                Zombie mirror = ZombieFactory.create(alias, primaryRow + r, col + c);
+                mirror.setBossMirror(true);
+                mirrors.add(mirror);
+            }
+        }
+
+        ZombossController controller = new ZombossController(primary, mirrors, data);
         primary.setEffectStatus(controller);
         primary.setDefenseBehavior(new ZombossDefense(controller));
-        mirror.setDefenseBehavior(new ZombossDefense(controller));
-
         primary.setZombossController(controller);
-        mirror.setZombossController(controller);
-
         session.spawnZombie(primary);
-        session.spawnZombie(mirror);
+
+        for (Zombie mirror : mirrors) {
+            mirror.setDefenseBehavior(new ZombossDefense(controller));
+            mirror.setZombossController(controller);
+            session.spawnZombie(mirror);
+        }
+
+        controller.spawnGlacierShield(session);
 
         return controller;
     }

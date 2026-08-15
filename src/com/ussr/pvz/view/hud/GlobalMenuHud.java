@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.ussr.pvz.model.App;
 
 public class GlobalMenuHud extends Table {
     private final Label coinLabel;
@@ -24,41 +25,26 @@ public class GlobalMenuHud extends Table {
         Image coinIcon = new Image(
                 skin.getDrawable("image_ui_generic_coin_icon_small")
         );
-
         Image gemIcon = new Image(
                 skin.getDrawable("image_ui_generic_gem_icon_small")
         );
 
-        Table coinCounter = createCurrencyCounter(
-                coinIcon,
-                coinLabel,
-                skin
-        );
-
-        Table gemCounter = createCurrencyCounter(
-                gemIcon,
-                diamondLabel,
-                skin
-        );
+        Table coinCounter = createCurrencyCounter(coinIcon, coinLabel, skin);
+        Table gemCounter  = createCurrencyCounter(gemIcon,  diamondLabel, skin);
         backButton = createBackButton(skin);
 
-        Table currencyLayer = createCurrencyLayer(
-                coinCounter,
-                gemCounter
-        );
+        Table currencyLayer   = createCurrencyLayer(coinCounter, gemCounter);
         Table navigationLayer = createNavigationLayer();
 
         Stack layers = new Stack();
         layers.add(currencyLayer);
         layers.add(navigationLayer);
-        add(layers).grow();
+        add(layers).grow();   // ← this is the ONLY add() call on `this`
 
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (backAction != null) {
-                    backAction.run();
-                }
+                if (backAction != null) backAction.run();
             }
         });
 

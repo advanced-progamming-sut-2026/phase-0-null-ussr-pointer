@@ -8,6 +8,7 @@ import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class SaveOurSeedsBehavior extends LevelBehavior {
             specialPlant.setAlive(true);
             specialPlant.setState(Plant.PlantState.ACTIVE);
             specialPlant.setLocation(new Plant.Location(target.col(), target.row()));
+            specialPlant.setPosition(Vec2.of(target.col(), target.row()));
             if (session.getPlants() != null) {
                 session.getPlants().add(specialPlant);
             }

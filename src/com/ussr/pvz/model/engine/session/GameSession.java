@@ -10,6 +10,7 @@ import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.NewsObserver;
+import com.ussr.pvz.model.engine.Tickable;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.event.GameEventBus;
 import com.ussr.pvz.model.entities.items.GroundItem;
@@ -33,7 +34,10 @@ import java.util.Optional;
 public class GameSession {
     private boolean progressTracked = true;
     private double skySunTimer = 0.0;
+    private boolean outroShown = false;
 
+    public boolean isOutroShown()      { return outroShown; }
+    public void    markOutroShown()    { outroShown = true; }
     private static final int LEVEL_COMPLETE_COIN_REWARD = 1000;
 
     private final GameEventBus eventBus = new GameEventBus();
@@ -174,6 +178,12 @@ public class GameSession {
             updater.registerEntity(structure);
         }
     }
+
+    public void registerTickable(Tickable tickable) {
+        if (tickable != null) {
+                updater.registerEntity(tickable);
+            }
+        }
 
     public void spawnZombie(Zombie zombie) {
         if (!zombie.isGlowing() && Math.random() < 0.05) {
