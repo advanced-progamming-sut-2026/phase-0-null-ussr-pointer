@@ -1,5 +1,7 @@
 package com.ussr.pvz.model.entities.zombies.zomboss;
 
+import com.ussr.pvz.model.board.structures.ZombossMidGlacier;
+import com.ussr.pvz.model.board.structures.ZombossMidGlacierCell;
 import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -59,6 +61,16 @@ public class ZombossController implements EffectStatus {
     private final int glacierShieldBlockHp;
     private int glacierShieldBlocksRemaining = 0;
 
+    // -------------------------------------------------------------------
+    // Mid-body glacier armor (Ice Age Zomboss) — a 3x3 hittable block
+    // (3 mid rows x last 3 columns) that shields the boss until destroyed,
+    // and reverts back to full when the boss recovers from its stun.
+    // -------------------------------------------------------------------
+    private final boolean hasMidGlacier;
+    private final int midGlacierHp;
+    private ZombossMidGlacier midGlacier;
+    private final List<ZombossMidGlacierCell> midGlacierCells = new ArrayList<>();
+
     private final double moveIntervalMin;
     private final double moveIntervalMax;
     private double nextMoveTimer;
@@ -116,6 +128,10 @@ public class ZombossController implements EffectStatus {
 
         this.hasGlacierShield = BehaviorSpec.getBoolean(data, "ZombossHasGlacierShield", false);
         this.glacierShieldBlockHp = BehaviorSpec.getInt(data, "ZombossGlacierShieldBlockHp", 1200);
+
+        this.hasMidGlacier = BehaviorSpec.getBoolean(data, "ZombossHasMidGlacier",
+                "ZombossMammoth".equalsIgnoreCase(primary.getAlias()));
+        this.midGlacierHp = BehaviorSpec.getInt(data, "ZombossMidGlacierHp", 900);
 
         this.moveIntervalMin = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMin", 4.0);
         this.moveIntervalMax = BehaviorSpec.getDouble(data, "ZombossMoveIntervalMax", 7.0);
@@ -183,6 +199,10 @@ public class ZombossController implements EffectStatus {
     public void effect(Zombie zombie, GameSession session, float delta) {
         if (!primary.isAlive()) return;
 
+        if (hasMidGlacier && midGlacier == null) {
+            spawnMidGlacier(session);
+        }
+
         updateDash(delta);
         syncMirrorPositions();
         tickMoveCooldowns(delta);
@@ -194,6 +214,9 @@ public class ZombossController implements EffectStatus {
             primary.queueAnimEvent(stunEndClip);
             if (hasGlacierShield) {
                 spawnGlacierShield(session);
+            }
+            if (midGlacier != null) {
+                midGlacier.revertToNormal();
             }
         }
         wasStunned = stunnedNow;
@@ -329,6 +352,52 @@ public class ZombossController implements EffectStatus {
 
     public boolean hasGlacierShield() {
         return hasGlacierShield;
+    }
+
+    // -------------------------------------------------------------------
+    // Mid-body glacier armor (3x3: 3 mid rows x last 3 columns)
+    // -------------------------------------------------------------------
+
+    private void spawnMidGlacier(GameSession session) {
+        if (session == null || session.getLawn() == null) return;
+
+        int totalRows = session.getLawn().getRows();
+        int totalCols = session.getLawn().getCols();
+        if (totalRows < 3 || totalCols < 3) return;
+
+        // 3 middle rows (excludes the top-most and bottom-most rows)
+        int rowStart = 1;
+        int rowEnd = totalRows - 2;
+        // last 3 columns, where the boss stands
+        int colStart = totalCols - 3;
+        int colEnd = totalCols - 1;
+
+        midGlacier = new ZombossMidGlacier(midGlacierHp, this::onMidGlacierDestroyed);
+        midGlacierCells.clear();
+
+        for (int row = rowStart; row <= rowEnd; row++) {
+            for (int col = colStart; col <= colEnd; col++) {
+                if (row < 0 || row >= totalRows || col < 0 || col >= totalCols) continue;
+
+                ZombossMidGlacierCell cellStructure = new ZombossMidGlacierCell(midGlacier);
+                cellStructure.setPosition(Vec2.of(col, row));
+
+                var cell = session.getLawn().getCell(row, col);
+                if (cell != null) {
+                    cell.setStructure(cellStructure);
+                }
+                session.registerStructure(cellStructure);
+                midGlacierCells.add(cellStructure);
+            }
+        }
+    }
+
+    private void onMidGlacierDestroyed() {
+        stun();
+    }
+
+    public ZombossMidGlacier getMidGlacier() {
+        return midGlacier;
     }
 
     private int computeSegment(int hp) {

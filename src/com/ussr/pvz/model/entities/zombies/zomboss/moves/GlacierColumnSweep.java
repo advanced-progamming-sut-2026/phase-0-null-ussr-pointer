@@ -18,7 +18,8 @@ public class GlacierColumnSweep implements Tickable {
     private static final int GLACIER_BLOCK_HP = 600;
     private static final String BURIED_ZOMBIE_ALIAS = "ZombieArmor1";
 
-    private static final double ROW_ADVANCE_SECONDS = 1.26;
+    private static final double ROW_START_DELAY_SECONDS = 1.8;
+    private static final double ROW_ADVANCE_SECONDS = 0.9;
     private static final double COLUMN_HOLD_SECONDS = 3.5;
 
     private final GameSession session;
@@ -44,7 +45,8 @@ public class GlacierColumnSweep implements Tickable {
 
         if (nextRowToFreeze < totalRows) {
             rowTimer += delta;
-            if (rowTimer >= ROW_ADVANCE_SECONDS) {
+            double threshold = nextRowToFreeze == 0 ? ROW_START_DELAY_SECONDS : ROW_ADVANCE_SECONDS;
+            if (rowTimer >= threshold) {
                 rowTimer = 0;
                 freezeRow(currentColumn, nextRowToFreeze);
                 nextRowToFreeze++;
