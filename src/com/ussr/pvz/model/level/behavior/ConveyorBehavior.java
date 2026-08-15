@@ -7,7 +7,7 @@ import com.ussr.pvz.model.level.delivery.DeliveryStrategy;
 public class ConveyorBehavior extends LevelBehavior {
 
     private double conveyorTimer = 0.0;
-    private static final double CONVEYOR_INTERVAL = 12.0;
+    private static final double CONVEYOR_INTERVAL = 6.0;
     private boolean initialDeliveryDone = false;
 
     @Override

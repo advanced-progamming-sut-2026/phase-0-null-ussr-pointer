@@ -937,6 +937,7 @@ public class GameService {
                 ? "zombie waves started (" + totalWaves + " waves loaded)"
                 : "zombie waves started (no wave data — add waves to your level JSON)";
     }
+
     public String showPlantFood() {
         if (App.getGameSession() == null) {
             return "no active game session";

@@ -29,7 +29,7 @@ public class TurbinePullMove implements ZombossMove {
         }
 
         for (Plant plant : plantsToRemove) {
-            removePlant(plant, session);
+            session.removePlantAt(plant.getLocation().x(), plant.getLocation().y());
         }
 
         for (Zombie zombie : session.getZombies()) {
@@ -37,7 +37,7 @@ public class TurbinePullMove implements ZombossMove {
             if (!zombie.isAlive()) continue;
 
             int row = (int) zombie.getPosition().y();
-            if (row == r1 || row == r2) {
+            if (occupiedRows.contains(row)) {
                 zombie.setPosition(Vec2.of(controller.getPrimary().getPosition().x(), row));
                 zombie.takeDamage(LETHAL_DAMAGE, controller.getPrimary());
             }

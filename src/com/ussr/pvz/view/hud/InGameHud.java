@@ -17,7 +17,7 @@ import pvz.libpvz.textures.TextureBank;
 public class InGameHud extends Table implements Disposable {
 
     private final IZombieHud iZombieHud;
-
+    private final TimedWarHudWidget timedWarHudWidget;
     private final SeedBankHud seedBankHud;
     private final ShovelWidget shovelWidget;
     private final PlantFoodWidget plantFoodWidget;
@@ -43,7 +43,7 @@ public class InGameHud extends Table implements Disposable {
 
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
-
+        timedWarHudWidget  = new TimedWarHudWidget(skin, textures);
         // ── Meow score widget (self-hides when not a Meow session) ────────────
         MeowScoreWidget meowScoreWidget = new MeowScoreWidget(skin, textures);
 
@@ -92,7 +92,12 @@ public class InGameHud extends Table implements Disposable {
         Table topRightControls = new Table();
         topRightControls.setTouchable(Touchable.childrenOnly);
         topRightControls.top().right();
-        topRightControls.add(waveProgressBar).right().top().padTop(2f).padRight(12f).row();
+        Table waveAndTimer = new Table();
+        waveAndTimer.top().right();
+        waveAndTimer.add(waveProgressBar).right().row();
+        waveAndTimer.add(timedWarHudWidget).right().padTop(4f);
+
+        topRightControls.add(waveAndTimer).right().top().padTop(2f).padRight(12f).row();
         topRightControls.add(debugTools).right().padTop(4f).padRight(12f).row();
         topRightControls.add(pauseButton).size(64f).right().top().padTop(4f).padRight(12f).row();
         topRightControls.add(meowScoreWidget).right().top().padTop(6f).padRight(12f);
@@ -114,9 +119,17 @@ public class InGameHud extends Table implements Disposable {
         InGameCurrencyHud currencyHud = new InGameCurrencyHud(skin);
 
 // Left column: currency stacked above the nuke/reset buttons
+        // Left column: currency + Let's Rock (beside sun) stacked above the nuke/reset buttons
+        LetsRockWidget letsRockWidget = new LetsRockWidget(skin);
+
+        Table currencyRow = new Table();
+        currencyRow.left();
+        currencyRow.add(currencyHud).left();
+        currencyRow.add(letsRockWidget).left().padLeft(10f).bottom();
+
         Table leftBottomColumn = new Table();
         leftBottomColumn.bottom().left();
-        leftBottomColumn.add(currencyHud).left().padLeft(15f).padBottom(6f).row();
+        leftBottomColumn.add(currencyRow).left().padLeft(15f).padBottom(6f).row();
 
         Table leftButtonsRow = new Table();
         leftButtonsRow.add(nukeMinionWidget).bottom().left().padLeft(15f).padBottom(20f);

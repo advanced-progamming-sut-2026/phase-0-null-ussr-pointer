@@ -153,22 +153,29 @@ public class ObjectiveWidgetFactory {
         public void draw(Batch batch, float parentAlpha) {
             try {
                 int col = session.getLevel().getDeadlineColumn();
-                if (col < 0 || getParent() == null) return;
+                if (col < 0) return;
 
-                float cellW = getParent().getWidth() / 9f;
-                float lineX = getParent().getX() + col * cellW;
-                float lineY = getParent().getY();
-                float lineH = getParent().getHeight();
+                // Use the same grid layout math the lawn widget uses,
+                // so the line lands exactly on the cell boundary.
+                float lineX = com.ussr.pvz.view.gameplay.LawnGridLayout.cellX(col);
+                float lineY = com.ussr.pvz.view.gameplay.LawnGridLayout.cellY(0);
+                float lineH = com.ussr.pvz.view.gameplay.LawnGridLayout.cellY(0)
+                        - com.ussr.pvz.view.gameplay.LawnGridLayout.cellY(
+                        session.getLawn() != null ? session.getLawn().getRows() : 5
+                );
 
                 // Soft glow pass
                 Color old = batch.getColor().cpy();
-                batch.setColor(GLOW_COLOR.r, GLOW_COLOR.g, GLOW_COLOR.b, GLOW_COLOR.a * parentAlpha);
-                batch.draw(WhitePixel.get(), lineX - GLOW_EXTRA, lineY,
+                batch.setColor(GLOW_COLOR.r, GLOW_COLOR.g, GLOW_COLOR.b,
+                        GLOW_COLOR.a * parentAlpha);
+                batch.draw(WhitePixel.get(),
+                        lineX - GLOW_EXTRA, lineY - lineH,
                         LINE_WIDTH + GLOW_EXTRA * 2f, lineH);
 
                 // Solid line pass
-                batch.setColor(LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b, LINE_COLOR.a * parentAlpha);
-                batch.draw(WhitePixel.get(), lineX, lineY, LINE_WIDTH, lineH);
+                batch.setColor(LINE_COLOR.r, LINE_COLOR.g, LINE_COLOR.b,
+                        LINE_COLOR.a * parentAlpha);
+                batch.draw(WhitePixel.get(), lineX, lineY - lineH, LINE_WIDTH, lineH);
 
                 batch.setColor(old);
             } catch (Exception ignored) {}

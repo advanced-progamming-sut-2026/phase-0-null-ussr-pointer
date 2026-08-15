@@ -60,7 +60,7 @@ public class JsonContainer {
 
         // === Minigame Strategy Parameters ===
         public int redLineColumn = 2;
-        public int startingSun = 150;
+        public int startingSun = 1500;
         public int targetMatches = 20;
         public List<String> startingPlants;
         public List<JsonPrePlacedPlant> plantLayout;
