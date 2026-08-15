@@ -3,12 +3,14 @@ package com.ussr.pvz.view.mainmenu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -16,649 +18,561 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.SettingController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.notification.NotificationCenter;
-import com.ussr.pvz.view.mainmenu.profile.ProfileUiFactory;
 import pvz.libpvz.textures.TextureBank;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
-
 public final class SettingMenu extends Table {
-    private static final String BACKGROUND_REGION =
-            "IMAGE_MAINMENU_BACKGROUND";
+
+    private static final String BG = "IMAGE_MAINMENU_BACKGROUND";
+
+    private static final String HEADER = "IMAGE_UI_SETTINGS_HEADER";
+    private static final String CLOSE = "IMAGE_UI_SETTINGS_CLOSE";
+
+    private static final String ICON_AUDIO = "IMAGE_UI_SETTINGS_ICON_AUDIO";
+    private static final String ICON_GAMEPLAY = "IMAGE_UI_SETTINGS_ICON_GAMEPLAY";
+    private static final String ICON_DISPLAY = "IMAGE_UI_SETTINGS_ICON_DISPLAY";
+    private static final String ICON_ACCESSIBILITY = "IMAGE_UI_SETTINGS_ICON_ACCESSIBILITY";
+
+    private static final String TAB_DARK = "IMAGE_UI_SETTINGS_TAB_DARK";
+    private static final String TAB_GREEN = "IMAGE_UI_SETTINGS_TAB_GREEN";
+
+    private static final String ARROW_LEFT = "IMAGE_UI_SETTINGS_ARROW_LEFT";
+    private static final String ARROW_RIGHT = "IMAGE_UI_SETTINGS_ARROW_RIGHT";
+    private static final String VALUE_PANEL = "IMAGE_UI_SETTINGS_VALUE_PANEL";
+
+    private static final String ROW_LARGE = "IMAGE_UI_SETTINGS_ROW_LARGE";
+    private static final String CONTENT_PANEL = "IMAGE_UI_SETTINGS_CONTENT_PANEL";
+
+    private static final String SLIDER_TRACK = "IMAGE_UI_SETTINGS_SLIDER_TRACK";
+    private static final String SLIDER_FILL = "IMAGE_UI_SETTINGS_SLIDER_FILL";
+    private static final String SLIDER_KNOB = "IMAGE_UI_SETTINGS_SLIDER_KNOB";
+
+    private static final String TOGGLE_OFF = "IMAGE_UI_SETTINGS_TOGGLE_OFF";
+    private static final String TOGGLE_ON = "IMAGE_UI_SETTINGS_TOGGLE_ON";
+
+    private static final String APPLY = "IMAGE_UI_SETTINGS_BUTTON_APPLY";
+    private static final String RESET = "IMAGE_UI_SETTINGS_BUTTON_RESET";
 
     private static final String[] DIFFICULTY_NAMES = {
-            "Easy",
-            "Normal",
-            "Medium",
-            "Hard",
-            "Very Hard"
+            "Easy", "Normal", "Medium", "Hard", "Very Hard"
     };
 
-    private static final int DEFAULT_DIFFICULTY = 2;
-    private static final float DEFAULT_GAME_SPEED = 1f;
-
     private enum Category {
-        GAMEPLAY,
-        TOOLS
+        AUDIO, GAMEPLAY, DISPLAY, ACCESSIBILITY
     }
 
     private final Skin skin;
     private final SettingController controller;
     private final TextureBank textures;
 
-    private Table contentRoot;
-    private TextButton gameplayTab;
-    private TextButton toolsTab;
-    private Category selectedCategory;
+    private final Button[] tabs = new Button[4];
+    private Table content;
+    private Category selected = Category.GAMEPLAY;
 
-    private int pendingDifficulty;
-    private float pendingGameSpeed;
-    private boolean pendingGridEnabled;
-    private boolean pendingDebugEnabled;
+    private int difficulty;
+    private float gameSpeed;
+    private boolean grid;
+    private boolean debug;
     private boolean keyboardFocusInitialized;
 
     public SettingMenu(Skin skin) {
         this.skin = skin;
         this.controller = new SettingController();
-        this.textures = new TextureBank(
-                "768",
-                Gdx.files.local("pvz-assets")
-        );
+        this.textures = new TextureBank("768", Gdx.files.local("pvz-assets"));
+
+        difficulty = currentDifficulty();
+        gameSpeed = controller.getGameSpeed();
+        grid = App.isGridEnabled();
+        debug = App.isDebugModeEnabled();
 
         setFillParent(true);
-        installKeyboardNavigation();
-        readCurrentSettings();
-        buildUi();
-    }
-
-    private void installKeyboardNavigation() {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode != Keys.ESCAPE) {
-                    return false;
+                if (keycode == Keys.ESCAPE) {
+                    App.setMenuState(MenuState.MAIN);
+                    return true;
                 }
-
-                App.setMenuState(MenuState.MAIN);
-                return true;
+                return false;
             }
         });
+
+        build();
     }
 
-    private void readCurrentSettings() {
-        pendingDifficulty = currentDifficulty();
-        pendingGameSpeed = controller.getGameSpeed();
-        pendingGridEnabled = App.isGridEnabled();
-        pendingDebugEnabled = App.isDebugModeEnabled();
-    }
+    private void build() {
+        Stack root = new Stack();
+        root.add(background());
 
-    private void buildUi() {
-        Stack screen = new Stack();
-        screen.add(createBackground());
-        screen.add(createDimLayer());
-
-        Table panelLayer = new Table();
-        panelLayer.add(createPanel())
-                .width(1120f)
-                .height(650f);
-        screen.add(panelLayer);
-
-        add(screen).grow();
-        showCategoryImmediately(Category.GAMEPLAY);
-    }
-
-    private Image createBackground() {
-        TextureRegion region = textures.region(BACKGROUND_REGION);
-        Image background = region == null
-                ? new Image()
-                : new Image(region);
-
-        background.setScaling(Scaling.fill);
-        background.setTouchable(Touchable.disabled);
-        return background;
-    }
-
-    private Image createDimLayer() {
         Image dim = new Image(skin.newDrawable(
                 "white-pixel",
-                new Color(0.02f, 0.05f, 0.04f, 0.66f)
+                new Color(0f, 0f, 0f, 0.52f)
         ));
         dim.setTouchable(Touchable.disabled);
-        return dim;
+        root.add(dim);
+
+        Table center = new Table();
+        center.add(panel()).width(1080f).height(650f);
+        root.add(center);
+
+        add(root).grow();
+        show(Category.GAMEPLAY);
     }
 
-    private Table createPanel() {
+    private Actor panel() {
         Table panel = new Table();
-        panel.setBackground(skin.getDrawable(
-                "image_ui_dialog_asset_dialogborder_10"
-        ));
-        panel.pad(24f, 28f, 24f, 28f);
+        panel.setBackground(panelDrawable(CONTENT_PANEL, 28, 28, 28, 28));
+        panel.pad(14f, 18f, 14f, 18f);
 
-        panel.add(createHeader())
-                .colspan(2)
-                .growX()
-                .height(66f)
-                .padBottom(12f)
-                .row();
+        panel.add(header()).colspan(2).growX().height(100f).row();
 
-        Table navigation = createNavigation();
-        contentRoot = new Table();
-        contentRoot.top();
+        Table nav = navigation();
+        content = new Table();
+        content.top();
 
-        panel.add(navigation)
-                .width(230f)
-                .growY()
-                .padRight(16f);
+        panel.add(nav).width(235f).growY().padRight(18f);
+        panel.add(content).grow().row();
 
-        panel.add(contentRoot)
-                .grow()
-                .row();
-
-        panel.add(createFooter())
-                .colspan(2)
-                .growX()
-                .height(66f)
-                .padTop(14f);
-
+        panel.add(footer()).colspan(2).growX().height(85f);
         return panel;
     }
 
-    private Table createHeader() {
-        Table header = new Table();
+    private Actor header() {
+        Table t = new Table();
+        t.add().width(72f);
 
-        header.add().width(56f);
-        header.add(new Label("SETTINGS", skin, "big_outline"))
-                .expandX()
-                .center();
+        Image title = image(HEADER);
+        t.add(title).width(350f).height(110f).expandX().center();
 
-        ImageButton closeButton = createCloseButton();
-        header.add(closeButton).size(56f);
-        return header;
+        ImageButton close = imageButton(CLOSE);
+        close.addListener(click(() -> App.setMenuState(MenuState.MAIN)));
+        t.add(close).size(72f).right();
+        return t;
     }
 
-    private ImageButton createCloseButton() {
-        ImageButton.ImageButtonStyle style =
-                new ImageButton.ImageButtonStyle();
+    private Table navigation() {
+        Table nav = new Table();
+        nav.top().padTop(8f);
 
-        style.imageUp = skin.getDrawable(
-                "image_ui_generic_close_circle"
-        );
-        style.imageDown = skin.getDrawable(
-                "image_ui_generic_close_circle_down"
-        );
+        tabs[0] = tab("Audio", ICON_AUDIO, Category.AUDIO);
+        tabs[1] = tab("Gameplay", ICON_GAMEPLAY, Category.GAMEPLAY);
+        tabs[2] = tab("Display", ICON_DISPLAY, Category.DISPLAY);
+        tabs[3] = tab("Accessibility", ICON_ACCESSIBILITY, Category.ACCESSIBILITY);
 
-        ImageButton button = new ImageButton(style);
-        button.addListener(ProfileUiFactory.listener(
-                () -> App.setMenuState(MenuState.MAIN)
-        ));
-        return button;
+        for (Button tab : tabs) {
+            nav.add(tab).width(210f).height(74f).padBottom(8f).row();
+        }
+        nav.add().growY();
+        return nav;
     }
 
-    private Table createNavigation() {
-        Table navigation = new Table();
-        navigation.top();
-        navigation.pad(14f);
-        navigation.setBackground(skin.newDrawable(
-                "white-pixel",
-                new Color(0.10f, 0.17f, 0.16f, 0.72f)
-        ));
+    private Button tab(String text, String iconRegion, Category category) {
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = panelDrawable(TAB_DARK, 24, 24, 24, 24);
+        style.down = panelDrawable(TAB_GREEN, 24, 24, 24, 24);
+        style.checked = panelDrawable(TAB_GREEN, 24, 24, 24, 24);
 
-        Label categoryTitle = new Label(
-                "CATEGORIES", skin, "medium_outline"
-        );
+        Button b = new Button(style);
+        Image icon = image(iconRegion);
+        Label label = new Label(text, skin, "medium_outline");
+        label.setAlignment(Align.left);
 
-        navigation.add(categoryTitle)
-                .growX()
-                .left()
-                .pad(4f, 8f, 14f, 8f)
-                .row();
+        b.add(icon).size(48f).padLeft(12f).padRight(8f);
+        b.add(label).growX().left().padRight(10f);
 
-        gameplayTab = createCategoryButton("Gameplay");
-        toolsTab = createCategoryButton("Tools");
-
-        navigation.add(gameplayTab)
-                .growX()
-                .height(62f)
-                .padBottom(10f)
-                .row();
-
-        navigation.add(toolsTab)
-                .growX()
-                .height(62f)
-                .row();
-
-        navigation.add().growY();
-
-        Label hint = createLightLabel(
-                "Changes are saved\nwhen you press APPLY."
-        );
-        hint.setAlignment(Align.center);
-
-        navigation.add(hint)
-                .growX()
-                .padBottom(6f)
-                .row();
-
-        attachCategoryListeners();
-
-        return navigation;
+        b.addListener(click(() -> show(category)));
+        return b;
     }
 
-    private void attachCategoryListeners() {
-        gameplayTab.addListener(ProfileUiFactory.listener(
-                () -> switchCategory(Category.GAMEPLAY)
-        ));
-        toolsTab.addListener(ProfileUiFactory.listener(
-                () -> switchCategory(Category.TOOLS)
-        ));
+    private Actor footer() {
+        Table f = new Table();
+
+        ImageButton reset = imageButton(RESET);
+        reset.addListener(click(this::resetDefaults));
+
+        ImageButton apply = imageButton(APPLY);
+        apply.addListener(click(this::applySettings));
+
+        f.add(reset).width(230f).height(58f).left();
+        f.add().growX();
+
+        Label esc = new Label("Esc / Back", skin, "default");
+        esc.setColor(new Color(0.9f, 0.86f, 0.70f, 1f));
+        f.add(esc).padRight(18f);
+
+        f.add(apply).width(250f).height(82f).right();
+        return f;
     }
 
-    private TextButton createCategoryButton(String text) {
-        TextButton button = new TextButton(text, skin, "brown");
-        button.getLabel().setAlignment(Align.left);
-        button.padLeft(18f);
-        return button;
-    }
+    private void show(Category category) {
+        selected = category;
+        if (content == null) return;
 
-    private Table createFooter() {
-        Table footer = new Table();
-
-        TextButton resetButton = new TextButton(
-                "Reset Defaults",
-                skin,
-                "brown"
-        );
-
-        TextButton applyButton = new TextButton(
-                "APPLY",
-                skin,
-                "green"
-        );
-
-        resetButton.addListener(ProfileUiFactory.listener(
-                this::resetDefaults
-        ));
-        applyButton.addListener(ProfileUiFactory.listener(
-                this::applySettings
-        ));
-
-        footer.add(resetButton)
-                .width(230f)
-                .height(58f)
-                .left();
-
-        footer.add().growX();
-
-        footer.add(createLightLabel("Esc / Back"))
-                .padRight(18f);
-
-        footer.add(applyButton)
-                .width(260f)
-                .height(62f)
-                .right();
-
-        return footer;
-    }
-
-    private void switchCategory(Category category) {
-        if (category == selectedCategory) {
-            return;
+        for (int i = 0; i < tabs.length; i++) {
+            tabs[i].setChecked(i == category.ordinal());
         }
 
-        contentRoot.clearActions();
-        contentRoot.addAction(sequence(
-                fadeOut(0.10f, Interpolation.fade),
-                run(() -> replaceCategoryContent(category)),
-                fadeIn(0.16f, Interpolation.fade)
-        ));
+        content.clearChildren();
+
+        switch (category) {
+            case AUDIO:
+                content.add(audioContent()).grow();
+                break;
+            case GAMEPLAY:
+                content.add(gameplayContent()).grow();
+                break;
+            case DISPLAY:
+                content.add(displayContent()).grow();
+                break;
+            case ACCESSIBILITY:
+                content.add(accessibilityContent()).grow();
+                break;
+        }
     }
 
-    private void showCategoryImmediately(Category category) {
-        replaceCategoryContent(category);
-        contentRoot.getColor().a = 1f;
+    private Actor audioContent() {
+        Table box = section();
+        box.add(title("Audio")).growX().left().padBottom(12f).row();
+
+        Table card = rowCard();
+        Label heading = title("Audio");
+        Label copy = description(
+                "Audio controls can be wired to your game's audio manager here."
+        );
+        card.add(copyBlock(heading, copy)).growX().left();
+
+        box.add(card).growX().height(125f).row();
+        box.add().growY();
+        return box;
     }
 
-    private void replaceCategoryContent(Category category) {
-        selectedCategory = category;
-        contentRoot.clearChildren();
+    private Actor gameplayContent() {
+        Table box = section();
 
-        Actor content = category == Category.GAMEPLAY
-                ? createGameplayContent()
-                : createToolsContent();
+        box.add(difficultyRow()).growX().height(126f).padBottom(14f).row();
+        box.add(speedRow()).growX().height(126f).row();
+        box.add().growY();
 
-        contentRoot.add(content).grow();
-        updateCategoryStyles();
+        return box;
     }
 
-    private void updateCategoryStyles() {
-        boolean gameplaySelected =
-                selectedCategory == Category.GAMEPLAY;
-
-        gameplayTab.setStyle(skin.get(
-                gameplaySelected ? "green" : "brown",
-                TextButton.TextButtonStyle.class
-        ));
-
-        toolsTab.setStyle(skin.get(
-                gameplaySelected ? "brown" : "green",
-                TextButton.TextButtonStyle.class
-        ));
+    private Actor displayContent() {
+        Table box = section();
+        box.add(toggleRow(
+                "Show Lawn Grid",
+                "Display tile guides during gameplay.",
+                () -> grid,
+                value -> grid = value
+        )).growX().height(126f).row();
+        box.add().growY();
+        return box;
     }
 
-    private Table createGameplayContent() {
-        Table content = createContentTable(
-                "GAMEPLAY",
-                "Tune the challenge and pace of each level."
+    private Actor accessibilityContent() {
+        Table box = section();
+        box.add(toggleRow(
+                "Debug Tools",
+                "Show testing and resource controls.",
+                () -> debug,
+                value -> debug = value
+        )).growX().height(126f).row();
+        box.add().growY();
+        return box;
+    }
+
+    private Table section() {
+        Table t = new Table();
+        t.top();
+        t.pad(8f, 2f, 2f, 2f);
+        return t;
+    }
+
+    private Table difficultyRow() {
+        Table row = rowCard();
+
+        Table copy = copyBlock(
+                title("Difficulty"),
+                description("Controls zombie strength")
         );
 
-        content.add(createSettingCard(
-                        "Difficulty",
-                        "Controls zombie strength and overall challenge.",
-                        createDifficultyControl()
-                ))
-                .growX()
-                .height(128f)
-                .padBottom(14f)
-                .row();
+        ImageButton left = imageButton(ARROW_LEFT);
+        ImageButton right = imageButton(ARROW_RIGHT);
 
-        content.add(createSettingCard(
-                        "Game Speed",
-                        "Adjust how quickly gameplay actions progress.",
-                        createSpeedControl()
-                ))
-                .growX()
-                .height(150f)
-                .row();
-
-        content.add().growY();
-        return content;
-    }
-
-    private Table createToolsContent() {
-        Table content = createContentTable(
-                "TOOLS",
-                "Optional helpers for testing and board inspection."
-        );
-
-        content.add(createSettingCard(
-                        "Show Lawn Grid",
-                        "Display tile guides during gameplay.",
-                        createGridToggle()
-                ))
-                .growX()
-                .height(128f)
-                .padBottom(14f)
-                .row();
-
-        content.add(createSettingCard(
-                        "Debug Tools",
-                        "Show testing buttons and resource controls.",
-                        createDebugToggle()
-                ))
-                .growX()
-                .height(128f)
-                .row();
-
-        content.add().growY();
-        return content;
-    }
-
-    private Table createContentTable(
-            String title,
-            String description
-    ) {
-        Table content = new Table();
-        content.top();
-
-        Label titleLabel = new Label(
-                title,
+        Label value = new Label(
+                difficultyName(difficulty),
                 skin,
                 "medium_outline"
         );
+        value.setAlignment(Align.center);
+        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
 
-        Label descriptionLabel = createLightLabel(description);
+        Stack valueBox = new Stack();
+        Image valueBg = image(VALUE_PANEL);
+        valueBg.setScaling(Scaling.stretch);
+        valueBg.setTouchable(Touchable.disabled);
+        valueBox.add(valueBg);
+        valueBox.add(value);
 
-        content.add(titleLabel)
-                .growX()
-                .left()
-                .pad(2f, 4f, 2f, 4f)
-                .row();
-
-        content.add(descriptionLabel)
-                .growX()
-                .left()
-                .pad(0f, 4f, 14f, 4f)
-                .row();
-
-        return content;
-    }
-
-    private Table createSettingCard(
-            String title,
-            String description,
-            Actor control
-    ) {
-        Table card = new Table();
-        card.setBackground(skin.getDrawable(
-                "image_ui_dialog_asset_inner_bkgd_10"
-        ));
-        card.pad(16f, 20f, 16f, 20f);
-
-        Table copy = new Table();
-        copy.left();
-
-        copy.add(ProfileUiFactory.sectionTitle(skin, title))
-                .growX()
-                .left()
-                .row();
-
-        Label details = ProfileUiFactory.cardText(
-                skin,
-                description
-        );
-        details.setWrap(true);
-
-        copy.add(details)
-                .width(350f)
-                .left()
-                .padTop(5f)
-                .row();
-
-        card.add(copy).growX().left();
-        card.add(control)
-                .width(330f)
-                .right();
-        return card;
-    }
-
-    private Table createDifficultyControl() {
-        Table control = new Table();
-
-        TextButton previous = new TextButton("<", skin, "brown");
-        TextButton next = new TextButton(">", skin, "brown");
-        Label value = createControlValueLabel(
-                difficultyName(pendingDifficulty)
-        );
-
-        previous.addListener(ProfileUiFactory.listener(() -> {
-            pendingDifficulty = Math.max(1, pendingDifficulty - 1);
-            value.setText(difficultyName(pendingDifficulty));
+        left.addListener(click(() -> {
+            difficulty = Math.max(1, difficulty - 1);
+            value.setText(difficultyName(difficulty));
         }));
 
-        next.addListener(ProfileUiFactory.listener(() -> {
-            pendingDifficulty = Math.min(
-                    DIFFICULTY_NAMES.length,
-                    pendingDifficulty + 1
-            );
-            value.setText(difficultyName(pendingDifficulty));
+        right.addListener(click(() -> {
+            difficulty = Math.min(DIFFICULTY_NAMES.length, difficulty + 1);
+            value.setText(difficultyName(difficulty));
         }));
 
-        control.add(previous).size(54f);
-        control.add(value).width(205f).height(54f).pad(0f, 8f, 0f, 8f);
-        control.add(next).size(54f);
-        return control;
+        Table controls = new Table();
+        controls.add(left).size(54f);
+        controls.add(valueBox).width(150f).height(54f).pad(0, 8f, 0, 8f);
+        controls.add(right).size(54f);
+
+        row.add(copy).growX().left();
+        row.add(controls).width(300f).right().padRight(12f);
+        return row;
     }
 
-    private Table createSpeedControl() {
-        Table control = new Table();
-        Slider slider = new Slider(
-                1f,
-                3f,
-                0.05f,
-                false,
-                skin,
-                "default-horizontal"
+    private Table speedRow() {
+        Table row = rowCard();
+
+        Table copy = copyBlock(
+                title("Game Speed"),
+                description("Adjust gameplay speed")
         );
 
-        slider.setValue(pendingGameSpeed);
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = drawable(SLIDER_TRACK);
+        sliderStyle.knob = drawable(SLIDER_KNOB);
+        sliderStyle.knobBefore = drawable(SLIDER_FILL);
+
+        Slider slider = new Slider(1f, 3f, 0.05f, false, sliderStyle);
+        slider.setValue(gameSpeed);
         slider.setAnimateDuration(0.08f);
         slider.setVisualInterpolation(Interpolation.smooth);
 
-        Label value = createControlValueLabel(
-                formatSpeed(pendingGameSpeed)
-        );
-
-        Table markers = new Table();
-        markers.add(ProfileUiFactory.cardText(skin, "1x")).left();
-        markers.add(ProfileUiFactory.cardText(skin, "2x")).expandX();
-        markers.add(ProfileUiFactory.cardText(skin, "3x")).right();
-
-        control.add(value)
-                .growX()
-                .height(38f)
-                .row();
-
-        control.add(slider)
-                .growX()
-                .height(34f)
-                .padTop(2f)
-                .row();
-
-        control.add(markers)
-                .growX()
-                .padTop(2f)
-                .row();
-
-        slider.addListener(ProfileUiFactory.listener(() -> {
-            pendingGameSpeed = slider.getValue();
-            value.setText(formatSpeed(pendingGameSpeed));
-        }));
-
-        return control;
-    }
-
-    private TextButton createGridToggle() {
-        TextButton button = createToggleButton(pendingGridEnabled);
-        button.addListener(ProfileUiFactory.listener(() -> {
-            pendingGridEnabled = !pendingGridEnabled;
-            updateToggleButton(button, pendingGridEnabled);
-        }));
-        return button;
-    }
-
-    private TextButton createDebugToggle() {
-        TextButton button = createToggleButton(pendingDebugEnabled);
-        button.addListener(ProfileUiFactory.listener(() -> {
-            pendingDebugEnabled = !pendingDebugEnabled;
-            updateToggleButton(button, pendingDebugEnabled);
-        }));
-        return button;
-    }
-
-    private TextButton createToggleButton(boolean enabled) {
-        TextButton button = new TextButton(
-                enabled ? "ON" : "OFF",
+        Label value = new Label(
+                String.format("%.2fx", gameSpeed),
                 skin,
-                enabled ? "green" : "brown"
+                "medium_outline"
         );
-        button.setSize(150f, 58f);
-        return button;
+        value.setAlignment(Align.center);
+        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+
+        slider.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
+                update();
+                return false;
+            }
+
+            @Override
+            public void touchDragged(InputEvent e, float x, float y, int pointer) {
+                update();
+            }
+
+            @Override
+            public void touchUp(InputEvent e, float x, float y, int pointer, int button) {
+                update();
+            }
+
+            private void update() {
+                gameSpeed = slider.getValue();
+                value.setText(String.format("%.2fx", gameSpeed));
+            }
+        });
+
+        Table controls = new Table();
+        controls.add(value).width(90f).padRight(8f);
+        controls.add(slider).width(260f).height(46f);
+
+        row.add(copy).growX().left();
+        row.add(controls).width(370f).right().padRight(12f);
+        return row;
     }
 
-    private void updateToggleButton(
-            TextButton button,
-            boolean enabled
+    private interface BoolGetter { boolean get(); }
+    private interface BoolSetter { void set(boolean value); }
+
+    private Table toggleRow(
+            String headingText,
+            String descriptionText,
+            BoolGetter getter,
+            BoolSetter setter
     ) {
-        button.setText(enabled ? "ON" : "OFF");
-        button.setStyle(skin.get(
-                enabled ? "green" : "brown",
-                TextButton.TextButtonStyle.class
-        ));
+        Table row = rowCard();
+
+        row.add(copyBlock(
+                title(headingText),
+                description(descriptionText)
+        )).growX().left();
+
+        ImageButton toggle = imageButton(getter.get() ? TOGGLE_ON : TOGGLE_OFF);
+        toggle.addListener(click(() -> {
+            boolean next = !getter.get();
+            setter.set(next);
+            setButtonRegion(toggle, next ? TOGGLE_ON : TOGGLE_OFF);
+        }));
+
+        row.add(toggle).width(130f).height(60f).right().padRight(14f);
+        return row;
     }
 
-    private Label createControlValueLabel(String text) {
-        Label label = ProfileUiFactory.sectionTitle(skin, text);
-        label.setAlignment(Align.center);
-        return label;
+    private Table rowCard() {
+        Table row = new Table();
+        row.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
+        row.pad(12f, 20f, 12f, 20f);
+        return row;
     }
 
-    private Label createLightLabel(String text) {
-        Label.LabelStyle style = new Label.LabelStyle(
-                skin.get("default", Label.LabelStyle.class)
+    private Table copyBlock(Label heading, Label details) {
+        Table copy = new Table();
+        copy.left();
+        copy.add(heading).growX().left().row();
+        copy.add(details).growX().left().padTop(3f).row();
+        return copy;
+    }
+
+    private Label title(String text) {
+        Label l = new Label(text, skin, "medium_outline");
+        l.setColor(new Color(0.27f, 0.13f, 0.05f, 1f));
+        return l;
+    }
+
+    private Label description(String text) {
+        Label l = new Label(text, skin, "default");
+        l.setColor(new Color(0.35f, 0.26f, 0.17f, 1f));
+        l.setWrap(true);
+        return l;
+    }
+
+    private Image background() {
+        TextureRegion region = textures.region(BG);
+        Image i = region == null ? new Image() : new Image(region);
+        i.setScaling(Scaling.fill);
+        i.setTouchable(Touchable.disabled);
+        return i;
+    }
+
+    private Image image(String name) {
+        TextureRegion region = required(name);
+        Image i = new Image(region);
+        i.setScaling(Scaling.fit);
+        return i;
+    }
+
+    private TextureRegionDrawable drawable(String name) {
+        return new TextureRegionDrawable(required(name));
+    }
+
+    private NinePatchDrawable panelDrawable(
+            String name,
+            int left,
+            int right,
+            int top,
+            int bottom
+    ) {
+        return new NinePatchDrawable(
+                new NinePatch(required(name), left, right, top, bottom)
         );
-        style.fontColor = Color.WHITE;
-        return new Label(text, style);
+    }
+
+    private ImageButton imageButton(String name) {
+        TextureRegionDrawable up = drawable(name);
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = up;
+        style.imageDown = up.tint(new Color(0.82f, 0.82f, 0.82f, 1f));
+
+        ImageButton b = new ImageButton(style);
+        b.getImage().setScaling(Scaling.fit);
+        return b;
+    }
+
+    private void setButtonRegion(ImageButton b, String name) {
+        TextureRegionDrawable up = drawable(name);
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = up;
+        style.imageDown = up.tint(new Color(0.82f, 0.82f, 0.82f, 1f));
+        b.setStyle(style);
+        b.getImage().setScaling(Scaling.fit);
+    }
+
+    private TextureRegion required(String name) {
+        TextureRegion region = textures.region(name);
+        if (region == null) {
+            throw new IllegalStateException("Missing settings texture: " + name);
+        }
+        return region;
+    }
+
+    private InputListener click(Runnable runnable) {
+        return new InputListener() {
+            private boolean pressed;
+
+            @Override
+            public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
+                pressed = true;
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent e, float x, float y, int pointer, int button) {
+                if (!pressed) return;
+                pressed = false;
+
+                Actor a = e.getListenerActor();
+                if (x >= 0 && y >= 0 && x <= a.getWidth() && y <= a.getHeight()) {
+                    runnable.run();
+                }
+            }
+        };
     }
 
     private void resetDefaults() {
-        pendingDifficulty = DEFAULT_DIFFICULTY;
-        pendingGameSpeed = DEFAULT_GAME_SPEED;
-        pendingGridEnabled = false;
-        pendingDebugEnabled = false;
-
-        replaceCategoryContent(selectedCategory);
-        NotificationCenter.info(
-                "Defaults selected. Press APPLY to save them."
-        );
+        difficulty = 2;
+        gameSpeed = 1f;
+        grid = false;
+        debug = false;
+        show(selected);
+        NotificationCenter.info("Defaults selected. Press APPLY to save them.");
     }
 
     private void applySettings() {
         if (App.getAccount() == null) {
-            NotificationCenter.error(
-                    "You must be logged in to save settings."
-            );
+            NotificationCenter.error("You must be logged in to save settings.");
             return;
         }
 
-        String difficultyResult = controller.changeDifficulty(
-                pendingDifficulty
-        );
-        if (!wasSuccessful(difficultyResult)) {
+        String difficultyResult = controller.changeDifficulty(difficulty);
+        if (!ok(difficultyResult)) {
             NotificationCenter.error(difficultyResult);
             return;
         }
 
-        String speedResult = controller.changeGameSpeed(
-                pendingGameSpeed
-        );
-        if (!wasSuccessful(speedResult)) {
+        String speedResult = controller.changeGameSpeed(gameSpeed);
+        if (!ok(speedResult)) {
             NotificationCenter.error(speedResult);
             return;
         }
 
-        App.setGridEnabled(pendingGridEnabled);
-        App.setDebugModeEnabled(pendingDebugEnabled);
+        App.setGridEnabled(grid);
+        App.setDebugModeEnabled(debug);
         NotificationCenter.success("Settings applied successfully.");
     }
 
-    private boolean wasSuccessful(String result) {
+    private boolean ok(String result) {
         return result != null && result.contains("successfully");
     }
 
     private int currentDifficulty() {
-        if (App.getAccount() == null) {
-            return DEFAULT_DIFFICULTY;
-        }
-
+        if (App.getAccount() == null) return 2;
         return Math.max(
                 1,
                 Math.min(
@@ -668,18 +582,13 @@ public final class SettingMenu extends Table {
         );
     }
 
-    private String difficultyName(int difficulty) {
-        return DIFFICULTY_NAMES[difficulty - 1];
-    }
-
-    private String formatSpeed(float value) {
-        return String.format("%.2fx", value);
+    private String difficultyName(int value) {
+        return DIFFICULTY_NAMES[value - 1];
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-
         if (!keyboardFocusInitialized && getStage() != null) {
             getStage().setKeyboardFocus(this);
             keyboardFocusInitialized = true;
