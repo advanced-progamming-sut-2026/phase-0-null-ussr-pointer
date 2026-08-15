@@ -1,8 +1,5 @@
 package com.ussr.pvz.model.entities.zombies.projectiles;
 
-import com.ussr.pvz.model.board.Cell;
-import com.ussr.pvz.model.board.structures.BurningGround;
-import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
@@ -10,7 +7,7 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class FireballProjectile extends ZombieBossProjectile {
     private static final double FLIGHT_TIME = 1.2;
-    private static final double BURN_DURATION = 4.0;
+    private static final float BURN_DURATION_SECONDS = 4f;
 
     private final int targetRow;
     private final int targetCol;
@@ -24,16 +21,7 @@ public class FireballProjectile extends ZombieBossProjectile {
     @Override
     protected void applyDestinationEffect(GameSession session) {
         session.removePlantAt(targetCol, targetRow);
-
-        Cell cell = session.getLawn().getCell(targetRow, targetCol);
-        if (cell != null && cell.getTile() != null) {
-            cell.getTile().setType(TileType.Burning);
-
-            BurningGround burningGround = new BurningGround(BURN_DURATION);
-            burningGround.setPosition(Vec2.of(targetCol, targetRow));
-            cell.setStructure(burningGround);
-            session.registerStructure(burningGround);
-        }
+        session.igniteTileTemporarily(targetRow, targetCol, BURN_DURATION_SECONDS);
 
         try {
             Zombie imp = ZombieFactory.create("ZombieDarkImpDragon", targetRow, targetCol);

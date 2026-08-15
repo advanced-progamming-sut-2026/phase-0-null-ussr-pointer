@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TurbinePullMove implements ZombossMove {
-    private static final double PULL_DURATION_SECONDS = 0.6;
+    private static final int LETHAL_DAMAGE = 99999;
 
     @Override
     public void execute(ZombossController controller, GameSession session) {
@@ -33,33 +33,13 @@ public class TurbinePullMove implements ZombossMove {
         }
 
         for (Zombie zombie : session.getZombies()) {
-            if (controller.isBodyOf(zombie)) continue;
+            if (zombie == controller.getPrimary() || zombie == controller.getMirror()) continue;
+            if (!zombie.isAlive()) continue;
+
             int row = (int) zombie.getPosition().y();
-            if (occupiedRows.contains(row)) {
-                Vec2 target = Vec2.of(controller.getPrimary().getPosition().x(), row);
-                session.registerTickable(new SmoothMoveTickable(zombie, target, PULL_DURATION_SECONDS));
-            }
-        }
-    }
-
-    private void removePlant(Plant plant, GameSession session) {
-        int col = (int) plant.getLocation().x();
-        int row = (int) plant.getLocation().y();
-        Cell cell = session.getLawn().getCell(row, col);
-
-        if (cell != null && cell.getPlant() == plant) {
-            session.removePlantAt(col, row);
-            return;
-        }
-
-        plant.setAlive(false);
-        session.getPlants().remove(plant);
-        session.notifyPlantPlucked(plant);
-
-        if (cell != null) {
-            InteractableStructure structure = cell.getInteractableStructure();
-            if (structure != null) {
-                structure.setAlive(false);
+            if (row == r1 || row == r2) {
+                zombie.setPosition(Vec2.of(controller.getPrimary().getPosition().x(), row));
+                zombie.takeDamage(LETHAL_DAMAGE, controller.getPrimary());
             }
         }
     }
