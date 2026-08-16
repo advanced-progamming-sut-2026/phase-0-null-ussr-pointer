@@ -2922,13 +2922,12 @@
           "Value": "speed0"
         }
       ],
-      "ZombossDrawOffsetX": -120.0,
-      "ZombossDrawOffsetY": 150.0,
-      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,
       "ZombossCanSwitchRows": true,
+      "ZombossOccupiedRows": 2,
+      "ZombossOccupiedCols": 2,
       "ZombossMoveIntervalMin": 5.0,
       "ZombossMoveIntervalMax": 9.0,
       "ZombossMinionPool": [
@@ -3023,10 +3022,6 @@
         "mX": 0,
         "mY": 0
       },
-      "ZombossOccupiedRows": 3,
-      "ZombossOccupiedCols": 3,
-      "ZombossHasGlacierShield": true,
-      "ZombossGlacierShieldBlockHp": 1200,
       "Hitpoints": 6500,
       "ScaledProps": [
         {
@@ -3061,13 +3056,12 @@
           "Value": "speed0"
         }
       ],
-      "ZombossDrawOffsetX": -120.0,
-      "ZombossDrawOffsetY": 150.0,
-      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": false,
       "ZombossCanSwitchRows": false,
+      "ZombossOccupiedRows": 3,
+      "ZombossOccupiedCols": 3,
       "ZombossMoveIntervalMin": 5.0,
       "ZombossMoveIntervalMax": 9.0,
       "ZombossMoves": [
@@ -3184,15 +3178,14 @@
           "Value": "speed0"
         }
       ],
-      "ZombossDrawOffsetX": -120.0,
-      "ZombossDrawOffsetY": 150.0,
-      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,
       "ZombossCanSwitchRows": true,
       "ZombossMoveIntervalMin": 5.0,
       "ZombossMoveIntervalMax": 9.0,
+      "ZombossOccupiedRows": 2,
+      "ZombossOccupiedCols": 2,
       "ZombossMinionPool": [
         "ZombieDarkArmor3",
         "ZombieDarkImpDragon",
@@ -3218,14 +3211,6 @@
             "fire_attack",
             "fire_attack_idle",
             "fire_attack_end"
-          ]
-        },
-        {
-          "name": "ColumnIgnite",
-          "weight": 250,
-          "cooldown": 17.0,
-          "clips": [
-            "intro"
           ]
         },
         {
@@ -3320,15 +3305,14 @@
           "Value": "speed0"
         }
       ],
-      "ZombossDrawOffsetX": -120.0,
-      "ZombossDrawOffsetY": 150.0,
-      "ZombossDrawScale": 1.0,
       "move": "StationaryMove",
       "ZombossStunDuration": 3.0,
       "ZombossCanSpawnZombies": true,
       "ZombossCanSwitchRows": true,
       "ZombossMoveIntervalMin": 5.0,
       "ZombossMoveIntervalMax": 9.0,
+      "ZombossOccupiedRows": 2,
+      "ZombossOccupiedCols": 2,
       "ZombossMinionPool": [
         "ZombieBeachFisherman",
         "ZombieBeachOctopus",

@@ -246,7 +246,7 @@ public class ZombossController implements EffectStatus {
             int gridIndex = i + 1; // 0 is primary
             int dRow = gridIndex / occupiedCols;
             int dCol = gridIndex % occupiedCols;
-            mirror.setPosition(Vec2.of(pos.x() + dCol, pos.y() + dRow));
+            mirror.setPosition(Vec2.of(pos.x() - dCol, pos.y() + dRow));
         }
     }
 
@@ -550,7 +550,7 @@ public class ZombossController implements EffectStatus {
         int base = getPrimaryCol();
         List<Integer> cols = new ArrayList<>(occupiedCols);
         for (int i = 0; i < occupiedCols; i++) {
-            cols.add(base + i);
+            cols.add(base - i);
         }
         return Collections.unmodifiableList(cols);
     }

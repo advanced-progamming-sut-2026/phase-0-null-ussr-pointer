@@ -293,6 +293,10 @@ public final class SessionUpdater {
             return;
         }
 
+        if (zombie.getZombossController() != null) {
+            return;
+        }
+
         double x = zombie.getPosition().x();
         int row = (int) zombie.getPosition().y();
 

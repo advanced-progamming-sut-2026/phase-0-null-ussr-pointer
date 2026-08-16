@@ -28,8 +28,7 @@ public final class ZombossFactory {
         List<Zombie> mirrors = new ArrayList<>();
         for (int r = 0; r < occupiedRows; r++) {
             for (int c = 0; c < occupiedCols; c++) {
-                if (r == 0 && c == 0) continue; // primary's own cell
-                Zombie mirror = ZombieFactory.create(alias, primaryRow + r, col + c);
+                Zombie mirror = ZombieFactory.create(alias, primaryRow + r, col - c);
                 mirror.setBossMirror(true);
                 mirrors.add(mirror);
             }

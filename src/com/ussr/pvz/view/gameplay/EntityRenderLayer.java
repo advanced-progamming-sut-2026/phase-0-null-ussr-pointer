@@ -59,6 +59,8 @@ public class EntityRenderLayer extends Group {
      */
     private final Group zombieGroup = new Group();
 
+    private final ZombossHitboxDebugOverlay zombossHitboxOverlay = new ZombossHitboxDebugOverlay();
+
     // Entity → actor maps
     private final Map<Plant, PamActor> plantActors = new HashMap<>();
     // Chill effects are keyed by Plant; IceBlock and OctopusWrap are keyed by structure.
@@ -118,6 +120,7 @@ public class EntityRenderLayer extends Group {
         addActor(overlayGroup);
         addActor(plantProjectileGroup);
         addActor(zombieGroup);
+        addActor(zombossHitboxOverlay);
     }
 
     // act — sync every category
