@@ -5,7 +5,6 @@ import com.ussr.pvz.model.board.structures.GlacierBlock;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.Tickable;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.model.entities.plants.PlantFreezer;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.ArrayDeque;
@@ -14,7 +13,6 @@ import java.util.Deque;
 import java.util.List;
 
 public class GlacierColumnSweep implements Tickable {
-    private static final int FREEZE_STACKS = 3;
     private static final int GLACIER_BLOCK_HP = 600;
     private static final String BURIED_ZOMBIE_ALIAS = "ZombieArmor1";
 
@@ -39,7 +37,7 @@ public class GlacierColumnSweep implements Tickable {
 
     @Override
     public void update(float delta) {
-        if (finished) return;
+        if (finished || session.isGameOver()) return;
 
         int totalRows = session.getLawn().getRows();
 
@@ -50,6 +48,12 @@ public class GlacierColumnSweep implements Tickable {
                 rowTimer = 0;
                 freezeRow(currentColumn, nextRowToFreeze);
                 nextRowToFreeze++;
+
+                if (checkFullLawnCoverage()) {
+                    finished = true;
+                    session.concludeDefeat();
+                    return;
+                }
             }
             return;
         }
@@ -90,10 +94,7 @@ public class GlacierColumnSweep implements Tickable {
     }
 
     private void freezeRow(int col, int row) {
-        Cell cell = session.getLawn().getCell(row, col);
-        if (cell != null && cell.getPlant() != null) {
-            PlantFreezer.applyFreeze(session, cell.getPlant(), FREEZE_STACKS);
-        }
+        session.removePlantAt(col, row);
 
         var tile = session.getLawn().getTile(row, col);
         if (tile == null) return;
@@ -103,10 +104,29 @@ public class GlacierColumnSweep implements Tickable {
 
         GlacierBlock block = new GlacierBlock(GLACIER_BLOCK_HP, previousType, null, BURIED_ZOMBIE_ALIAS);
         block.setPosition(Vec2.of(col, row));
+
+        Cell cell = session.getLawn().getCell(row, col);
         if (cell != null) {
             cell.setStructure(block);
         }
         session.registerStructure(block);
         currentColumnBlocks.add(block);
+    }
+
+    private boolean checkFullLawnCoverage() {
+        int rows = session.getLawn().getRows();
+        int cols = session.getLawn().getCols();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Cell cell = session.getLawn().getCell(row, col);
+                if (cell == null
+                        || !(cell.getInteractableStructure() instanceof GlacierBlock block)
+                        || !block.isAlive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
