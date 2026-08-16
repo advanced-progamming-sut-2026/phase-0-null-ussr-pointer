@@ -3,16 +3,12 @@ package com.ussr.pvz.model.entities.zombies.projectiles;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.util.Vec2;
 
-public class IceRocketProjectile extends ZombieBossProjectile {
+public class IceRocketProjectile extends MissileProjectile {
     private static final double FLIGHT_TIME = 1.4;
-
-    private final int targetRow;
-    private final int targetCol;
+    private static final double LAUNCH_DELAY = 5.0; // tune to match ZombossMammoth's rocket-launch clip length
 
     public IceRocketProjectile(Vec2 startPos, Vec2 targetPos, int row, int col) {
-        super(startPos, targetPos, FLIGHT_TIME, "ZombossMammoth");
-        this.targetRow = row;
-        this.targetCol = col;
+        super(startPos, targetPos, FLIGHT_TIME, LAUNCH_DELAY, row, col, "ZombossMammoth");
     }
 
     @Override

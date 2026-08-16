@@ -219,6 +219,7 @@ public class EntityRenderLayer extends Group {
         if (session.getLawn() == null) return;
 
         syncChillOverlays(session, live);
+        syncMissileReticles(session, live);
 
         for (int row = 0; row < session.getLawn().getRows(); row++) {
             for (int col = 0; col < session.getLawn().getCols(); col++) {
@@ -277,6 +278,22 @@ public class EntityRenderLayer extends Group {
 
             actor.setClip(chillLevel == 1 ? "chill_stage1" : "chill_stage2");
             positionLikePlant(actor, plant.getLocation().x(), plant.getLocation().y());
+        }
+    }
+
+    private void syncMissileReticles(GameSession session, Set<Object> live) {
+        for (ZombieProjectile proj : session.getZombieProjectiles()) {
+            if (!(proj instanceof MissileProjectile missile) || !missile.isAlive()) continue;
+            if (missile.getPhase() == MissileProjectile.Phase.EXPLODING) continue; // gone the instant it lands
+
+            live.add(missile);
+            PamActor actor = overlayActors.computeIfAbsent(missile, k -> {
+                PamActor pa = new PamActor(pamPlayer, missile.getPamLocation(), "missile_lock_reticle");
+                pa.setPamScale(0.55f);
+                overlayGroup.addActor(pa);
+                return pa;
+            });
+            positionLikePlant(actor, missile.getTargetCol(), missile.getTargetRow());
         }
     }
 
@@ -599,6 +616,13 @@ public class EntityRenderLayer extends Group {
         for (ZombieProjectile proj : live) {
             if (!proj.isAlive()) continue;
 
+            // Missile projectiles show only the ground reticle during TARGETING —
+            // the missile actor itself doesn't exist yet.
+            if (proj instanceof MissileProjectile missile
+                    && missile.getPhase() == MissileProjectile.Phase.TARGETING) {
+                continue;
+            }
+
             float screenX = LawnGridLayout.worldX((float) proj.getPosition().x())
                     + LawnGridLayout.CELL_WIDTH / 2f;
             float screenY = LawnGridLayout.worldY((float) proj.getPosition().y())
@@ -628,6 +652,11 @@ public class EntityRenderLayer extends Group {
                 zombieGroup.addActor(a);
                 return a;
             });
+
+            // Missiles switch clip mid-flight (falling -> exploding); keep it in sync.
+            if (proj instanceof MissileProjectile) {
+                actor.setClip(clip);
+            }
 
             // Same fixed-tick-vs-render-frame mismatch as plant projectiles — tween
             // toward the new model position instead of snapping every render frame.
@@ -662,6 +691,11 @@ public class EntityRenderLayer extends Group {
     }
 
     private String resolveZombieProjectileClip(ZombieProjectile proj) {
+        if (proj instanceof MissileProjectile missile) {
+            return missile.getPhase() == MissileProjectile.Phase.EXPLODING
+                    ? "missile_explosion"
+                    : "missile";
+        }
         if (proj instanceof ZombieBossProjectile) return "missile";
         if (proj instanceof OctopusProjectile) return "animation2";
         return "animation";

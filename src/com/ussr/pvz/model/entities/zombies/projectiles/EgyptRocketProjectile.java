@@ -6,16 +6,12 @@ import com.ussr.pvz.model.util.Vec2;
 
 import java.util.Random;
 
-public class EgyptRocketProjectile extends ZombieBossProjectile {
+public class EgyptRocketProjectile extends MissileProjectile {
     private static final double FLIGHT_TIME = 1.4;
-
-    private final int targetRow;
-    private final int targetCol;
+    private static final double LAUNCH_DELAY = 5.0; // tune to match ZombossEgypt's rocket-launch clip length
 
     public EgyptRocketProjectile(Vec2 startPos, Vec2 targetPos, int row, int col) {
-        super(startPos, targetPos, FLIGHT_TIME, "ZombossEgypt");
-        this.targetRow = row;
-        this.targetCol = col;
+        super(startPos, targetPos, FLIGHT_TIME, LAUNCH_DELAY, row, col, "ZombossEgypt");
     }
 
     @Override

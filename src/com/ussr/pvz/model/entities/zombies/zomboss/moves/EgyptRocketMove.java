@@ -9,11 +9,15 @@ import com.ussr.pvz.model.util.Vec2;
 import java.util.Random;
 
 public class EgyptRocketMove implements ZombossMove {
+    private static final int EXCLUDED_RIGHT_COLUMNS = 2;
+
     @Override
     public void execute(ZombossController controller, GameSession session) {
         Random random = new Random();
+
+        int maxCol = Math.max(1, session.getLawn().getCols() - EXCLUDED_RIGHT_COLUMNS);
         int row = random.nextInt(session.getLawn().getRows());
-        int col = random.nextInt(session.getLawn().getCols());
+        int col = random.nextInt(maxCol);
 
         Vec2 startPos = controller.getPrimary().getPosition();
         Vec2 targetPos = Vec2.of(col, row);

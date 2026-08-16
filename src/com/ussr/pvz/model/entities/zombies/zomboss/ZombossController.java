@@ -210,13 +210,16 @@ public class ZombossController implements EffectStatus {
         boolean stunnedNow = isStunned();
         if (stunnedNow && !wasStunned && stunStartClip != null && !stunStartClip.isBlank()) {
             primary.queueAnimEvent(stunStartClip);
-        } else if (!stunnedNow && wasStunned && stunEndClip != null && !stunEndClip.isBlank()) {
-            primary.queueAnimEvent(stunEndClip);
+        } else if (!stunnedNow && wasStunned) {
+            if (stunEndClip != null && !stunEndClip.isBlank()) {
+                primary.queueAnimEvent(stunEndClip);
+            }
             if (hasGlacierShield) {
                 spawnGlacierShield(session);
             }
             if (midGlacier != null) {
                 midGlacier.revertToNormal();
+                restoreMidGlacierCells(session);
             }
         }
         wasStunned = stunnedNow;
@@ -388,6 +391,26 @@ public class ZombossController implements EffectStatus {
                 }
                 session.registerStructure(cellStructure);
                 midGlacierCells.add(cellStructure);
+            }
+        }
+    }
+
+    private void restoreMidGlacierCells(GameSession session) {
+        if (session == null || session.getLawn() == null || midGlacierCells.isEmpty()) return;
+
+        for (ZombossMidGlacierCell cellStructure : midGlacierCells) {
+            Vec2 pos = cellStructure.getPosition();
+            if (pos == null) continue;
+
+            int col = (int) pos.x();
+            int row = (int) pos.y();
+
+            var cell = session.getLawn().getCell(row, col);
+            if (cell == null) continue;
+
+            if (cell.getInteractableStructure() == null) {
+                cell.setStructure(cellStructure);
+                session.registerStructure(cellStructure);
             }
         }
     }
