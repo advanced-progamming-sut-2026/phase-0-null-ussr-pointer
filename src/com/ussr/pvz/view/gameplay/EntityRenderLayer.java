@@ -360,7 +360,10 @@ public class EntityRenderLayer extends Group {
                     }
                 } else {
                     boolean bossStunned = boss != null && boss.isStunned();
-                    String idleClip = bossStunned ? boss.getStunClip() : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                    boolean bossLocked = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
+                    String idleClip = bossStunned ? boss.getStunClip()
+                            : bossLocked ? boss.getLockedClip()
+                            : (boss != null ? boss.resolveClip(currentClip) : currentClip);
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> animSeq = zombie.pollAnimSequence();
                         if (animSeq != null) {

@@ -23,7 +23,10 @@ public class ColumnFreezeMove implements ZombossMove {
         }
         if (columns.isEmpty()) return;
 
-        GlacierColumnSweep sweep = new GlacierColumnSweep(session, columns);
+        String sweepClip = playingClips.isEmpty() ? null : playingClips.get(0);
+        controller.lockMoves(sweepClip);
+
+        GlacierColumnSweep sweep = new GlacierColumnSweep(session, columns, controller);
         session.registerTickable(sweep);
     }
 

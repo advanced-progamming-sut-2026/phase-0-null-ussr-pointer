@@ -79,6 +79,8 @@ public class ZombossController implements EffectStatus {
 
     // ------------------------------------------------------------------
     private List<String> lastMoveClips = List.of();
+    private boolean moveLocked = false;
+    private String lockedClip = null;
 
     // -------------------------------------------------------------------
     // Dash state — used by moves like ForwardDash to physically move the
@@ -226,10 +228,12 @@ public class ZombossController implements EffectStatus {
 
         if (stunnedNow) return;
 
-        nextMoveTimer -= delta;
-        if (nextMoveTimer <= 0) {
-            tryExecuteRandomMove(session);
-            nextMoveTimer = randomInterval();
+        if (!moveLocked) {
+            nextMoveTimer -= delta;
+            if (nextMoveTimer <= 0) {
+                tryExecuteRandomMove(session);
+                nextMoveTimer = randomInterval();
+            }
         }
     }
 
@@ -602,6 +606,24 @@ public class ZombossController implements EffectStatus {
             return getStunClip();
         }
         return resolveClip("idle");
+    }
+
+    public void lockMoves(String clip) {
+        this.moveLocked = true;
+        this.lockedClip = (clip != null && !clip.isBlank()) ? clip : null;
+    }
+
+    public void unlockMoves() {
+        this.moveLocked = false;
+        this.lockedClip = null;
+    }
+
+    public boolean isMoveLocked() {
+        return moveLocked;
+    }
+
+    public String getLockedClip() {
+        return lockedClip;
     }
 
     public List<String> getIntroSequence() {
