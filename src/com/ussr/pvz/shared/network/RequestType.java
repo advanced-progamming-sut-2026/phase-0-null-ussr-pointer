@@ -32,5 +32,5 @@ public enum RequestType {
     GAME_ACTION,
     GAME_STATE,
 
-    SEND_REACTION
+    SEND_REACTION,
 }

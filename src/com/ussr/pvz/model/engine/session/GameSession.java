@@ -2,7 +2,6 @@ package com.ussr.pvz.model.engine.session;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.shared.account.AccountState;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
@@ -24,7 +23,6 @@ import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.util.Vec2;
-import com.ussr.pvz.server.account.SaveService;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -119,46 +117,101 @@ public class GameSession {
         updater.update(delta);
     }
 
-    private void applyReward(){
-        if (this.progressTracked) {
-            Account account = App.getAccount();
-            boolean firstClear = account != null
-                    && level != null
-                    && level.getId() != null
-                    && !account.getAdventureProgress().isLevelCompleted(level.getId());
+    private void applyReward() {
 
-            App.getLevelManager().completeCurrentLevel();
-            if (firstClear) {
-                account.getAdventureProgress().addCompletedLevel(level.getId());
-                account.getAdventureProgress().addCoin(LEVEL_COMPLETE_COIN_REWARD);
+        if (!progressTracked) {
+            return;
+        }
 
-                for (String plantAlias : level.getRewardPlantAliases()) {
-                    account.getAdventureProgress().upgradePlant(plantAlias);
-                }
+        Account account =
+                App.getAccount();
 
-                if (!level.getRewardPlantAliases().isEmpty()) {
-                    NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
-                }
-                NewsObserver.triggerNewLevel(level);
+        if (account == null) {
+            return;
+        }
+
+        boolean firstClear =
+                level != null
+                        && level.getId() != null
+                        && !account
+                        .getAdventureProgress()
+                        .isLevelCompleted(
+                                level.getId()
+                        );
+
+        App.getLevelManager()
+                .completeCurrentLevel();
+
+        if (firstClear) {
+
+            account
+                    .getAdventureProgress()
+                    .addCompletedLevel(
+                            level.getId()
+                    );
+
+            account
+                    .getAdventureProgress()
+                    .addCoin(
+                            LEVEL_COMPLETE_COIN_REWARD
+                    );
+
+            for (String plantAlias :
+                    level.getRewardPlantAliases()) {
+
+                account
+                        .getAdventureProgress()
+                        .upgradePlant(
+                                plantAlias
+                        );
             }
 
-            try {
-                App.getLevelManager().nextLevel();
-            } catch (IllegalStateException e) {
-                System.err.println("[GameSession] Could not advance to next level: " + e.getMessage());
-            }
-            com.ussr.pvz.model.level.Chapter completedChapter = level == null
-                    ? null
-                    : App.getLevelManager().findChapter(level.getChapter());
-            if (firstClear && completedChapter != null
-                    && completedChapter.getGameMode().equals(GameMode.MINIGAME)) {
-                NewsObserver.triggerNewMiniGame(this.level);
+            if (!level
+                    .getRewardPlantAliases()
+                    .isEmpty()) {
+
+                NewsObserver.triggerNewPlant(
+                        level.getRewardPlantAliases()
+                );
             }
 
-            List<AccountState> updatedStates = App.getAccounts().stream()
-                    .map(Account::toState)
-                    .toList();
-            SaveService.saveAccounts(updatedStates);
+            NewsObserver.triggerNewLevel(
+                    level
+            );
+        }
+
+        try {
+
+            App.getLevelManager()
+                    .nextLevel();
+
+        } catch (IllegalStateException e) {
+
+            System.err.println(
+                    "[GameSession] Could not advance "
+                            + "to next level: "
+                            + e.getMessage()
+            );
+        }
+
+        com.ussr.pvz.model.level.Chapter
+                completedChapter =
+                level == null
+                        ? null
+                        : App.getLevelManager()
+                        .findChapter(
+                                level.getChapter()
+                        );
+
+        if (firstClear
+                && completedChapter != null
+                && completedChapter
+                .getGameMode()
+                .equals(GameMode.MINIGAME)) {
+
+            NewsObserver.triggerNewMiniGame(
+                    level
+            );
         }
     }
 

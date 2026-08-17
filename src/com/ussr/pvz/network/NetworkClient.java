@@ -1,15 +1,16 @@
 package com.ussr.pvz.network;
 
 import com.google.gson.Gson;
-import com.ussr.pvz.shared.network.NetworkResponse;
 import com.ussr.pvz.shared.network.NetworkRequest;
+import com.ussr.pvz.shared.network.NetworkResponse;
 
 import java.io.*;
 import java.net.Socket;
 
 public class NetworkClient {
 
-    private static NetworkClient instance;
+    private static final NetworkClient instance =
+            new NetworkClient();
 
     private Socket socket;
     private BufferedReader reader;
@@ -21,17 +22,17 @@ public class NetworkClient {
     }
 
     public static NetworkClient getInstance() {
-        if (instance == null) {
-            instance = new NetworkClient();
-        }
-
         return instance;
     }
 
-    public void connect(
+    public synchronized void connect(
             String host,
             int port
     ) throws IOException {
+
+        if (isConnected()) {
+            return;
+        }
 
         socket = new Socket(host, port);
 
@@ -47,17 +48,40 @@ public class NetworkClient {
         );
     }
 
-    public NetworkResponse send(
+    public synchronized NetworkResponse send(
             NetworkRequest request
     ) throws IOException {
+
+        if (!isConnected() ||
+                reader == null ||
+                writer == null) {
+
+            throw new IOException(
+                    "Not connected to server."
+            );
+        }
 
         String json =
                 gson.toJson(request);
 
         writer.println(json);
 
+        if (writer.checkError()) {
+            throw new IOException(
+                    "Failed to send request to server."
+            );
+        }
+
         String responseJson =
                 reader.readLine();
+
+        if (responseJson == null) {
+            disconnect();
+
+            throw new IOException(
+                    "Server disconnected."
+            );
+        }
 
         return gson.fromJson(
                 responseJson,
@@ -66,20 +90,40 @@ public class NetworkClient {
     }
 
     public boolean isConnected() {
+
         return socket != null
                 && socket.isConnected()
                 && !socket.isClosed();
     }
 
-    public void disconnect() {
+    public synchronized void disconnect() {
 
         try {
 
-            if (socket != null) {
+            if (reader != null) {
+                reader.close();
+            }
+
+        } catch (IOException ignored) {
+        }
+
+        if (writer != null) {
+            writer.close();
+        }
+
+        try {
+
+            if (socket != null &&
+                    !socket.isClosed()) {
+
                 socket.close();
             }
 
         } catch (IOException ignored) {
         }
+
+        reader = null;
+        writer = null;
+        socket = null;
     }
 }

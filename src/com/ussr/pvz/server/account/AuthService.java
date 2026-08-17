@@ -2,6 +2,8 @@ package com.ussr.pvz.server.account;
 
 public class AuthService {
 
+    private final AccountRepository accountRepository;
+
     private final LoginService loginService;
     private final RegisterService registerService;
     private final ProfileService profileService;
@@ -10,6 +12,7 @@ public class AuthService {
             AccountRepository accountRepository,
             ServerSessionManager sessionManager
     ) {
+        this.accountRepository = accountRepository;
 
         this.loginService =
                 new LoginService(
@@ -39,5 +42,9 @@ public class AuthService {
 
     public ProfileService getProfileService() {
         return profileService;
+    }
+
+    public AccountRepository getAccountRepository() {
+        return accountRepository;
     }
 }

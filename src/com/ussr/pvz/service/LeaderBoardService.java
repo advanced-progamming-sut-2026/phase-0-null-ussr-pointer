@@ -1,12 +1,17 @@
 package com.ussr.pvz.service;
 
-import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.account.Account;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.ussr.pvz.model.dto.LeaderBoardSortRequest;
 import com.ussr.pvz.model.leaderboard.LeaderboardColumn;
 import com.ussr.pvz.model.leaderboard.LeaderboardEntry;
-import com.ussr.pvz.model.quest.ConfigurableQuest;
-import com.ussr.pvz.model.quest.QuestType;
+import com.ussr.pvz.model.util.SessionManager;
+import com.ussr.pvz.network.NetworkClient;
+import com.ussr.pvz.shared.dto.LeaderboardEntryDto;
+import com.ussr.pvz.shared.network.NetworkRequest;
+import com.ussr.pvz.shared.network.NetworkResponse;
+import com.ussr.pvz.shared.network.RequestType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,177 +19,346 @@ import java.util.List;
 
 public class LeaderBoardService {
 
+    private final NetworkClient networkClient;
+    private final Gson gson = new Gson();
+
     public LeaderBoardService() {
+        this.networkClient = NetworkClient.getInstance();
     }
 
+
     public String show() {
-        List<Account> accounts = App.getAccounts();
-        if (accounts.isEmpty()) {
+
+        List<LeaderboardEntry> entries =
+                getEntries(
+                        LeaderboardColumn.SCORE,
+                        false
+                );
+
+        if (entries.isEmpty()) {
             return "No accounts found.";
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(String.format("%-15s | %-15s | %-10s | %-12s | %-12s | %-10s\n",
-                "Username", "Progress", "Minigames", "Daily Quests", "Other Quests", "MooPoints"));
-        sb.append("-".repeat(85)).append("\n");
-
-        for (Account acc : accounts) {
-            String progress = "Ch:" + acc.getAdventureProgress().getCurrentChapter() +
-                    " Lv:" + acc.getAdventureProgress().getCurrentLvl();
-
-            int minigames = acc.getAdventureProgress().getMinigamesWon();
-            int dailyQuests = getCompletedQuestCount(acc, QuestType.DAILY);
-            int nonDailyQuests = getCompletedQuestCount(acc, QuestType.CHALLENGE)
-                    + getCompletedQuestCount(acc, QuestType.EPIC);
-            int score = acc.getScoreRecord().getScore();
-
-            sb.append(String.format("%-15s | %-15s | %-10d | %-12d | %-12d | %-10d\n",
-                    acc.getName(), progress, minigames, dailyQuests, nonDailyQuests, score));
-        }
-
-        return sb.toString();
+        return formatEntries(entries);
     }
+
 
     public List<LeaderboardEntry> getEntries(
             LeaderboardColumn column,
             boolean ascending
     ) {
-        List<Account> accounts =
-                new ArrayList<>(App.getAccounts());
 
-        Comparator<Account> comparator =
+        List<LeaderboardEntry> entries =
+                loadEntriesFromServer();
+
+        Comparator<LeaderboardEntry> comparator =
                 comparatorFor(column);
 
         if (!ascending) {
             comparator = comparator.reversed();
         }
 
-        accounts.sort(comparator.thenComparing(
-                Account::getName,
-                String.CASE_INSENSITIVE_ORDER
-        ));
+        entries.sort(
+                comparator.thenComparing(
+                        LeaderboardEntry::username,
+                        String.CASE_INSENSITIVE_ORDER
+                )
+        );
 
-        return accounts.stream()
-                .map(this::toEntry)
-                .toList();
+        return entries;
     }
 
-    private LeaderboardEntry toEntry(Account account) {
-        int daily = getCompletedQuestCount(
-                account,
-                QuestType.DAILY
-        );
 
-        int other = getCompletedQuestCount(
-                account,
-                QuestType.CHALLENGE
-        ) + getCompletedQuestCount(
-                account,
-                QuestType.EPIC
-        );
-
-        return new LeaderboardEntry(
-                account.getName(),
-                account.getAdventureProgress().getCurrentChapter(),
-                account.getAdventureProgress().getCurrentLvl(),
-                account.getAdventureProgress().getMinigamesWon(),
-                daily,
-                other,
-                account.getScoreRecord().getScore()
-        );
-    }
-
-    private Comparator<Account> comparatorFor(
-            LeaderboardColumn column
+    public String sort(
+            LeaderBoardSortRequest request
     ) {
-        return switch (column) {
-            case USERNAME -> Comparator.comparing(
-                    Account::getName,
-                    String.CASE_INSENSITIVE_ORDER
+
+        String rawColumn =
+                request.column() != null
+                        ? request.column()
+                        .toLowerCase()
+                        .trim()
+                        : "score";
+
+        String order =
+                request.order() != null
+                        ? request.order()
+                        .toLowerCase()
+                        .trim()
+                        : "desc";
+
+        boolean ascending =
+                order.equals("asc")
+                        || order.equals("ascending")
+                        || order.equals("+");
+
+        LeaderboardColumn column =
+                mapColumn(rawColumn);
+
+        List<LeaderboardEntry> entries =
+                getEntries(
+                        column,
+                        ascending
+                );
+
+        StringBuilder result =
+                new StringBuilder();
+
+        result.append(
+                "Leaderboard successfully sorted by '"
+        );
+
+        result.append(
+                rawColumn
+        );
+
+        result.append(
+                "' in "
+        );
+
+        result.append(
+                ascending
+                        ? "ascending"
+                        : "descending"
+        );
+
+        result.append(
+                " order.\n\n"
+        );
+
+        if (entries.isEmpty()) {
+
+            result.append(
+                    "No accounts found."
             );
 
-            case PROGRESS -> Comparator
-                    .comparingInt((Account account) ->
-                            account.getAdventureProgress()
-                                    .getCurrentChapter())
-                    .thenComparingInt(account ->
-                            account.getAdventureProgress()
-                                    .getCurrentLvl());
-
-            case MINIGAMES -> Comparator.comparingInt(
-                    account -> account.getAdventureProgress()
-                            .getMinigamesWon()
-            );
-
-            case DAILY_QUESTS -> Comparator.comparingInt(
-                    account -> getCompletedQuestCount(
-                            account,
-                            QuestType.DAILY
-                    )
-            );
-
-            case OTHER_QUESTS -> Comparator.comparingInt(
-                    account -> getCompletedQuestCount(
-                            account,
-                            QuestType.CHALLENGE
-                    ) + getCompletedQuestCount(
-                            account,
-                            QuestType.EPIC
-                    )
-            );
-
-            case SCORE -> Comparator.comparingInt(
-                    account -> account.getScoreRecord().getScore()
-            );
-        };
-    }
-
-    public String sort(LeaderBoardSortRequest request) {
-        String rawCol = request.column() != null ? request.column().toLowerCase().trim() : "score";
-        String ord = request.order() != null ? request.order().toLowerCase().trim() : "desc";
-
-        boolean isAsc = ord.equals("asc") || ord.equals("ascending") || ord.equals("+");
-
-        Comparator<Account> comparator = getComparatorForColumn(rawCol);
-
-        if (!isAsc) {
-            comparator = comparator.reversed();
+            return result.toString();
         }
 
-        // Always tie-break with alphabetical username sorting
-        comparator = comparator.thenComparing(Account::getName);
-        App.getAccounts().sort(comparator);
+        result.append(
+                formatEntries(entries)
+        );
 
-        return "Leaderboard successfully sorted by '" + rawCol + "' in " +
-                (isAsc ? "ascending" : "descending") + " order.\n\n" + show();
+        return result.toString();
     }
 
-    private int getCompletedQuestCount(Account acc, QuestType type) {
-        if (acc.getQuestManager() == null) return 0;
-        List<ConfigurableQuest> quests = acc.getQuestManager().getByType(type);
-        if (quests == null) return 0;
-        return (int) quests.stream().filter(ConfigurableQuest::isCompleted).count();
+
+    // =========================================================
+    // SERVER DATA
+    // =========================================================
+
+    private List<LeaderboardEntry>
+    loadEntriesFromServer() {
+
+        String token =
+                SessionManager.getToken();
+
+        if (token == null ||
+                token.isBlank()) {
+
+            return new ArrayList<>();
+        }
+
+        NetworkRequest request =
+                new NetworkRequest(
+                        RequestType.GET_LEADERBOARD,
+                        token,
+                        null
+                );
+
+        NetworkResponse response;
+
+        try {
+
+            response =
+                    networkClient.send(
+                            request
+                    );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Leaderboard network error: "
+                            + e.getMessage()
+            );
+
+            return new ArrayList<>();
+        }
+
+        if (response == null ||
+                !response.isSuccess() ||
+                response.getData() == null ||
+                !response.getData()
+                        .has("entries")) {
+
+            return new ArrayList<>();
+        }
+
+        JsonArray array =
+                response
+                        .getData()
+                        .getAsJsonArray(
+                                "entries"
+                        );
+
+        List<LeaderboardEntry> entries =
+                new ArrayList<>();
+
+        for (JsonElement element : array) {
+
+            LeaderboardEntryDto dto =
+                    gson.fromJson(
+                            element,
+                            LeaderboardEntryDto.class
+                    );
+
+            LeaderboardEntry entry =
+                    new LeaderboardEntry(
+                            dto.username(),
+                            dto.currentChapter(),
+                            dto.currentLevel(),
+                            dto.minigamesWon(),
+                            dto.dailyQuests(),
+                            dto.otherQuests(),
+                            dto.score()
+                    );
+
+            entries.add(entry);
+        }
+
+        return entries;
     }
 
-    private Comparator<Account> getComparatorForColumn(String column) {
+
+    // =========================================================
+    // SORTING
+    // =========================================================
+
+    private Comparator<LeaderboardEntry>
+    comparatorFor(
+            LeaderboardColumn column
+    ) {
+
         return switch (column) {
-            case "progress", "level", "chapter" ->
-                    Comparator.comparingInt((Account a) -> a.getAdventureProgress().getCurrentChapter())
-                            .thenComparingInt(a -> a.getAdventureProgress().getCurrentLvl());
-            case "minigames", "minigame" ->
-                    Comparator.comparingInt(a -> a.getAdventureProgress().getMinigamesWon());
-            case "daily", "daily quests" ->
-                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.DAILY));
-            case "non-daily", "other quests", "epic", "challenge" ->
-                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.CHALLENGE)
-                            + getCompletedQuestCount(a, QuestType.EPIC));
-            case "quests", "quest" ->
-                    Comparator.comparingInt(a -> getCompletedQuestCount(a, QuestType.DAILY)
-                            + getCompletedQuestCount(a, QuestType.CHALLENGE) +
-                            getCompletedQuestCount(a, QuestType.EPIC));
-            default ->
-                    Comparator.comparingInt(a -> a.getScoreRecord().getScore());
+
+            case USERNAME ->
+                    Comparator.comparing(
+                            LeaderboardEntry::username,
+                            String.CASE_INSENSITIVE_ORDER
+                    );
+
+            case PROGRESS ->
+                    Comparator
+                            .comparingInt(
+                                    LeaderboardEntry::chapter
+                            )
+                            .thenComparingInt(
+                                    LeaderboardEntry::level
+                            );
+
+            case MINIGAMES ->
+                    Comparator.comparingInt(
+                            LeaderboardEntry::minigames
+                    );
+
+            case DAILY_QUESTS ->
+                    Comparator.comparingInt(
+                            LeaderboardEntry::dailyQuests
+                    );
+
+            case OTHER_QUESTS ->
+                    Comparator.comparingInt(
+                            LeaderboardEntry::otherQuests
+                    );
+
+            case SCORE ->
+                    Comparator.comparingInt(
+                            LeaderboardEntry::score
+                    );
         };
+    }
+
+
+    private LeaderboardColumn mapColumn(
+            String column
+    ) {
+
+        return switch (column) {
+
+            case "username" ->
+                    LeaderboardColumn.USERNAME;
+
+            case "progress",
+                 "level",
+                 "chapter" ->
+                    LeaderboardColumn.PROGRESS;
+
+            case "minigames",
+                 "minigame" ->
+                    LeaderboardColumn.MINIGAMES;
+
+            case "daily",
+                 "daily quests" ->
+                    LeaderboardColumn.DAILY_QUESTS;
+
+            case "non-daily",
+                 "other quests",
+                 "epic",
+                 "challenge",
+                 "quests",
+                 "quest" ->
+                    LeaderboardColumn.OTHER_QUESTS;
+
+            default ->
+                    LeaderboardColumn.SCORE;
+        };
+    }
+
+
+    // =========================================================
+    // DISPLAY
+    // =========================================================
+
+    private String formatEntries(
+            List<LeaderboardEntry> entries
+    ) {
+
+        StringBuilder sb =
+                new StringBuilder();
+
+        sb.append(String.format(
+                "%-15s | %-15s | %-10s | %-12s | %-12s | %-10s\n",
+                "Username",
+                "Progress",
+                "Minigames",
+                "Daily Quests",
+                "Other Quests",
+                "MooPoints"
+        ));
+
+        sb.append(
+                "-".repeat(85)
+        ).append("\n");
+
+        for (LeaderboardEntry entry : entries) {
+
+            String progress =
+                    "Ch:"
+                            + entry.chapter()
+                            + " Lv:"
+                            + entry.level();
+
+            sb.append(String.format(
+                    "%-15s | %-15s | %-10d | %-12d | %-12d | %-10d\n",
+                    entry.username(),
+                    progress,
+                    entry.minigames(),
+                    entry.dailyQuests(),
+                    entry.otherQuests(),
+                    entry.score()
+            ));
+        }
+
+        return sb.toString();
     }
 }

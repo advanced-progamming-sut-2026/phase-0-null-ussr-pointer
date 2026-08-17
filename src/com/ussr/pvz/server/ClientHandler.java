@@ -1,33 +1,19 @@
 package com.ussr.pvz.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import com.ussr.pvz.model.account.Account;
-
+import com.ussr.pvz.model.quest.ConfigurableQuest;
+import com.ussr.pvz.model.quest.QuestType;
 import com.ussr.pvz.server.account.AuthService;
 import com.ussr.pvz.server.account.PasswordResetStartResult;
 import com.ussr.pvz.server.account.PendingRegistrationResult;
 import com.ussr.pvz.server.account.ServerLoginResult;
-
 import com.ussr.pvz.shared.account.AccountState;
-
-import com.ussr.pvz.shared.dto.AnswerRequest;
-import com.ussr.pvz.shared.dto.ChangeEmailRequest;
-import com.ussr.pvz.shared.dto.ChangeNicknameRequest;
-import com.ussr.pvz.shared.dto.ChangePasswordRequest;
-import com.ussr.pvz.shared.dto.ChangeUsernameRequest;
-import com.ussr.pvz.shared.dto.ForgetPasswordRequest;
-import com.ussr.pvz.shared.dto.LoginRequest;
-import com.ussr.pvz.shared.dto.LoginResult;
-import com.ussr.pvz.shared.dto.PickQuestionRequest;
-import com.ussr.pvz.shared.dto.RegisterRequest;
-import com.ussr.pvz.shared.dto.RegistrationResult;
-import com.ussr.pvz.shared.dto.UserInfo;
-
+import com.ussr.pvz.shared.dto.*;
 import com.ussr.pvz.shared.dto.enums.LoginStatus;
 import com.ussr.pvz.shared.dto.enums.RegistrationStatus;
-
 import com.ussr.pvz.shared.network.NetworkRequest;
 import com.ussr.pvz.shared.network.NetworkResponse;
 
@@ -35,50 +21,32 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
 import java.net.Socket;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
 
     private final Socket socket;
     private final AuthService authService;
+    private final Gson gson = new Gson();
 
     private BufferedReader reader;
     private PrintWriter writer;
 
-    private final Gson gson = new Gson();
-
-
-    // -------------------------
-    // Per-client temporary state
-    // -------------------------
-
     private AccountState pendingRegistration;
-
     private Account pendingPasswordReset;
+    private boolean passwordResetAnswerAccepted;
 
-    private boolean passwordResetAnswerAccepted = false;
-
-
-    public ClientHandler(
-            Socket socket,
-            AuthService authService
-    ) {
-
+    public ClientHandler(Socket socket, AuthService authService) {
         this.socket = socket;
         this.authService = authService;
     }
 
-
     @Override
     public void run() {
-
         try {
-
             reader = new BufferedReader(
-                    new InputStreamReader(
-                            socket.getInputStream()
-                    )
+                    new InputStreamReader(socket.getInputStream())
             );
 
             writer = new PrintWriter(
@@ -89,204 +57,94 @@ public class ClientHandler implements Runnable {
             String line;
 
             while ((line = reader.readLine()) != null) {
-
                 NetworkResponse response;
 
                 try {
-
                     NetworkRequest request =
-                            gson.fromJson(
-                                    line,
-                                    NetworkRequest.class
-                            );
+                            gson.fromJson(line, NetworkRequest.class);
 
-                    response =
-                            handleRequest(request);
+                    response = handleRequest(request);
 
                 } catch (Exception e) {
-
-                    response =
-                            NetworkResponse.error(
-                                    "Invalid request: "
-                                            + e.getMessage()
-                            );
+                    response = NetworkResponse.error(
+                            "Invalid request: " + e.getMessage()
+                    );
                 }
 
-                writer.println(
-                        gson.toJson(response)
-                );
+                writer.println(gson.toJson(response));
             }
 
         } catch (IOException e) {
-
             System.out.println(
-                    "Client disconnected: "
-                            + socket.getInetAddress()
+                    "Client disconnected: " + socket.getInetAddress()
             );
 
         } finally {
-
             closeConnection();
         }
     }
 
-
-    private NetworkResponse handleRequest(
-            NetworkRequest request
-    ) {
-
-        if (request == null ||
-                request.getType() == null) {
-
-            return NetworkResponse.error(
-                    "Invalid request."
-            );
+    private NetworkResponse handleRequest(NetworkRequest request) {
+        if (request == null || request.getType() == null) {
+            return NetworkResponse.error("Invalid request.");
         }
 
         return switch (request.getType()) {
+            case PING -> NetworkResponse.success("PONG");
 
-            case PING ->
-                    NetworkResponse.success(
-                            "PONG"
-                    );
+            case LOGIN -> handleLogin(request);
+            case REGISTER -> handleRegister(request);
+            case COMPLETE_REGISTRATION -> handleCompleteRegistration(request);
 
+            case FORGOT_PASSWORD -> handleForgotPassword(request);
+            case ANSWER_SECURITY_QUESTION -> handleSecurityAnswer(request);
+            case RESET_PASSWORD -> handleResetPassword(request);
 
-            case LOGIN ->
-                    handleLogin(request);
+            case LOGOUT -> handleLogout(request);
 
+            case GET_PROFILE -> handleGetProfile(request);
+            case CHANGE_USERNAME -> handleChangeUsername(request);
+            case CHANGE_NICKNAME -> handleChangeNickname(request);
+            case CHANGE_EMAIL -> handleChangeEmail(request);
+            case CHANGE_PASSWORD -> handleChangePassword(request);
 
-            case REGISTER ->
-                    handleRegister(request);
+            case GET_LEADERBOARD -> handleGetLeaderboard(request);
 
-
-            case COMPLETE_REGISTRATION ->
-                    handleCompleteRegistration(
-                            request
-                    );
-
-
-            case FORGOT_PASSWORD ->
-                    handleForgotPassword(
-                            request
-                    );
-
-
-            case ANSWER_SECURITY_QUESTION ->
-                    handleSecurityAnswer(
-                            request
-                    );
-
-
-            case RESET_PASSWORD ->
-                    handleResetPassword(
-                            request
-                    );
-
-
-            case LOGOUT ->
-                    handleLogout(
-                            request
-                    );
-
-
-            case GET_PROFILE ->
-                    handleGetProfile(
-                            request
-                    );
-
-
-            case CHANGE_USERNAME ->
-                    handleChangeUsername(
-                            request
-                    );
-
-
-            case CHANGE_NICKNAME ->
-                    handleChangeNickname(
-                            request
-                    );
-
-
-            case CHANGE_EMAIL ->
-                    handleChangeEmail(
-                            request
-                    );
-
-
-            case CHANGE_PASSWORD ->
-                    handleChangePassword(
-                            request
-                    );
-
-
-            default ->
-                    NetworkResponse.error(
-                            "Request not implemented."
-                    );
+            default -> NetworkResponse.error(
+                    "Request not implemented."
+            );
         };
     }
-
 
     // =========================================================
     // LOGIN
     // =========================================================
 
-    private NetworkResponse handleLogin(
-            NetworkRequest request
-    ) {
-
+    private NetworkResponse handleLogin(NetworkRequest request) {
         if (request.getData() == null) {
-
-            return NetworkResponse.error(
-                    "Missing login data."
-            );
+            return NetworkResponse.error("Missing login data.");
         }
 
         LoginRequest loginRequest =
-                gson.fromJson(
-                        request.getData(),
-                        LoginRequest.class
-                );
+                gson.fromJson(request.getData(), LoginRequest.class);
 
         ServerLoginResult serverResult =
-                authService
-                        .getLoginService()
-                        .login(loginRequest);
+                authService.getLoginService().login(loginRequest);
 
-        LoginResult loginResult =
-                serverResult.result();
+        LoginResult result = serverResult.result();
+
+        JsonObject data = new JsonObject();
+        data.addProperty("status", result.status().name());
 
         if (serverResult.account() == null ||
                 serverResult.token() == null) {
 
-            JsonObject data =
-                    new JsonObject();
-
-            data.addProperty(
-                    "status",
-                    loginResult.status().name()
-            );
-
             return new NetworkResponse(
                     false,
-                    loginResult.message(),
+                    result.message(),
                     data
             );
         }
-
-        Account account =
-                serverResult.account();
-
-        UserInfo userInfo =
-                createUserInfo(account);
-
-        JsonObject data =
-                new JsonObject();
-
-        data.addProperty(
-                "status",
-                loginResult.status().name()
-        );
 
         data.addProperty(
                 "token",
@@ -294,27 +152,24 @@ public class ClientHandler implements Runnable {
         );
 
         data.add(
-                "user",
-                gson.toJsonTree(userInfo)
+                "accountState",
+                gson.toJsonTree(
+                        serverResult.account().toState()
+                )
         );
 
         return NetworkResponse.success(
-                loginResult.message(),
+                result.message(),
                 data
         );
     }
-
 
     // =========================================================
     // REGISTER
     // =========================================================
 
-    private NetworkResponse handleRegister(
-            NetworkRequest request
-    ) {
-
+    private NetworkResponse handleRegister(NetworkRequest request) {
         if (request.getData() == null) {
-
             return NetworkResponse.error(
                     "Missing registration data."
             );
@@ -334,16 +189,13 @@ public class ClientHandler implements Runnable {
         RegistrationResult publicResult =
                 result.result();
 
+        JsonObject data = new JsonObject();
+        data.addProperty(
+                "status",
+                publicResult.status().name()
+        );
+
         if (result.pendingAccount() == null) {
-
-            JsonObject data =
-                    new JsonObject();
-
-            data.addProperty(
-                    "status",
-                    publicResult.status().name()
-            );
-
             return new NetworkResponse(
                     false,
                     publicResult.message(),
@@ -351,17 +203,8 @@ public class ClientHandler implements Runnable {
             );
         }
 
-        // This remains only on the server.
         pendingRegistration =
                 result.pendingAccount();
-
-        JsonObject data =
-                new JsonObject();
-
-        data.addProperty(
-                "status",
-                publicResult.status().name()
-        );
 
         return NetworkResponse.success(
                 publicResult.message(),
@@ -369,20 +212,16 @@ public class ClientHandler implements Runnable {
         );
     }
 
-
     private NetworkResponse handleCompleteRegistration(
             NetworkRequest request
     ) {
-
         if (pendingRegistration == null) {
-
             return NetworkResponse.error(
                     "No pending registration."
             );
         }
 
         if (request.getData() == null) {
-
             return NetworkResponse.error(
                     "Missing security question data."
             );
@@ -402,17 +241,17 @@ public class ClientHandler implements Runnable {
                                 questionRequest
                         );
 
-        JsonObject data =
-                new JsonObject();
-
+        JsonObject data = new JsonObject();
         data.addProperty(
                 "status",
                 result.status().name()
         );
 
-        if (result.status()
-                == RegistrationStatus.COMPLETED) {
+        boolean success =
+                result.status() ==
+                        RegistrationStatus.COMPLETED;
 
+        if (success) {
             pendingRegistration = null;
 
             return NetworkResponse.success(
@@ -428,17 +267,14 @@ public class ClientHandler implements Runnable {
         );
     }
 
-
     // =========================================================
-    // PASSWORD RECOVERY
+    // PASSWORD RESET
     // =========================================================
 
     private NetworkResponse handleForgotPassword(
             NetworkRequest request
     ) {
-
         if (request.getData() == null) {
-
             return NetworkResponse.error(
                     "Missing password recovery data."
             );
@@ -453,22 +289,18 @@ public class ClientHandler implements Runnable {
         PasswordResetStartResult result =
                 authService
                         .getLoginService()
-                        .forgetPassword(
-                                forgotRequest
-                        );
-
-        LoginResult publicResult =
-                result.result();
+                        .forgetPassword(forgotRequest);
 
         if (result.account() == null) {
+            pendingPasswordReset = null;
+            passwordResetAnswerAccepted = false;
 
             return createLoginResponse(
-                    publicResult,
+                    result.result(),
                     false
             );
         }
 
-        // Stored per connection only.
         pendingPasswordReset =
                 result.account();
 
@@ -476,18 +308,15 @@ public class ClientHandler implements Runnable {
                 false;
 
         return createLoginResponse(
-                publicResult,
+                result.result(),
                 true
         );
     }
 
-
     private NetworkResponse handleSecurityAnswer(
             NetworkRequest request
     ) {
-
         if (request.getData() == null) {
-
             return NetworkResponse.error(
                     "Missing security answer."
             );
@@ -507,35 +336,21 @@ public class ClientHandler implements Runnable {
                                 answerRequest
                         );
 
-        if (result.status()
-                == LoginStatus.ANSWER_ACCEPTED) {
-
-            passwordResetAnswerAccepted =
-                    true;
-
-            return createLoginResponse(
-                    result,
-                    true
-            );
-        }
-
         passwordResetAnswerAccepted =
-                false;
+                result.status() ==
+                        LoginStatus.ANSWER_ACCEPTED;
 
         return createLoginResponse(
                 result,
-                false
+                passwordResetAnswerAccepted
         );
     }
-
 
     private NetworkResponse handleResetPassword(
             NetworkRequest request
     ) {
-
         if (request.getData() == null ||
-                !request.getData()
-                        .has("newPassword")) {
+                !request.getData().has("newPassword")) {
 
             return NetworkResponse.error(
                     "Missing new password."
@@ -543,7 +358,8 @@ public class ClientHandler implements Runnable {
         }
 
         String newPassword =
-                request.getData()
+                request
+                        .getData()
                         .get("newPassword")
                         .getAsString();
 
@@ -556,26 +372,20 @@ public class ClientHandler implements Runnable {
                                 newPassword
                         );
 
-        if (result.status()
-                == LoginStatus.PASSWORD_RESET) {
+        boolean success =
+                result.status() ==
+                        LoginStatus.PASSWORD_RESET;
 
+        if (success) {
             pendingPasswordReset = null;
-
-            passwordResetAnswerAccepted =
-                    false;
-
-            return createLoginResponse(
-                    result,
-                    true
-            );
+            passwordResetAnswerAccepted = false;
         }
 
         return createLoginResponse(
                 result,
-                false
+                success
         );
     }
-
 
     // =========================================================
     // LOGOUT
@@ -584,26 +394,13 @@ public class ClientHandler implements Runnable {
     private NetworkResponse handleLogout(
             NetworkRequest request
     ) {
+        String token = request.getToken();
 
-        String token =
-                request.getToken();
-
-        if (token == null ||
-                token.isBlank()) {
-
+        if (!validSession(token)) {
             return NetworkResponse.error(
                     "Invalid session."
             );
         }
-
-        // We will expose logout through AuthService/session manager
-        // rather than letting the client manipulate sessions.
-        //
-        // Add logout() to LoginService:
-        //
-        // public void logout(String token) {
-        //     sessionManager.removeSession(token);
-        // }
 
         authService
                 .getLoginService()
@@ -614,7 +411,6 @@ public class ClientHandler implements Runnable {
         );
     }
 
-
     // =========================================================
     // PROFILE
     // =========================================================
@@ -622,9 +418,7 @@ public class ClientHandler implements Runnable {
     private NetworkResponse handleGetProfile(
             NetworkRequest request
     ) {
-
-        String token =
-                request.getToken();
+        String token = request.getToken();
 
         Account account =
                 authService
@@ -632,33 +426,27 @@ public class ClientHandler implements Runnable {
                         .getAccount(token);
 
         if (account == null) {
-
             return NetworkResponse.error(
                     "you are not logged in"
             );
         }
 
-        UserInfo userInfo =
-                createUserInfo(account);
+        String info =
+                authService
+                        .getProfileService()
+                        .showInfo(token);
 
-        JsonObject data =
-                new JsonObject();
-
-        data.add(
-                "user",
-                gson.toJsonTree(userInfo)
-        );
-
-        return NetworkResponse.success(
-                "Profile loaded.",
-                data
-        );
+        return NetworkResponse.success(info);
     }
-
 
     private NetworkResponse handleChangeUsername(
             NetworkRequest request
     ) {
+        if (request.getData() == null) {
+            return NetworkResponse.error(
+                    "Missing username data."
+            );
+        }
 
         ChangeUsernameRequest changeRequest =
                 gson.fromJson(
@@ -666,21 +454,24 @@ public class ClientHandler implements Runnable {
                         ChangeUsernameRequest.class
                 );
 
-        String message =
+        return profileResponse(
                 authService
                         .getProfileService()
                         .changeUsername(
                                 request.getToken(),
                                 changeRequest
-                        );
-
-        return profileResponse(message);
+                        )
+        );
     }
-
 
     private NetworkResponse handleChangeNickname(
             NetworkRequest request
     ) {
+        if (request.getData() == null) {
+            return NetworkResponse.error(
+                    "Missing nickname data."
+            );
+        }
 
         ChangeNicknameRequest changeRequest =
                 gson.fromJson(
@@ -688,21 +479,24 @@ public class ClientHandler implements Runnable {
                         ChangeNicknameRequest.class
                 );
 
-        String message =
+        return profileResponse(
                 authService
                         .getProfileService()
                         .changeNickname(
                                 request.getToken(),
                                 changeRequest
-                        );
-
-        return profileResponse(message);
+                        )
+        );
     }
-
 
     private NetworkResponse handleChangeEmail(
             NetworkRequest request
     ) {
+        if (request.getData() == null) {
+            return NetworkResponse.error(
+                    "Missing email data."
+            );
+        }
 
         ChangeEmailRequest changeRequest =
                 gson.fromJson(
@@ -710,21 +504,24 @@ public class ClientHandler implements Runnable {
                         ChangeEmailRequest.class
                 );
 
-        String message =
+        return profileResponse(
                 authService
                         .getProfileService()
                         .changeEmail(
                                 request.getToken(),
                                 changeRequest
-                        );
-
-        return profileResponse(message);
+                        )
+        );
     }
-
 
     private NetworkResponse handleChangePassword(
             NetworkRequest request
     ) {
+        if (request.getData() == null) {
+            return NetworkResponse.error(
+                    "Missing password data."
+            );
+        }
 
         ChangePasswordRequest changeRequest =
                 gson.fromJson(
@@ -732,27 +529,122 @@ public class ClientHandler implements Runnable {
                         ChangePasswordRequest.class
                 );
 
-        String message =
+        return profileResponse(
                 authService
                         .getProfileService()
                         .changePassword(
                                 request.getToken(),
                                 changeRequest
-                        );
-
-        return profileResponse(message);
+                        )
+        );
     }
 
+    // =========================================================
+    // LEADERBOARD
+    // =========================================================
+
+    private NetworkResponse handleGetLeaderboard(
+            NetworkRequest request
+    ) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error(
+                    "Invalid session."
+            );
+        }
+
+        List<Account> accounts =
+                authService
+                        .getAccountRepository()
+                        .getAccounts();
+
+        JsonArray entries =
+                new JsonArray();
+
+        for (Account account : accounts) {
+            LeaderboardEntryDto entry =
+                    new LeaderboardEntryDto(
+                            account.getName(),
+                            account.getAdventureProgress()
+                                    .getCurrentChapter(),
+                            account.getAdventureProgress()
+                                    .getCurrentLvl(),
+                            account.getAdventureProgress()
+                                    .getMinigamesWon(),
+                            getCompletedQuestCount(
+                                    account,
+                                    QuestType.DAILY
+                            ),
+                            getCompletedQuestCount(
+                                    account,
+                                    QuestType.CHALLENGE
+                            ) + getCompletedQuestCount(
+                                    account,
+                                    QuestType.EPIC
+                            ),
+                            account.getScoreRecord()
+                                    .getScore()
+                    );
+
+            entries.add(
+                    gson.toJsonTree(entry)
+            );
+        }
+
+        JsonObject data =
+                new JsonObject();
+
+        data.add(
+                "entries",
+                entries
+        );
+
+        return NetworkResponse.success(
+                "Leaderboard loaded successfully.",
+                data
+        );
+    }
 
     // =========================================================
     // HELPERS
     // =========================================================
 
+    private boolean validSession(String token) {
+        return token != null
+                && !token.isBlank()
+                && authService
+                .getLoginService()
+                .isLoggedIn(token);
+    }
+
+    private int getCompletedQuestCount(
+            Account account,
+            QuestType type
+    ) {
+        if (account.getQuestManager() == null) {
+            return 0;
+        }
+
+        List<ConfigurableQuest> quests =
+                account
+                        .getQuestManager()
+                        .getByType(type);
+
+        if (quests == null) {
+            return 0;
+        }
+
+        return (int) quests
+                .stream()
+                .filter(
+                        ConfigurableQuest::isCompleted
+                )
+                .count();
+    }
+
     private NetworkResponse createLoginResponse(
             LoginResult result,
             boolean success
     ) {
-
         JsonObject data =
                 new JsonObject();
 
@@ -768,24 +660,25 @@ public class ClientHandler implements Runnable {
         );
     }
 
-
     private NetworkResponse profileResponse(
             String message
     ) {
+        if (message == null) {
+            return NetworkResponse.error(
+                    "Unknown profile error."
+            );
+        }
+
+        String lower =
+                message.toLowerCase();
 
         boolean success =
-                !message.equals(
+                !message.equalsIgnoreCase(
                         "you are not logged in"
                 )
-                        && !message.startsWith(
-                        "invalid"
-                )
-                        && !message.contains(
-                        "incorrect"
-                )
-                        && !message.contains(
-                        "already exists"
-                );
+                        && !lower.startsWith("invalid")
+                        && !lower.contains("incorrect")
+                        && !lower.contains("already exists");
 
         return new NetworkResponse(
                 success,
@@ -794,40 +687,11 @@ public class ClientHandler implements Runnable {
         );
     }
 
-
-    private UserInfo createUserInfo(
-            Account account
-    ) {
-
-        return new UserInfo(
-                account.getName(),
-                account.getNickname(),
-                account.getEmail(),
-                account.getGender()
-                        .name()
-                        .toLowerCase(),
-                account.getAdventureProgress()
-                        .getCoin(),
-                account.getAdventureProgress()
-                        .getGem(),
-                account.getScoreRecord()
-                        .getScore(),
-                account.getAdventureProgress()
-                        .getCurrentChapter(),
-                account.getAdventureProgress()
-                        .getCurrentLvl()
-        );
-    }
-
-
     private void closeConnection() {
-
         try {
-
             if (reader != null) {
                 reader.close();
             }
-
         } catch (IOException ignored) {
         }
 
@@ -836,13 +700,10 @@ public class ClientHandler implements Runnable {
         }
 
         try {
-
             if (socket != null &&
                     !socket.isClosed()) {
-
                 socket.close();
             }
-
         } catch (IOException ignored) {
         }
     }

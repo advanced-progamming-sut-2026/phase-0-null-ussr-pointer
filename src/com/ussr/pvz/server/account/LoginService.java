@@ -18,11 +18,33 @@ public class LoginService {
             AccountRepository accountRepository,
             ServerSessionManager sessionManager
     ) {
-        this.accountRepository = accountRepository;
-        this.sessionManager = sessionManager;
+
+        this.accountRepository =
+                accountRepository;
+
+        this.sessionManager =
+                sessionManager;
     }
 
-    public ServerLoginResult login(LoginRequest request) {
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
+
+    public ServerLoginResult login(
+            LoginRequest request
+    ) {
+
+        if (request == null ||
+                request.username() == null ||
+                request.password() == null) {
+
+            return ServerLoginResult.error(
+                    LoginResult.error(
+                            "Invalid login request."
+                    )
+            );
+        }
 
         Account account =
                 accountRepository.findByUsername(
@@ -30,6 +52,7 @@ public class LoginService {
                 );
 
         if (account == null) {
+
             return ServerLoginResult.error(
                     LoginResult.error(
                             "Username not found."
@@ -42,7 +65,8 @@ public class LoginService {
                         request.password()
                 );
 
-        if (!account.getPassword()
+        if (!account
+                .getPassword()
                 .equals(hashedPassword)) {
 
             return ServerLoginResult.error(
@@ -74,13 +98,47 @@ public class LoginService {
         );
     }
 
-    public void logout(String token) {
-        sessionManager.removeSession(token);
+
+    // =========================================================
+    // SESSION
+    // =========================================================
+
+    public boolean isLoggedIn(
+            String token
+    ) {
+
+        return sessionManager.isValid(
+                token
+        );
     }
+
+
+    public void logout(
+            String token
+    ) {
+
+        sessionManager.removeSession(
+                token
+        );
+    }
+
+
+    // =========================================================
+    // FORGOT PASSWORD
+    // =========================================================
 
     public PasswordResetStartResult forgetPassword(
             ForgetPasswordRequest request
     ) {
+
+        if (request == null ||
+                request.username() == null ||
+                request.email() == null) {
+
+            return PasswordResetStartResult.error(
+                    "Invalid password recovery request."
+            );
+        }
 
         Account account =
                 accountRepository.findByUsername(
@@ -88,13 +146,18 @@ public class LoginService {
                 );
 
         if (account == null) {
+
             return PasswordResetStartResult.error(
                     "Username not found."
             );
         }
 
-        if (!account.getEmail()
-                .equals(request.email())) {
+        if (account.getEmail() == null ||
+                !account
+                        .getEmail()
+                        .equals(
+                                request.email()
+                        )) {
 
             return PasswordResetStartResult.error(
                     "Invalid email."
@@ -109,7 +172,8 @@ public class LoginService {
         }
 
         String question =
-                account.getSecurityQuestion()
+                account
+                        .getSecurityQuestion()
                         .getText();
 
         return PasswordResetStartResult.success(
@@ -117,6 +181,11 @@ public class LoginService {
                 account
         );
     }
+
+
+    // =========================================================
+    // SECURITY ANSWER
+    // =========================================================
 
     public LoginResult answer(
             Account pendingPasswordReset,
@@ -130,9 +199,21 @@ public class LoginService {
             );
         }
 
-        if (!pendingPasswordReset
-                .getSecurityAnswer()
-                .equals(request.answer())) {
+        if (request == null ||
+                request.answer() == null) {
+
+            return LoginResult.error(
+                    "Invalid security answer."
+            );
+        }
+
+        if (pendingPasswordReset
+                .getSecurityAnswer() == null ||
+                !pendingPasswordReset
+                        .getSecurityAnswer()
+                        .equals(
+                                request.answer()
+                        )) {
 
             return LoginResult.error(
                     "Wrong security answer."
@@ -144,6 +225,11 @@ public class LoginService {
                 "Answer accepted."
         );
     }
+
+
+    // =========================================================
+    // RESET PASSWORD
+    // =========================================================
 
     public LoginResult resetPassword(
             Account pendingPasswordReset,
@@ -159,8 +245,17 @@ public class LoginService {
             );
         }
 
+        if (newPass == null) {
+
+            return LoginResult.error(
+                    "Invalid password."
+            );
+        }
+
         String validationError =
-                validatePassword(newPass);
+                validatePassword(
+                        newPass
+                );
 
         if (validationError != null) {
 
@@ -186,32 +281,53 @@ public class LoginService {
         );
     }
 
+
+    // =========================================================
+    // PASSWORD VALIDATION
+    // =========================================================
+
     private String validatePassword(
             String password
     ) {
 
-        if (!validPasswordLength(password)) {
+        if (!validPasswordLength(
+                password
+        )) {
+
             return "Invalid password length.";
         }
 
-        if (!validPasswordLower(password)) {
+        if (!validPasswordLower(
+                password
+        )) {
+
             return "Password must contain a lowercase character.";
         }
 
-        if (!validPasswordUpper(password)) {
+        if (!validPasswordUpper(
+                password
+        )) {
+
             return "Password must contain an uppercase character.";
         }
 
-        if (!validPasswordNumber(password)) {
+        if (!validPasswordNumber(
+                password
+        )) {
+
             return "Password must contain a number.";
         }
 
-        if (!validPasswordSpecific(password)) {
+        if (!validPasswordSpecific(
+                password
+        )) {
+
             return "Password must contain a special character.";
         }
 
         return null;
     }
+
 
     private boolean validPasswordLength(
             String password
@@ -219,9 +335,12 @@ public class LoginService {
 
         return ValidationRegex
                 .VALID_PASSWORD_LENGTH
-                .matchToRegex(password)
+                .matchToRegex(
+                        password
+                )
                 .matches();
     }
+
 
     private boolean validPasswordLower(
             String password
@@ -229,9 +348,12 @@ public class LoginService {
 
         return ValidationRegex
                 .VALID_PASSWORD_LOWER
-                .matchToRegex(password)
+                .matchToRegex(
+                        password
+                )
                 .matches();
     }
+
 
     private boolean validPasswordUpper(
             String password
@@ -239,9 +361,12 @@ public class LoginService {
 
         return ValidationRegex
                 .VALID_PASSWORD_UPPER
-                .matchToRegex(password)
+                .matchToRegex(
+                        password
+                )
                 .matches();
     }
+
 
     private boolean validPasswordSpecific(
             String password
@@ -249,9 +374,12 @@ public class LoginService {
 
         return ValidationRegex
                 .VALID_PASSWORD_SPECIFIC_CHARACTER
-                .matchToRegex(password)
+                .matchToRegex(
+                        password
+                )
                 .matches();
     }
+
 
     private boolean validPasswordNumber(
             String password
@@ -259,7 +387,9 @@ public class LoginService {
 
         return ValidationRegex
                 .VALID_PASSWORD_NUMBER
-                .matchToRegex(password)
+                .matchToRegex(
+                        password
+                )
                 .matches();
     }
 }

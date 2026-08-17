@@ -5,148 +5,298 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.shared.account.AccountState;
-import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
-import com.ussr.pvz.server.account.SaveService;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class App {
-    private static MenuState menuState = MenuState.REGISTER;
+
+    private static MenuState menuState =
+            MenuState.REGISTER;
+
+    /*
+     * Client-side cache of the currently logged-in account.
+     *
+     * The server is the real owner of account data.
+     */
     private static Account account;
+
     private static GameSession gameSession;
-    private static List<Map<String, Object>> cachedPlantsData = null;
+
+    private static List<Map<String, Object>>
+            cachedPlantsData = null;
+
     private static ShopManager shopManager;
+
     private static boolean cheatedLevel = false;
-    private static final LevelManager levelManager = new LevelManager();
-    private static final List<Account> accounts = new ArrayList<>(
-            SaveService.loadAccounts().stream()
-                    .map(state -> new Account
-                            (state, new Collection(new ArrayList<>(), new ArrayList<>()))).toList());
+
+    private static final LevelManager levelManager =
+            new LevelManager();
+
 
     static {
         loadPlantsDataToMemory();
     }
-    // --- in App.java ---
 
-    // Debug flags (both default off)
-    private static boolean debugModeEnabled = false;
-    private static boolean gridEnabled      = false;
 
-    public static boolean isDebugModeEnabled() { return debugModeEnabled; }
-    public static void setDebugModeEnabled(boolean v) { debugModeEnabled = v; }
+    // =========================================================
+    // DEBUG
+    // =========================================================
 
-    public static boolean isGridEnabled() { return gridEnabled; }
-    public static void setGridEnabled(boolean v)     { gridEnabled = v; }
+    private static boolean debugModeEnabled =
+            false;
 
-    // Call this when a game session ends (wherever you null out gameSession)
-    public static void setGameSession(GameSession gameSession) {
-        App.gameSession = gameSession;
+    private static boolean gridEnabled =
+            false;
+
+
+    public static boolean isDebugModeEnabled() {
+        return debugModeEnabled;
+    }
+
+
+    public static void setDebugModeEnabled(
+            boolean value
+    ) {
+        debugModeEnabled = value;
+    }
+
+
+    public static boolean isGridEnabled() {
+        return gridEnabled;
+    }
+
+
+    public static void setGridEnabled(
+            boolean value
+    ) {
+        gridEnabled = value;
+    }
+
+
+    // =========================================================
+    // GAME SESSION
+    // =========================================================
+
+    public static void setGameSession(
+            GameSession gameSession
+    ) {
+
+        App.gameSession =
+                gameSession;
+
         if (gameSession == null) {
-            // Grid/hitbox overlays are only meaningful during gameplay
-            gridEnabled = false;
+
+            gridEnabled =
+                    false;
         }
     }
 
-    public static void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            List<Account> accounts = getAccounts();
-            if (!accounts.isEmpty()) {
-                List<AccountState> states = accounts.stream()
-                        .map(Account::toState)
-                        .toList();
-                SaveService.saveAccounts(states);
-            }
-        }));
-    }
-
-    public static void loadPlantsDataToMemory() {
-        if (cachedPlantsData != null) return;
-        Gson gson = new GsonBuilder()
-                .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
-                .create();
-
-        File allPlantsFile = new File("src/resources/plants.json");
-
-        if (!allPlantsFile.exists()) {
-            System.err.println("Critical Error: plants.json not found during App boot!");
-            cachedPlantsData = new ArrayList<>();
-            return;
-        }
-
-        try (FileReader reader = new FileReader(allPlantsFile)) {
-            Type complexListType = new TypeToken<List<Map<String, Object>>>() {}.getType();
-            cachedPlantsData = gson.fromJson(reader, complexListType);
-
-            if (cachedPlantsData == null) {
-                cachedPlantsData = new ArrayList<>();
-            }
-        } catch (IOException e) {
-            System.err.println("Error caching plants.json to memory: " + e.getMessage());
-            cachedPlantsData = new ArrayList<>();
-        }
-    }
-
-    public static LevelManager getLevelManager() {
-        return levelManager;
-    }
-
-    public static List<Account> getAccounts() {
-        return accounts;
-    }
-
-    public static void addAccount(Account account) {
-        accounts.add(account);
-    }
-
-    public static MenuState getMenuState() {
-        return App.menuState;
-    }
-
-    public static void setMenuState(MenuState menuState) {
-        App.menuState = menuState;
-    }
-
-    public static void login(Account account) {
-        App.account = account;
-    }
-
-    public static Account getAccount() {
-        return App.account;
-    }
 
     public static GameSession getGameSession() {
         return App.gameSession;
     }
 
-    public static ShopManager getShopManager() {
-        return shopManager;
+
+    // =========================================================
+    // ACCOUNT
+    // =========================================================
+
+    public static void login(
+            Account account
+    ) {
+
+        App.account =
+                account;
     }
 
-    public static void setShopManager(ShopManager shopManager) {
-        App.shopManager = shopManager;
+
+    public static void logout() {
+
+        App.account =
+                null;
     }
 
-    public static void initShop(){
-        App.shopManager = new ShopManager();
+
+    public static Account getAccount() {
+        return App.account;
     }
 
-    public static List<Map<String, Object>> getCachedPlantsData() {
+
+    // =========================================================
+    // SERVER PERSISTENCE
+    // =========================================================
+
+    /*
+     * Kept temporarily so existing startup code does not break.
+     *
+     * Account persistence is now handled by the server,
+     * therefore the client has nothing to save on shutdown.
+     */
+    public static void registerShutdownHook() {
+
+        // Intentionally empty.
+        // Server owns account persistence.
+    }
+
+
+    // =========================================================
+    // PLANT DATA
+    // =========================================================
+
+    public static void loadPlantsDataToMemory() {
+
+        if (cachedPlantsData != null) {
+            return;
+        }
+
+        Gson gson =
+                new GsonBuilder()
+                        .setObjectToNumberStrategy(
+                                ToNumberPolicy.LONG_OR_DOUBLE
+                        )
+                        .create();
+
+        File allPlantsFile =
+                new File(
+                        "src/resources/plants.json"
+                );
+
+        if (!allPlantsFile.exists()) {
+
+            System.err.println(
+                    "Critical Error: plants.json "
+                            + "not found during App boot!"
+            );
+
+            cachedPlantsData =
+                    new ArrayList<>();
+
+            return;
+        }
+
+        try (FileReader reader =
+                     new FileReader(
+                             allPlantsFile
+                     )) {
+
+            Type complexListType =
+                    new TypeToken<
+                            List<Map<String, Object>>
+                            >() {
+                    }.getType();
+
+            cachedPlantsData =
+                    gson.fromJson(
+                            reader,
+                            complexListType
+                    );
+
+            if (cachedPlantsData == null) {
+
+                cachedPlantsData =
+                        new ArrayList<>();
+            }
+
+        } catch (IOException e) {
+
+            System.err.println(
+                    "Error caching plants.json "
+                            + "to memory: "
+                            + e.getMessage()
+            );
+
+            cachedPlantsData =
+                    new ArrayList<>();
+        }
+    }
+
+
+    public static List<Map<String, Object>>
+    getCachedPlantsData() {
+
         return cachedPlantsData;
     }
 
+
+    // =========================================================
+    // MENU
+    // =========================================================
+
+    public static MenuState getMenuState() {
+
+        return App.menuState;
+    }
+
+
+    public static void setMenuState(
+            MenuState menuState
+    ) {
+
+        App.menuState =
+                menuState;
+    }
+
+
+    // =========================================================
+    // LEVEL
+    // =========================================================
+
+    public static LevelManager getLevelManager() {
+
+        return levelManager;
+    }
+
+
+    // =========================================================
+    // SHOP
+    // =========================================================
+
+    public static ShopManager getShopManager() {
+
+        return shopManager;
+    }
+
+
+    public static void setShopManager(
+            ShopManager shopManager
+    ) {
+
+        App.shopManager =
+                shopManager;
+    }
+
+
+    public static void initShop() {
+
+        App.shopManager =
+                new ShopManager();
+    }
+
+
+    // =========================================================
+    // CHEAT STATE
+    // =========================================================
+
     public static boolean isCheatedLevel() {
+
         return cheatedLevel;
     }
 
-    public static void setCheatedLevel(boolean cheatedLevel) {
-        App.cheatedLevel = cheatedLevel;
+
+    public static void setCheatedLevel(
+            boolean cheatedLevel
+    ) {
+
+        App.cheatedLevel =
+                cheatedLevel;
     }
 }

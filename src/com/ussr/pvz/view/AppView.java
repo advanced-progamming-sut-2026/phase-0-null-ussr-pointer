@@ -19,7 +19,7 @@ import com.ussr.pvz.audio.MusicTrack;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.util.SessionManager;
+import com.ussr.pvz.network.NetworkClient;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.DebugOverlay;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
@@ -33,7 +33,6 @@ import com.ussr.pvz.view.mainmenu.gamemenu.GraphicalLevelSelectionMenu;
 import com.ussr.pvz.view.mainmenu.greenhouse.GreenHouseMenu;
 import com.ussr.pvz.view.notification.NotificationOverlay;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -54,6 +53,8 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.ussr.pvz.view.mainmenu.news.NewsMenu;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import java.io.IOException;
 
 import static com.badlogic.gdx.Gdx.files;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
@@ -90,36 +91,22 @@ public class AppView implements ApplicationListener {
     public AppView() {
         App.initShop();
         App.getLevelManager().loadFromJson();
-
-        tryAutoLogin();
-    }
-
-    private void tryAutoLogin() {
-        String savedUsername = SessionManager.getAutoLoginUsername();
-        if (savedUsername == null) {
-            return;
-        }
-
-        Account autoLoginAccount = App.getAccounts().stream()
-                .filter(a -> a.getName().equalsIgnoreCase(savedUsername))
-                .findFirst()
-                .orElse(null);
-
-        if (autoLoginAccount != null) {
-            // Update login time and check for daily resets
-            autoLoginAccount.updateLoginTime();
-
-            App.login(autoLoginAccount);
-
-            App.setMenuState(MenuState.MAIN);
-            System.out.println("[Session] Welcome back, " + autoLoginAccount.getName() + "! Auto-login successful.");
-        } else {
-            SessionManager.clearSession();
-        }
     }
 
     @Override
     public void create() {
+        try {
+            NetworkClient.getInstance()
+                    .connect(
+                            "localhost",
+                            8080
+                    );
+        } catch (IOException e) {
+            System.err.println(
+                    "Could not connect to server: "
+                            + e.getMessage()
+            );
+        }
         // The lawn background, entities, hitboxes and mouse input all share
         // this fixed logical canvas. Different monitor sizes/aspect ratios only
         // scale the complete canvas; they never change its world dimensions.
@@ -628,6 +615,9 @@ public class AppView implements ApplicationListener {
         if (skin instanceof Disposable disposable) {
             disposable.dispose();
         }
+
+        NetworkClient.getInstance()
+                .disconnect();
     }
 
     private void configureGlobalHud(MenuState state) {
