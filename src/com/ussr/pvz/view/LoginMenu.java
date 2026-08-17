@@ -153,10 +153,16 @@ public final class LoginMenu extends FadingMenu {
 
     private void submitLogin() {
         LoginRequest request = new LoginRequest(
-                usernameField.getText().trim(), passwordField.getText(), stayLoggedIn);
+                usernameField.getText().trim(),
+                passwordField.getText(),
+                stayLoggedIn
+        );
+
         LoginResult result = controller.login(request);
+
         if (result.status() == LoginStatus.LOGIN_SUCCESS) {
             NotificationCenter.success(result.message());
+            App.setMenuState(MenuState.MAIN);
         } else {
             NotificationCenter.error(result.message());
         }
