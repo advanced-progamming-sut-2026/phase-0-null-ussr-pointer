@@ -33,7 +33,7 @@ public class TurbinePullMove implements ZombossMove {
         }
 
         for (Zombie zombie : session.getZombies()) {
-            if (zombie == controller.getPrimary() || zombie == controller.getMirror()) continue;
+            if (controller.isBodyOf(zombie)) continue;
             if (!zombie.isAlive()) continue;
 
             int row = (int) zombie.getPosition().y();

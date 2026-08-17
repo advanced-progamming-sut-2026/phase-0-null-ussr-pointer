@@ -659,8 +659,9 @@ public class EntityRenderLayer extends Group {
                 return a;
             });
 
-            // Missiles switch clip mid-flight (falling -> exploding); keep it in sync.
-            if (proj instanceof MissileProjectile) {
+            // Missiles switch clip mid-flight (falling -> exploding); baby sharks
+            // switch through swim -> submerge -> attack. Keep both in sync.
+            if (proj instanceof MissileProjectile || proj instanceof BabySharkProjectile) {
                 actor.setClip(clip);
             }
 
@@ -701,6 +702,13 @@ public class EntityRenderLayer extends Group {
             return missile.getPhase() == MissileProjectile.Phase.EXPLODING
                     ? "missile_explosion"
                     : "missile";
+        }
+        if (proj instanceof BabySharkProjectile shark) {
+            return switch (shark.getPhase()) {
+                case SWIMMING -> shark.getIdleClip();
+                case SUBMERGING -> "submerge";
+                case ATTACKING -> "attack";
+            };
         }
         if (proj instanceof ZombieBossProjectile) return "missile";
         if (proj instanceof OctopusProjectile) return "animation2";
