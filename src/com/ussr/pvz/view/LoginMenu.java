@@ -18,11 +18,11 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.LoginController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
-import com.ussr.pvz.model.dto.AnswerRequest;
-import com.ussr.pvz.model.dto.ForgetPasswordRequest;
-import com.ussr.pvz.model.dto.LoginRequest;
-import com.ussr.pvz.model.dto.LoginResult;
-import com.ussr.pvz.model.dto.enums.LoginStatus;
+import com.ussr.pvz.shared.dto.AnswerRequest;
+import com.ussr.pvz.shared.dto.ForgetPasswordRequest;
+import com.ussr.pvz.shared.dto.LoginRequest;
+import com.ussr.pvz.shared.dto.LoginResult;
+import com.ussr.pvz.shared.dto.enums.LoginStatus;
 import com.ussr.pvz.notification.NotificationCenter;
 import pvz.libpvz.textures.TextureBank;
 

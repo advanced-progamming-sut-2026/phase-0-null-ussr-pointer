@@ -1,8 +1,7 @@
 package com.ussr.pvz.model.engine;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.account.NewsItem;
-import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.shared.account.NewsItem;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 

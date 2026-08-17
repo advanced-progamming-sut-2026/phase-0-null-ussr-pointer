@@ -2,8 +2,8 @@ package com.ussr.pvztest.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.account.AccountState;
-import com.ussr.pvz.model.account.Gender;
+import com.ussr.pvz.shared.account.AccountState;
+import com.ussr.pvz.shared.account.Gender;
 import com.ussr.pvz.service.QuestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

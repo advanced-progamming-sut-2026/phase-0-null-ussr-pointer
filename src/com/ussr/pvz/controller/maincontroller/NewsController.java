@@ -1,6 +1,6 @@
 package com.ussr.pvz.controller.maincontroller;
 
-import com.ussr.pvz.model.account.NewsItem;
+import com.ussr.pvz.shared.account.NewsItem;
 import com.ussr.pvz.service.NewsService;
 
 import java.util.List;

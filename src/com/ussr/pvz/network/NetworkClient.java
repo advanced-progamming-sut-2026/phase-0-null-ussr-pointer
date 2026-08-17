@@ -1,6 +1,9 @@
 package com.ussr.pvz.network;
 
 import com.google.gson.Gson;
+import com.ussr.pvz.shared.network.NetworkResponse;
+import com.ussr.pvz.shared.network.NetworkRequest;
+
 import java.io.*;
 import java.net.Socket;
 

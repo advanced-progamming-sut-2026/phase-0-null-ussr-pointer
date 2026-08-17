@@ -1,9 +1,8 @@
 package com.ussr.pvz.model.engine.session;
 
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.shared.account.AccountState;
 import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.LawnMower;
@@ -25,11 +24,10 @@ import com.ussr.pvz.model.level.chaptereffect.ChapterEffect;
 import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.util.Vec2;
-import com.ussr.pvz.service.SaveService;
+import com.ussr.pvz.server.account.SaveService;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 public class GameSession {
     private boolean progressTracked = true;

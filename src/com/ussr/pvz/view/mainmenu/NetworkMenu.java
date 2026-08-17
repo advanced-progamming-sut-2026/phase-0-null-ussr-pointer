@@ -3,9 +3,9 @@ package com.ussr.pvz.view.mainmenu;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.network.NetworkClient;
-import com.ussr.pvz.network.NetworkRequest;
-import com.ussr.pvz.network.NetworkResponse;
-import com.ussr.pvz.network.RequestType;
+import com.ussr.pvz.shared.network.NetworkRequest;
+import com.ussr.pvz.shared.network.NetworkResponse;
+import com.ussr.pvz.shared.network.RequestType;
 import com.ussr.pvz.view.AppMenu;
 
 import java.io.IOException;

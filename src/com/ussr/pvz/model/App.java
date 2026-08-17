@@ -5,12 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.shared.account.AccountState;
 import com.ussr.pvz.model.account.Collection;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.LevelManager;
 import com.ussr.pvz.model.shop.ShopManager;
-import com.ussr.pvz.service.SaveService;
+import com.ussr.pvz.server.account.SaveService;
 
 import java.io.*;
 import java.lang.reflect.Type;

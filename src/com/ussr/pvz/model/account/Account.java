@@ -3,6 +3,10 @@ package com.ussr.pvz.model.account;
 import com.ussr.pvz.model.greenhouse.Greenhouse;
 import com.ussr.pvz.model.quest.ConfigurableQuest;
 import com.ussr.pvz.model.quest.QuestManager;
+import com.ussr.pvz.shared.account.AccountState;
+import com.ussr.pvz.shared.account.Gender;
+import com.ussr.pvz.shared.account.NewsItem;
+import com.ussr.pvz.shared.account.SecurityQuestion;
 
 import java.time.Instant;
 import java.time.LocalDate;

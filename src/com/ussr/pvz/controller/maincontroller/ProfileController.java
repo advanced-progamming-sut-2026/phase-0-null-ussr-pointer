@@ -1,11 +1,11 @@
 package com.ussr.pvz.controller.maincontroller;
 
 import com.ussr.pvz.controller.command.maincommand.ProfileCommand;
-import com.ussr.pvz.model.dto.ChangeEmailRequest;
-import com.ussr.pvz.model.dto.ChangeNicknameRequest;
-import com.ussr.pvz.model.dto.ChangePasswordRequest;
-import com.ussr.pvz.model.dto.ChangeUsernameRequest;
-import com.ussr.pvz.service.ProfileService;
+import com.ussr.pvz.shared.dto.ChangeEmailRequest;
+import com.ussr.pvz.shared.dto.ChangeNicknameRequest;
+import com.ussr.pvz.shared.dto.ChangePasswordRequest;
+import com.ussr.pvz.shared.dto.ChangeUsernameRequest;
+import com.ussr.pvz.server.account.ProfileService;
 
 import java.util.regex.Matcher;
 

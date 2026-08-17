@@ -3,7 +3,7 @@ package com.ussr.pvztest.service;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.account.AccountState;
+import com.ussr.pvz.shared.account.AccountState;
 import com.ussr.pvz.model.dto.MenuEnterRequest;
 import com.ussr.pvz.service.GlobalService;
 import org.junit.jupiter.api.BeforeEach;

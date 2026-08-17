@@ -2,7 +2,7 @@ package com.ussr.pvz.model.quest;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
-import com.ussr.pvz.model.account.NewsItem;
+import com.ussr.pvz.shared.account.NewsItem;
 
 public class QuestRewardApplier {
 

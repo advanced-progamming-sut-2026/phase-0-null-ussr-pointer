@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.ussr.pvz.controller.maincontroller.NewsController;
-import com.ussr.pvz.model.account.NewsItem;
+import com.ussr.pvz.shared.account.NewsItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

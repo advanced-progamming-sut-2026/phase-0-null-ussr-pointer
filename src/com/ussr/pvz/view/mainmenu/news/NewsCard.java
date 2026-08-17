@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.ussr.pvz.model.account.NewsItem;
+import com.ussr.pvz.shared.account.NewsItem;
 
 public final class NewsCard extends Table {
 

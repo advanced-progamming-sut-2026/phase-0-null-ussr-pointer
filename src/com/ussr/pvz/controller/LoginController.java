@@ -1,10 +1,10 @@
 package com.ussr.pvz.controller;
 
-import com.ussr.pvz.model.dto.AnswerRequest;
-import com.ussr.pvz.model.dto.ForgetPasswordRequest;
-import com.ussr.pvz.model.dto.LoginRequest;
-import com.ussr.pvz.model.dto.LoginResult;
-import com.ussr.pvz.service.LoginService;
+import com.ussr.pvz.shared.dto.AnswerRequest;
+import com.ussr.pvz.shared.dto.ForgetPasswordRequest;
+import com.ussr.pvz.shared.dto.LoginRequest;
+import com.ussr.pvz.shared.dto.LoginResult;
+import com.ussr.pvz.server.account.LoginService;
 
 public final class LoginController {
     private final LoginService service = new LoginService();
