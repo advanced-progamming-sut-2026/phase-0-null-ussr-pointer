@@ -29,10 +29,10 @@ public class ClientHandler implements Runnable {
     private final Socket socket;
     private final AuthService authService;
     private final Gson gson = new Gson();
-
+    private final LobbyManager lobby = LobbyManager.getInstance();
     private BufferedReader reader;
     private PrintWriter writer;
-
+    private String sessionToken;
     private AccountState pendingRegistration;
     private Account pendingPasswordReset;
     private boolean passwordResetAnswerAccepted;
@@ -109,7 +109,15 @@ public class ClientHandler implements Runnable {
             case CHANGE_PASSWORD -> handleChangePassword(request);
 
             case GET_LEADERBOARD -> handleGetLeaderboard(request);
-
+            case GET_ONLINE_PLAYERS -> handleGetOnlinePlayers(request);
+            case SEND_INVITE -> handleSendInvite(request);
+            case CANCEL_INVITE -> handleCancelInvite(request);
+            case RESPOND_INVITE -> handleRespondInvite(request);
+            case CHECK_INVITE -> handleCheckInvite(request);
+            case JOIN_RANDOM_QUEUE -> handleJoinRandomQueue(request);
+            case LEAVE_RANDOM_QUEUE -> handleLeaveRandomQueue(request);
+            case CHECK_RANDOM_MATCH -> handleCheckRandomMatch(request);
+            case CHECK_INVITE_RESULT -> handleCheckInviteResult(request);
             default -> NetworkResponse.error(
                     "Request not implemented."
             );
@@ -157,11 +165,21 @@ public class ClientHandler implements Runnable {
                         serverResult.account().toState()
                 )
         );
+        this.sessionToken = serverResult.token();
+
+        // Register as online immediately after login so other lobby
+        // clients can see this player without waiting for them to open
+        // the lobby screen themselves.
+        lobby.playerEntered(
+                serverResult.token(),
+                serverResult.account()
+        );
 
         return NetworkResponse.success(
                 result.message(),
                 data
         );
+
     }
 
     // =========================================================
@@ -688,6 +706,10 @@ public class ClientHandler implements Runnable {
     }
 
     private void closeConnection() {
+        if (sessionToken != null) {
+            lobby.playerLeft(sessionToken);
+            sessionToken = null;
+        }
         try {
             if (reader != null) {
                 reader.close();
@@ -706,5 +728,211 @@ public class ClientHandler implements Runnable {
             }
         } catch (IOException ignored) {
         }
+    }
+
+    private NetworkResponse handleGetOnlinePlayers(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        java.util.List<LobbyManager.OnlinePlayerInfo> players =
+                lobby.getOnlinePlayers();
+
+        com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
+        for (LobbyManager.OnlinePlayerInfo info : players) {
+            if (!info.token().equals(request.getToken())) {
+                com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
+                obj.addProperty("username", info.username());
+                arr.add(obj);
+            }
+        }
+
+        com.google.gson.JsonObject data = new com.google.gson.JsonObject();
+        data.add("players", arr);
+
+        return NetworkResponse.success("Online players fetched.", data);
+    }
+
+    // =========================================================
+    // LOBBY — SEND INVITE
+    // =========================================================
+
+    private NetworkResponse handleSendInvite(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        if (request.getData() == null ||
+                !request.getData().has("invitedUsername")) {
+            return NetworkResponse.error("Missing invitedUsername.");
+        }
+
+        String invitedUsername =
+                request.getData().get("invitedUsername").getAsString();
+
+        String error = lobby.sendInvite(
+                request.getToken(),
+                invitedUsername
+        );
+
+        if (error != null) {
+            return NetworkResponse.error(error);
+        }
+
+        return NetworkResponse.success(
+                "Invite sent to " + invitedUsername + "."
+        );
+    }
+
+    // =========================================================
+    // LOBBY — CANCEL INVITE
+    // =========================================================
+
+    private NetworkResponse handleCancelInvite(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        lobby.cancelInviteByInviter(request.getToken());
+
+        return NetworkResponse.success("Invite cancelled.");
+    }
+
+    // =========================================================
+    // LOBBY — RESPOND TO INVITE (accept / reject)
+    // =========================================================
+
+    private NetworkResponse handleRespondInvite(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        if (request.getData() == null ||
+                !request.getData().has("accepted")) {
+            return NetworkResponse.error("Missing 'accepted' field.");
+        }
+
+        boolean accepted =
+                request.getData().get("accepted").getAsBoolean();
+
+        String error = lobby.respondToInvite(
+                request.getToken(),
+                accepted
+        );
+
+        if (error != null) {
+            return NetworkResponse.error(error);
+        }
+
+        return NetworkResponse.success(
+                accepted ? "Invite accepted." : "Invite rejected."
+        );
+    }
+
+    // =========================================================
+    // LOBBY — POLL FOR INCOMING INVITE
+    // =========================================================
+
+    private NetworkResponse handleCheckInvite(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        LobbyManager.PendingInvite invite =
+                lobby.getInviteFor(request.getToken());
+
+        com.google.gson.JsonObject data = new com.google.gson.JsonObject();
+
+        if (invite == null) {
+            data.addProperty("hasInvite", false);
+        } else {
+            data.addProperty("hasInvite", true);
+            data.addProperty("fromUsername", invite.inviterUsername());
+        }
+
+        return NetworkResponse.success("Invite check done.", data);
+    }
+
+    // =========================================================
+    // LOBBY — JOIN RANDOM QUEUE
+    // =========================================================
+
+    private NetworkResponse handleJoinRandomQueue(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        // Make sure this player is registered as online
+        Account me = authService
+                .getProfileService()
+                .getAccount(request.getToken());
+
+        if (me != null) {
+            lobby.playerEntered(request.getToken(), me);
+        }
+
+        boolean ok = lobby.joinRandomQueue(request.getToken());
+
+        if (!ok) {
+            return NetworkResponse.error("Could not join queue.");
+        }
+
+        return NetworkResponse.success("Joined matchmaking queue.");
+    }
+
+    // =========================================================
+    // LOBBY — LEAVE RANDOM QUEUE
+    // =========================================================
+
+    private NetworkResponse handleLeaveRandomQueue(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        lobby.leaveRandomQueue(request.getToken());
+
+        return NetworkResponse.success("Left matchmaking queue.");
+    }
+
+    // =========================================================
+    // LOBBY — POLL FOR RANDOM MATCH
+    // =========================================================
+
+    private NetworkResponse handleCheckRandomMatch(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        String opponent = lobby.pollRandomMatch(request.getToken());
+
+        com.google.gson.JsonObject data = new com.google.gson.JsonObject();
+
+        if (opponent == null) {
+            data.addProperty("matched", false);
+        } else {
+            data.addProperty("matched", true);
+            data.addProperty("opponentUsername", opponent);
+        }
+
+        return NetworkResponse.success("Random match check done.", data);
+    }
+
+    private NetworkResponse handleCheckInviteResult(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        String result = lobby.pollInviteResult(request.getToken());
+
+        com.google.gson.JsonObject data = new com.google.gson.JsonObject();
+
+        if (result == null) {
+            data.addProperty("hasResult", false);
+        } else {
+            data.addProperty("hasResult", true);
+            data.addProperty("result", result); // "ACCEPTED" or "REJECTED"
+        }
+
+        return NetworkResponse.success("Invite result check done.", data);
     }
 }

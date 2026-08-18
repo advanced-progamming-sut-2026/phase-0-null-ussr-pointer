@@ -24,7 +24,15 @@ public enum RequestType {
 
     FIND_RANDOM_MATCH,
     CANCEL_RANDOM_MATCH,
-
+    GET_ONLINE_PLAYERS,      // client polls for the online-player list
+    SEND_INVITE,             // client → server: invite a specific username
+    CANCEL_INVITE,           // client → server: withdraw a sent invite
+    RESPOND_INVITE,          // client → server: accept or reject an incoming invite
+    CHECK_INVITE,            // client polls for any pending invite aimed at this client
+    JOIN_RANDOM_QUEUE,       // client → server: join the matchmaking queue
+    LEAVE_RANDOM_QUEUE,      // client → server: leave the matchmaking queue
+    CHECK_RANDOM_MATCH,
+    CHECK_INVITE_RESULT,
     CHALLENGE_PLAYER,
     ACCEPT_CHALLENGE,
     REJECT_CHALLENGE,

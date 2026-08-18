@@ -15,7 +15,8 @@ public enum MenuState {
     CHOOSE_PLANT("choose plant"),
     COLLECTION("collection"),
     LEVEL_SELECTION("Level Selection Menu"),
-    SHOP("shop");
+    SHOP("shop"),
+    LOBBY("lobby");
 
     private String name;
 
@@ -41,6 +42,7 @@ public enum MenuState {
             case COLLECTION, GREENHOUSE, LEADERBOARD,
                  CHOOSE_PLANT, LEVEL_SELECTION -> GAME;
             case SHOP -> GREENHOUSE;
+            case LOBBY  -> GAME;
             case REGISTER, MAIN -> null;
         };
     }

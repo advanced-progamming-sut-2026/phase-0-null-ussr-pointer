@@ -10,7 +10,7 @@ public final class MenuMusicResolver {
 
     public static MusicTrack resolve(MenuState state) {
         return switch (state) {
-            case LOGIN, REGISTER, MAIN, NEWS, PROFILE, SETTING ->
+            case LOGIN, REGISTER, MAIN, NEWS, PROFILE, SETTING,LOBBY ->
                     MusicTrack.STARTUP;
             case GAME -> App.getGameSession() == null
                     ? MusicTrack.WORLD_MAP

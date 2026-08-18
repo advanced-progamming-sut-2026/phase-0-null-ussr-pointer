@@ -22,6 +22,7 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.network.NetworkClient;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.hud.DebugOverlay;
+import com.ussr.pvz.view.hud.GlobalInviteOverlay;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
 import com.ussr.pvz.view.hud.MenuDebugHud;
 import com.ussr.pvz.view.loading.LoadingOverlay;
@@ -65,6 +66,7 @@ public class AppView implements ApplicationListener {
     private static final float GAME_WORLD_WIDTH = 1920f;
     private static final float GAME_WORLD_HEIGHT = 1080f;
     private final GlobalController globalController = new GlobalController();
+    private GlobalInviteOverlay globalInviteOverlay;
     private Stage stage;
     private Skin skin;
     private NotificationOverlay notificationOverlay;
@@ -127,6 +129,8 @@ public class AppView implements ApplicationListener {
 
         loadingOverlay = new LoadingOverlay(skin);
         stage.addActor(loadingOverlay);
+        globalInviteOverlay = new GlobalInviteOverlay(skin);
+        stage.addActor(globalInviteOverlay);
 
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
@@ -387,7 +391,12 @@ public class AppView implements ApplicationListener {
                     skin
             )).grow();
             case CHOOSE_PLANT -> screenRoot.add(new ChoosePlantMenu(skin)).grow();
-
+            case LOBBY -> screenRoot.add(
+                    new com.ussr.pvz.view.mainmenu.lobby.LobbyMenu(
+                            skin,
+                            globalInviteOverlay   // pass the overlay reference
+                    )
+            ).grow();
             default -> screenRoot.add(
                     new Label(
                             state.getName(),

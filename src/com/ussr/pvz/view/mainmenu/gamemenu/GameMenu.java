@@ -148,7 +148,20 @@ public class GameMenu extends Table {
                 .size(72f, 72f)
                 .padTop(18f)
                 .padRight(18f);
+        TextButton multiplayerButton = new TextButton("⚔ Multiplayer", skin, "default");
+        multiplayerButton.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                com.ussr.pvz.model.App.setMenuState(
+                        com.ussr.pvz.model.MenuState.LOBBY
+                );
+            }
+        });
 
+        layer.add(multiplayerButton)
+                .height(72f)
+                .padTop(18f)
+                .padRight(18f);
         return layer;
     }
 
