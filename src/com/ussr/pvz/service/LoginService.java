@@ -59,6 +59,8 @@ public class LoginService {
                 loginRequest.password()
         );
 
+        data.addProperty("stayLoggedIn", loginRequest.stayLoggedIn());
+
         NetworkRequest request =
                 new NetworkRequest(
                         RequestType.LOGIN,
@@ -133,9 +135,7 @@ public class LoginService {
              * GlobalService, etc. will all use
              * SessionManager.getToken().
              */
-            SessionManager.saveSession(
-                    token
-            );
+            SessionManager.saveSession(token, loginRequest.stayLoggedIn());
 
 
             /*
@@ -205,6 +205,36 @@ public class LoginService {
                 status,
                 response.getMessage()
         );
+    }
+
+    public LoginResult restoreSession() {
+        String token = SessionManager.getToken();
+        if (token == null || token.isBlank()) {
+            return LoginResult.error("No saved session.");
+        }
+
+        NetworkRequest request = new NetworkRequest(RequestType.AUTH_TOKEN, token, null);
+        NetworkResponse response = send(request);
+
+        if (response == null || !response.isSuccess()) {
+            SessionManager.clearSession(); // stale/expired token — don't keep retrying it
+            return LoginResult.error(response != null ? response.getMessage() : "Could not connect to server.");
+        }
+
+        if (response.getData() == null || !response.getData().has("accountState")) {
+            SessionManager.clearSession();
+            return LoginResult.error("Could not load account data.");
+        }
+
+        try {
+            AccountState state = gson.fromJson(response.getData().get("accountState"), AccountState.class);
+            Account account = new Account(state, new Collection(new ArrayList<>(), new ArrayList<>()));
+            App.login(account);
+            return LoginResult.of(LoginStatus.LOGIN_SUCCESS, "Session restored.");
+        } catch (Exception e) {
+            SessionManager.clearSession();
+            return LoginResult.error("Could not load account data.");
+        }
     }
 
 

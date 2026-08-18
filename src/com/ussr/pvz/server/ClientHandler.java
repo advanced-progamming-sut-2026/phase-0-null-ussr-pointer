@@ -93,6 +93,7 @@ public class ClientHandler implements Runnable {
             case PING -> NetworkResponse.success("PONG");
 
             case LOGIN -> handleLogin(request);
+            case AUTH_TOKEN -> handleAuthToken(request);
             case REGISTER -> handleRegister(request);
             case COMPLETE_REGISTRATION -> handleCompleteRegistration(request);
 
@@ -180,6 +181,24 @@ public class ClientHandler implements Runnable {
                 data
         );
 
+    }
+
+    private NetworkResponse handleAuthToken(NetworkRequest request) {
+        String token = request.getToken();
+
+        Account account = authService.getSessionManager().getAccount(token);
+
+        if (account == null) {
+            return NetworkResponse.error("Session expired.");
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("token", token);
+        data.add("accountState", gson.toJsonTree(account.toState()));
+
+        lobby.playerEntered(token, account);
+
+        return NetworkResponse.success("Session restored.", data);
     }
 
     // =========================================================

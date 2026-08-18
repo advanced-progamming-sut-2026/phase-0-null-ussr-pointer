@@ -16,11 +16,15 @@ import com.ussr.pvz.audio.GameplayMusicCue;
 import com.ussr.pvz.audio.GameplayMusicResolver;
 import com.ussr.pvz.audio.MenuMusicResolver;
 import com.ussr.pvz.audio.MusicTrack;
+import com.ussr.pvz.controller.LoginController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.account.Account;
+import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.network.NetworkClient;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.shared.dto.LoginResult;
+import com.ussr.pvz.shared.dto.enums.LoginStatus;
 import com.ussr.pvz.view.hud.DebugOverlay;
 import com.ussr.pvz.view.hud.GlobalInviteOverlay;
 import com.ussr.pvz.view.hud.GlobalMenuHud;
@@ -103,6 +107,13 @@ public class AppView implements ApplicationListener {
                             "localhost",
                             8080
                     );
+
+            if (SessionManager.isLoggedIn()) {
+                LoginResult restore = new LoginController().restoreSession();
+                if (restore.status() == LoginStatus.LOGIN_SUCCESS) {
+                    App.setMenuState(MenuState.MAIN);
+                }
+            }
         } catch (IOException e) {
             System.err.println(
                     "Could not connect to server: "

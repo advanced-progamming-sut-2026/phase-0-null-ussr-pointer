@@ -36,4 +36,6 @@ public final class LoginController {
                 newPassword
         );
     }
+
+    public LoginResult restoreSession() { return service.restoreSession(); }
 }
