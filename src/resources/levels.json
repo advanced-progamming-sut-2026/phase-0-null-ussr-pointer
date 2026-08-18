@@ -1057,6 +1057,7 @@
             "Chomper",
             "Mega Gatling Pea"
           ],
+          "startingTideColumn": 2,
           "allowedZombies": [
             {
               "id": "ZombieModernAllStar",

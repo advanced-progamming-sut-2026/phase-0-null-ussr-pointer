@@ -80,6 +80,7 @@ public class ZombossController implements EffectStatus {
     // ------------------------------------------------------------------
     private List<String> lastMoveClips = List.of();
     private boolean moveLocked = false;
+    private MoveEntry activeLockingMove = null;
     private String lockedClip = null;
 
     // -------------------------------------------------------------------
@@ -285,7 +286,11 @@ public class ZombossController implements EffectStatus {
                 }
                 lastMoveClips = playingClips;
                 entry.move.execute(this, session, playingClips);
-                entry.cooldownRemaining = entry.cooldown;
+                if (moveLocked) {
+                    activeLockingMove = entry;
+                } else {
+                    entry.cooldownRemaining = entry.cooldown;
+                }
                 return;
             }
         }
@@ -303,6 +308,12 @@ public class ZombossController implements EffectStatus {
 
     public void applyDamage(int rawDamage, GameSession session) {
         if (currentHp <= 0) return;
+
+        if (hasMidGlacier && midGlacier != null
+                && midGlacier.getState() != ZombossMidGlacier.State.DESTROYED) {
+            midGlacier.takeDamage(rawDamage);
+            return;
+        }
 
         currentHp = Math.max(0, currentHp - rawDamage);
 
@@ -616,6 +627,10 @@ public class ZombossController implements EffectStatus {
     public void unlockMoves() {
         this.moveLocked = false;
         this.lockedClip = null;
+        if (activeLockingMove != null) {
+            activeLockingMove.cooldownRemaining = activeLockingMove.cooldown;
+            activeLockingMove = null;
+        }
     }
 
     public boolean isMoveLocked() {

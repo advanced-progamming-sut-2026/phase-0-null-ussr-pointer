@@ -22,34 +22,50 @@ import java.util.Random;
  */
 public class BabySharkProjectile extends ZombieBossProjectile {
 
-    public enum Phase { SWIMMING, SUBMERGING, ATTACKING }
+    public enum Phase { IDLE, SWIMMING, SUBMERGING, ATTACKING }
 
     private static final double FLIGHT_TIME = 1.0;
     private static final double IDLE_LINGER_DURATION = 0.5;
     private static final double SUBMERGE_DURATION = 0.3;
     private static final double PRE_ATTACK_DELAY = 0.5;
     private static final double ATTACK_DURATION = 0.4;
-
     private static final Random RAND = new Random();
 
-    private final int targetRow;
-    private final int targetCol;
+    private final int row;
     private final String idleClip;
+    private int targetRow;
+    private int targetCol;
 
-    private Phase phase = Phase.SWIMMING;
+    private Phase phase = Phase.IDLE;
     private double phaseTimer = 0.0;
     private boolean effectApplied = false;
 
-    public BabySharkProjectile(Vec2 startPos, Vec2 targetPos, int row, int col) {
-        super(startPos, targetPos, FLIGHT_TIME, "ZombossShark");
+    /** Spawns resting in its row, idle, until activate() is called. */
+    public BabySharkProjectile(Vec2 restPosition, int row) {
+        super(restPosition, restPosition, FLIGHT_TIME, "ZombossShark");
+        this.row = row;
         this.targetRow = row;
-        this.targetCol = col;
+        this.targetCol = (int) restPosition.x();
         this.idleClip = RAND.nextBoolean() ? "idle" : "idle2";
+    }
+
+    public int getRow() { return row; }
+    public boolean isIdle() { return phase == Phase.IDLE; }
+
+    /** Ends the idle loop and starts submerge → swim → attack. */
+    public void activate(Vec2 targetPos, int targetRow, int targetCol) {
+        if (phase != Phase.IDLE) return;
+        this.startPosition = this.getPosition();
+        this.targetPosition = targetPos;
+        this.targetRow = targetRow;
+        this.targetCol = targetCol;
+        this.phase = Phase.SWIMMING;
+        this.phaseTimer = 0.0;
     }
 
     @Override
     public void update(float delta) {
-        if (!isAlive) return;
+        if (!isAlive || phase == Phase.IDLE) return; // idle never advances on its own
         phaseTimer += delta;
 
         switch (phase) {
@@ -75,31 +91,26 @@ public class BabySharkProjectile extends ZombieBossProjectile {
                     effectApplied = true;
                 }
                 if (phaseTimer >= PRE_ATTACK_DELAY + ATTACK_DURATION) {
-                    this.isAlive = false;
+                    this.isAlive = false; // shark destroys itself on attack
                 }
             }
+            default -> {}
         }
     }
 
     @Override
     protected void applyDestinationEffect(GameSession session) {
-        if (session.getLawn().getTile(targetRow, targetCol) != null && session.getLawn().getTile(targetRow, targetCol).getType() == TileType.Water) {
+        if (session.getLawn().getTile(targetRow, targetCol) != null
+                && session.getLawn().getTile(targetRow, targetCol).getType() == TileType.Water) {
             session.removePlantAt(targetCol, targetRow);
         }
     }
 
     @Override
-    public void onDestinationReached() {
+    public void onDestinationReached() {}
 
-    }
-
-    public Phase getPhase() {
-        return phase;
-    }
-
-    public String getIdleClip() {
-        return idleClip;
-    }
+    public Phase getPhase() { return phase; }
+    public String getIdleClip() { return idleClip; }
 
     @Override
     public String getPamLocation() {

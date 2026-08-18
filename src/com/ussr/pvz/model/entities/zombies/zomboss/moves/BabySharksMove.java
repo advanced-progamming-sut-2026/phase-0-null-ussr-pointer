@@ -10,17 +10,12 @@ import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossMove;
 import com.ussr.pvz.model.util.Vec2;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class BabySharksMove implements ZombossMove {
-    private final int count;
-    private final Random random = new Random();
+    private final Map<Integer, BabySharkProjectile> rowSharks = new HashMap<>();
 
     public BabySharksMove(Map<String, Object> params) {
-        this.count = BehaviorSpec.getInt(params, "count", 4);
     }
 
     @Override
@@ -28,38 +23,52 @@ public class BabySharksMove implements ZombossMove {
         Lawn lawn = session.getLawn();
         if (lawn == null) return;
 
-        List<int[]> waterCellsWithPlant = new ArrayList<>();
-        List<int[]> waterCells = new ArrayList<>();
+        int rows = lawn.getRows();
+        int cols = lawn.getCols();
 
-        for (int row = 0; row < lawn.getRows(); row++) {
-            for (int col = 0; col < lawn.getCols(); col++) {
-                Cell cell = lawn.getCell(row, col);
-                if (cell == null || cell.getTile() == null
-                        || cell.getTile().getType() != TileType.Water) {
-                    continue;
-                }
+        for (int row = 0; row < rows; row++) {
+            BabySharkProjectile shark = rowSharks.get(row);
 
-                waterCells.add(new int[]{row, col});
-                if (cell.getPlant() != null) {
-                    waterCellsWithPlant.add(new int[]{row, col});
-                }
+            if (shark == null || !shark.isAlive()) {
+                int restCol = rightmostWaterColumn(lawn, row, cols);
+                if (restCol < 0) continue; // no water in this row
+                shark = new BabySharkProjectile(Vec2.of(restCol, row), row);
+                rowSharks.put(row, shark);
+                session.addZombieProjectile(shark);
+            }
+
+            if (!shark.isIdle()) continue; // already mid-attack
+
+            int[] target = findWaterPlantInRow(lawn, row, cols);
+            if (target == null) continue; // nothing to hit — stays idle
+
+            int targetCol = target[1];
+            shark.activate(Vec2.of(targetCol, row), row, targetCol);
+        }
+    }
+
+    private int rightmostWaterColumn(Lawn lawn, int row, int cols) {
+        for (int col = cols - 1; col >= 0; col--) {
+            Cell cell = lawn.getCell(row, col);
+            if (cell != null && cell.getTile() != null
+                    && cell.getTile().getType() == TileType.Water) {
+                return col;
             }
         }
+        return -1;
+    }
 
-        if (waterCells.isEmpty()) {
-            return;
+    private int[] findWaterPlantInRow(Lawn lawn, int row, int cols) {
+        for (int col = 0; col < cols; col++) {
+            Cell cell = lawn.getCell(row, col);
+            if (cell == null || cell.getTile() == null
+                    || cell.getTile().getType() != TileType.Water) {
+                continue;
+            }
+            if (cell.getPlant() != null) {
+                return new int[]{row, col};
+            }
         }
-
-        for (int i = 0; i < count; i++) {
-            int[] target = !waterCellsWithPlant.isEmpty()
-                    ? waterCellsWithPlant.remove(random.nextInt(waterCellsWithPlant.size()))
-                    : waterCells.get(random.nextInt(waterCells.size()));
-
-            int row = target[0];
-            int col = target[1];
-
-            BabySharkProjectile projectile = new BabySharkProjectile(controller.getPrimary().getPosition(), Vec2.of(col, row), row, col);
-            session.addZombieProjectile(projectile);
-        }
+        return null;
     }
 }

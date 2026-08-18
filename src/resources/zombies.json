@@ -2872,6 +2872,9 @@
         "x": 100,
         "y": 130
       },
+      "ZombossDrawOffsetX": -80.0,
+      "ZombossDrawOffsetY": 0.0,
+      "ZombossDrawScale": 1,
       "AttackRect": {
         "mHeight": 95,
         "mWidth": 30,
@@ -3006,6 +3009,9 @@
         "x": 100,
         "y": 130
       },
+      "ZombossDrawOffsetX": -160.0,
+      "ZombossDrawOffsetY": 130.0,
+      "ZombossDrawScale": 0.9,
       "AttackRect": {
         "mHeight": 95,
         "mWidth": 30,
@@ -3128,6 +3134,9 @@
         "x": 100,
         "y": 130
       },
+      "ZombossDrawOffsetX": -100.0,
+      "ZombossDrawOffsetY": 0.0,
+      "ZombossDrawScale": 0.9,
       "AttackRect": {
         "mHeight": 95,
         "mWidth": 30,
@@ -3255,6 +3264,9 @@
         "x": 100,
         "y": 130
       },
+      "ZombossDrawOffsetX": -100.0,
+      "ZombossDrawOffsetY": 0.0,
+      "ZombossDrawScale": 0.9,
       "AttackRect": {
         "mHeight": 95,
         "mWidth": 30,

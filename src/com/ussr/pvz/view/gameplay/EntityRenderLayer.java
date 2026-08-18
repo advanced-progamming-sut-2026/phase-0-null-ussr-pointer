@@ -705,6 +705,7 @@ public class EntityRenderLayer extends Group {
         }
         if (proj instanceof BabySharkProjectile shark) {
             return switch (shark.getPhase()) {
+                case IDLE -> shark.getIdleClip();
                 case SWIMMING -> shark.getIdleClip();
                 case SUBMERGING -> "submerge";
                 case ATTACKING -> "attack";
