@@ -21,8 +21,13 @@ public class BowlingNutProjectile extends Projectile {
     }
 
     public BowlingNutProjectile(Vec2 position, NutType nutType, double verticalSign) {
+        String user = switch (nutType){
+            case NORMAL -> "peashooter";
+            case EXPLODING -> "Citron";
+            case GIANT -> "Bowling Bulb";
+        };
         super(null, position, diagonalVelocity(verticalSign), resolveDamage(nutType), null,
-                null, PlantFactory.createPlantByName("peashooter",1));
+                null, PlantFactory.createPlantByName(user,1));
         this.nutType = nutType;
     }
 
