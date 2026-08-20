@@ -2577,7 +2577,7 @@
       "ZombiePeashooter"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_NUTCRACKER/ZOMBIE_NUTCRACKER.PAM",
     "textureRegion": "",
     "objdata": {
       "ArtCenter": {
@@ -2653,7 +2653,7 @@
       "ZombieWallnut"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_SUMMER_IMP/ZOMBIE_SUMMER_IMP.PAM",
     "textureRegion": "",
     "objdata": {
       "ArtCenter": {
@@ -2724,7 +2724,7 @@
       "ZombieJalapeno"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "",
+    "pamLocation": "768/FULL/ZOMBIES/ZOMBIE_HAMSTERBALL/ZOMBIE_HAMSTERBALL.PAM",
     "textureRegion": "",
     "objdata": {
       "ArtCenter": {
@@ -2796,7 +2796,7 @@
       "ZombieSquash"
     ],
     "objclass": "ZombiePropertySheet",
-    "pamLocation": "",
+    "pamLocation": "768/FULL/ZOMBIE/ZOMBIE_TREADMILL/ZOMBIE_TREADMILL.PAM",
     "textureRegion": "",
     "objdata": {
       "ArtCenter": {

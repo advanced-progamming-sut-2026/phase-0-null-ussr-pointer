@@ -12,8 +12,6 @@ import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.board.structures.OctopusWrap;
 import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.model.entities.items.GroundItem;
-import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
