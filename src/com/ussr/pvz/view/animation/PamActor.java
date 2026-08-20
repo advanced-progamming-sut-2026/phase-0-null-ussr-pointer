@@ -22,6 +22,7 @@ public class PamActor extends Actor {
     protected boolean looping = true;
     protected String currentClipName;
     protected Map<String, Boolean> partVisibility;
+    protected float rotationDegrees = 0f;
 
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
@@ -99,6 +100,14 @@ public class PamActor extends Actor {
         this.offsetX = offsetX;
     }
 
+    public void setRotationDegrees(float rotationDegrees) {
+        this.rotationDegrees = rotationDegrees;
+    }
+
+    public float getRotationDegrees() {
+        return rotationDegrees;
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -130,6 +139,9 @@ public class PamActor extends Actor {
         Matrix4 transform = batch.getTransformMatrix().cpy();
 
         transform.translate(centerX, centerY, 0);
+        if (rotationDegrees != 0f) {
+            transform.rotate(0f, 0f, 1f, rotationDegrees);
+        }
         transform.scale(pamScale, pamScale, 1f);
         batch.setTransformMatrix(transform);
 
