@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.projectiles;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.util.Vec2;
@@ -15,20 +16,50 @@ public class BowlingNutProjectile extends Projectile {
     private int deflectionCount = 0;
 
     private static final double NUT_SPEED = 4.0;
+    private static final float ROLL_SPIN_DEG_PER_SEC_NORMAL = 720f;
+    private static final float ROLL_SPIN_DEG_PER_SEC_EXPLODING = 640f;
+    private static final float ROLL_SPIN_DEG_PER_SEC_GIANT = 420f;
 
     public BowlingNutProjectile(Vec2 position, NutType nutType) {
         this(position, nutType, defaultVerticalSign(position));
     }
 
     public BowlingNutProjectile(Vec2 position, NutType nutType, double verticalSign) {
-        String user = switch (nutType){
-            case NORMAL -> "peashooter";
-            case EXPLODING -> "Citron";
-            case GIANT -> "Bowling Bulb";
+        String ownerPlantName = switch (nutType) {
+            case NORMAL -> "Wall-nut";
+            case EXPLODING -> "Explode-o-nut";
+            case GIANT -> "Tall-nut";
         };
         super(null, position, diagonalVelocity(verticalSign), resolveDamage(nutType), null,
-                null, PlantFactory.createPlantByName(user,1));
+                null, createVisualOwner(ownerPlantName));
         this.nutType = nutType;
+    }
+
+    private static Plant createVisualOwner(String plantName) {
+        Plant owner = PlantFactory.createPlantByName(plantName, 1);
+        owner.setState(Plant.PlantState.ACTIVE);
+        owner.setAlive(true);
+        return owner;
+    }
+
+    public String getVisualPamPath() {
+        return getUser() != null ? getUser().getPamPath() : null;
+    }
+
+    public String getVisualClipName() {
+        return getUser() != null ? getUser().getAnimationClip() : "idle";
+    }
+
+    public float getVisualScale() {
+        return nutType == NutType.GIANT ? 0.6f : 0.4f;
+    }
+
+    public float getRollSpinDegPerSec() {
+        return switch (nutType) {
+            case NORMAL -> ROLL_SPIN_DEG_PER_SEC_NORMAL;
+            case EXPLODING -> ROLL_SPIN_DEG_PER_SEC_EXPLODING;
+            case GIANT -> ROLL_SPIN_DEG_PER_SEC_GIANT;
+        };
     }
 
     private static double defaultVerticalSign(Vec2 position) {

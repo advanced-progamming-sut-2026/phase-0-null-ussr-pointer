@@ -14,6 +14,7 @@ import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
@@ -527,10 +528,21 @@ public class EntityRenderLayer extends Group {
 
         for (Projectile proj : liveProjectiles) {
             ProjectilePamActor actor = projectileActors.computeIfAbsent(proj, p -> {
-                Plant user = p.getUser();
-                String projPam = user != null ? user.getProjectilePam() : null;
-                String hitPam = user != null ? user.getHitPam() : null;
+                String projPam;
+                String hitPam;
+                if (p instanceof BowlingNutProjectile nut) {
+                    projPam = nut.getVisualPamPath();
+                    hitPam = null;
+                } else {
+                    Plant user = p.getUser();
+                    projPam = user != null ? user.getProjectilePam() : null;
+                    hitPam = user != null ? user.getHitPam() : null;
+                }
                 ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
+                if (p instanceof BowlingNutProjectile nut) {
+                    pa.setPamScale(nut.getVisualScale());
+                    pa.setClockwiseSpinDegPerSec(nut.getRollSpinDegPerSec());
+                }
 
                 float[] start = plantProjectileScreenPosition(p);
                 float startX = start[0];

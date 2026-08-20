@@ -10,6 +10,7 @@ public class ProjectilePamActor extends PamActor {
     private final String hitPamPath;   // may be null
     private float hitTimer = 0f;
     private static final float HIT_ANIM_DURATION = 0.5f;
+    private float clockwiseDegPerSec = 0f;
 
     public ProjectilePamActor(PamPlayer player, String projectilePamPath, String hitPamPath) {
         super(player, projectilePamPath != null ? projectilePamPath : "", "idle");
@@ -44,6 +45,10 @@ public class ProjectilePamActor extends PamActor {
         return phase == Phase.DONE;
     }
 
+    public void setClockwiseSpinDegPerSec(float degPerSec) {
+        this.clockwiseDegPerSec = degPerSec;
+    }
+
     @Override
     public void act(float delta) {
         if (phase == Phase.HIT) {
@@ -56,6 +61,10 @@ public class ProjectilePamActor extends PamActor {
         // only tick stateTime while flying or hitting
         if (phase != Phase.DONE) {
             super.act(delta);
+        }
+
+        if (phase == Phase.FLYING && clockwiseDegPerSec != 0f) {
+            setRotationDegrees(getRotationDegrees() - clockwiseDegPerSec * delta);
         }
     }
 
