@@ -78,7 +78,10 @@ public class WallnutBowlingBehavior extends LevelBehavior {
         }
 
         String belt = matched.get();
-        BowlingNutProjectile.NutType type = switch (ChoosePlantService.normalizePlantKey(belt)) {
+        String normalizedKey = ChoosePlantService.normalizePlantKey(belt)
+                .replaceAll("[^A-Z0-9]", "");
+
+        BowlingNutProjectile.NutType type = switch (normalizedKey) {
             case "EXPLODEONUT" -> BowlingNutProjectile.NutType.EXPLODING;
             case "TALLNUT" -> BowlingNutProjectile.NutType.GIANT;
             default -> BowlingNutProjectile.NutType.NORMAL;
