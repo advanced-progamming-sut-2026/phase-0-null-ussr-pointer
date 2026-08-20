@@ -15,39 +15,22 @@ public final class SessionEventPublisher {
     }
 
     public void plantFoodUsed(Plant plant) {
-        eventBus.publish(new GameEvent.PlantFoodUsed(
-                plant.getName(),
-                plant.getLocation().y(),
-                plant.getLocation().x()
-        ));
+        eventBus.publish(new GameEvent.PlantFoodUsed(plant));
     }
 
     public void plantPlanted(Plant plant) {
-        eventBus.publish(new GameEvent.PlantPlanted(
-                plant.getName(),
-                plant.getLocation().y(),
-                plant.getLocation().x()
-        ));
+        eventBus.publish(new GameEvent.PlantPlanted(plant));
     }
 
     public void plantPlucked(Plant plant) {
-        eventBus.publish(new GameEvent.PlantPlucked(
-                plant.getName(),
-                plant.getLocation().y(),
-                plant.getLocation().x()
-        ));
+        eventBus.publish(new GameEvent.PlantPlucked(plant));
     }
 
     public void zombieDied(
             Zombie zombie,
             String killerName
     ) {
-        eventBus.publish(new GameEvent.ZombieDied(
-                zombie.getAlias(),
-                zombie.getPosition().x(),
-                zombie.getPosition().y(),
-                killerName
-        ));
+        eventBus.publish(new GameEvent.ZombieDied(zombie, killerName));
     }
 
     public void graveDestroyed(int row, int column) {

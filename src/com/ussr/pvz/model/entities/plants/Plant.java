@@ -234,11 +234,7 @@ public class Plant extends GameEntity implements Damageable {
 
         App.getGameSession()
                 .getEventBus()
-                .publish(new GameEvent.PlantDied(
-                        name,
-                        (int) getPosition().x(),
-                        (int) getPosition().y()
-                ));
+                .publish(new GameEvent.PlantDied(this));
     }
 
     private void applySpecialDeathEffect() {

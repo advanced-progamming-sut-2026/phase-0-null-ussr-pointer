@@ -1,5 +1,8 @@
 package com.ussr.pvz.model.engine.event;
 
+import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.entities.zombies.Zombie;
+
 public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
         GameEvent.GameOver, GameEvent.GameWon, GameEvent.GlowingZombieDroppedPlantFood,
         GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.PlantDamaged,
@@ -13,7 +16,11 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
         ,GameEvent.MeowScoreMilestone{
 
 
-    record ZombieSpawned(String alias, int lane, int col, boolean isGlowing) implements GameEvent {
+    record ZombieSpawned(Zombie zombie) implements GameEvent {
+        public String alias() { return zombie.getAlias(); }
+        public int lane() { return (int) zombie.getPosition().y(); }
+        public int col() { return (int) zombie.getPosition().x(); }
+        public boolean isGlowing() { return zombie.isGlowing(); }
     }
 
     record SunStartedFalling(String type, int x , int y) implements GameEvent {
@@ -25,7 +32,10 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
     record SunExpired(int x, int y) implements GameEvent {
     }
 
-    record ZombieDied(String alias, double x, double y, String killerPlantName) implements GameEvent {
+    record ZombieDied(Zombie zombie, String killerPlantName) implements GameEvent {
+        public String alias() { return zombie.getAlias(); }
+        public double x() { return zombie.getPosition().x(); }
+        public double y() { return zombie.getPosition().y(); }
     }
 
     record ZombieReachedHouse(int lane) implements GameEvent {
@@ -41,13 +51,22 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
             implements GameEvent {
     }
 
-    record PlantDied(String plantName, int row, int col) implements GameEvent {
+    record PlantDied(Plant plant) implements GameEvent {
+        public String plantName() { return plant.getName(); }
+        public int row() { return plant.getLocation().y(); }
+        public int col() { return plant.getLocation().x(); }
     }
 
-    record PlantPlanted(String plantName, int row, int col) implements GameEvent {
+    record PlantPlanted(Plant plant) implements GameEvent {
+        public String plantName() { return plant.getName(); }
+        public int row() { return plant.getLocation().y(); }
+        public int col() { return plant.getLocation().x(); }
     }
 
-    record PlantPlucked(String plantName, int row, int col) implements GameEvent {
+    record PlantPlucked(Plant plant) implements GameEvent {
+        public String plantName() { return plant.getName(); }
+        public int row() { return plant.getLocation().y(); }
+        public int col() { return plant.getLocation().x(); }
     }
 
     record SunProduced(String plantName, int value, double x, double y) implements GameEvent {
@@ -65,7 +84,10 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
     record PlantFoodDropped(double x, double y) implements GameEvent {
     }
 
-    record PlantFoodUsed(String plantName, int row, int col) implements GameEvent {
+    record PlantFoodUsed(Plant plant) implements GameEvent {
+        public String plantName() { return plant.getName(); }
+        public int row() { return plant.getLocation().y(); }
+        public int col() { return plant.getLocation().x(); }
     }
 
     record ProjectileFired(String plantName, double startX, double startY) implements GameEvent {

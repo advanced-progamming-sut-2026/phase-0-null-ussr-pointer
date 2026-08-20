@@ -1,7 +1,8 @@
 package com.ussr.pvz.model.engine.event;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class GameEventBus {
@@ -16,10 +17,19 @@ public class GameEventBus {
             }
         }
 
-    private final List<Entry<?>> entries = new ArrayList<>();
+    public interface Subscription {
+        void unsubscribe();
+    }
 
-    public <T extends GameEvent> void subscribe(Class<T> eventType, Consumer<T> handler) {
-        entries.add(new Entry<>(eventType, handler));
+    private final List<Entry<?>> entries = new CopyOnWriteArrayList<>();
+
+    public <T extends GameEvent> Subscription subscribe(Class<T> eventType, Consumer<T> handler) {
+        Entry<T> entry = new Entry<>(
+                Objects.requireNonNull(eventType, "eventType"),
+                Objects.requireNonNull(handler, "handler")
+        );
+        entries.add(entry);
+        return () -> entries.remove(entry);
     }
 
     public void publish(GameEvent event) {

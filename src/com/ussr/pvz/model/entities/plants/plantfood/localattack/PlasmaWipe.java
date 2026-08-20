@@ -17,8 +17,7 @@ public class PlasmaWipe extends LocalAttack implements PlantFoodEffect {
 
         for (Zombie z : session.getZombies()) {
             z.setAlive(false);
-            session.getEventBus().publish(new GameEvent.ZombieDied(z.getAlias() , z.getPosition().x() ,
-                    z.getPosition().y(), user.getName()));
+            session.getEventBus().publish(new GameEvent.ZombieDied(z, user.getName()));
         }
     }
 }

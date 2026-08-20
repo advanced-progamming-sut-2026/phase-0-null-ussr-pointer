@@ -250,12 +250,7 @@ public class GameSession {
                 NewsObserver.triggerNewZombie(zombie);
             }
         }
-        eventBus.publish(new GameEvent.ZombieSpawned(
-                zombie.getAlias(),
-                (int) zombie.getPosition().y(),
-                (int) zombie.getPosition().x(),
-                zombie.isGlowing()
-        ));
+        eventBus.publish(new GameEvent.ZombieSpawned(zombie));
     }
 
     public void onZombieReachedEnd() {
@@ -604,11 +599,7 @@ public class GameSession {
     }
 
     public void notifyPlantDied(Plant plant) {
-        eventBus.publish(new GameEvent.PlantDied(
-                plant.getName(),
-                plant.getLocation().y(),
-                plant.getLocation().x()
-        ));
+        eventBus.publish(new GameEvent.PlantDied(plant));
 
         if (level != null && level.getBehavior() != null) {
             level.getBehavior().onPlantDied(this, plant);
