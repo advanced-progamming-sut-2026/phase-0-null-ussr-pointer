@@ -8,5 +8,5 @@ public interface MatchPeer {
     String username();
     void sendMatchStarted(MatchDescriptor descriptor);
     void sendMatchAction(MatchAction action);
-    void sendMatchClosed(String reason);
+    void sendMatchClosed(String matchId, String reason);   // matchId added
 }

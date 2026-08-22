@@ -10,6 +10,7 @@ import com.ussr.pvz.model.util.SessionManager;
 
 import com.ussr.pvz.network.NetworkClient;
 
+import com.ussr.pvz.service.minigame.MultiplayerIZombieService;
 import com.ussr.pvz.shared.account.AccountState;
 import com.ussr.pvz.shared.dto.AnswerRequest;
 import com.ussr.pvz.shared.dto.ForgetPasswordRequest;
@@ -189,6 +190,9 @@ public class LoginService {
                             "Could not load account data."
                     );
                 }
+                NetworkClient.getInstance().setMatchMessageHandler(
+                        MultiplayerIZombieService.getInstance()::dispatch
+                );
 
             } else {
 

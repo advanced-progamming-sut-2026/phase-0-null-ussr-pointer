@@ -308,9 +308,7 @@ public class GlobalInviteOverlay extends Table {
     // ─────────────────────────────────────────────────────────────────────────
 
     private void startMatch() {
-        // TODO: replace with real PvP session init
-        NotificationCenter.info("Starting match…");
-        App.setMenuState(MenuState.LOBBY);
+        App.setMenuState(MenuState.GAME);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
