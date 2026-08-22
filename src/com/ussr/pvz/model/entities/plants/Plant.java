@@ -34,6 +34,7 @@ public class Plant extends GameEntity implements Damageable {
     private double maxRecharge;
     private double recharge;
     private double actionInterval;
+    private double attackOffset = -1.0;
     private int cost;
     private Location location;
     private final ArrayList<Tag> tags = new ArrayList<>();
@@ -120,6 +121,8 @@ public class Plant extends GameEntity implements Damageable {
     private float deathAnimationTimer;
     private float deathImpactTimer;
     private Runnable deathImpactAction;
+    private float pendingAttackTimer;
+    private Runnable pendingAttackAction;
     private boolean mineArmed;
     private float mineRecoverTimer;
     private double defensiveReactionCharge;
@@ -152,6 +155,7 @@ public class Plant extends GameEntity implements Damageable {
         this.cost = blueprint.cost;
         this.damage = blueprint.damage;
         this.actionInterval = blueprint.actionInterval;
+        this.attackOffset = blueprint.attackOffset;
         this.recharge = blueprint.recharge;
         this.maxRecharge = blueprint.maxRecharge;
         this.abilityValue = blueprint.abilityValue;
@@ -210,6 +214,15 @@ public class Plant extends GameEntity implements Damageable {
         if (state == PlantState.INCAPACITATED) {
             animationController.playIncapacitated();
             return;
+        }
+
+        if (pendingAttackAction != null) {
+            pendingAttackTimer -= delta;
+            if (pendingAttackTimer <= 0f) {
+                Runnable attack = pendingAttackAction;
+                pendingAttackAction = null;
+                attack.run();
+            }
         }
 
         lifetime -= delta;
@@ -476,6 +489,20 @@ public class Plant extends GameEntity implements Damageable {
         if (actionIntervalStat != null) actionIntervalStat.setBaseValue((float) actionInterval);
     }
 
+    public double getAttackOffset() {
+        return attackOffset;
+    }
+
+    public void setAttackOffset(double attackOffset) {
+        this.attackOffset = attackOffset;
+    }
+
+    public float getAttackDelay(float defaultSeconds) {
+        return attackOffset >= 0.0
+                ? (float) attackOffset
+                : defaultSeconds;
+    }
+
     public int getCost() {
         return cost;
     }
@@ -708,6 +735,18 @@ public class Plant extends GameEntity implements Damageable {
 
     public void triggerActionAnimation(float duration) {
         animationController.playAttack(name, getCurrentStage(), duration);
+    }
+
+    public void scheduleAttack(float delay, Runnable action) {
+        if (action == null) {
+            return;
+        }
+        if (delay <= 0f) {
+            action.run();
+            return;
+        }
+        pendingAttackTimer = delay;
+        pendingAttackAction = action;
     }
 
     public void triggerProduceAnimation(float duration) {

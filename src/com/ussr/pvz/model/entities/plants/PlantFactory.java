@@ -60,6 +60,10 @@ public class PlantFactory {
         plant.setCost(Math.max(0, result.runtimeCost()));
         plant.setActionInterval(Math.max(0.05, result.runtimeInterval()));
         plant.setDamage(result.runtimeDamage());
+        if (data.containsKey("attackOffset")) {
+            plant.setAttackOffset(
+                    ((Number) data.get("attackOffset")).doubleValue());
+        }
 
         // Set the PAM location/path from the data map
         String pamLocation = (String) data.get("pamLocation");
