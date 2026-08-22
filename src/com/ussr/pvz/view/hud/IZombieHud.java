@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
@@ -24,9 +25,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Vertical zombie-selection panel that replaces {@link SeedBankHud} during
- * i,Zombie minigame levels.  Positioned and sized identically to SeedBankHud
- * (top-left, vertical column) so the HUD layout requires no changes.
+ * Horizontal zombie-selection row shown at the top-right of the screen
+ * during i,Zombie minigame levels, mirroring {@link SeedBankHud} on the
+ * left. In couch play both panels are visible at once so each player sees
+ * only their own side's options.
  *
  * <p>Each card shows the zombie's portrait texture (or a coloured fallback),
  * its sun cost, and a cooldown-style greyed state when the player can't afford
@@ -54,7 +56,7 @@ public class IZombieHud extends Table {
         this.skin       = skin;
         this.textures   = textures;
         this.controller = controller;
-        top().left();
+        top().right();
         setTouchable(Touchable.childrenOnly);
         setVisible(false); // hidden until confirmed IZombie level
 
@@ -63,10 +65,10 @@ public class IZombieHud extends Table {
         Table sunCounter = buildCounter();
 
         cardColumn = new Table();
-        cardColumn.top().left();
+        cardColumn.top().right();
 
-        add(sunCounter).width(100f).height(38f).padBottom(6f).left().row();
-        add(cardColumn).top().left().row();
+        add(sunCounter).width(100f).height(38f).padBottom(6f).right().row();
+        add(cardColumn).top().right().row();
     }
 
     private Table buildCounter() {
@@ -119,7 +121,7 @@ public class IZombieHud extends Table {
 
         LevelBehavior behavior = session.getLevel().getBehavior();
 
-        if (behavior instanceof IZombieBehavior) {
+        if (behavior instanceof IZombieBehavior || behavior instanceof CouchIZombieBehavior) {
             return true;
         }
 
@@ -141,7 +143,7 @@ public class IZombieHud extends Table {
 
             ZombieSlotWidget slot = new ZombieSlotWidget(id, skin, textures, () -> selectZombie(id));
             slots.put(id, slot);
-            cardColumn.add(slot).size(SLOT_W, SLOT_H).padBottom(3f).left().row();
+            cardColumn.add(slot).size(SLOT_W, SLOT_H).padLeft(3f).top();
         }
     }
 

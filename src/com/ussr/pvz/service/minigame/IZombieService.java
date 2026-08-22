@@ -4,6 +4,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 
@@ -13,8 +14,13 @@ public class IZombieService {
         GameSession session = App.getGameSession();
         if (session == null || session.getLawn() == null) return "Game session not active.";
 
-        LevelBehavior behavior = (LevelBehavior) session.getLevel().getBehavior();
-        if (!(behavior instanceof IZombieBehavior iZombieBehavior)) {
+        LevelBehavior behavior = session.getLevel().getBehavior();
+        int redLineColumn;
+        if (behavior instanceof IZombieBehavior iZombieBehavior) {
+            redLineColumn = iZombieBehavior.getRedLineColumn();
+        } else if (behavior instanceof CouchIZombieBehavior couchBehavior) {
+            redLineColumn = couchBehavior.getRedLineColumn();
+        } else {
             return "Current level is not an i,Zombie minigame.";
         }
 
@@ -33,14 +39,18 @@ public class IZombieService {
 
 
         // 2. Validate placement area (must be to the right of the red line)
-        if (x < iZombieBehavior.getRedLineColumn()) {
+        if (x < redLineColumn) {
             return "You can only spawn zombies to the right of the red line (column " +
-                    iZombieBehavior.getRedLineColumn() + " or greater).";
+                    redLineColumn + " or greater).";
         }
 
         // 3. Validate Cost
         int cost = ZombieFactory.getZombieCost(zombieAlias);
-        if (session.getSunCount() < cost) {
+        if (behavior instanceof CouchIZombieBehavior couchBehavior) {
+            if (couchBehavior.getZombieSun() < cost) {
+                return "Not enough sun! " + zombieAlias + " costs " + cost + " sun.";
+            }
+        } else if (session.getSunCount() < cost) {
             return "Not enough sun! " + zombieAlias + " costs " + cost + " sun.";
         }
 
@@ -49,7 +59,11 @@ public class IZombieService {
             Zombie zombie = ZombieFactory.create(zombieAlias, y, x);
 
             // 5. Deduct sun and add to session
-            session.spendSun(cost);
+            if (behavior instanceof CouchIZombieBehavior couchBehavior) {
+                couchBehavior.spendZombieSun(cost);
+            } else {
+                session.spendSun(cost);
+            }
             session.spawnZombie(zombie);
 
             return "Spawned " + zombieAlias + " at (" + x + ", " + y + ").";

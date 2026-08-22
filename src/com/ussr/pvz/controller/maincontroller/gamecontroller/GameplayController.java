@@ -10,6 +10,7 @@ import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
@@ -51,6 +52,9 @@ public final class GameplayController {
     private int beghouledSelectedCol = -1;
 
     private SeedPackDrop heldSeedPack;
+
+    private int zombieCursorColumn = -1;
+    private int zombieCursorRow = 0;
 
     public GameplayController() {
     }
@@ -148,13 +152,45 @@ public final class GameplayController {
         LevelBehavior behavior =
                 session.getLevel().getBehavior();
 
-        if (behavior instanceof IZombieBehavior) {
+        if (behavior instanceof IZombieBehavior
+                || behavior instanceof CouchIZombieBehavior) {
             return true;
         }
 
         return behavior
                 instanceof MultiplayerIZombieBehavior multiplayer
                 && multiplayer.isZombiesPlayer();
+    }
+
+    /**
+     * Couch play runs the plant side (mouse) and the zombie side (keyboard)
+     * at the same time, so neither role should clear the other's selection.
+     */
+    private boolean isCouchMatch() {
+        GameSession session =
+                App.getGameSession();
+
+        return session != null
+                && session.getLevel() != null
+                && session.getLevel().getBehavior()
+                instanceof CouchIZombieBehavior;
+    }
+
+    private CouchIZombieBehavior couchBehavior() {
+        GameSession session =
+                App.getGameSession();
+
+        if (session == null
+                || session.getLevel() == null) {
+            return null;
+        }
+
+        if (session.getLevel().getBehavior()
+                instanceof CouchIZombieBehavior behavior) {
+            return behavior;
+        }
+
+        return null;
     }
 
     // =========================================================
@@ -231,9 +267,12 @@ public final class GameplayController {
 
             /*
              * Plant and zombie selections must never be active at
-             * the same time.
+             * the same time, except in couch play where both sides
+             * act independently and simultaneously.
              */
-            selectedZombieKey = null;
+            if (!isCouchMatch()) {
+                selectedZombieKey = null;
+            }
         }
     }
 
@@ -299,6 +338,18 @@ public final class GameplayController {
                     gridX,
                     gridY,
                     session
+            );
+            return;
+        }
+
+        if (behavior instanceof CouchIZombieBehavior) {
+            /*
+             * In couch play the mouse always drives the plant side;
+             * the zombie side is placed through the keyboard cursor.
+             */
+            handlePlantPlayerClick(
+                    gridX,
+                    gridY
             );
             return;
         }
@@ -652,7 +703,7 @@ public final class GameplayController {
 
         selectedZombieKey = key;
 
-        if (key != null) {
+        if (key != null && !isCouchMatch()) {
             clearPlantControls();
         }
     }
@@ -675,6 +726,72 @@ public final class GameplayController {
                 column,
                 row
         );
+    }
+
+    // =========================================================
+    // Keyboard-driven zombie cursor (couch play)
+    // =========================================================
+
+    public void moveZombieCursor(
+            int deltaColumn,
+            int deltaRow
+    ) {
+        CouchIZombieBehavior behavior = couchBehavior();
+        GameSession session = App.getGameSession();
+
+        if (behavior == null
+                || session == null
+                || session.getLawn() == null
+                || isPaused()) {
+            return;
+        }
+
+        int rows = session.getLawn().getRows();
+        int columns = session.getLawn().getCols();
+
+        if (zombieCursorColumn < 0) {
+            zombieCursorColumn = behavior.getRedLineColumn();
+        }
+
+        int minColumn = behavior.getRedLineColumn();
+        zombieCursorColumn = clamp(
+                zombieCursorColumn + deltaColumn,
+                minColumn,
+                columns - 1
+        );
+        zombieCursorRow = clamp(
+                zombieCursorRow + deltaRow,
+                0,
+                rows - 1
+        );
+    }
+
+    public void confirmZombiePlacement() {
+        if (couchBehavior() == null
+                || zombieCursorColumn < 0) {
+            return;
+        }
+
+        handleIZombieClick(
+                zombieCursorColumn,
+                zombieCursorRow
+        );
+    }
+
+    public int getZombieCursorColumn() {
+        return zombieCursorColumn;
+    }
+
+    public int getZombieCursorRow() {
+        return zombieCursorRow;
+    }
+
+    private static int clamp(
+            int value,
+            int min,
+            int max
+    ) {
+        return Math.max(min, Math.min(max, value));
     }
 
     // =========================================================

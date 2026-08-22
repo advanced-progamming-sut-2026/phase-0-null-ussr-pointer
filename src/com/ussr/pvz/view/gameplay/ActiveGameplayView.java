@@ -18,8 +18,10 @@ import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
 import com.ussr.pvz.view.hud.HoverCursorWidget;
 import com.ussr.pvz.view.hud.InGameHud;
+import com.ussr.pvz.view.hud.KeyboardZombieInputWidget;
 import com.ussr.pvz.view.hud.LawnWidget;
 import com.ussr.pvz.view.hud.VaseBreakerOverlayWidget;
+import com.ussr.pvz.view.hud.ZombieCursorWidget;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 
@@ -91,6 +93,8 @@ public class ActiveGameplayView extends Table implements Disposable {
         layers.add(lawnWidget);   // invisible click target — must stay here for
         // standard gameplay clicks; overlays above it
         // consume their own clicks first.
+        layers.add(new ZombieCursorWidget(controller));
+        layers.add(new KeyboardZombieInputWidget(controller));
         layers.add(inGameHud);
         layers.add(hoverCursor);
         layers.add(new LevelIntroOverlay(

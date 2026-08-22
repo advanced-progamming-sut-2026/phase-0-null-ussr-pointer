@@ -71,20 +71,16 @@ public class InGameHud extends Table implements Disposable {
             }
         });
 
-        // ── Top Row: seed bank (left) | objectives (center) | upgrade | controls (right) ──
+        // ── Top Row: seeds (left) | objectives (center) | upgrade | zombies | controls (right) ──
         Table topRow = new Table();
         topRow.setFillParent(true);
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
 
-        // SeedBankHud and IZombieHud share the same top-left slot.
-        Stack leftHudStack = new Stack();
-        leftHudStack.add(seedBankHud);
-        leftHudStack.add(this.iZombieHud);
-
-        topRow.add(leftHudStack).top().left().pad(0f, 4f, 0f, 0f);
+        topRow.add(seedBankHud).top().left().pad(0f, 4f, 0f, 0f);
         topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
         topRow.add(upgradePanel).top().right().height(82f).padRight(6f);
+        topRow.add(this.iZombieHud).top().right().pad(0f, 0f, 0f, 4f);
 
         // ── Top-right controls: wave bar · debug · pause · meow score ─────────
         // MeowScoreWidget sits below the pause button and is invisible in

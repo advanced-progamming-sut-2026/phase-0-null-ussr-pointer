@@ -3,6 +3,8 @@ package com.ussr.pvz.model.entities.zombies.effect;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
 
 public class SunProducerZombieEffect implements EffectStatus {
     private double currentInterval = 20.0; // Starts slow
@@ -20,10 +22,15 @@ public class SunProducerZombieEffect implements EffectStatus {
 
         timer -= delta;
         if (timer <= 0) {
-            int zRow = (int) zombie.getPosition().y();
-            int zCol = (int) zombie.getPosition().x();
-            ProducedSun sun = new ProducedSun(zCol, zRow, 50, zombie.getAlias());
-            session.addItem(sun);
+            LevelBehavior behavior = session.getLevel() != null ? session.getLevel().getBehavior() : null;
+            if (behavior instanceof CouchIZombieBehavior couchBehavior) {
+                couchBehavior.addZombieSun(50);
+            } else {
+                int zRow = (int) zombie.getPosition().y();
+                int zCol = (int) zombie.getPosition().x();
+                ProducedSun sun = new ProducedSun(zCol, zRow, 50, zombie.getAlias());
+                session.addItem(sun);
+            }
 
             if (currentInterval > minInterval) {
                 currentInterval -= intervalDecrement;

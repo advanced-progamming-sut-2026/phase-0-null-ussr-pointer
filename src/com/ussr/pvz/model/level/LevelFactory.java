@@ -73,6 +73,7 @@ public class LevelFactory {
             case "BeghouledBehavior" -> new BeghouledBehavior(data.targetMatches,
                     data.startingPlants != null ? data.startingPlants : new ArrayList<>());
             case "IZombieBehavior" -> new IZombieBehavior(data.redLineColumn, data.startingSun);
+            case "CouchIZombieBehavior" -> new CouchIZombieBehavior(data.redLineColumn, data.startingSun);
             case "PlantWhatYouGetBehavior" -> {
                 PlantWhatYouGetBehavior behavior = new PlantWhatYouGetBehavior();
                 behavior.setStartingSun(data.startingSun);

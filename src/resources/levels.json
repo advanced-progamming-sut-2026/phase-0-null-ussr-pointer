@@ -1790,6 +1790,41 @@
               "cost": 9000
             }
           ]
+        },
+        {
+          "id": "minigame_izombie_couch",
+          "order": 16,
+          "deliveryStrategy": "regular",
+          "behavior": "CouchIZombieBehavior",
+          "sunFalling": true,
+          "lockedPlants": [],
+          "seedPlants": [],
+          "rewardPlantAliases": [],
+          "redLineColumn": 6,
+          "startingSun": 150,
+          "allowedZombies": [
+            {
+              "id": "ZombieImp",
+              "weight": 700
+            },
+            {
+              "id": "ZombieArmor2",
+              "weight": 500
+            },
+            {
+              "id": "ZombieGargantuar",
+              "weight": 100
+            },
+            {
+              "id": "ZombieProspector",
+              "weight": 300
+            },
+            {
+              "id": "ZombieArmor1",
+              "weight": 400
+            }
+          ],
+          "waves": []
         }
       ]
     },
