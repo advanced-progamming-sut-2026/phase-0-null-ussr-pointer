@@ -21,7 +21,9 @@ import pvz.libpvz.textures.TextureBank;
 // Note: Ensure you import your TextureBank class from libPVZ here.
 // import ...TextureBank;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TravelLogMenu extends FadingMenu {
     private final Skin skin;
@@ -142,6 +144,29 @@ public class TravelLogMenu extends FadingMenu {
         }
     }
 
+    private static String kindLabel(String behaviorSimpleName) {
+        return switch (behaviorSimpleName) {
+            case "WallnutBowlingBehavior" -> "Wall-nut Bowling";
+            case "BeghouledBehavior" -> "Beghouled";
+            case "IZombieBehavior" -> "I, Zombie";
+            case "VaseBreakerBehavior" -> "Vasebreaker";
+            case "NormalBehavior" -> "Zombotany";
+            default -> behaviorSimpleName;
+        };
+    }
+
+    private String kindOf(Level level) {
+        var behavior = level.getBehavior();
+        if (behavior == null) return "Unknown";
+        String simpleName = behavior.getClass().getSimpleName();
+        // Couch co-op i,Zombie is the same minigame kind as solo i,Zombie —
+        // group them under one panel rather than splitting into two.
+        if (simpleName.equals("CouchIZombieBehavior")) {
+            return "IZombieBehavior";
+        }
+        return simpleName;
+    }
+
     private void loadMinigamesPage() {
         contentTable.clearChildren();
         List<Level> minigames = questService.getMinigamesAsList();
@@ -151,17 +176,91 @@ public class TravelLogMenu extends FadingMenu {
             return;
         }
 
+        Map<String, List<Level>> byKind = new LinkedHashMap<>();
+        for (Level level : minigames) {
+            byKind.computeIfAbsent(kindOf(level), k -> new java.util.ArrayList<>()).add(level);
+        }
+
         int columns = 2;
         int currentCount = 0;
 
-        for (Level level : minigames) {
+        for (Map.Entry<String, List<Level>> entry : byKind.entrySet()) {
+            String kind = entry.getKey();
+            List<Level> levelsOfKind = entry.getValue();
+
             Table row = new Table();
             TextureRegion toastRegion = textures.region("IMAGE_UI_QUEST_TOAST_QUEST_TOAST_DEFAULT");
             if (toastRegion != null) {
                 row.setBackground(new TextureRegionDrawable(toastRegion));
             }
 
-            Label lblTitle = new Label("Minigame: " + level.getId(), skin, "medium");
+            Label lblTitle = new Label(kindLabel(kind), skin, "medium");
+            Label lblCount = new Label(levelsOfKind.size() + " level" + (levelsOfKind.size() == 1 ? "" : "s"),
+                    skin, "default");
+            Table textCol = new Table();
+            textCol.add(lblTitle).left().row();
+            textCol.add(lblCount).left();
+
+            TextButton enterBtn = new TextButton("Enter", skin, "green_small");
+            enterBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    loadMinigameLevelsPage(kind, levelsOfKind);
+                }
+            });
+
+            row.add(textCol).expandX().left().pad(15);
+            row.add(enterBtn).right().pad(15);
+
+            contentTable.add(row).expandX().fillX().pad(10);
+            currentCount++;
+
+            if (currentCount >= columns) {
+                contentTable.row();
+                currentCount = 0;
+            }
+        }
+    }
+
+    /** Shows the individual levels within one minigame kind, with a way back to the category list. */
+    private void loadMinigameLevelsPage(String kind, List<Level> levelsOfKind) {
+        contentTable.clearChildren();
+
+        Table header = new Table();
+        TextButton backBtn = new TextButton("< Back", skin, "green_small");
+        backBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                loadMinigamesPage();
+            }
+        });
+        Label headerLabel = new Label(kindLabel(kind), skin, "medium");
+        header.add(backBtn).left().padRight(15);
+        header.add(headerLabel).left().expandX();
+        contentTable.add(header).expandX().fillX().colspan(2).padBottom(10).row();
+
+        int columns = 2;
+        int currentCount = 0;
+        int index = 0;
+
+        for (Level level : levelsOfKind) {
+            Table row = new Table();
+            TextureRegion toastRegion = textures.region("IMAGE_UI_QUEST_TOAST_QUEST_TOAST_DEFAULT");
+            if (toastRegion != null) {
+                row.setBackground(new TextureRegionDrawable(toastRegion));
+            }
+
+            boolean isCouch = level.getBehavior() != null
+                    && level.getBehavior().getClass().getSimpleName().equals("CouchIZombieBehavior");
+            String levelLabel;
+            if (isCouch) {
+                levelLabel = kindLabel(kind) + " Coop";
+            } else {
+                index++;
+                levelLabel = kindLabel(kind) + " " + index;
+            }
+
+            Label lblTitle = new Label(levelLabel, skin, "medium");
             TextButton playBtn = new TextButton("Play", skin, "green_small");
 
             playBtn.addListener(new ClickListener() {
