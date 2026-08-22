@@ -97,7 +97,7 @@ public final class SettingMenu extends Table {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Keys.ESCAPE) {
-                    App.setMenuState(MenuState.MAIN);
+                    closeToPreviousContext();
                     return true;
                 }
                 return false;
@@ -105,6 +105,14 @@ public final class SettingMenu extends Table {
         });
 
         build();
+    }
+
+    private void closeToPreviousContext() {
+        if (App.getGameSession() != null) {
+            App.setMenuState(MenuState.GAME);
+        } else {
+            App.setMenuState(MenuState.MAIN);
+        }
     }
 
     private void build() {
@@ -152,7 +160,7 @@ public final class SettingMenu extends Table {
         t.add(title).width(350f).height(110f).expandX().center();
 
         ImageButton close = imageButton(CLOSE);
-        close.addListener(click(() -> App.setMenuState(MenuState.MAIN)));
+        close.addListener(click(this::closeToPreviousContext));
         t.add(close).size(72f).right();
         return t;
     }

@@ -185,6 +185,9 @@ public final class PauseMenuOverlay extends WidgetGroup {
         TextButton resumeButton =
                 new TextButton("RESUME", style);
 
+        TextButton settingsButton =
+                new TextButton("SETTINGS", style);
+
         TextButton restartButton =
                 new TextButton("RESTART LEVEL", style);
 
@@ -198,6 +201,16 @@ public final class PauseMenuOverlay extends WidgetGroup {
                     Actor actor
             ) {
                 controller.togglePauseMenu();
+            }
+        });
+
+        settingsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(
+                    ChangeEvent event,
+                    Actor actor
+            ) {
+                App.setMenuState(MenuState.SETTING);
             }
         });
 
@@ -229,6 +242,12 @@ public final class PauseMenuOverlay extends WidgetGroup {
         });
 
         panel.add(resumeButton)
+                .width(300f)
+                .height(62f)
+                .padBottom(14f)
+                .row();
+
+        panel.add(settingsButton)
                 .width(300f)
                 .height(62f)
                 .padBottom(14f)
