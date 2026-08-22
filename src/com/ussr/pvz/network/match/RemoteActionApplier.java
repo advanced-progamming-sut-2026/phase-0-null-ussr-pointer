@@ -2,6 +2,7 @@ package com.ussr.pvz.network.match;
 
 import com.google.gson.JsonObject;
 import com.ussr.pvz.model.board.Cell;
+import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -11,16 +12,20 @@ import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.shared.multiplayer.MatchAction;
+import com.ussr.pvz.shared.multiplayer.MatchRole;
 
 import java.util.Objects;
 
 public final class RemoteActionApplier {
     private final GameSession session;
     private final NetworkEntityRegistry registry;
+    private final MatchContext context;
 
-    public RemoteActionApplier(GameSession session, NetworkEntityRegistry registry) {
+    public RemoteActionApplier(GameSession session, NetworkEntityRegistry registry,
+                               MatchContext context) {
         this.session = Objects.requireNonNull(session, "session");
         this.registry = Objects.requireNonNull(registry, "registry");
+        this.context = Objects.requireNonNull(context, "context");
     }
 
     public void apply(MatchAction action) {
@@ -35,9 +40,10 @@ public final class RemoteActionApplier {
             case ZOMBIE_DIED -> removeZombie(payload);
             case MOWER_TRIGGERED -> applyMower(payload);
             case ENTITY_CORRECTION -> applyCorrection(payload);
-            case BRAIN_DAMAGED, BRAIN_EATEN, REACTION, GAME_OVER -> {
-                // Handled by the multiplayer behavior or HUD layer.
-            }
+            case BRAIN_DAMAGED -> applyBrainDamaged(payload);
+            case BRAIN_EATEN -> applyBrainEaten(payload);
+            case GAME_OVER -> applyGameOver(payload);
+            case REACTION -> { /* A presentation-only event. */ }
         }
     }
 
@@ -62,14 +68,17 @@ public final class RemoteActionApplier {
 
     private void removePlant(JsonObject payload) {
         String id = string(payload, "entityId");
-        Plant plant = registry.require(id, Plant.class);
+        Plant plant = registry.find(id, Plant.class).orElse(null);
+        if (plant == null) return;
         Plant.Location location = plant.getLocation();
         session.removePlantAt(location.x(), location.y());
         registry.unregister(id);
     }
 
     private void applyPlantFood(JsonObject payload) {
-        Plant plant = registry.require(string(payload, "entityId"), Plant.class);
+        Plant plant = registry.find(string(payload, "entityId"), Plant.class)
+                .orElse(null);
+        if (plant == null) return;
         if (plant.getPlantFoodEffect() != null) {
             plant.setBuffed(true);
             plant.getPlantFoodEffect().triggerSuperpower(plant, session);
@@ -84,20 +93,27 @@ public final class RemoteActionApplier {
         double x = number(payload, "x");
         Zombie zombie = ZombieFactory.create(string(payload, "alias"), lane, (int) x);
         zombie.setPosition(Vec2.of(x, lane));
-        if (payload.has("isGlowing")) zombie.setGlowing(payload.get("isGlowing").getAsBoolean());
+        boolean glowing = payload.has("isGlowing")
+                && payload.get("isGlowing").getAsBoolean();
+        zombie.setGlowing(glowing);
         registry.register(id, zombie);
         session.spawnZombie(zombie);
+        // spawnZombie may randomly make a zombie glow; the sender is authoritative.
+        zombie.setGlowing(glowing);
     }
 
     private void applyZombieEating(JsonObject payload) {
-        Zombie zombie = registry.require(string(payload, "zombieId"), Zombie.class);
-        registry.require(string(payload, "plantId"), Plant.class);
+        Zombie zombie = registry.find(string(payload, "zombieId"), Zombie.class)
+                .orElse(null);
+        if (zombie == null
+                || registry.find(string(payload, "plantId"), Plant.class).isEmpty()) return;
         zombie.setState(ZombieActivity.EATING);
     }
 
     private void removeZombie(JsonObject payload) {
         String id = string(payload, "entityId");
-        Zombie zombie = registry.require(id, Zombie.class);
+        Zombie zombie = registry.find(id, Zombie.class).orElse(null);
+        if (zombie == null) return;
         zombie.setHp(0);
         zombie.setAlive(false);
         zombie.startDeathTimer();
@@ -115,12 +131,48 @@ public final class RemoteActionApplier {
     }
 
     private void applyCorrection(JsonObject payload) {
-        GameEntity entity = registry.require(string(payload, "entityId"));
+        GameEntity entity = registry.find(string(payload, "entityId")).orElse(null);
+        if (entity == null) return;
         entity.setPosition(Vec2.of(number(payload, "x"), number(payload, "y")));
         entity.setAlive(bool(payload, "alive"));
         int hp = integer(payload, "hp");
         if (entity instanceof Plant plant) plant.setHp(hp);
         else if (entity instanceof Zombie zombie) zombie.setHp(hp);
+    }
+
+    private void applyBrainDamaged(JsonObject payload) {
+        Brain brain = findBrain(payload);
+        if (brain == null || !brain.isAlive()) return;
+
+        int hp = integer(payload, "hp");
+        if (hp < 0) throw new IllegalArgumentException("hp must not be negative");
+        if (hp < brain.getHp()) brain.takeDamage(brain.getHp() - hp);
+    }
+
+    private void applyBrainEaten(JsonObject payload) {
+        Brain brain = findBrain(payload);
+        if (brain != null && brain.isAlive()) brain.takeDamage(brain.getHp());
+    }
+
+    private Brain findBrain(JsonObject payload) {
+        String id = payload.has("entityId")
+                ? string(payload, "entityId")
+                : "brain-" + integer(payload, "lane");
+        return registry.find(id, Brain.class).orElse(null);
+    }
+
+    private void applyGameOver(JsonObject payload) {
+        String winnerName = string(payload, "winnerRole");
+        final MatchRole winner;
+        try {
+            winner = MatchRole.valueOf(winnerName);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("Invalid winnerRole: " + winnerName, exception);
+        }
+
+        if (session.isGameOver()) return;
+        if (winner == context.role()) session.concludeVictory();
+        else session.concludeDefeat();
     }
 
     private Cell requireCell(int row, int col) {

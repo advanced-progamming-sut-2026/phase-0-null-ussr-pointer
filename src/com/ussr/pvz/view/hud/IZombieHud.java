@@ -15,10 +15,9 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
-import com.ussr.pvz.view.util.WhitePixel;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.LinkedHashMap;
@@ -87,12 +86,18 @@ public class IZombieHud extends Table {
         super.act(delta);
 
         GameSession session = App.getGameSession();
-        if (session == null || session.getLevel() == null) { setVisible(false); return; }
-
-        LevelBehavior behavior = session.getLevel().getBehavior();
-        if (!(behavior instanceof IZombieBehavior)) { setVisible(false); return; }
+        if (!shouldShowFor(session)) {
+            if (isVisible()) {
+                clearSelection();
+            }
+            setVisible(false);
+            setTouchable(Touchable.disabled);
+            lastSession = null;
+            return;
+        }
 
         setVisible(true);
+        setTouchable(Touchable.childrenOnly);
 
         if (session != lastSession) {
             rebuildCards(session);
@@ -107,6 +112,21 @@ public class IZombieHud extends Table {
         }
     }
 
+    private boolean shouldShowFor(GameSession session) {
+        if (session == null || session.getLevel() == null) {
+            return false;
+        }
+
+        LevelBehavior behavior = session.getLevel().getBehavior();
+
+        if (behavior instanceof IZombieBehavior) {
+            return true;
+        }
+
+        return behavior instanceof MultiplayerIZombieBehavior multiplayer
+                && multiplayer.isZombiesPlayer();
+    }
+
     // ── Build ─────────────────────────────────────────────────────────────────
 
     private void rebuildCards(GameSession session) {
@@ -117,7 +137,7 @@ public class IZombieHud extends Table {
 
         for (var entry : session.getLevel().getAllowedZombies()) {
             String id = entry.id();
-            if ("SunProducerZombie".equals(id)) continue; // not placeable
+            if ("SunProducerZombie".equalsIgnoreCase(id)) continue; // not placeable
 
             ZombieSlotWidget slot = new ZombieSlotWidget(id, skin, textures, () -> selectZombie(id));
             slots.put(id, slot);

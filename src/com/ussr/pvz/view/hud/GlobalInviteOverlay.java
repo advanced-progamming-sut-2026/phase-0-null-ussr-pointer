@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.LobbyService;
 
@@ -40,13 +39,13 @@ public class GlobalInviteOverlay extends Table {
     private enum OverlayMode {
         HIDDEN,
         INCOMING_INVITE,
-        INVITE_ACCEPTED,
         INVITE_REJECTED,
-        MATCH_FOUND
+        WAITING_FOR_SERVER
     }
 
     private OverlayMode mode = OverlayMode.HIDDEN;
     private String pendingInviteTarget;
+    private String incomingInviter;
     private boolean inRandomQueue = false;
 
     /** Registered by LobbyMenu; null when lobby is not on screen */
@@ -135,7 +134,7 @@ public class GlobalInviteOverlay extends Table {
 
     public void notifyInviteCancelled() {
         this.pendingInviteTarget = null;
-        if (mode == OverlayMode.INVITE_ACCEPTED || mode == OverlayMode.INVITE_REJECTED) {
+        if (mode == OverlayMode.INVITE_REJECTED) {
             hideCard();
         }
     }
@@ -146,9 +145,6 @@ public class GlobalInviteOverlay extends Table {
 
     public void notifyLeftRandomQueue() {
         this.inRandomQueue = false;
-        if (mode == OverlayMode.MATCH_FOUND) {
-            hideCard();
-        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -208,6 +204,7 @@ public class GlobalInviteOverlay extends Table {
     // ─────────────────────────────────────────────────────────────────────────
 
     private void showIncomingInvite(String inviterUsername) {
+        incomingInviter = inviterUsername;
         mode = OverlayMode.INCOMING_INVITE;
         titleLabel.setText("⚔  Game Invite!");
         bodyLabel.setText(inviterUsername + " wants to play against you.");
@@ -222,13 +219,7 @@ public class GlobalInviteOverlay extends Table {
     }
 
     private void showInviteAccepted(String targetUsername) {
-        mode = OverlayMode.INVITE_ACCEPTED;
-        titleLabel.setText("✔  Invite Accepted!");
-        bodyLabel.setText(targetUsername + " accepted!\nGet ready to play.");
-        acceptButton.setVisible(false);
-        rejectButton.setVisible(false);
-        okButton.setVisible(true);
-        showCard();
+        showWaitingForServer(targetUsername + " accepted your invitation.");
     }
 
     private void showInviteRejected(String targetUsername) {
@@ -242,15 +233,17 @@ public class GlobalInviteOverlay extends Table {
     }
 
     private void showMatchFound(String opponentUsername) {
-        mode = OverlayMode.MATCH_FOUND;
-        titleLabel.setText("🎲  Match Found!");
-        bodyLabel.setText("Your opponent:\n" + opponentUsername + "\nReady to play?");
-        acceptButton.setText("▶  Let's go!");
-        acceptButton.getLabel().setColor(new Color(0.3f, 0.9f, 0.3f, 1f));
-        rejectButton.setText("✕  Bail out");
-        rejectButton.getLabel().setColor(new Color(0.9f, 0.3f, 0.3f, 1f));
-        acceptButton.setVisible(true);
-        rejectButton.setVisible(true);
+        showWaitingForServer("Opponent: " + opponentUsername);
+    }
+
+    private void showWaitingForServer(String detail) {
+        mode = OverlayMode.WAITING_FOR_SERVER;
+        titleLabel.setText("Match Confirmed");
+        bodyLabel.setText(
+                detail + "\n\nWaiting for the server to start the match..."
+        );
+        acceptButton.setVisible(false);
+        rejectButton.setVisible(false);
         okButton.setVisible(false);
         showCard();
     }
@@ -260,55 +253,48 @@ public class GlobalInviteOverlay extends Table {
     // ─────────────────────────────────────────────────────────────────────────
 
     private void onAccept() {
-        switch (mode) {
-            case INCOMING_INVITE -> {
-                String error = lobbyService.respondToInvite(true);
-                hideCard();
-                if (error != null) {
-                    NotificationCenter.error(error);
-                } else {
-                    startMatch();
-                }
-            }
-            case MATCH_FOUND -> {
-                hideCard();
-                startMatch();
-            }
-            default -> hideCard();
+        if (mode != OverlayMode.INCOMING_INVITE) {
+            return;
         }
+
+        String error = lobbyService.respondToInvite(true);
+
+        if (error != null) {
+            incomingInviter = null;
+            hideCard();
+            NotificationCenter.error(error);
+            return;
+        }
+
+        String opponent = incomingInviter;
+        incomingInviter = null;
+        showWaitingForServer(
+                opponent == null
+                        ? "Invitation accepted."
+                        : "Opponent: " + opponent
+        );
     }
 
     private void onReject() {
-        switch (mode) {
-            case INCOMING_INVITE -> {
-                lobbyService.respondToInvite(false);
-                hideCard();
-                NotificationCenter.info("Invite declined.");
-            }
-            case MATCH_FOUND -> {
-                lobbyService.leaveRandomQueue();
-                hideCard();
-                NotificationCenter.info("Bailed out of match.");
-            }
-            default -> hideCard();
+        if (mode != OverlayMode.INCOMING_INVITE) {
+            return;
+        }
+
+        String error = lobbyService.respondToInvite(false);
+        incomingInviter = null;
+        hideCard();
+
+        if (error != null) {
+            NotificationCenter.error(error);
+        } else {
+            NotificationCenter.info("Invite declined.");
         }
     }
 
     private void onOk() {
-        OverlayMode previous = mode;
-        hideCard();
-        if (previous == OverlayMode.INVITE_ACCEPTED) {
-            startMatch();
+        if (mode == OverlayMode.INVITE_REJECTED) {
+            hideCard();
         }
-        // INVITE_REJECTED: dismiss only — lobby is already reset by the callback
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Match start
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private void startMatch() {
-        App.setMenuState(MenuState.GAME);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -325,6 +311,7 @@ public class GlobalInviteOverlay extends Table {
 
     private void hideCard() {
         mode = OverlayMode.HIDDEN;
+        incomingInviter = null;
         setTouchable(Touchable.disabled);
         card.clearActions();
         card.addAction(sequence(

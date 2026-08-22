@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ClientHandler implements Runnable, MatchPeer {
 
@@ -39,6 +40,9 @@ public class ClientHandler implements Runnable, MatchPeer {
 
     private BufferedReader reader;
     private PrintWriter writer;
+
+    private final Object writerLock =
+            new Object();
 
     // Single source of truth for the authenticated session.
     // Both MatchPeer.token() and all request handling use this.
@@ -67,30 +71,98 @@ public class ClientHandler implements Runnable, MatchPeer {
     // =========================================================
 
     @Override
-    public String token() { return sessionToken; }
-
-    @Override
-    public String username() { return sessionUsername; }
-
-    @Override
-    public void sendMatchStarted(MatchDescriptor descriptor) {
-        sendPush(MatchServerMessage.started(descriptor));
+    public String token() {
+        return sessionToken;
     }
 
     @Override
-    public void sendMatchAction(MatchAction action) {
-        sendPush(MatchServerMessage.action(action));
+    public String username() {
+        return sessionUsername;
     }
 
     @Override
-    public void sendMatchClosed(String matchId, String reason) {
-        sendPush(MatchServerMessage.closed(matchId, reason));
+    public void sendMatchStarted(
+            MatchDescriptor descriptor
+    ) {
+        sendPush(
+                MatchServerMessage.started(descriptor)
+        );
     }
 
-    /** Thread-safe write of a server-push message (not a response to a request). */
-    private synchronized void sendPush(MatchServerMessage message) {
-        if (writer != null) {
-            writer.println(gson.toJson(message));
+    @Override
+    public void sendMatchAction(
+            MatchAction action
+    ) {
+        sendPush(
+                MatchServerMessage.action(action)
+        );
+    }
+
+    @Override
+    public void sendMatchClosed(
+            String matchId,
+            String reason
+    ) {
+        sendPush(
+                MatchServerMessage.closed(
+                        matchId,
+                        reason
+                )
+        );
+    }
+
+    private void sendPush(
+            MatchServerMessage message
+    ) {
+        Objects.requireNonNull(message, "message");
+
+        try {
+            writeJson(message);
+
+        } catch (IOException exception) {
+            System.err.println(
+                    "[ClientHandler] Failed to push match message: "
+                            + exception.getMessage()
+            );
+
+            closeConnection();
+        }
+    }
+
+    private void sendResponse(
+            NetworkResponse response
+    ) throws IOException {
+        writeJson(
+                Objects.requireNonNull(
+                        response,
+                        "response"
+                )
+        );
+    }
+
+    /**
+     * Every write to the socket must pass through this method.
+     * Match pushes and ordinary responses can originate on different
+     * client-handler threads.
+     */
+    private void writeJson(Object message)
+            throws IOException {
+        synchronized (writerLock) {
+            if (writer == null) {
+                throw new IOException(
+                        "Client writer is not available."
+                );
+            }
+
+            writer.println(
+                    gson.toJson(message)
+            );
+
+            if (writer.checkError()) {
+                throw new IOException(
+                        "Failed to write to client socket."
+                );
+            }
         }
     }
 
@@ -102,27 +174,65 @@ public class ClientHandler implements Runnable, MatchPeer {
     public void run() {
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream())
+                    new InputStreamReader(
+                            socket.getInputStream()
+                    )
             );
-            writer = new PrintWriter(socket.getOutputStream(), true);
+
+            writer = new PrintWriter(
+                    socket.getOutputStream(),
+                    true
+            );
 
             String line;
+
             while ((line = reader.readLine()) != null) {
                 NetworkResponse response;
+
                 try {
-                    NetworkRequest request = gson.fromJson(line, NetworkRequest.class);
-                    response = handleRequest(request);
-                } catch (Exception e) {
-                    response = NetworkResponse.error("Invalid request: " + e.getMessage());
+                    NetworkRequest request =
+                            gson.fromJson(
+                                    line,
+                                    NetworkRequest.class
+                            );
+
+                    response =
+                            handleRequest(request);
+
+                } catch (Exception exception) {
+                    response =
+                            NetworkResponse.error(
+                                    "Invalid request: "
+                                            + safeMessage(exception)
+                            );
                 }
-                writer.println(gson.toJson(response));
+
+                sendResponse(response);
             }
 
-        } catch (IOException e) {
-            System.out.println("Client disconnected: " + socket.getInetAddress());
+        } catch (IOException exception) {
+            if (!socket.isClosed()) {
+                System.out.println(
+                        "Client disconnected: "
+                                + socket.getInetAddress()
+                                + " - "
+                                + exception.getMessage()
+                );
+            }
+
         } finally {
             closeConnection();
         }
+    }
+
+    private static String safeMessage(
+            Exception exception
+    ) {
+        String message = exception.getMessage();
+
+        return message == null || message.isBlank()
+                ? exception.getClass().getSimpleName()
+                : message;
     }
 
     // =========================================================
@@ -226,11 +336,63 @@ public class ClientHandler implements Runnable, MatchPeer {
      * and marks the player as online in the lobby.
      * Called on both fresh login and token restore.
      */
-    private void registerSession(String token, Account account) {
-        this.sessionToken    = token;
-        this.sessionUsername = account.getName();
-        connectedPeers.put(token, this);
-        lobby.playerEntered(token, account);
+    private void registerSession(
+            String token,
+            Account account
+    ) {
+        Objects.requireNonNull(account, "account");
+
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Session token must not be blank."
+            );
+        }
+
+        if (account.getName() == null
+                || account.getName().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Account username must not be blank."
+            );
+        }
+
+        /*
+         * Remove a previous token associated with this same
+         * connection before registering the new session.
+         */
+        String previousToken = sessionToken;
+
+        if (previousToken != null
+                && !previousToken.equals(token)) {
+            connectedPeers.remove(
+                    previousToken,
+                    this
+            );
+
+            lobby.playerLeft(previousToken);
+        }
+
+        sessionToken = token;
+        sessionUsername = account.getName();
+
+        ClientHandler previousConnection =
+                connectedPeers.put(
+                        token,
+                        this
+                );
+
+        /*
+         * If the same account reconnects, close the older socket so
+         * only one connection receives match messages.
+         */
+        if (previousConnection != null
+                && previousConnection != this) {
+            previousConnection.closeConnection();
+        }
+
+        lobby.playerEntered(
+                token,
+                account
+        );
     }
 
     // =========================================================
@@ -353,13 +515,40 @@ public class ClientHandler implements Runnable, MatchPeer {
     // LOGOUT
     // =========================================================
 
-    private NetworkResponse handleLogout(NetworkRequest request) {
-        String token = request.getToken();
-        if (!validSession(token)) {
-            return NetworkResponse.error("Invalid session.");
+    private NetworkResponse handleLogout(
+            NetworkRequest request
+    ) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error(
+                    "Invalid session."
+            );
         }
-        authService.getLoginService().logout(token);
-        return NetworkResponse.success("Logged out successfully.");
+
+        String token = sessionToken;
+
+        /*
+         * Notify and close the active room before clearing the
+         * connection identity.
+         */
+        matchManager.onPeerDisconnected(this);
+
+        authService
+                .getLoginService()
+                .logout(token);
+
+        connectedPeers.remove(
+                token,
+                this
+        );
+
+        lobby.playerLeft(token);
+
+        sessionToken = null;
+        sessionUsername = null;
+
+        return NetworkResponse.success(
+                "Logged out successfully."
+        );
     }
 
     // =========================================================
@@ -504,26 +693,83 @@ public class ClientHandler implements Runnable, MatchPeer {
     // LOBBY — RESPOND TO INVITE
     // =========================================================
 
-    private NetworkResponse handleRespondInvite(NetworkRequest request) {
+    private NetworkResponse handleRespondInvite(
+            NetworkRequest request
+    ) {
         if (!validSession(request.getToken())) {
-            return NetworkResponse.error("Invalid session.");
+            return NetworkResponse.error(
+                    "Invalid session."
+            );
         }
-        if (request.getData() == null || !request.getData().has("accepted")) {
-            return NetworkResponse.error("Missing 'accepted' field.");
+
+        if (request.getData() == null
+                || !request.getData().has("accepted")) {
+            return NetworkResponse.error(
+                    "Missing 'accepted' field."
+            );
         }
 
-        boolean accepted = request.getData().get("accepted").getAsBoolean();
-        String error = lobby.respondToInvite(request.getToken(), accepted);
+        boolean accepted =
+                request.getData()
+                        .get("accepted")
+                        .getAsBoolean();
 
-        if (error != null) return NetworkResponse.error(error);
+        /*
+         * Capture the exact inviter token before respondToInvite()
+         * removes the pending invitation.
+         */
+        LobbyManager.PendingInvite pendingInvite =
+                lobby.getInviteFor(
+                        request.getToken()
+                );
 
-        // If accepted, the invite pair is now in confirmedMatches on both sides.
-        // Trigger room creation immediately so neither peer has to poll.
+        if (pendingInvite == null) {
+            return NetworkResponse.error(
+                    "No pending invite found."
+            );
+        }
+
+        String error =
+                lobby.respondToInvite(
+                        request.getToken(),
+                        accepted
+                );
+
+        if (error != null) {
+            return NetworkResponse.error(error);
+        }
+
         if (accepted) {
-            triggerMatchForInvitePair(request.getToken());
+            String inviterToken =
+                    pendingInvite.inviterToken();
+
+            String recipientToken =
+                    pendingInvite.invitedToken();
+
+            if (!recipientToken.equals(
+                    request.getToken()
+            )) {
+                return NetworkResponse.error(
+                        "Invite recipient does not match the active session."
+                );
+            }
+
+            /*
+             * Deterministic role assignment:
+             * inviter   -> PLANTS
+             * recipient -> ZOMBIES
+             */
+            matchManager.createRoom(
+                    inviterToken,
+                    recipientToken
+            );
         }
 
-        return NetworkResponse.success(accepted ? "Invite accepted." : "Invite rejected.");
+        return NetworkResponse.success(
+                accepted
+                        ? "Invite accepted."
+                        : "Invite rejected."
+        );
     }
 
     /**
@@ -532,41 +778,6 @@ public class ClientHandler implements Runnable, MatchPeer {
      * The invitee's token is known (recipientToken); we find the inviter by
      * scanning confirmedMatches — whoever has this username as opponent.
      */
-    private void triggerMatchForInvitePair(String recipientToken) {
-        // confirmedMatches maps token → opponentUsername.
-        // The recipient's entry was just written; find the inviter by checking
-        // which other online peer's confirmed entry points to the recipient's username.
-        String recipientUsername = sessionUsername; // already set
-
-        // The inviter's token: onlinePlayers entry whose confirmed opponent == recipientUsername.
-        // We look this up through LobbyManager's online list.
-        List<LobbyManager.OnlinePlayerInfo> online = lobby.getOnlinePlayers();
-        for (LobbyManager.OnlinePlayerInfo info : online) {
-            if (info.token().equals(recipientToken)) continue;
-
-            // Poll their confirmed match — if it points to us, they're the inviter.
-            // We don't consume it here (matchManager.createRoom will start the match
-            // and the inviter will get MATCH_STARTED, not a poll response).
-            // Use a non-consuming peek via getOnlinePlayers is not enough;
-            // we need to find who sent the invite.
-            // Simplest: just call createRoom with both tokens; MatchManager is idempotent.
-            // The inviter's token is in connectedPeers keyed by their token.
-            // We identify them by checking if their confirmedMatch opponent == us.
-            ClientHandler candidate = connectedPeers.get(info.token());
-            if (candidate == null) continue;
-
-            // pollRandomMatch is destructive, so we can't use it here.
-            // Instead we rely on the fact that LobbyManager.respondToInvite already
-            // wrote confirmedMatches for BOTH tokens. We create the room with
-            // (inviter=PLANTS, recipient=ZOMBIES) — first-sender gets plants.
-            // We identify the inviter as whoever is NOT the recipient in the pair.
-            // Since we don't have a non-destructive peek, we create the room now
-            // using the first match of a connected peer that has a confirmed entry.
-            // MatchManager.createRoom is synchronized and idempotent (no double rooms).
-            matchManager.createRoom(info.token(), recipientToken);
-            return;
-        }
-    }
 
     // =========================================================
     // LOBBY — CHECK INCOMING INVITE
@@ -705,26 +916,78 @@ public class ClientHandler implements Runnable, MatchPeer {
     // GAME ACTION
     // =========================================================
 
-    private NetworkResponse handleGameAction(NetworkRequest request) {
+    private NetworkResponse handleGameAction(
+            NetworkRequest request
+    ) {
         if (!validSession(request.getToken())) {
-            return NetworkResponse.error("Invalid session.");
+            return NetworkResponse.error(
+                    "Invalid session."
+            );
         }
+
+        /*
+         * The request token must belong to this particular socket.
+         */
+        if (sessionToken == null
+                || !sessionToken.equals(
+                request.getToken()
+        )) {
+            return NetworkResponse.error(
+                    "Session token does not belong to this connection."
+            );
+        }
+
         if (request.getData() == null) {
-            return NetworkResponse.error("Missing command data.");
+            return NetworkResponse.error(
+                    "Missing command data."
+            );
         }
-        MatchCommand cmd = gson.fromJson(request.getData(), MatchCommand.class);
-        matchManager.handleCommand(cmd, sessionToken);
-        return NetworkResponse.success("Action relayed.");
+
+        try {
+            MatchCommand command =
+                    gson.fromJson(
+                            request.getData(),
+                            MatchCommand.class
+                    );
+
+            if (command == null) {
+                return NetworkResponse.error(
+                        "Invalid match command."
+                );
+            }
+
+            matchManager.handleCommand(
+                    command,
+                    sessionToken
+            );
+
+            return NetworkResponse.success(
+                    "Action accepted."
+            );
+
+        } catch (IllegalArgumentException
+                 | IllegalStateException exception) {
+            return NetworkResponse.error(
+                    exception.getMessage() == null
+                            ? "Match command rejected."
+                            : exception.getMessage()
+            );
+        }
     }
 
     // =========================================================
     // HELPERS
     // =========================================================
 
-    private boolean validSession(String token) {
+    private boolean validSession(
+            String token
+    ) {
         return token != null
                 && !token.isBlank()
-                && authService.getLoginService().isLoggedIn(token);
+                && token.equals(sessionToken)
+                && authService
+                .getLoginService()
+                .isLoggedIn(token);
     }
 
     private int getCompletedQuestCount(Account account, QuestType type) {
@@ -751,15 +1014,47 @@ public class ClientHandler implements Runnable, MatchPeer {
     }
 
     private void closeConnection() {
-        if (sessionToken != null) {
-            connectedPeers.remove(sessionToken);
-            lobby.playerLeft(sessionToken);
+        String token = sessionToken;
+
+        /*
+         * Notify MatchManager before clearing sessionToken because
+         * MatchPeer.token() reads this field.
+         */
+        if (token != null) {
             matchManager.onPeerDisconnected(this);
-            sessionToken = null;
+
+            connectedPeers.remove(
+                    token,
+                    this
+            );
+
+            lobby.playerLeft(token);
         }
-        try { if (reader != null) reader.close(); } catch (IOException ignored) {}
-        if (writer != null) writer.close();
-        try { if (socket != null && !socket.isClosed()) socket.close(); }
-        catch (IOException ignored) {}
+
+        sessionToken = null;
+        sessionUsername = null;
+
+        synchronized (writerLock) {
+            if (writer != null) {
+                writer.close();
+                writer = null;
+            }
+        }
+
+        try {
+            if (reader != null) {
+                reader.close();
+            }
+        } catch (IOException ignored) {
+        } finally {
+            reader = null;
+        }
+
+        try {
+            if (!socket.isClosed()) {
+                socket.close();
+            }
+        } catch (IOException ignored) {
+        }
     }
 }

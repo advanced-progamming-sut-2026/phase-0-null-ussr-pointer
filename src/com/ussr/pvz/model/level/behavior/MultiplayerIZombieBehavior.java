@@ -3,7 +3,6 @@ package com.ussr.pvz.model.level.behavior;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
-import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
@@ -18,134 +17,382 @@ import com.ussr.pvz.shared.multiplayer.MatchRole;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
-public class MultiplayerIZombieBehavior extends LevelBehavior {
+public final class MultiplayerIZombieBehavior
+        extends LevelBehavior {
 
-    private static final float MATCH_DURATION_SECONDS = 120f;
+    private static final float MATCH_DURATION_SECONDS =
+            120f;
+
+    private static final int DEFAULT_STARTING_SUN = 150;
+    private static final int SUN_PRODUCER_HP = 1300;
 
     private final int redLineColumn;
     private final int startingSun;
     private final MatchRole localRole;
+    private final long matchStartTimeMillis;
+    private final Random random;
 
-    private float timeRemaining = MATCH_DURATION_SECONDS;
-    private boolean missionFailed = false;
-    private final List<Brain> brains = new ArrayList<>();
-    private final Random random = new Random();
+    private final List<Brain> brains =
+            new ArrayList<>();
+
+    private final List<Zombie> sunProducers =
+            new ArrayList<>();
+
+    private float timeRemaining =
+            MATCH_DURATION_SECONDS;
+
+    private boolean started;
+    private boolean missionFailed;
+    private MatchRole winner;
 
     public MultiplayerIZombieBehavior(
             int redLineColumn,
             int startingSun,
-            MatchRole localRole
+            MatchRole localRole,
+            long seed,
+            long matchStartTimeMillis
     ) {
+        if (redLineColumn < 0) {
+            throw new IllegalArgumentException(
+                    "redLineColumn must not be negative"
+            );
+        }
+
+        if (matchStartTimeMillis <= 0) {
+            throw new IllegalArgumentException(
+                    "matchStartTimeMillis must be positive"
+            );
+        }
+
         this.redLineColumn = redLineColumn;
-        this.startingSun   = startingSun > 0 ? startingSun : 150;
-        this.localRole     = localRole;
-        this.autoWinOnWavesClear   = false;
+        this.startingSun =
+                startingSun > 0
+                        ? startingSun
+                        : DEFAULT_STARTING_SUN;
+
+        this.localRole =
+                Objects.requireNonNull(
+                        localRole,
+                        "localRole"
+                );
+
+        this.matchStartTimeMillis =
+                matchStartTimeMillis;
+
+        /*
+         * Both clients receive the same seed, so initial entity
+         * positions are identical.
+         */
+        this.random = new Random(seed);
+
+        this.autoWinOnWavesClear = false;
         this.waitForManualWaveStart = true;
     }
 
     @Override
     public void onStart(Level level) {
-        // No super.onStart() — we don't want ZombieAIManager or wave start
+        Objects.requireNonNull(level, "level");
 
-        GameSession session = App.getGameSession();
-        if (session == null || session.getLawn() == null) return;
+        if (started) {
+            return;
+        }
+
+        GameSession session =
+                App.getGameSession();
+
+        if (session == null
+                || session.getLawn() == null) {
+            throw new IllegalStateException(
+                    "Cannot start multiplayer behavior "
+                            + "without an active game session and lawn."
+            );
+        }
+
+        int rows = session.getLawn().getRows();
+        int columns = session.getLawn().getCols();
+
+        if (redLineColumn >= columns) {
+            throw new IllegalStateException(
+                    "redLineColumn must be inside the lawn."
+            );
+        }
+
+        started = true;
 
         level.setSunFalling(false);
 
-        int currentSun = session.getSunCount();
-        session.addSun(startingSun - currentSun);
+        synchronizeMatchTimer();
+        initializeSun(session);
 
-        int rows = session.getLawn().getRows();
-        int cols = session.getLawn().getCols();
+        brains.clear();
+        sunProducers.clear();
+
+        /*
+         * GameSession.initClock() creates normal lawnmowers.
+         * Multiplayer i,Zombie replaces them with brains.
+         */
+        removeLawnMowers(session);
 
         placeBrains(session, rows);
-        placeSunProducers(session, rows, cols);
-        // No plants placed — plants player places them manually
+        placeSunProducers(
+                session,
+                rows,
+                columns
+        );
     }
 
-    private void placeBrains(GameSession session, int rows) {
+    private void synchronizeMatchTimer() {
+        long elapsedMillis =
+                Math.max(
+                        0L,
+                        System.currentTimeMillis()
+                                - matchStartTimeMillis
+                );
+
+        float elapsedSeconds =
+                elapsedMillis / 1000f;
+
+        timeRemaining =
+                Math.max(
+                        0f,
+                        MATCH_DURATION_SECONDS
+                                - elapsedSeconds
+                );
+    }
+
+    private void initializeSun(GameSession session) {
+        int difference =
+                startingSun - session.getSunCount();
+
+        if (difference != 0) {
+            session.addSun(difference);
+        }
+    }
+
+    private void removeLawnMowers(
+            GameSession session
+    ) {
+        session.getLawnMowers().forEach(
+                mower -> mower.setAlive(false)
+        );
+
         session.getLawnMowers().clear();
-        for (int r = 0; r < rows; r++) {
+    }
+
+    private void placeBrains(
+            GameSession session,
+            int rows
+    ) {
+        for (int lane = 0; lane < rows; lane++) {
             Brain brain = new Brain();
-            brain.setPosition(Vec2.of(-0.5, r));
+
+            brain.setPosition(
+                    Vec2.of(-0.5, lane)
+            );
+
             brains.add(brain);
             session.registerStructure(brain);
         }
     }
 
-    private void placeSunProducers(GameSession session, int rows, int cols) {
-        int zombieZoneWidth = cols - redLineColumn;
-        if (zombieZoneWidth <= 0) return;
+    private void placeSunProducers(
+            GameSession session,
+            int rows,
+            int columns
+    ) {
+        int zombieZoneWidth =
+                columns - redLineColumn;
 
-        for (int r = 0; r < rows; r++) {
-            int c = redLineColumn + random.nextInt(zombieZoneWidth);
-            Zombie sun = new Zombie("SunProducerZombie", null, false);
-            sun.setMaxHp(1300);
-            sun.setHp(1300);
-            sun.setEatDps(0);
-            sun.setSize(ZombieSize.DEFAULT);
-            sun.setPosition(Vec2.of(c, r));
-            sun.setMoveBehavior(new StationaryMove());
-            sun.setAttackBehavior(new ChompAttack());
-            sun.setDefenseBehavior(new NormalDefense());
-            sun.setEffectStatus(new SunProducerZombieEffect());
-            session.spawnZombie(sun);
+        if (zombieZoneWidth <= 0) {
+            throw new IllegalStateException(
+                    "The zombie placement zone is empty."
+            );
+        }
+
+        for (int lane = 0; lane < rows; lane++) {
+            int column =
+                    redLineColumn
+                            + random.nextInt(
+                            zombieZoneWidth
+                    );
+
+            Zombie producer =
+                    createSunProducer(
+                            lane,
+                            column
+                    );
+
+            sunProducers.add(producer);
+            session.spawnZombie(producer);
         }
     }
 
-    @Override
-    public void tick(GameSession session, double deltaTime) {
-        // No super.tick() — no aiManager
-        if (levelCompleted || session.isGameOver() || missionFailed) return;
+    private Zombie createSunProducer(
+            int lane,
+            int column
+    ) {
+        Zombie producer =
+                new Zombie(
+                        "SunProducerZombie",
+                        null,
+                        false
+                );
 
-        timeRemaining -= (float) deltaTime;
+        producer.setMaxHp(SUN_PRODUCER_HP);
+        producer.setHp(SUN_PRODUCER_HP);
+        producer.setEatDps(0);
+        producer.setSize(ZombieSize.DEFAULT);
+
+        producer.setPosition(
+                Vec2.of(column, lane)
+        );
+
+        producer.setMoveBehavior(
+                new StationaryMove()
+        );
+
+        producer.setAttackBehavior(
+                new ChompAttack()
+        );
+
+        producer.setDefenseBehavior(
+                new NormalDefense()
+        );
+
+        producer.setEffectStatus(
+                new SunProducerZombieEffect()
+        );
+
+        return producer;
+    }
+
+    @Override
+    public void tick(
+            GameSession session,
+            double deltaTime
+    ) {
+        if (!started
+                || levelCompleted
+                || missionFailed
+                || session == null
+                || session.isGameOver()) {
+            return;
+        }
+
+        if (deltaTime > 0) {
+            timeRemaining = Math.max(
+                    0f,
+                    timeRemaining - (float) deltaTime
+            );
+        }
 
         if (allBrainsEaten()) {
-            endMatch(session, MatchRole.ZOMBIES);
+            endMatch(
+                    session,
+                    MatchRole.ZOMBIES
+            );
             return;
         }
 
         if (timeRemaining <= 0f) {
-            endMatch(session, MatchRole.PLANTS);
+            endMatch(
+                    session,
+                    MatchRole.PLANTS
+            );
             return;
         }
 
-        if (zombiePlayerIsStuck(session)) {
-            endMatch(session, MatchRole.PLANTS);
+        /*
+         * Sun is intentionally local. Only the zombies client can
+         * determine whether the zombies player is economically
+         * unable to continue.
+         */
+        if (localRole == MatchRole.ZOMBIES
+                && zombiePlayerIsStuck(session)) {
+            endMatch(
+                    session,
+                    MatchRole.PLANTS
+            );
         }
     }
 
     private boolean allBrainsEaten() {
         return !brains.isEmpty()
-                && brains.stream().noneMatch(Brain::isAlive);
+                && brains.stream()
+                .noneMatch(Brain::isAlive);
     }
 
-    private boolean zombiePlayerIsStuck(GameSession session) {
-        int cheapest = session.getLevel()
-                .getAllowedZombies().stream()
-                .mapToInt(a -> ZombieFactory.getZombieCost(a.id()))
-                .filter(c -> c > 0)
-                .min()
-                .orElse(50);
+    private boolean zombiePlayerIsStuck(
+            GameSession session
+    ) {
+        int cheapestZombieCost =
+                session.getLevel()
+                        .getAllowedZombies()
+                        .stream()
+                        .mapToInt(
+                                allowed ->
+                                        ZombieFactory.getZombieCost(
+                                                allowed.id()
+                                        )
+                        )
+                        .filter(cost -> cost > 0)
+                        .min()
+                        .orElse(50);
 
-        boolean broke = session.getSunCount() < cheapest;
-        boolean noAttackers = session.getZombies().stream()
-                .filter(z -> !"SunProducerZombie".equals(z.getAlias()))
-                .noneMatch(GameEntity::isAlive);
-        boolean noProducers = session.getZombies().stream()
-                .filter(z -> "SunProducerZombie".equals(z.getAlias()))
-                .noneMatch(GameEntity::isAlive);
+        boolean cannotAffordZombie =
+                session.getSunCount()
+                        < cheapestZombieCost;
 
-        return broke && noAttackers && noProducers;
+        boolean hasNoAttackers =
+                session.getZombies()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .filter(zombie ->
+                                !"SunProducerZombie"
+                                        .equalsIgnoreCase(
+                                                zombie.getAlias()
+                                        )
+                        )
+                        .noneMatch(GameEntity::isAlive);
+
+        boolean hasNoProducers =
+                session.getZombies()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .filter(zombie ->
+                                "SunProducerZombie"
+                                        .equalsIgnoreCase(
+                                                zombie.getAlias()
+                                        )
+                        )
+                        .noneMatch(GameEntity::isAlive);
+
+        return cannotAffordZombie
+                && hasNoAttackers
+                && hasNoProducers;
     }
 
-    private void endMatch(GameSession session, MatchRole winner) {
-        if (levelCompleted) return;
-        levelCompleted = true;
+    private void endMatch(
+            GameSession session,
+            MatchRole winner
+    ) {
+        if (levelCompleted
+                || missionFailed
+                || this.winner != null) {
+            return;
+        }
+
+        this.winner =
+                Objects.requireNonNull(
+                        winner,
+                        "winner"
+                );
 
         if (winner == localRole) {
+            levelCompleted = true;
             session.concludeVictory();
         } else {
             missionFailed = true;
@@ -154,8 +401,14 @@ public class MultiplayerIZombieBehavior extends LevelBehavior {
     }
 
     @Override
-    public void onZombieBreach(GameSession session, Zombie zombie) {
-        // Reaching left edge is normal in i,Zombie — brains determine victory
+    public void onZombieBreach(
+            GameSession session,
+            Zombie zombie
+    ) {
+        /*
+         * Reaching the left edge is expected in i,Zombie.
+         * The zombies side wins only when every brain is eaten.
+         */
     }
 
     @Override
@@ -163,8 +416,31 @@ public class MultiplayerIZombieBehavior extends LevelBehavior {
         return missionFailed;
     }
 
+    public boolean isStarted() {
+        return started;
+    }
+
+    public MatchRole getLocalRole() {
+        return localRole;
+    }
+
+    public boolean isPlantsPlayer() {
+        return localRole == MatchRole.PLANTS;
+    }
+
+    public boolean isZombiesPlayer() {
+        return localRole == MatchRole.ZOMBIES;
+    }
+
+    public MatchRole getWinner() {
+        return winner;
+    }
+
     public float getTimeRemaining() {
-        return Math.max(0f, timeRemaining);
+        return Math.max(
+                0f,
+                timeRemaining
+        );
     }
 
     public int getRedLineColumn() {
@@ -173,12 +449,21 @@ public class MultiplayerIZombieBehavior extends LevelBehavior {
 
     public Brain getBrainInLane(int lane) {
         return brains.stream()
-                .filter(b -> (int) b.getPosition().y() == lane)
+                .filter(brain ->
+                        brain.getPosition() != null
+                                && (int) brain
+                                .getPosition()
+                                .y() == lane
+                )
                 .findFirst()
                 .orElse(null);
     }
 
     public List<Brain> getBrains() {
-        return brains;
+        return List.copyOf(brains);
+    }
+
+    public List<Zombie> getSunProducers() {
+        return List.copyOf(sunProducers);
     }
 }

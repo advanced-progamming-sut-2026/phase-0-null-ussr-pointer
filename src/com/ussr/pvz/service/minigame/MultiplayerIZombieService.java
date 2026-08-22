@@ -1,8 +1,12 @@
 package com.ussr.pvz.service.minigame;
 
+import com.badlogic.gdx.Gdx;
 import com.ussr.pvz.model.App;
+import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.board.Lawn;
+import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.network.NetworkClient;
@@ -14,182 +18,394 @@ import com.ussr.pvz.network.match.RemoteActionApplier;
 import com.ussr.pvz.shared.multiplayer.MatchDescriptor;
 import com.ussr.pvz.shared.multiplayer.MatchRole;
 import com.ussr.pvz.shared.multiplayer.MatchServerMessage;
-import com.ussr.pvz.shared.multiplayer.MatchServerMessageType;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-/**
- * Client-side service that bootstraps a multiplayer i,Zombie session
- * from a {@link MatchDescriptor} received from the server.
- *
- * Call {@link #startMatch(MatchDescriptor)} exactly once, on the GL/game thread,
- * after the server sends MATCH_STARTED.
- */
-public class MultiplayerIZombieService {
+public final class MultiplayerIZombieService {
 
-    // ── Layout constants — must match server's level config ───────────────────
-    private static final int ROWS             = 5;
-    private static final int COLS             = 9;
-    private static final int RED_LINE_COLUMN  = 5;
-    private static final int STARTING_SUN     = 150;
+    private static final int ROWS = 5;
+    private static final int COLS = 9;
+    private static final int RED_LINE_COLUMN = 5;
+    private static final int STARTING_SUN = 150;
 
-    // ── Singleton ─────────────────────────────────────────────────────────────
+    private static final List<String> MULTIPLAYER_PLANTS =
+            List.of(
+                    "Peashooter",
+                    "Sunflower",
+                    "WallNut",
+                    "PotatoMine",
+                    "SnowPea"
+            );
+
     private static final MultiplayerIZombieService INSTANCE =
             new MultiplayerIZombieService();
+
+    private NetworkEventBridge activeBridge;
+    private MatchContext activeContext;
+    private NetworkEntityRegistry activeRegistry;
+
+    private MultiplayerIZombieService() {
+    }
 
     public static MultiplayerIZombieService getInstance() {
         return INSTANCE;
     }
 
-    private MultiplayerIZombieService() {}
-
-    // ── Active bridge (kept so we can dispose on match end) ───────────────────
-    private NetworkEventBridge activeBridge;
-
-    // ─────────────────────────────────────────────────────────────────────────
+    /**
+     * Install this handler after login and keep it installed for
+     * the entire authenticated connection.
+     */
+    public void installNetworkHandler() {
+        NetworkClient.getInstance()
+                .setMatchMessageHandler(this::dispatch);
+    }
 
     /**
-     * Bootstraps the full multiplayer session.
-     * Must be called on the LibGDX rendering thread (or inside postRunnable).
+     * Must run on the LibGDX rendering thread.
      */
-    public void startMatch(MatchDescriptor descriptor) {
-        MatchRole role = descriptor.role();
-
-        // 1. Build the game session
-        GameSession session = buildSession(descriptor);
-        App.setGameSession(session);
-
-        // 2. Build network layer
-        MatchContext context         = new MatchContext(descriptor);
-        NetworkEntityRegistry registry = new NetworkEntityRegistry();
-        MatchActionBuffer buffer     = new MatchActionBuffer(descriptor.matchId());
-        RemoteActionApplier applier  = new RemoteActionApplier(session, registry);
-
-        NetworkEventBridge bridge = new NetworkEventBridge(
-                context,
-                session.getEventBus(),
-                registry,
-                buffer,
-                applier,
-                command -> {
-                    try {
-                        NetworkClient.getInstance().sendMatchCommand(command);
-                    } catch (Exception e) {
-                        System.err.println(
-                                "[MultiplayerIZombieService] Failed to send command: "
-                                        + e.getMessage());
-                    }
-                }
+    public void startMatch(
+            MatchDescriptor descriptor
+    ) {
+        Objects.requireNonNull(
+                descriptor,
+                "descriptor"
         );
 
-        this.activeBridge = bridge;
+        /*
+         * Ignore a retransmitted MATCH_STARTED for the current
+         * match.
+         */
+        if (activeContext != null
+                && activeContext.matchId().equals(
+                descriptor.matchId()
+        )
+                && activeContext.isActive()) {
+            return;
+        }
 
-        // 3. Register the bridge as the match-message handler
-        NetworkClient.getInstance().setMatchMessageHandler(bridge::receive);
+        /*
+         * Clean up a previous match before creating another one.
+         */
+        disposeActiveMatch();
 
-        // 4. Wire up session — run onStart (plants + brain setup etc.)
-        Level level = session.getLevel();
-        level.onStart();
+        GameSession session =
+                buildSession(descriptor);
 
-        // 5. Init clock (registers tickables, lawn mowers, etc.)
+        App.setGameSession(session);
+
+        MatchContext context =
+                new MatchContext(descriptor);
+
+        NetworkEntityRegistry registry =
+                new NetworkEntityRegistry();
+
+        MatchActionBuffer buffer =
+                new MatchActionBuffer(
+                        descriptor.matchId()
+                );
+
+        RemoteActionApplier applier =
+                new RemoteActionApplier(
+                        session,
+                        registry,
+                        context
+                );
+
+        NetworkEventBridge bridge =
+                new NetworkEventBridge(
+                        context,
+                        session.getEventBus(),
+                        registry,
+                        buffer,
+                        applier,
+                        command -> {
+                            try {
+                                NetworkClient
+                                        .getInstance()
+                                        .sendMatchCommand(command);
+
+                            } catch (Exception exception) {
+                                System.err.println(
+                                        "[MultiplayerIZombieService] "
+                                                + "Failed to send command: "
+                                                + exception.getMessage()
+                                );
+                            }
+                        }
+                );
+
+        activeContext = context;
+        activeRegistry = registry;
+        activeBridge = bridge;
+
+        /*
+         * initClock() creates ordinary lawnmowers. The multiplayer
+         * behavior then removes them and replaces them with brains.
+         */
         session.initClock();
 
-        // 6. Init the bridge (subscribe to game events)
+        Level level =
+                session.getLevel();
+
+        level.onStart();
+
+        registerInitialEntities(
+                level,
+                registry
+        );
+
+        /*
+         * Subscribe only after initial entities have been created.
+         * Their creation is deterministic and should not produce
+         * outgoing spawn commands.
+         */
         bridge.init();
 
-        // 7. Navigate to gameplay
-        // AppView/the navigation layer will pick this up because
-        // App.getGameSession() is now non-null.
-        // If your project uses a MenuState for this, set it here:
-        // App.setMenuState(MenuState.GAMEPLAY);
+        /*
+         * Keep the service-level dispatcher installed. Do not
+         * replace it with bridge::receive because this service is
+         * responsible for MATCH_STARTED and MATCH_CLOSED.
+         */
+        installNetworkHandler();
+
+        App.setMenuState(MenuState.GAME);
     }
 
-    /**
-     * Call when the match ends (MATCH_CLOSED received, or game over).
-     * Safe to call multiple times.
-     */
-    public void endMatch() {
-        if (activeBridge != null) {
-            activeBridge.dispose();
-            activeBridge = null;
-        }
-        NetworkClient.getInstance().setMatchMessageHandler(null);
-    }
+    private GameSession buildSession(
+            MatchDescriptor descriptor
+    ) {
+        GameSession session =
+                new GameSession();
 
-    // ── Session factory ───────────────────────────────────────────────────────
+        session.setLawn(
+                new Lawn(ROWS, COLS)
+        );
 
-    private GameSession buildSession(MatchDescriptor descriptor) {
-        GameSession session = new GameSession();
+        session.setPlants(
+                new ArrayList<>()
+        );
 
-        // Build a fresh lawn
-        Lawn lawn = new Lawn(ROWS, COLS);
-        session.setLawn(lawn);
-        session.setPlants(new java.util.ArrayList<>());
-        session.setZombies(new java.util.ArrayList<>());
-        session.setItems(new java.util.ArrayList<>());
+        session.setZombies(
+                new ArrayList<>()
+        );
 
-        // Build the level
-        Level level = buildLevel(descriptor);
-        session.setLevel(level);
+        session.setItems(
+                new ArrayList<>()
+        );
 
-        // Progress must not be tracked for multiplayer
+        session.setLevel(
+                buildLevel(descriptor)
+        );
+
         session.setProgressTracked(false);
+
+        if (descriptor.role() == MatchRole.PLANTS) {
+            session.setSelectedPlants(
+                    new ArrayList<>(
+                            MULTIPLAYER_PLANTS
+                    )
+            );
+        } else {
+            session.setSelectedPlants(
+                    new ArrayList<>()
+            );
+        }
 
         return session;
     }
 
-    private Level buildLevel(MatchDescriptor descriptor) {
+    private Level buildLevel(
+            MatchDescriptor descriptor
+    ) {
         Level level = new Level();
-        level.setId(descriptor.levelId());
+
+        level.setId(
+                descriptor.levelId()
+        );
+
         level.setChapter("multiplayer");
         level.setSunFalling(false);
         level.setWaves(List.of());
 
-        // Zombie pool drawn from the actual i,Zombie minigame levels in levels.json.
-        // Weights reflect relative cost/danger — cheaper/weaker zombies have higher weight.
-        level.setAllowedZombies(List.of(
-                new Level.AllowedZombie("ZombieImp",         1000),
-                new Level.AllowedZombie("ZombieDefault",      500),
-                new Level.AllowedZombie("ZombieArmor1",       400),
-                new Level.AllowedZombie("ZombieArmor2",       300),
-                new Level.AllowedZombie("ZombieNewspaper",    250),
-                new Level.AllowedZombie("ZombieExplorer",     250),
-                new Level.AllowedZombie("ZombieCrystalSkull", 200),
-                new Level.AllowedZombie("ZombiePiano",        200),
-                new Level.AllowedZombie("ZombieProspector",   200),
-                new Level.AllowedZombie("ZombieGargantuar",    75)
-        ));
+        level.setAllowedZombies(
+                List.of(
+                        new Level.AllowedZombie(
+                                "ZombieImp",
+                                1000
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieDefault",
+                                500
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieArmor1",
+                                400
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieArmor2",
+                                300
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieNewspaper",
+                                250
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieExplorer",
+                                250
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieCrystalSkull",
+                                200
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombiePiano",
+                                200
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieProspector",
+                                200
+                        ),
+                        new Level.AllowedZombie(
+                                "ZombieGargantuar",
+                                75
+                        )
+                )
+        );
 
-        MultiplayerIZombieBehavior behavior =
+        level.setBehavior(
                 new MultiplayerIZombieBehavior(
                         RED_LINE_COLUMN,
                         STARTING_SUN,
-                        descriptor.role()
-                );
-        level.setBehavior(behavior);
+                        descriptor.role(),
+                        descriptor.seed(),
+                        descriptor.startTimeMillis()
+                )
+        );
 
         return level;
     }
 
-    // ── Incoming server-push dispatch (called from NetworkClient reader thread) ─
+    /**
+     * Both clients create these entities deterministically, so
+     * they must also assign exactly the same network IDs.
+     */
+    private void registerInitialEntities(
+            Level level,
+            NetworkEntityRegistry registry
+    ) {
+        if (!(level.getBehavior()
+                instanceof MultiplayerIZombieBehavior behavior)) {
+            throw new IllegalStateException(
+                    "Incorrect multiplayer level behavior."
+            );
+        }
+
+        for (Brain brain : behavior.getBrains()) {
+            int lane =
+                    (int) brain.getPosition().y();
+
+            registry.register(
+                    "brain-" + lane,
+                    brain
+            );
+        }
+
+        for (Zombie producer :
+                behavior.getSunProducers()) {
+            int lane =
+                    (int) producer.getPosition().y();
+
+            registry.register(
+                    "sun-producer-" + lane,
+                    producer
+            );
+        }
+    }
 
     /**
-     * Feed a raw server-push message into the active match.
-     * The NetworkClient already routes this to the bridge via
-     * setMatchMessageHandler; this method exists as a manual escape hatch.
+     * Called by NetworkClient's dedicated reader thread.
      */
-    public void dispatch(MatchServerMessage message) {
+    public void dispatch(
+            MatchServerMessage message
+    ) {
+        if (message == null) {
+            return;
+        }
+
+        /*
+         * Every branch is posted to the game thread. This ensures
+         * neither the bridge nor the action applier mutates a
+         * GameSession from the socket thread.
+         */
+        Gdx.app.postRunnable(
+                () -> handleOnGameThread(message)
+        );
+    }
+
+    private void handleOnGameThread(
+            MatchServerMessage message
+    ) {
         switch (message.type()) {
-            case MATCH_STARTED -> {
-                // Must post to GL thread if called from network thread
-                com.badlogic.gdx.Gdx.app.postRunnable(
-                        () -> startMatch(message.descriptor())
-                );
+            case MATCH_STARTED ->
+                    startMatch(
+                            message.descriptor()
+                    );
+
+            case MATCH_ACTION -> {
+                if (activeBridge == null
+                        || activeContext == null
+                        || !activeContext
+                        .belongsToThisMatch(message)) {
+                    return;
+                }
+
+                activeBridge.receive(message);
             }
-            case MATCH_ACTION, MATCH_CLOSED -> {
-                if (activeBridge != null) activeBridge.receive(message);
-                if (message.type() == MatchServerMessageType.MATCH_CLOSED) endMatch();
+
+            case MATCH_CLOSED -> {
+                if (activeContext == null
+                        || !activeContext
+                        .belongsToThisMatch(message)) {
+                    return;
+                }
+
+                activeBridge.receive(message);
+                endMatch();
             }
         }
+    }
+
+    public void endMatch() {
+        disposeActiveMatch();
+
+        /*
+         * Keep listening for the next MATCH_STARTED message.
+         */
+        installNetworkHandler();
+    }
+
+    private void disposeActiveMatch() {
+        if (activeBridge != null) {
+            activeBridge.dispose();
+        }
+
+        activeBridge = null;
+        activeContext = null;
+        activeRegistry = null;
+    }
+
+    public boolean hasActiveMatch() {
+        return activeContext != null
+                && activeContext.isActive();
+    }
+
+    public MatchContext getActiveContext() {
+        return activeContext;
+    }
+
+    public NetworkEntityRegistry getActiveRegistry() {
+        return activeRegistry;
     }
 }

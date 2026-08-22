@@ -2,97 +2,403 @@ package com.ussr.pvz.server.match;
 
 import com.ussr.pvz.shared.multiplayer.MatchCommand;
 
+import java.security.SecureRandom;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MatchManager {
+public final class MatchManager {
 
-    private static final String DEFAULT_LEVEL_ID = "multiplayer_izombie";
+    private static final String DEFAULT_LEVEL_ID =
+            "multiplayer_izombie";
 
-    /** matchId → active room */
-    private final Map<String, MatchRoom> rooms = new ConcurrentHashMap<>();
+    private final Map<String, MatchRoom> rooms =
+            new ConcurrentHashMap<>();
 
-    /** token → room (for fast command routing) */
-    private final Map<String, MatchRoom> roomByToken = new ConcurrentHashMap<>();
+    private final Map<String, MatchRoom> roomByToken =
+            new ConcurrentHashMap<>();
 
     /**
-     * token → ClientHandler — injected from PvZServer so we can look up
-     * both peers by token when a match is confirmed.
+     * Used only to create a shared deterministic seed for both
+     * clients. The server still contains no game simulation.
      */
-    private final Map<String, ? extends MatchPeer> connectedPeers;
+    private final SecureRandom seedGenerator =
+            new SecureRandom();
 
-    public MatchManager(Map<String, ? extends MatchPeer> connectedPeers) {
-        this.connectedPeers = connectedPeers;
+    /**
+     * Authenticated token -> connected MatchPeer.
+     */
+    private final Map<
+            String,
+            ? extends MatchPeer
+            > connectedPeers;
+
+    public MatchManager(
+            Map<String, ? extends MatchPeer> connectedPeers
+    ) {
+        this.connectedPeers =
+                Objects.requireNonNull(
+                        connectedPeers,
+                        "connectedPeers"
+                );
     }
 
     /**
-     * Called when LobbyManager has confirmed a match between two tokens.
-     * Looks both peers up in the peer registry, assigns roles, and starts
-     * the room.  Safe to call from any thread.
+     * Creates and starts one room for the supplied players.
      *
-     * @param plantsToken  token of the player who will be PLANTS
-     * @param zombiesToken token of the player who will be ZOMBIES
+     * Existing callers may ignore the returned room.
+     *
+     * @throws IllegalArgumentException if either token is invalid
+     * @throws IllegalStateException if a peer is unavailable or
+     *                               already belongs to another room
      */
-    public synchronized void createRoom(String plantsToken, String zombiesToken) {
-        // Don't create a second room if one already exists for either token
-        if (roomByToken.containsKey(plantsToken)
-                || roomByToken.containsKey(zombiesToken)) {
-            return;
+    public synchronized MatchRoom createRoom(
+            String plantsToken,
+            String zombiesToken
+    ) {
+        requireNonBlank(
+                plantsToken,
+                "plantsToken"
+        );
+
+        requireNonBlank(
+                zombiesToken,
+                "zombiesToken"
+        );
+
+        if (plantsToken.equals(zombiesToken)) {
+            throw new IllegalArgumentException(
+                    "A player cannot be matched with itself."
+            );
         }
 
-        MatchPeer plants  = connectedPeers.get(plantsToken);
-        MatchPeer zombies = connectedPeers.get(zombiesToken);
+        MatchRoom plantsExistingRoom =
+                roomByToken.get(plantsToken);
 
-        if (plants == null || zombies == null) {
-            System.err.println("[MatchManager] Cannot create room — peer(s) not found.");
-            return;
+        MatchRoom zombiesExistingRoom =
+                roomByToken.get(zombiesToken);
+
+        /*
+         * Repeated matchmaking confirmation for the same pair is
+         * idempotent.
+         */
+        if (plantsExistingRoom != null
+                && plantsExistingRoom
+                == zombiesExistingRoom) {
+            return plantsExistingRoom;
         }
 
-        long seed = System.currentTimeMillis();
-        MatchRoom room = new MatchRoom(plants, zombies);
-        rooms.put(room.matchId(), room);
-        roomByToken.put(plantsToken,  room);
-        roomByToken.put(zombiesToken, room);
+        if (plantsExistingRoom != null) {
+            throw new IllegalStateException(
+                    "Plants player is already in a match."
+            );
+        }
 
-        System.out.println("[MatchManager] Match started: "
-                + plants.username()  + " (PLANTS) vs "
-                + zombies.username() + " (ZOMBIES) — "
-                + room.matchId());
+        if (zombiesExistingRoom != null) {
+            throw new IllegalStateException(
+                    "Zombies player is already in a match."
+            );
+        }
 
-        room.start(DEFAULT_LEVEL_ID, seed);
+        MatchPeer plants =
+                connectedPeers.get(plantsToken);
+
+        MatchPeer zombies =
+                connectedPeers.get(zombiesToken);
+
+        if (plants == null) {
+            throw new IllegalStateException(
+                    "Plants player is not connected."
+            );
+        }
+
+        if (zombies == null) {
+            throw new IllegalStateException(
+                    "Zombies player is not connected."
+            );
+        }
+
+        validatePeer(
+                plants,
+                plantsToken,
+                "plants"
+        );
+
+        validatePeer(
+                zombies,
+                zombiesToken,
+                "zombies"
+        );
+
+        MatchRoom room =
+                new MatchRoom(
+                        plants,
+                        zombies
+                );
+
+        /*
+         * Register the room before sending MATCH_STARTED. If a
+         * client sends a command immediately, routing is already
+         * available.
+         */
+        rooms.put(
+                room.matchId(),
+                room
+        );
+
+        roomByToken.put(
+                plantsToken,
+                room
+        );
+
+        roomByToken.put(
+                zombiesToken,
+                room
+        );
+
+        long seed =
+                seedGenerator.nextLong();
+
+        try {
+            room.start(
+                    DEFAULT_LEVEL_ID,
+                    seed
+            );
+
+            System.out.println(
+                    "[MatchManager] Match started: "
+                            + plants.username()
+                            + " (PLANTS) vs "
+                            + zombies.username()
+                            + " (ZOMBIES) - "
+                            + room.matchId()
+            );
+
+            return room;
+
+        } catch (RuntimeException exception) {
+            cleanupRoom(room);
+
+            try {
+                room.close(
+                        "MATCH_START_FAILED"
+                );
+            } catch (RuntimeException ignored) {
+                /*
+                 * The original start exception is more useful.
+                 */
+            }
+
+            throw new IllegalStateException(
+                    "Failed to start match.",
+                    exception
+            );
+        }
     }
 
     /**
-     * Routes a GAME_ACTION command from the given sender token to its room.
+     * Routes a client command to the room containing the sender.
+     *
+     * MatchRoom performs match-ID, role, duplicate-action and
+     * lifecycle validation.
      */
-    public void handleCommand(MatchCommand command, String senderToken) {
-        MatchRoom room = roomByToken.get(senderToken);
+    public void handleCommand(
+            MatchCommand command,
+            String senderToken
+    ) {
+        Objects.requireNonNull(
+                command,
+                "command"
+        );
+
+        requireNonBlank(
+                senderToken,
+                "senderToken"
+        );
+
+        MatchRoom room =
+                roomByToken.get(senderToken);
+
         if (room == null) {
-            System.err.println("[MatchManager] No room for token: " + senderToken);
+            throw new IllegalStateException(
+                    "Player is not currently in a match."
+            );
+        }
+
+        if (!room.hasPeer(senderToken)) {
+            throw new IllegalStateException(
+                    "Player does not belong to the routed room."
+            );
+        }
+
+        try {
+            room.relay(
+                    command,
+                    senderToken
+            );
+
+        } finally {
+            if (room.isClosed()) {
+                cleanupRoom(room);
+            }
+        }
+    }
+
+    /**
+     * Closes a room explicitly by match ID.
+     */
+    public void closeRoom(
+            String matchId,
+            String reason
+    ) {
+        requireNonBlank(
+                matchId,
+                "matchId"
+        );
+
+        requireNonBlank(
+                reason,
+                "reason"
+        );
+
+        MatchRoom room =
+                rooms.get(matchId);
+
+        if (room == null) {
             return;
         }
-        room.relay(command, senderToken);
-        if (room.isClosed()) {
+
+        try {
+            room.close(reason);
+
+        } finally {
             cleanupRoom(room);
         }
     }
 
     /**
-     * Called when a client disconnects.
-     * Closes their room (if any) and notifies the opponent.
+     * Called before the disconnected peer's token is cleared.
      */
-    public void onPeerDisconnected(MatchPeer peer) {
-        if (peer == null || peer.token() == null) return;
+    public void onPeerDisconnected(
+            MatchPeer peer
+    ) {
+        if (peer == null) {
+            return;
+        }
 
-        MatchRoom room = roomByToken.get(peer.token());
-        if (room != null) {
-            room.close("OPPONENT_DISCONNECTED");
+        String token =
+                peer.token();
+
+        if (token == null || token.isBlank()) {
+            return;
+        }
+
+        MatchRoom room =
+                roomByToken.get(token);
+
+        if (room == null) {
+            return;
+        }
+
+        try {
+            room.close(
+                    "OPPONENT_DISCONNECTED"
+            );
+
+        } finally {
             cleanupRoom(room);
         }
     }
 
-    private void cleanupRoom(MatchRoom room) {
-        rooms.remove(room.matchId());
-        roomByToken.values().removeIf(r -> r == room);
+    /**
+     * Allows lobby code to prevent a matched player from joining
+     * another queue or sending another invitation.
+     */
+    public boolean isPlayerInMatch(
+            String token
+    ) {
+        return token != null
+                && roomByToken.containsKey(token);
+    }
+
+    public MatchRoom findRoomByToken(
+            String token
+    ) {
+        if (token == null) {
+            return null;
+        }
+
+        return roomByToken.get(token);
+    }
+
+    public MatchRoom findRoomById(
+            String matchId
+    ) {
+        if (matchId == null) {
+            return null;
+        }
+
+        return rooms.get(matchId);
+    }
+
+    public int activeRoomCount() {
+        return rooms.size();
+    }
+
+    private void cleanupRoom(
+            MatchRoom room
+    ) {
+        if (room == null) {
+            return;
+        }
+
+        /*
+         * Conditional removal prevents cleanup of an old room
+         * from accidentally removing a player's newer room.
+         */
+        rooms.remove(
+                room.matchId(),
+                room
+        );
+
+        roomByToken.entrySet().removeIf(
+                entry -> entry.getValue() == room
+        );
+    }
+
+    private static void validatePeer(
+            MatchPeer peer,
+            String expectedToken,
+            String peerName
+    ) {
+        if (peer.token() == null
+                || !expectedToken.equals(
+                peer.token()
+        )) {
+            throw new IllegalStateException(
+                    peerName
+                            + " peer token does not match "
+                            + "the connected-peer registry."
+            );
+        }
+
+        if (peer.username() == null
+                || peer.username().isBlank()) {
+            throw new IllegalStateException(
+                    peerName
+                            + " peer has no username."
+            );
+        }
+    }
+
+    private static void requireNonBlank(
+            String value,
+            String name
+    ) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(
+                    name + " must not be blank"
+            );
+        }
     }
 }

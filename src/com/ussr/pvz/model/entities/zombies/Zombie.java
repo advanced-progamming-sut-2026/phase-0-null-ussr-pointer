@@ -20,6 +20,7 @@ import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.util.Vec2;
 
 import java.util.*;
@@ -307,11 +308,21 @@ public class Zombie extends GameEntity implements Damageable {
 
     public Damageable acquireTarget(GameSession session) {
         if (this.getPosition().x() <= -0.5) {
-            if (session.getLevel() != null && session.getLevel().getBehavior() instanceof IZombieBehavior izb) {
-                Brain b = izb.getBrainInLane((int) this.getPosition().y());
-                if (b != null && b.isAlive()) {
-                    return b;
+            Brain brain = null;
+
+            if (session.getLevel() != null) {
+                int lane = (int) this.getPosition().y();
+                Object behavior = session.getLevel().getBehavior();
+
+                if (behavior instanceof IZombieBehavior iZombie) {
+                    brain = iZombie.getBrainInLane(lane);
+                } else if (behavior instanceof MultiplayerIZombieBehavior multiplayer) {
+                    brain = multiplayer.getBrainInLane(lane);
                 }
+            }
+
+            if (brain != null && brain.isAlive()) {
+                return brain;
             }
         }
 

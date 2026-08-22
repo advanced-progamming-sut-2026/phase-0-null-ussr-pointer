@@ -10,44 +10,54 @@ import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
 import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
 import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
-import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.service.game.GameService;
 import com.ussr.pvz.service.minigame.BeghouledService;
 import com.ussr.pvz.service.minigame.IZombieService;
 import com.ussr.pvz.service.minigame.VaseBreakerService;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 
-public class GameplayController {
+public final class GameplayController {
 
-    private final GameService      gameService      = new GameService();
-    private final BeghouledService beghouledService = new BeghouledService();
-    private final VaseBreakerService vaseBreakerService = new VaseBreakerService();
-    private final IZombieService   iZombieService   = new IZombieService();
+    private final GameService gameService =
+            new GameService();
+
+    private final BeghouledService beghouledService =
+            new BeghouledService();
+
+    private final VaseBreakerService vaseBreakerService =
+            new VaseBreakerService();
+
+    private final IZombieService iZombieService =
+            new IZombieService();
 
     private boolean manuallyPaused;
     private boolean dialoguePaused;
-    private boolean shovelModeActive    = false;
-    private boolean plantFoodModeActive = false;
-    private String  selectedSeedKey     = null;
+
+    private boolean shovelModeActive;
+    private boolean plantFoodModeActive;
+
+    private String selectedSeedKey;
+    private String selectedZombieKey;
+
     private Runnable onPlantingCompleted;
     private Runnable onPlantFoodDeactivated;
 
-    // ── Beghouled state ───────────────────────────────────────────────────────
     private int beghouledSelectedRow = -1;
     private int beghouledSelectedCol = -1;
 
-    // ── IZombie state ─────────────────────────────────────────────────────────
-    private String selectedZombieKey = null;
+    private SeedPackDrop heldSeedPack;
 
-    // ── VaseBreaker state ─────────────────────────────────────────────────────
-    private SeedPackDrop heldSeedPack = null;
+    public GameplayController() {
+    }
 
-    public GameplayController() {}
-
-    // ── Pause / modes ─────────────────────────────────────────────────────────
+    // =========================================================
+    // Pause
+    // =========================================================
 
     public void togglePauseMenu() {
         manuallyPaused = !manuallyPaused;
@@ -57,227 +67,629 @@ public class GameplayController {
         return manuallyPaused;
     }
 
-    public void setDialoguePaused(boolean paused) {
+    public void setDialoguePaused(
+            boolean paused
+    ) {
         dialoguePaused = paused;
     }
 
     public boolean isPaused() {
-        return manuallyPaused || dialoguePaused;
+        return manuallyPaused
+                || dialoguePaused;
     }
 
-    public void toggleShovelMode(boolean active) {
+    // =========================================================
+    // Player-role checks
+    // =========================================================
+
+    private MultiplayerIZombieBehavior
+    multiplayerBehavior() {
+        GameSession session =
+                App.getGameSession();
+
+        if (session == null
+                || session.getLevel() == null) {
+            return null;
+        }
+
+        if (session.getLevel().getBehavior()
+                instanceof MultiplayerIZombieBehavior behavior) {
+            return behavior;
+        }
+
+        return null;
+    }
+
+    public boolean isMultiplayerMatch() {
+        return multiplayerBehavior() != null;
+    }
+
+    public boolean isMultiplayerPlantsPlayer() {
+        MultiplayerIZombieBehavior behavior =
+                multiplayerBehavior();
+
+        return behavior != null
+                && behavior.isPlantsPlayer();
+    }
+
+    public boolean isMultiplayerZombiesPlayer() {
+        MultiplayerIZombieBehavior behavior =
+                multiplayerBehavior();
+
+        return behavior != null
+                && behavior.isZombiesPlayer();
+    }
+
+    /**
+     * Offline modes retain their normal plant controls.
+     * During multiplayer, only the plants player may use them.
+     */
+    private boolean canUsePlantControls() {
+        MultiplayerIZombieBehavior behavior =
+                multiplayerBehavior();
+
+        return behavior == null
+                || behavior.isPlantsPlayer();
+    }
+
+    /**
+     * Ordinary i,Zombie and the multiplayer zombies role may use
+     * zombie placement controls.
+     */
+    private boolean canUseZombieControls() {
+        GameSession session =
+                App.getGameSession();
+
+        if (session == null
+                || session.getLevel() == null) {
+            return false;
+        }
+
+        LevelBehavior behavior =
+                session.getLevel().getBehavior();
+
+        if (behavior instanceof IZombieBehavior) {
+            return true;
+        }
+
+        return behavior
+                instanceof MultiplayerIZombieBehavior multiplayer
+                && multiplayer.isZombiesPlayer();
+    }
+
+    // =========================================================
+    // Plant modes
+    // =========================================================
+
+    public void toggleShovelMode(
+            boolean active
+    ) {
+        if (active && !canUsePlantControls()) {
+            clearPlantControls();
+            return;
+        }
+
         shovelModeActive = active;
+
         if (active) {
             plantFoodModeActive = false;
             selectedSeedKey = null;
+
             if (onPlantFoodDeactivated != null) {
                 onPlantFoodDeactivated.run();
             }
+
             if (onPlantingCompleted != null) {
                 onPlantingCompleted.run();
             }
         }
     }
 
-    public void togglePlantFoodMode(boolean active) {
-        this.plantFoodModeActive = active;
-        if (active) {
-            this.shovelModeActive = false;
-            this.selectedSeedKey = null;
-            if (onPlantingCompleted != null) onPlantingCompleted.run();
-        } else {
-            if (onPlantFoodDeactivated != null) onPlantFoodDeactivated.run();
-        }
-    }
-
-    public void setSelectedSeed(String plantKey) {
-        this.selectedSeedKey = plantKey;
-        if (plantKey != null) {
-            this.shovelModeActive = false;
-            if (this.plantFoodModeActive) {
-                this.plantFoodModeActive = false;
-                if (onPlantFoodDeactivated != null) onPlantFoodDeactivated.run();
-            }
-        }
-    }
-
-    public void setOnPlantingCompleted(Runnable callback)    { this.onPlantingCompleted    = callback; }
-    public void setOnPlantFoodDeactivated(Runnable callback) { this.onPlantFoodDeactivated = callback; }
-
-    // ── Main click entry point (called by LawnWidget) ─────────────────────────
-
-    public void handleGridClick(int gridX, int gridY) {
-        if (isPaused()) return;
-
-        GameSession session = App.getGameSession();
-        if (session != null && session.getLevel() != null) {
-            LevelBehavior behavior = (LevelBehavior) session.getLevel().getBehavior();
-
-            if (behavior instanceof BeghouledBehavior) {
-                handleBeghouledClick(gridX, gridY);
-                return;
-            }
-            if (behavior instanceof VaseBreakerBehavior) {
-                handleVaseBreakerClick(gridX, gridY, session);
-                return;
-            }
-            if (behavior instanceof IZombieBehavior) {
-                handleIZombieClick(gridX, gridY);
-                return;
-            }
-        }
-
-        // Standard gameplay
-        if (shovelModeActive) {
-            executeShovelAction(gridX, gridY);
-        } else if (plantFoodModeActive) {
-            executePlantFoodAction(gridX, gridY);
-        } else if (selectedSeedKey != null) {
-            executePlantingAction(gridX, gridY);
-        } else {
-            executeSunCollection(gridX, gridY);
-        }
-    }
-
-    // ── Beghouled ─────────────────────────────────────────────────────────────
-
-    private void handleBeghouledClick(int col, int row) {
-        if (beghouledSelectedRow == -1) {
-            // First click — select
-            beghouledSelectedRow = row;
-            beghouledSelectedCol = col;
-        } else {
-            // Second click — attempt swap
-            beghouledService.swapPlants(
-                    beghouledSelectedRow, beghouledSelectedCol, row, col);
-
-            beghouledSelectedRow = -1;
-            beghouledSelectedCol = -1;
-        }
-    }
-
-    /** Read by BeghouledOverlayWidget to draw highlights. */
-    public int getBeghouledSelectedRow() { return beghouledSelectedRow; }
-    public int getBeghouledSelectedCol() { return beghouledSelectedCol; }
-
-    // ── VaseBreaker ───────────────────────────────────────────────────────────
-
-    /**
-     * LawnWidget gives us grid col/row, but we also need raw stage coords to
-     * do the radius check against seed pack positions, so we accept them both.
-     * LawnWidget calls handleGridClick(col, row) — we reconstruct stage coords
-     * from the grid position for the radius check.
-     */
-    private void handleVaseBreakerClick(int col, int row, GameSession session) {
-        // Mode A: holding a seed pack — plant it
-        if (heldSeedPack != null) {
-            int sX = (int) heldSeedPack.getLocation().x();
-            int sY = (int) heldSeedPack.getLocation().y();
-            String result = vaseBreakerService.plantFromSeedPack(sX, sY, col, row);
-            if (result.contains("Successfully")) {
-                heldSeedPack = null;
-            }
+    public void togglePlantFoodMode(
+            boolean active
+    ) {
+        if (active && !canUsePlantControls()) {
+            clearPlantControls();
             return;
         }
 
-        // Mode B: nothing held
-        // Reconstruct the stage-space click centre for this cell
-        float clickX = LawnGridLayout.cellX(col) + LawnGridLayout.CELL_WIDTH  / 2f;
-        float clickY = LawnGridLayout.cellY(row)  + LawnGridLayout.CELL_HEIGHT / 2f;
+        plantFoodModeActive = active;
 
-        // Priority 1 — seed pack within radius of the clicked cell centre
+        if (active) {
+            shovelModeActive = false;
+            selectedSeedKey = null;
+
+            if (onPlantingCompleted != null) {
+                onPlantingCompleted.run();
+            }
+        } else if (onPlantFoodDeactivated != null) {
+            onPlantFoodDeactivated.run();
+        }
+    }
+
+    public void setSelectedSeed(
+            String plantKey
+    ) {
+        if (plantKey != null
+                && !canUsePlantControls()) {
+            clearPlantControls();
+            return;
+        }
+
+        selectedSeedKey = plantKey;
+
+        if (plantKey != null) {
+            shovelModeActive = false;
+
+            if (plantFoodModeActive) {
+                plantFoodModeActive = false;
+
+                if (onPlantFoodDeactivated != null) {
+                    onPlantFoodDeactivated.run();
+                }
+            }
+
+            /*
+             * Plant and zombie selections must never be active at
+             * the same time.
+             */
+            selectedZombieKey = null;
+        }
+    }
+
+    private void clearPlantControls() {
+        shovelModeActive = false;
+        plantFoodModeActive = false;
+        selectedSeedKey = null;
+
+        if (onPlantFoodDeactivated != null) {
+            onPlantFoodDeactivated.run();
+        }
+
+        if (onPlantingCompleted != null) {
+            onPlantingCompleted.run();
+        }
+    }
+
+    public void setOnPlantingCompleted(
+            Runnable callback
+    ) {
+        onPlantingCompleted = callback;
+    }
+
+    public void setOnPlantFoodDeactivated(
+            Runnable callback
+    ) {
+        onPlantFoodDeactivated = callback;
+    }
+
+    // =========================================================
+    // Main lawn click
+    // =========================================================
+
+    public void handleGridClick(
+            int gridX,
+            int gridY
+    ) {
+        if (isPaused()) {
+            return;
+        }
+
+        GameSession session =
+                App.getGameSession();
+
+        if (session == null
+                || session.getLevel() == null) {
+            return;
+        }
+
+        LevelBehavior behavior =
+                session.getLevel().getBehavior();
+
+        if (behavior instanceof BeghouledBehavior) {
+            handleBeghouledClick(
+                    gridX,
+                    gridY
+            );
+            return;
+        }
+
+        if (behavior instanceof VaseBreakerBehavior) {
+            handleVaseBreakerClick(
+                    gridX,
+                    gridY,
+                    session
+            );
+            return;
+        }
+
+        if (behavior instanceof IZombieBehavior) {
+            handleIZombieClick(
+                    gridX,
+                    gridY
+            );
+            return;
+        }
+
+        if (behavior
+                instanceof MultiplayerIZombieBehavior multiplayer) {
+            if (multiplayer.isZombiesPlayer()) {
+                handleIZombieClick(
+                        gridX,
+                        gridY
+                );
+            } else {
+                handlePlantPlayerClick(
+                        gridX,
+                        gridY
+                );
+            }
+
+            return;
+        }
+
+        handlePlantPlayerClick(
+                gridX,
+                gridY
+        );
+    }
+
+    private void handlePlantPlayerClick(
+            int gridX,
+            int gridY
+    ) {
+        if (!canUsePlantControls()) {
+            return;
+        }
+
+        if (shovelModeActive) {
+            executeShovelAction(
+                    gridX,
+                    gridY
+            );
+
+        } else if (plantFoodModeActive) {
+            executePlantFoodAction(
+                    gridX,
+                    gridY
+            );
+
+        } else if (selectedSeedKey != null) {
+            executePlantingAction(
+                    gridX,
+                    gridY
+            );
+
+        } else {
+            executeSunCollection(
+                    gridX,
+                    gridY
+            );
+        }
+    }
+
+    // =========================================================
+    // Beghouled
+    // =========================================================
+
+    private void handleBeghouledClick(
+            int column,
+            int row
+    ) {
+        if (beghouledSelectedRow == -1) {
+            beghouledSelectedRow = row;
+            beghouledSelectedCol = column;
+            return;
+        }
+
+        beghouledService.swapPlants(
+                beghouledSelectedRow,
+                beghouledSelectedCol,
+                row,
+                column
+        );
+
+        beghouledSelectedRow = -1;
+        beghouledSelectedCol = -1;
+    }
+
+    public int getBeghouledSelectedRow() {
+        return beghouledSelectedRow;
+    }
+
+    public int getBeghouledSelectedCol() {
+        return beghouledSelectedCol;
+    }
+
+    // =========================================================
+    // VaseBreaker
+    // =========================================================
+
+    private void handleVaseBreakerClick(
+            int column,
+            int row,
+            GameSession session
+    ) {
+        if (heldSeedPack != null) {
+            int sourceX =
+                    (int) heldSeedPack
+                            .getLocation()
+                            .x();
+
+            int sourceY =
+                    (int) heldSeedPack
+                            .getLocation()
+                            .y();
+
+            String result =
+                    vaseBreakerService
+                            .plantFromSeedPack(
+                                    sourceX,
+                                    sourceY,
+                                    column,
+                                    row
+                            );
+
+            if (result.contains("Successfully")) {
+                heldSeedPack = null;
+            }
+
+            return;
+        }
+
+        float clickX =
+                LawnGridLayout.cellX(column)
+                        + LawnGridLayout.CELL_WIDTH / 2f;
+
+        float clickY =
+                LawnGridLayout.cellY(row)
+                        + LawnGridLayout.CELL_HEIGHT / 2f;
+
         for (GroundItem item : session.getItems()) {
-            if (item.getItemType() != ItemType.SEED_PACK) continue;
-            if (!item.isAlive() || item.isCollected()) continue;
-            float iX = LawnGridLayout.worldX(item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
-            float iY = LawnGridLayout.worldY(item.getPosition().y());
-            float dx = clickX - iX, dy = clickY - iY;
-            if (dx * dx + dy * dy < 75f * 75f) {   // 75 stage-unit radius
-                heldSeedPack = (SeedPackDrop) item;
+            if (item.getItemType()
+                    != ItemType.SEED_PACK) {
+                continue;
+            }
+
+            if (!item.isAlive()
+                    || item.isCollected()) {
+                continue;
+            }
+
+            float itemX =
+                    LawnGridLayout.worldX(
+                            item.getPosition().x()
+                    )
+                            + LawnGridLayout.CELL_WIDTH / 2f;
+
+            float itemY =
+                    LawnGridLayout.worldY(
+                            item.getPosition().y()
+                    );
+
+            float deltaX = clickX - itemX;
+            float deltaY = clickY - itemY;
+
+            if (deltaX * deltaX
+                    + deltaY * deltaY
+                    < 75f * 75f) {
+                heldSeedPack =
+                        (SeedPackDrop) item;
                 return;
             }
         }
 
-        // Priority 2 — smash vase at this cell
-        Cell cell = session.getLawn().getCell(row, col);
+        Cell cell =
+                session.getLawn()
+                        .getCell(row, column);
+
         if (cell != null
-                && cell.getInteractableStructure() instanceof Vase vase
+                && cell.getInteractableStructure()
+                instanceof Vase vase
                 && vase.isAlive()) {
-            vaseBreakerService.smashVase(col, row);
+            vaseBreakerService.smashVase(
+                    column,
+                    row
+            );
         }
     }
 
-    /** Read by VaseBreakerOverlayWidget to draw the held-pack cursor. */
-    public SeedPackDrop getHeldSeedPack() { return heldSeedPack; }
+    public SeedPackDrop getHeldSeedPack() {
+        return heldSeedPack;
+    }
 
-    // ── Standard actions ──────────────────────────────────────────────────────
+    // =========================================================
+    // Plant actions
+    // =========================================================
 
-    private void executeShovelAction(int x, int y) {
-        LocationRequest req = new LocationRequest(String.valueOf(x), String.valueOf(y));
-        String result = gameService.pluckPlant(req);
+    private void executeShovelAction(
+            int x,
+            int y
+    ) {
+        if (!canUsePlantControls()) {
+            return;
+        }
+
+        LocationRequest request =
+                new LocationRequest(
+                        String.valueOf(x),
+                        String.valueOf(y)
+                );
+
+        String result =
+                gameService.pluckPlant(request);
+
         if (result.contains("plucked")) {
             toggleShovelMode(false);
         }
     }
 
-    private void executePlantFoodAction(int x, int y) {
-        LocationRequest req = new LocationRequest(String.valueOf(x), String.valueOf(y));
-        gameService.feedPlant(req);
+    private void executePlantFoodAction(
+            int x,
+            int y
+    ) {
+        if (!canUsePlantControls()) {
+            return;
+        }
+
+        LocationRequest request =
+                new LocationRequest(
+                        String.valueOf(x),
+                        String.valueOf(y)
+                );
+
+        gameService.feedPlant(request);
         togglePlantFoodMode(false);
     }
 
-    public void plantAt(String plantKey, int gridX, int gridY) {
-        if (isPaused() || plantKey == null) return;
-        String result = executeSelectedPlant(plantKey, gridX, gridY);
-        if (result.contains("placed") || result.contains("Rolled")) {
+    public void plantAt(
+            String plantKey,
+            int gridX,
+            int gridY
+    ) {
+        if (isPaused()
+                || plantKey == null
+                || !canUsePlantControls()) {
+            return;
+        }
+
+        String result =
+                executeSelectedPlant(
+                        plantKey,
+                        gridX,
+                        gridY
+                );
+
+        if (result.contains("placed")
+                || result.contains("Rolled")) {
             setSelectedSeed(null);
-            if (onPlantingCompleted != null) onPlantingCompleted.run();
+
+            if (onPlantingCompleted != null) {
+                onPlantingCompleted.run();
+            }
         }
     }
 
-    private String executeSelectedPlant(String plantKey, int gridX, int gridY) {
-        GameSession session = App.getGameSession();
+    private String executeSelectedPlant(
+            String plantKey,
+            int gridX,
+            int gridY
+    ) {
+        GameSession session =
+                App.getGameSession();
+
         if (session != null
                 && session.getLevel() != null
-                && session.getLevel().getBehavior() instanceof WallnutBowlingBehavior bowling) {
-            return bowling.rollNut(plantKey, gridX, gridY);
+                && session.getLevel().getBehavior()
+                instanceof WallnutBowlingBehavior bowling) {
+            return bowling.rollNut(
+                    plantKey,
+                    gridX,
+                    gridY
+            );
         }
-        return gameService.plantPlant(new PlantPlantRequest(
-                plantKey, String.valueOf(gridX), String.valueOf(gridY)));
+
+        return gameService.plantPlant(
+                new PlantPlantRequest(
+                        plantKey,
+                        String.valueOf(gridX),
+                        String.valueOf(gridY)
+                )
+        );
     }
 
-    private void executePlantingAction(int x, int y) { plantAt(selectedSeedKey, x, y); }
-
-    private void executeSunCollection(int x, int y) {
-        gameService.collectSun(new LocationRequest(String.valueOf(x), String.valueOf(y)));
+    private void executePlantingAction(
+            int x,
+            int y
+    ) {
+        plantAt(
+                selectedSeedKey,
+                x,
+                y
+        );
     }
 
-    // ── Beghouled upgrades ────────────────────────────────────────────────────
-
-    /**
-     * Called by {@link com.ussr.pvz.view.hud.BeghouledUpgradePanel} when the
-     * player clicks an upgrade button.
-     *
-     * @param plantType the current plant type key (lower-case), e.g. "peashooter"
-     */
-    public void upgradeBeghouledPlant(String plantType) {
-        if (isPaused()) return;
-        beghouledService.upgradePlant(plantType);
+    private void executeSunCollection(
+            int x,
+            int y
+    ) {
+        gameService.collectSun(
+                new LocationRequest(
+                        String.valueOf(x),
+                        String.valueOf(y)
+                )
+        );
     }
 
-    // ── IZombie ───────────────────────────────────────────────────────────────
+    // =========================================================
+    // Beghouled upgrades
+    // =========================================================
 
-    /** Called by IZombieHud when the player selects (or deselects) a zombie card. */
-    public void setSelectedZombieKey(String key) { this.selectedZombieKey = key; }
-    public String getSelectedZombieKey()         { return selectedZombieKey; }
+    public void upgradeBeghouledPlant(
+            String plantType
+    ) {
+        if (isPaused()) {
+            return;
+        }
 
-    private void handleIZombieClick(int col, int row) {
-        if (selectedZombieKey == null) return;
-        iZombieService.placeZombie(selectedZombieKey, col, row);
-        // Keep the selection — the player may want to place multiple of the same type.
+        beghouledService.upgradePlant(
+                plantType
+        );
     }
 
-    public boolean isShovelModeActive()    { return shovelModeActive; }
-    public boolean isPlantFoodModeActive() { return plantFoodModeActive; }
-    public String  getSelectedSeedKey()    { return selectedSeedKey; }
+    // =========================================================
+    // I, Zombie
+    // =========================================================
+
+    public void setSelectedZombieKey(
+            String key
+    ) {
+        if (key != null
+                && !canUseZombieControls()) {
+            selectedZombieKey = null;
+            return;
+        }
+
+        selectedZombieKey = key;
+
+        if (key != null) {
+            clearPlantControls();
+        }
+    }
+
+    public String getSelectedZombieKey() {
+        return selectedZombieKey;
+    }
+
+    private void handleIZombieClick(
+            int column,
+            int row
+    ) {
+        if (!canUseZombieControls()
+                || selectedZombieKey == null) {
+            return;
+        }
+
+        iZombieService.placeZombie(
+                selectedZombieKey,
+                column,
+                row
+        );
+    }
+
+    // =========================================================
+    // State accessors
+    // =========================================================
+
+    public boolean isShovelModeActive() {
+        return shovelModeActive;
+    }
+
+    public boolean isPlantFoodModeActive() {
+        return plantFoodModeActive;
+    }
+
+    public String getSelectedSeedKey() {
+        return selectedSeedKey;
+    }
 }

@@ -13,6 +13,8 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
+import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.service.ChoosePlantService;
 import pvz.libpvz.textures.TextureBank;
 
@@ -94,28 +96,35 @@ public class SeedBankHud extends Table {
 
         GameSession session = App.getGameSession();
 
-        if (session == null) {
+        if (session == null || session.getLevel() == null) {
             setVisible(false);
+            setTouchable(Touchable.disabled);
+            lastSession = null;
             return;
         }
 
         boolean conveyorLevel =
-                session.getLevel() != null
-                        && session.getLevel().getDeliveryStrategy()
+                session.getLevel().getDeliveryStrategy()
                         instanceof ConveyorDeliveryStrategy;
 
-        boolean iZombieLevel =
-                session.getLevel() != null
-                        && session.getLevel().getBehavior()
-                        instanceof IZombieBehavior;
+        LevelBehavior behavior = session.getLevel().getBehavior();
 
-        if (conveyorLevel || iZombieLevel) {
+        boolean offlineIZombie = behavior instanceof IZombieBehavior;
+
+        boolean multiplayerZombie =
+                behavior instanceof MultiplayerIZombieBehavior multiplayer
+                        && multiplayer.isZombiesPlayer();
+
+        if (conveyorLevel || offlineIZombie || multiplayerZombie) {
             setVisible(false);
+            setTouchable(Touchable.disabled);
             clearSelection();
+            lastSession = null;
             return;
         }
 
         setVisible(true);
+        setTouchable(Touchable.childrenOnly);
 
         if (session != lastSession) {
             rebuildSeedRow(session);
@@ -144,7 +153,8 @@ public class SeedBankHud extends Table {
         for (String key : session.getSelectedPlants()) {
             Plant blueprint = App.getAccount().getAdventureProgress()
                     .getAccountPlants().stream()
-                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName()).equals(key))
+                    .filter(p -> ChoosePlantService.normalizePlantKey(p.getName())
+                            .equals(ChoosePlantService.normalizePlantKey(key)))
                     .findFirst()
                     .orElse(null);
             if (blueprint == null) continue;

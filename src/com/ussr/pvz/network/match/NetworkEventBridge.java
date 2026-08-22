@@ -44,6 +44,7 @@ public final class NetworkEventBridge {
         subscriptions.add(eventBus.subscribe(GameEvent.ZombieSpawned.class, this::zombieSpawned));
         subscriptions.add(eventBus.subscribe(GameEvent.ZombieDied.class, this::zombieDied));
         subscriptions.add(eventBus.subscribe(GameEvent.LawnMowerTriggered.class, this::mowerTriggered));
+        subscriptions.add(eventBus.subscribe(GameEvent.StructureDestroyed.class, this::structureDestroyed));
         subscriptions.add(eventBus.subscribe(GameEvent.GameWon.class,
                 event -> send(MatchActionType.GAME_OVER, property("winnerRole", context.role().name()))));
         subscriptions.add(eventBus.subscribe(GameEvent.GameOver.class,
@@ -103,6 +104,18 @@ public final class NetworkEventBridge {
         if (!canSend(MatchRole.PLANTS)) return;
         JsonObject p = new JsonObject(); p.addProperty("lane", e.lane());
         send(MatchActionType.MOWER_TRIGGERED, p);
+    }
+
+    private void structureDestroyed(GameEvent.StructureDestroyed event) {
+        if (!canSend(MatchRole.ZOMBIES)
+                || !"brain".equalsIgnoreCase(event.structureType())) {
+            return;
+        }
+
+        JsonObject payload = new JsonObject();
+        payload.addProperty("entityId", "brain-" + event.row());
+        payload.addProperty("lane", event.row());
+        send(MatchActionType.BRAIN_EATEN, payload);
     }
     private void sendEntity(MatchRole role, MatchActionType type, Plant plant) {
         if (!canSend(role)) return;
