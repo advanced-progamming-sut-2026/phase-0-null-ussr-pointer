@@ -57,6 +57,7 @@ public final class GameplayController {
     private int zombieCursorRow = 0;
 
     public GameplayController() {
+        manuallyPaused = App.consumeResumeToPauseMenu();
     }
 
     // =========================================================

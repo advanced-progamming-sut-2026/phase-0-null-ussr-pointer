@@ -210,6 +210,7 @@ public final class PauseMenuOverlay extends WidgetGroup {
                     ChangeEvent event,
                     Actor actor
             ) {
+                App.setResumeToPauseMenu(true);
                 App.setMenuState(MenuState.SETTING);
             }
         });

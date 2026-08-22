@@ -75,7 +75,19 @@ public class ActiveGameplayView extends Table implements Disposable {
         StormRenderLayer stormRearLayer = new StormRenderLayer(pamPlayer, true);
         StormRenderLayer stormTopLayer = new StormRenderLayer(pamPlayer, false);
 
-        Stack layers = new Stack();
+        Stack layers = new Stack() {
+            @Override
+            public void act(float delta) {
+                boolean paused = controller.isPauseMenuOpen();
+                com.badlogic.gdx.utils.SnapshotArray<Actor> children = getChildren();
+                Actor[] actors = children.begin();
+                for (int i = 0, n = children.size; i < n; i++) {
+                    Actor child = actors[i];
+                    child.act(child == inGameHud ? delta : (paused ? 0f : delta));
+                }
+                children.end();
+            }
+        };
         layers.add(background);
         layers.add(terrainLayer);
         layers.add(glacierLayer);

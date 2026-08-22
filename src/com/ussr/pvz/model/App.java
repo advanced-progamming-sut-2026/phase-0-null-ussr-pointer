@@ -31,6 +31,14 @@ public class App {
 
     private static GameSession gameSession;
 
+    /*
+     * Set right before leaving the GAME screen for the Settings menu from the
+     * pause overlay, so the freshly-rebuilt gameplay screen can re-open the
+     * pause overlay on return instead of resuming unpaused. Consumed (read
+     * once, then cleared) by GameplayController on construction.
+     */
+    private static boolean resumeToPauseMenu = false;
+
     private static List<Map<String, Object>>
             cachedPlantsData = null;
 
@@ -97,12 +105,28 @@ public class App {
 
             gridEnabled =
                     false;
+
+            resumeToPauseMenu =
+                    false;
         }
     }
 
 
     public static GameSession getGameSession() {
         return App.gameSession;
+    }
+
+
+    public static void setResumeToPauseMenu(
+            boolean value
+    ) {
+        resumeToPauseMenu = value;
+    }
+
+    public static boolean consumeResumeToPauseMenu() {
+        boolean value = resumeToPauseMenu;
+        resumeToPauseMenu = false;
+        return value;
     }
 
 
