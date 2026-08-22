@@ -155,7 +155,17 @@ public class GlobalInviteOverlay extends Table {
     public void act(float delta) {
         super.act(delta);
 
-        if (App.getGameSession() != null) return;
+        if (App.getGameSession() != null) {
+            /*
+             * MATCH_STARTED has already been handled and the gameplay session
+             * now exists. This overlay is attached globally, so it must clear
+             * its waiting card explicitly instead of merely stopping polling.
+             */
+            if (mode == OverlayMode.WAITING_FOR_SERVER) {
+                hideCard();
+            }
+            return;
+        }
         if (mode != OverlayMode.HIDDEN) return;
 
         pollTimer += delta;

@@ -3,11 +3,11 @@ package com.ussr.pvz.service.minigame;
 import com.badlogic.gdx.Gdx;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
-import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.TerrainFactory;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.network.NetworkClient;
 import com.ussr.pvz.network.match.MatchActionBuffer;
@@ -179,8 +179,17 @@ public final class MultiplayerIZombieService {
         GameSession session =
                 new GameSession();
 
+        /*
+         * Lawn's constructor stores only its dimensions; it does not create
+         * rows, cells, or tiles. The gameplay renderers expect a complete
+         * grid, so build a normal deterministic lawn through TerrainFactory.
+         */
         session.setLawn(
-                new Lawn(ROWS, COLS)
+                TerrainFactory.build(
+                        null,
+                        ROWS,
+                        COLS
+                )
         );
 
         session.setPlants(
