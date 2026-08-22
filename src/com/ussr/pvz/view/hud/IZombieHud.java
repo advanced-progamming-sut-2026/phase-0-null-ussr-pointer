@@ -106,12 +106,20 @@ public class IZombieHud extends Table {
             lastSession = session;
         }
 
-        int sun = session.getSunCount();
+        int sun = getZombieSunCount(session);
         sunLabel.setText(String.valueOf(sun));
 
         for (ZombieSlotWidget slot : slots.values()) {
             slot.refreshAffordability(sun);
         }
+    }
+
+    private int getZombieSunCount(GameSession session) {
+        LevelBehavior behavior = session.getLevel().getBehavior();
+        if (behavior instanceof CouchIZombieBehavior couchBehavior) {
+            return couchBehavior.getZombieSun();
+        }
+        return session.getSunCount();
     }
 
     private boolean shouldShowFor(GameSession session) {
@@ -191,14 +199,8 @@ public class IZombieHud extends Table {
                 add(new Image(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10")));
             }
 
-            // Portrait — try to find a zombie texture by convention, fall back to tinted box
-            String texKey = "IMAGE_UI_ZOMBIES_" + zombieId.toUpperCase();
+            String texKey = com.ussr.pvz.model.entities.zombies.ZombieFactory.getZombieTextureRegion(zombieId);
             TextureRegion portRegion = textures.region(texKey);
-            if (portRegion == null) {
-                // Try the packet-style key
-                texKey = "IMAGE_UI_PACKETS_ZOMBIE_" + zombieId.toUpperCase();
-                portRegion = textures.region(texKey);
-            }
             portrait = portRegion != null ? new Image(portRegion) : new Image();
             portrait.setScaling(Scaling.fit);
             portrait.setTouchable(Touchable.disabled);

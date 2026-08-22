@@ -30,6 +30,7 @@ public class ZombieFactory {
 
     private static final Map<String, Map<String, Object>> blueprints = new HashMap<>();
     private static final Map<String, String> pamLocations = new HashMap<>();
+    private static final Map<String, String> textureRegions = new HashMap<>();
     private static final Map<String, Integer> armorBaseHp = new HashMap<>();
 
     private static boolean loaded = false;
@@ -57,6 +58,7 @@ public class ZombieFactory {
                 List<String> aliases = (List<String>) entry.get("aliases");
                 Map<String, Object> objdata = (Map<String, Object>) entry.get("objdata");
                 String pamLocation = (String) entry.get("pamLocation");
+                String textureRegion = (String) entry.get("textureRegion");
 
                 if (aliases == null || objdata == null) continue;
 
@@ -64,6 +66,9 @@ public class ZombieFactory {
                     blueprints.put(alias, objdata);
                     if (pamLocation != null) {
                         pamLocations.put(alias, pamLocation);
+                    }
+                    if (textureRegion != null && !textureRegion.isEmpty()) {
+                        textureRegions.put(alias, textureRegion);
                     }
                 }
             }
@@ -314,5 +319,33 @@ public class ZombieFactory {
         init();
         Map<String, Object> blueprint = blueprints.get(alias);
         return blueprint == null ? null : new HashMap<>(blueprint);
+    }
+
+    public static String getZombieTextureRegion(String alias) {
+        init();
+        String explicit = textureRegions.get(alias);
+        if (explicit != null && !explicit.isEmpty()) {
+            return explicit;
+        }
+
+        String pam = pamLocations.get(alias);
+        if (pam != null && !pam.isEmpty()) {
+            String fileName = pam.substring(pam.lastIndexOf('/') + 1);
+            int dot = fileName.lastIndexOf('.');
+            String withoutExt = dot >= 0 ? fileName.substring(0, dot) : fileName;
+            String stripped = withoutExt.toUpperCase();
+            if (stripped.startsWith("ZOMBIE_")) {
+                stripped = stripped.substring(7);
+            } else if (stripped.startsWith("ZOMBIE")) {
+                stripped = stripped.substring(6);
+            }
+            if (!stripped.isEmpty()) {
+                return "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_" + stripped;
+            }
+        }
+
+        String base = alias.startsWith("Zombie") ? alias.substring(6) : alias;
+        String underscored = base.replaceAll("([a-z])([A-Z])", "$1_$2").toUpperCase();
+        return "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_" + underscored;
     }
 }

@@ -76,7 +76,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/LNY_CONEHEAD_ZOMBIE/LNY_CONEHEAD_ZOMBIE.PAM",
-    "textureRegion": "",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LUNAR_ARMOR1",
     "objdata": {
       "ArtCenter": {
         "x": 90,
@@ -151,7 +151,7 @@
     ],
     "objclass": "ZombiePropertySheet",
     "pamLocation": "768/FULL/ZOMBIE/LNY_BUCKETHEAD_ZOMBIE/LNY_BUCKETHEAD_ZOMBIE.PAM",
-    "textureRegion": "",
+    "textureRegion": "IMAGE_UI_ALMANAC_PACKETS_ZOMBIES_LUNAR_ARMOR2",
     "objdata": {
       "ArtCenter": {
         "x": 90,
