@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
-import com.ussr.pvz.service.ChoosePlantService;
+import com.ussr.pvz.service.minigame.MultiplayerIZombieService;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
@@ -221,6 +221,14 @@ public final class PauseMenuOverlay extends WidgetGroup {
                     ChangeEvent event,
                     Actor actor
             ) {
+                if (controller.isMultiplayerMatch()) {
+                    MultiplayerIZombieService.getInstance()
+                            .forfeitMatch();
+                    App.setMenuState(MenuState.LEVEL_SELECTION);
+                    App.setGameSession(null);
+                    return;
+                }
+
                 App.getLevelManager().startLevel(
                         App.getGameSession()
                                 .getLevel()
@@ -237,6 +245,8 @@ public final class PauseMenuOverlay extends WidgetGroup {
                     ChangeEvent event,
                     Actor actor
             ) {
+                MultiplayerIZombieService.getInstance()
+                        .forfeitMatch();
                 App.setMenuState(MenuState.LEVEL_SELECTION);
                 App.setGameSession(null);
             }

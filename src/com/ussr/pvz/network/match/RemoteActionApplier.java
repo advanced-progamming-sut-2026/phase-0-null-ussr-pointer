@@ -10,6 +10,7 @@ import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.shared.multiplayer.MatchAction;
 import com.ussr.pvz.shared.multiplayer.MatchRole;
@@ -32,6 +33,17 @@ public final class RemoteActionApplier {
         Objects.requireNonNull(action, "action");
         JsonObject payload = action.payload();
         switch (action.type()) {
+            case PLAYER_READY ->
+                    multiplayerBehavior().markPlayerReady(action.senderRole());
+            case MATCH_READY ->
+                    multiplayerBehavior().startSynchronizedMatch(
+                            longNumber(payload, "startTimeMillis")
+                    );
+            case PAUSE_CHANGED ->
+                    multiplayerBehavior().setMatchPaused(
+                            bool(payload, "paused")
+                    );
+            case FORFEIT -> { /* Followed by the server's GAME_OVER action. */ }
             case PLANT_PLACED -> applyPlantPlaced(payload);
             case PLANT_PLUCKED, PLANT_DIED -> removePlant(payload);
             case PLANT_FOOD_USED -> applyPlantFood(payload);
@@ -175,6 +187,17 @@ public final class RemoteActionApplier {
         else session.concludeDefeat();
     }
 
+    private MultiplayerIZombieBehavior multiplayerBehavior() {
+        if (session.getLevel() == null
+                || !(session.getLevel().getBehavior()
+                instanceof MultiplayerIZombieBehavior behavior)) {
+            throw new IllegalStateException(
+                    "Synchronized action received outside a multiplayer match"
+            );
+        }
+        return behavior;
+    }
+
     private Cell requireCell(int row, int col) {
         if (session.getLawn() == null || row < 0 || col < 0
                 || row >= session.getLawn().getRows() || col >= session.getLawn().getCols()) {
@@ -197,6 +220,10 @@ public final class RemoteActionApplier {
         double value = p.get(key).getAsDouble();
         if (!Double.isFinite(value)) throw new IllegalArgumentException(key + " must be finite");
         return value;
+    }
+    private static long longNumber(JsonObject p, String key) {
+        if (!p.has(key)) throw new IllegalArgumentException("Missing payload field: " + key);
+        return p.get(key).getAsLong();
     }
     private static boolean bool(JsonObject p, String key) {
         if (!p.has(key)) throw new IllegalArgumentException("Missing payload field: " + key);

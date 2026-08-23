@@ -1,6 +1,11 @@
 package com.ussr.pvz.shared.multiplayer;
 
 public enum MatchActionType {
+    PLAYER_READY,
+    MATCH_READY,
+    PAUSE_CHANGED,
+    FORFEIT,
+
     PLANT_PLACED,
     PLANT_PLUCKED,
     PLANT_FOOD_USED,

@@ -301,9 +301,7 @@ public final class MatchManager {
         }
 
         try {
-            room.close(
-                    "OPPONENT_DISCONNECTED"
-            );
+            room.peerDisconnected(token);
 
         } finally {
             cleanupRoom(room);

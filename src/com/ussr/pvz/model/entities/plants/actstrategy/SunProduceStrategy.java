@@ -4,6 +4,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.plants.Plant;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.badlogic.gdx.math.MathUtils;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 
@@ -16,6 +17,13 @@ public class SunProduceStrategy implements ActStrategy {
     }
     @Override
     public void act(Plant user, GameSession session) {
+        if (session.getLevel() != null
+                && session.getLevel().getBehavior()
+                instanceof MultiplayerIZombieBehavior multiplayer
+                && !multiplayer.isPlantsPlayer()) {
+            return;
+        }
+
         setInstantBurst(user);
         int x = user.getLocation().x();
         int y = user.getLocation().y();

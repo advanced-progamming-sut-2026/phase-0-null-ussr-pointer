@@ -5,12 +5,12 @@ import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
-import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.entities.zombies.ZombieSize;
 import com.ussr.pvz.model.entities.zombies.attack.ChompAttack;
 import com.ussr.pvz.model.entities.zombies.defense.NormalDefense;
 import com.ussr.pvz.model.entities.zombies.effect.SunProducerZombieEffect;
 import com.ussr.pvz.model.entities.zombies.move.StationaryMove;
+import com.ussr.pvz.model.level.IZombiePricing;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.shared.multiplayer.MatchRole;
@@ -32,7 +32,6 @@ public final class MultiplayerIZombieBehavior
     private final int redLineColumn;
     private final int startingSun;
     private final MatchRole localRole;
-    private final long matchStartTimeMillis;
     private final Random random;
 
     private final List<Brain> brains =
@@ -45,6 +44,10 @@ public final class MultiplayerIZombieBehavior
             MATCH_DURATION_SECONDS;
 
     private boolean started;
+    private boolean plantsReady;
+    private boolean zombiesReady;
+    private boolean matchReady;
+    private boolean matchPaused;
     private boolean missionFailed;
     private MatchRole winner;
 
@@ -78,9 +81,6 @@ public final class MultiplayerIZombieBehavior
                         localRole,
                         "localRole"
                 );
-
-        this.matchStartTimeMillis =
-                matchStartTimeMillis;
 
         /*
          * Both clients receive the same seed, so initial entity
@@ -124,7 +124,6 @@ public final class MultiplayerIZombieBehavior
 
         level.setSunFalling(false);
 
-        synchronizeMatchTimer();
         initializeSun(session);
 
         brains.clear();
@@ -144,23 +143,52 @@ public final class MultiplayerIZombieBehavior
         );
     }
 
-    private void synchronizeMatchTimer() {
-        long elapsedMillis =
-                Math.max(
-                        0L,
-                        System.currentTimeMillis()
-                                - matchStartTimeMillis
-                );
+    public void markPlayerReady(MatchRole role) {
+        Objects.requireNonNull(role, "role");
+        if (role == MatchRole.PLANTS) {
+            plantsReady = true;
+        } else {
+            zombiesReady = true;
+        }
+    }
 
-        float elapsedSeconds =
-                elapsedMillis / 1000f;
+    public void startSynchronizedMatch(long startTimeMillis) {
+        if (startTimeMillis <= 0) {
+            throw new IllegalArgumentException(
+                    "startTimeMillis must be positive"
+            );
+        }
 
-        timeRemaining =
-                Math.max(
-                        0f,
-                        MATCH_DURATION_SECONDS
-                                - elapsedSeconds
-                );
+        plantsReady = true;
+        zombiesReady = true;
+        matchReady = true;
+
+        long elapsedMillis = Math.max(
+                0L,
+                System.currentTimeMillis() - startTimeMillis
+        );
+        timeRemaining = Math.max(
+                0f,
+                MATCH_DURATION_SECONDS - elapsedMillis / 1000f
+        );
+    }
+
+    public boolean isWaitingForPlayers() {
+        return !matchReady;
+    }
+
+    public boolean isLocalPlayerReady() {
+        return localRole == MatchRole.PLANTS
+                ? plantsReady
+                : zombiesReady;
+    }
+
+    public boolean isMatchPaused() {
+        return matchPaused;
+    }
+
+    public void setMatchPaused(boolean paused) {
+        matchPaused = paused;
     }
 
     private void initializeSun(GameSession session) {
@@ -275,6 +303,8 @@ public final class MultiplayerIZombieBehavior
             double deltaTime
     ) {
         if (!started
+                || !matchReady
+                || matchPaused
                 || levelCompleted
                 || missionFailed
                 || session == null
@@ -334,7 +364,8 @@ public final class MultiplayerIZombieBehavior
                         .stream()
                         .mapToInt(
                                 allowed ->
-                                        ZombieFactory.getZombieCost(
+                                        IZombiePricing.getCost(
+                                                session,
                                                 allowed.id()
                                         )
                         )

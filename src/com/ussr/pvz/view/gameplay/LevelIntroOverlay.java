@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.dialogue.LevelDialogueRegistry;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.service.minigame.MultiplayerIZombieService;
 import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.hud.ObjectiveWidgetFactory;
 import pvz.libpvz.pam.PamPlayer;
@@ -61,6 +62,7 @@ public final class LevelIntroOverlay extends Table {
     private boolean dialogueOpen;
     private boolean leaving;
     private boolean showingObjective;
+    private boolean completionNotified;
 
     // =========================================================================
     // Constructor
@@ -121,11 +123,11 @@ public final class LevelIntroOverlay extends Table {
             if (!objectives.isEmpty()) {
                 addAction(sequence(delay(0.5f), run(this::openObjectiveCardDirectly)));
             } else {
-                remove();
+                completeIntro();
             }
         } else {
             if (dialogue.isEmpty() && objectives.isEmpty()) {
-                remove();
+                completeIntro();
             } else {
                 addAction(sequence(delay(APPEAR_DELAY), run(this::openDialogue)));
             }
@@ -350,11 +352,24 @@ public final class LevelIntroOverlay extends Table {
         addAction(sequence(
                 delay(LEAVE_DURATION),
                 run(() -> {
-                    controller.setDialoguePaused(false);
-                    setTouchable(Touchable.disabled);
-                    remove();
+                    completeIntro();
                 })
         ));
+    }
+
+    private void completeIntro() {
+        if (completionNotified) {
+            return;
+        }
+
+        completionNotified = true;
+        controller.setDialoguePaused(false);
+        markIntroShown();
+        MultiplayerIZombieService.getInstance()
+                .markLocalPlayerReady();
+        setTouchable(Touchable.disabled);
+        setVisible(false);
+        remove();
     }
 
     private void markIntroShown() {

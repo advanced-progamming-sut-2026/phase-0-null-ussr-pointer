@@ -5,6 +5,7 @@ import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 
 public class SunProducerZombieEffect implements EffectStatus {
     private double currentInterval = 20.0; // Starts slow
@@ -25,11 +26,12 @@ public class SunProducerZombieEffect implements EffectStatus {
             LevelBehavior behavior = session.getLevel() != null ? session.getLevel().getBehavior() : null;
             if (behavior instanceof CouchIZombieBehavior couchBehavior) {
                 couchBehavior.addZombieSun(50);
+            } else if (behavior instanceof MultiplayerIZombieBehavior multiplayer) {
+                if (multiplayer.isZombiesPlayer()) {
+                    addProducedSun(zombie, session);
+                }
             } else {
-                int zRow = (int) zombie.getPosition().y();
-                int zCol = (int) zombie.getPosition().x();
-                ProducedSun sun = new ProducedSun(zCol, zRow, 50, zombie.getAlias());
-                session.addItem(sun);
+                addProducedSun(zombie, session);
             }
 
             if (currentInterval > minInterval) {
@@ -38,5 +40,12 @@ public class SunProducerZombieEffect implements EffectStatus {
             }
             timer = currentInterval;
         }
+    }
+
+    private void addProducedSun(Zombie zombie, GameSession session) {
+        int zRow = (int) zombie.getPosition().y();
+        int zCol = (int) zombie.getPosition().x();
+        ProducedSun sun = new ProducedSun(zCol, zRow, 50, zombie.getAlias());
+        session.addItem(sun);
     }
 }

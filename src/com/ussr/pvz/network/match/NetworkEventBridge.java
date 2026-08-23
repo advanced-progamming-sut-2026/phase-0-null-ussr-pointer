@@ -75,11 +75,31 @@ public final class NetworkEventBridge {
                 continue; // never reaches actionApplier
             }
 
+            if (isSynchronizedMatchState(action.type())) {
+                applyRemoteAction(action);
+                continue;
+            }
+
             // ── All other actions: skip own, apply remote ─────────────────────
             if (action.senderRole() == context.role()) continue;
-            applyingRemoteAction = true;
-            try { actionApplier.apply(action); }
-            finally { applyingRemoteAction = false; }
+            applyRemoteAction(action);
+        }
+    }
+
+    private boolean isSynchronizedMatchState(MatchActionType type) {
+        return type == MatchActionType.PLAYER_READY
+                || type == MatchActionType.MATCH_READY
+                || type == MatchActionType.PAUSE_CHANGED
+                || type == MatchActionType.FORFEIT
+                || type == MatchActionType.GAME_OVER;
+    }
+
+    private void applyRemoteAction(MatchAction action) {
+        applyingRemoteAction = true;
+        try {
+            actionApplier.apply(action);
+        } finally {
+            applyingRemoteAction = false;
         }
     }
 
@@ -89,6 +109,20 @@ public final class NetworkEventBridge {
     public void sendReaction(ReactionKind kind, int index) {
         if (!canSendAnyRole()) return;
         send(MatchActionType.REACTION, new ReactionPayload(kind, index).toJson());
+    }
+
+    public void sendPlayerReady() {
+        send(MatchActionType.PLAYER_READY, new JsonObject());
+    }
+
+    public void sendPauseChanged(boolean paused) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("paused", paused);
+        send(MatchActionType.PAUSE_CHANGED, payload);
+    }
+
+    public void sendForfeit() {
+        send(MatchActionType.FORFEIT, new JsonObject());
     }
 
     private void plantPlaced(GameEvent.PlantPlanted event) {

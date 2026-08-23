@@ -10,6 +10,7 @@ import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 
@@ -27,6 +28,7 @@ public class InGameHud extends Table implements Disposable {
     private final ResetTerrainWidget resetTerrainWidget;
     private final ReactionHudWidget reactionHud;
     private final ReactionOverlayWidget reactionOverlay;
+    private final Label waitingForOpponentLabel;
     private final PamPlayer pamPlayer;
 
     private GameSession wiredSession = null;
@@ -48,6 +50,13 @@ public class InGameHud extends Table implements Disposable {
         timedWarHudWidget  = new TimedWarHudWidget(skin, textures);
         reactionHud        = new ReactionHudWidget(skin, textures,pamPlayer);
         reactionOverlay    = new ReactionOverlayWidget(skin, textures,pamPlayer);
+        waitingForOpponentLabel = new Label(
+                "WAITING FOR OPPONENT...",
+                skin,
+                "medium_outline"
+        );
+        waitingForOpponentLabel.setTouchable(Touchable.disabled);
+        waitingForOpponentLabel.setVisible(false);
 
         MeowScoreWidget      meowScoreWidget      = new MeowScoreWidget(skin, textures);
         GameEventAnnouncer   eventAnnouncer       = new GameEventAnnouncer(skin, App.getGameSession());
@@ -154,6 +163,11 @@ public class InGameHud extends Table implements Disposable {
         reactionOverlayWrapper.setTouchable(Touchable.disabled);
         reactionOverlayWrapper.add(reactionOverlay).grow();
 
+        Table waitingLayer = new Table();
+        waitingLayer.setFillParent(true);
+        waitingLayer.setTouchable(Touchable.disabled);
+        waitingLayer.add(waitingForOpponentLabel).center();
+
         // Root stack — reaction layers added last so they render on top
         Stack rootStack = new Stack();
         rootStack.setTouchable(Touchable.childrenOnly);
@@ -162,6 +176,7 @@ public class InGameHud extends Table implements Disposable {
         rootStack.add(bottomRow);
         rootStack.add(conveyorLayer);
         rootStack.add(lawnGridDebugOverlay);
+        rootStack.add(waitingLayer);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);
         rootStack.add(eventAnnouncer);
@@ -175,6 +190,14 @@ public class InGameHud extends Table implements Disposable {
     public void act(float delta) {
         super.act(delta);
         GameSession session = App.getGameSession();
+        boolean waitingForOpponent = session != null
+                && session.getLevel() != null
+                && session.getLevel().getBehavior()
+                instanceof MultiplayerIZombieBehavior behavior
+                && behavior.isWaitingForPlayers()
+                && behavior.isLocalPlayerReady();
+        waitingForOpponentLabel.setVisible(waitingForOpponent);
+
         if (session != null && session != wiredSession && session.getEventBus() != null) {
             session.getEventBus().subscribe(
                     GameEvent.ReactionReceivedEvent.class,
@@ -190,7 +213,6 @@ public class InGameHud extends Table implements Disposable {
     private void clearPlantSelection() {
         seedBankHud.clearSelection();
         conveyorBeltWidget.clearSelection();
-        iZombieHud.clearSelection();
     }
 
     @Override

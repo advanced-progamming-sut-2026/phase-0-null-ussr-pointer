@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
+import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.view.components.PlantCard;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 import pvz.libpvz.textures.TextureBank;
@@ -48,6 +49,20 @@ public class HoverCursorWidget extends Actor {
         }
 
         // ── Plant selection mode ──────────────────────────────────────────
+        String selectedZombieKey = controller.getSelectedZombieKey();
+        if (selectedZombieKey != null) {
+            if (!LawnGridLayout.contains(mouse.x, mouse.y)) return;
+
+            int column = LawnGridLayout.columnAt(mouse.x);
+            int row = LawnGridLayout.rowAt(mouse.y);
+            drawHighlight(batch, parentAlpha,
+                    LawnGridLayout.cellX(column),
+                    LawnGridLayout.cellY(row));
+            drawZombiePreview(batch, parentAlpha,
+                    selectedZombieKey, mouse.x, mouse.y);
+            return;
+        }
+
         String selectedKey =
                 controller.getSelectedSeedKey();
         if (selectedKey == null) return;
@@ -142,6 +157,34 @@ public class HoverCursorWidget extends Actor {
         Color prev = new Color(batch.getColor());
         batch.setColor(1f, 1f, 1f, 0.9f * parentAlpha);
         batch.draw(shovel, mouse.x - width / 2f, mouse.y - height / 2f, width, height);
+        batch.setColor(prev);
+    }
+
+    private void drawZombiePreview(
+            Batch batch, float parentAlpha,
+            String selectedKey, float mouseX, float mouseY
+    ) {
+        TextureRegion zombieRegion = textures.region(
+                ZombieFactory.getZombieTextureRegion(selectedKey)
+        );
+        if (zombieRegion == null) return;
+
+        float maxWidth = LawnGridLayout.CELL_WIDTH * 0.8f;
+        float maxHeight = LawnGridLayout.CELL_HEIGHT * 0.85f;
+        float scale = Math.min(
+                maxWidth / Math.max(1f, zombieRegion.getRegionWidth()),
+                maxHeight / Math.max(1f, zombieRegion.getRegionHeight())
+        );
+        float previewWidth = zombieRegion.getRegionWidth() * scale;
+        float previewHeight = zombieRegion.getRegionHeight() * scale;
+
+        Color prev = new Color(batch.getColor());
+        batch.setColor(1f, 1f, 1f, 0.7f * parentAlpha);
+        batch.draw(zombieRegion,
+                mouseX - previewWidth / 2f,
+                mouseY - previewHeight / 2f - 10f,
+                previewWidth,
+                previewHeight);
         batch.setColor(prev);
     }
 }

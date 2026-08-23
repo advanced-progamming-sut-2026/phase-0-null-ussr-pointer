@@ -366,6 +366,12 @@ public final class MultiplayerIZombieService {
                 }
 
                 activeBridge.receive(message);
+                GameSession session = App.getGameSession();
+                if ("OPPONENT_DISCONNECTED".equals(message.reason())
+                        && session != null
+                        && !session.isGameOver()) {
+                    session.concludeVictory();
+                }
                 endMatch();
             }
         }
@@ -394,6 +400,28 @@ public final class MultiplayerIZombieService {
         return activeContext != null
                 && activeContext.isActive();
     }
+
+    public void markLocalPlayerReady() {
+        if (activeBridge == null || !hasActiveMatch()) {
+            return;
+        }
+        activeBridge.sendPlayerReady();
+    }
+
+    public void setMatchPaused(boolean paused) {
+        if (activeBridge == null || !hasActiveMatch()) {
+            return;
+        }
+        activeBridge.sendPauseChanged(paused);
+    }
+
+    public void forfeitMatch() {
+        if (activeBridge == null || !hasActiveMatch()) {
+            return;
+        }
+        activeBridge.sendForfeit();
+    }
+
     public void sendReaction(ReactionKind kind, int index) {
         if (activeBridge == null || !hasActiveMatch()) return;
         activeBridge.sendReaction(kind, index);

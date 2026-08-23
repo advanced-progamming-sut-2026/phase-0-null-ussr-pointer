@@ -66,10 +66,24 @@ public final class GameplayController {
     // =========================================================
 
     public void togglePauseMenu() {
+        MultiplayerIZombieBehavior multiplayer =
+                multiplayerBehavior();
+
+        if (multiplayer != null) {
+            MultiplayerIZombieService.getInstance()
+                    .setMatchPaused(!multiplayer.isMatchPaused());
+            return;
+        }
+
         manuallyPaused = !manuallyPaused;
     }
 
     public boolean isPauseMenuOpen() {
+        MultiplayerIZombieBehavior multiplayer =
+                multiplayerBehavior();
+        if (multiplayer != null) {
+            return multiplayer.isMatchPaused();
+        }
         return manuallyPaused;
     }
 
@@ -80,8 +94,13 @@ public final class GameplayController {
     }
 
     public boolean isPaused() {
-        return manuallyPaused
-                || dialoguePaused;
+        MultiplayerIZombieBehavior multiplayer =
+                multiplayerBehavior();
+
+        return isPauseMenuOpen()
+                || dialoguePaused
+                || multiplayer != null
+                && multiplayer.isWaitingForPlayers();
     }
 
     // =========================================================
@@ -718,10 +737,22 @@ public final class GameplayController {
             int column,
             int row
     ) {
-        if (!canUseZombieControls()
-                || selectedZombieKey == null) {
+        if (!canUseZombieControls()) {
             return;
         }
+
+        String collectionResult = gameService.collectSun(
+                new LocationRequest(
+                        String.valueOf(column),
+                        String.valueOf(row)
+                )
+        );
+
+        if (collectionResult.startsWith("sun collected")) {
+            return;
+        }
+
+        if (selectedZombieKey == null) return;
 
         iZombieService.placeZombie(
                 selectedZombieKey,

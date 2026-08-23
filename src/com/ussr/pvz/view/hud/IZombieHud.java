@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.level.IZombiePricing;
 import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
@@ -149,7 +150,14 @@ public class IZombieHud extends Table {
             String id = entry.id();
             if ("SunProducerZombie".equalsIgnoreCase(id)) continue; // not placeable
 
-            ZombieSlotWidget slot = new ZombieSlotWidget(id, skin, textures, () -> selectZombie(id));
+            int cost = IZombiePricing.getCost(session, id);
+            ZombieSlotWidget slot = new ZombieSlotWidget(
+                    id,
+                    cost,
+                    skin,
+                    textures,
+                    () -> selectZombie(id)
+            );
             slots.put(id, slot);
             cardColumn.add(slot).size(SLOT_W, SLOT_H).padLeft(3f).top();
         }
@@ -183,6 +191,7 @@ public class IZombieHud extends Table {
         private static final Color BORDER_COLOR = new Color(1f, 0.72f, 0.08f, 1f);
 
         private final String  zombieId;
+        private final int      cost;
         private final Image   portrait;
         private final Label   costLabel;
         private final Actor   selectionFrame;
@@ -190,8 +199,15 @@ public class IZombieHud extends Table {
         private boolean selected    = false;
         private boolean affordable  = true;
 
-        ZombieSlotWidget(String zombieId, Skin skin, TextureBank textures, Runnable onClick) {
+        ZombieSlotWidget(
+                String zombieId,
+                int cost,
+                Skin skin,
+                TextureBank textures,
+                Runnable onClick
+        ) {
             this.zombieId = zombieId;
+            this.cost = cost;
             setTouchable(Touchable.enabled);
 
             // Card background
@@ -222,7 +238,6 @@ public class IZombieHud extends Table {
             }
 
             // Cost label
-            int cost = com.ussr.pvz.model.entities.zombies.ZombieFactory.getZombieCost(zombieId);
             Table costLayer = new Table();
             costLayer.setTouchable(Touchable.disabled);
             costLayer.bottom().left();
@@ -249,7 +264,6 @@ public class IZombieHud extends Table {
         }
 
         void refreshAffordability(int sun) {
-            int cost = com.ussr.pvz.model.entities.zombies.ZombieFactory.getZombieCost(zombieId);
             affordable = sun >= cost;
             Color tint = affordable ? AFFORDABLE : UNAFFORDABLE;
             portrait.setColor(tint);

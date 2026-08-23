@@ -4,6 +4,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.level.IZombiePricing;
 import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
@@ -48,7 +49,7 @@ public class IZombieService {
         }
 
         // 3. Validate Cost
-        int cost = ZombieFactory.getZombieCost(zombieAlias);
+        int cost = IZombiePricing.getCost(session, zombieAlias);
         if (behavior instanceof CouchIZombieBehavior couchBehavior) {
             if (couchBehavior.getZombieSun() < cost) {
                 return "Not enough sun! " + zombieAlias + " costs " + cost + " sun.";

@@ -1,11 +1,13 @@
 package com.ussr.pvz.server.match;
 
+import com.google.gson.JsonObject;
 import com.ussr.pvz.shared.multiplayer.MatchAction;
 import com.ussr.pvz.shared.multiplayer.MatchActionType;
 import com.ussr.pvz.shared.multiplayer.MatchCommand;
 import com.ussr.pvz.shared.multiplayer.MatchDescriptor;
 import com.ussr.pvz.shared.multiplayer.MatchRole;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +32,12 @@ public final class MatchRoom {
     private final Map<String, MatchAction> actionsById =
             new HashMap<>();
 
+    private final EnumSet<MatchRole> readyRoles =
+            EnumSet.noneOf(MatchRole.class);
+
     private boolean started;
+    private boolean matchReady;
+    private boolean paused;
     private volatile boolean closed;
 
     public MatchRoom(
@@ -174,6 +181,8 @@ public final class MatchRoom {
             return;
         }
 
+        validateLifecycle(command);
+
         MatchAction action =
                 new MatchAction(
                         matchId,
@@ -191,9 +200,113 @@ public final class MatchRoom {
 
         broadcast(action);
 
-        if (action.type() == MatchActionType.GAME_OVER) {
-            closeWith("GAME_OVER");
+        switch (action.type()) {
+            case PLAYER_READY -> {
+                readyRoles.add(senderRole);
+                if (readyRoles.size() == MatchRole.values().length) {
+                    broadcastMatchReady();
+                }
+            }
+            case PAUSE_CHANGED ->
+                    paused = action.payload().get("paused").getAsBoolean();
+            case FORFEIT -> concludeWithWinner(
+                    opposite(senderRole),
+                    "OPPONENT_FORFEITED"
+            );
+            case GAME_OVER -> closeWith("GAME_OVER");
+            default -> { }
         }
+    }
+
+    private void validateLifecycle(MatchCommand command) {
+        MatchActionType type = command.type();
+
+        if (type == MatchActionType.MATCH_READY) {
+            throw new IllegalArgumentException(
+                    "MATCH_READY is a server-only action."
+            );
+        }
+
+        if (type == MatchActionType.PAUSE_CHANGED) {
+            if (!command.payload().has("paused")
+                    || !command.payload().get("paused").isJsonPrimitive()
+                    || !command.payload().get("paused")
+                    .getAsJsonPrimitive().isBoolean()) {
+                throw new IllegalArgumentException(
+                        "PAUSE_CHANGED requires a boolean paused value."
+                );
+            }
+            return;
+        }
+
+        boolean allowedBeforeReady =
+                type == MatchActionType.PLAYER_READY
+                        || type == MatchActionType.FORFEIT
+                        || type == MatchActionType.REACTION;
+
+        if (!matchReady && !allowedBeforeReady) {
+            throw new IllegalStateException(
+                    "Both players must finish the intro first."
+            );
+        }
+
+        if (paused
+                && type != MatchActionType.FORFEIT
+                && type != MatchActionType.REACTION
+                && type != MatchActionType.GAME_OVER) {
+            throw new IllegalStateException("Match is paused.");
+        }
+    }
+
+    private void broadcastMatchReady() {
+        if (matchReady || closed) {
+            return;
+        }
+
+        matchReady = true;
+        JsonObject payload = new JsonObject();
+        payload.addProperty(
+                "startTimeMillis",
+                System.currentTimeMillis()
+        );
+        broadcastServerAction(
+                "server-match-ready",
+                MatchRole.PLANTS,
+                MatchActionType.MATCH_READY,
+                payload
+        );
+    }
+
+    private MatchAction createServerAction(
+            String actionId,
+            MatchRole senderRole,
+            MatchActionType type,
+            JsonObject payload
+    ) {
+        MatchAction action = new MatchAction(
+                matchId,
+                actionId,
+                sequenceCounter.getAndIncrement(),
+                senderRole,
+                type,
+                payload
+        );
+        actionsById.put(action.actionId(), action);
+        return action;
+    }
+
+    private void broadcastServerAction(
+            String actionId,
+            MatchRole senderRole,
+            MatchActionType type,
+            JsonObject payload
+    ) {
+        broadcast(createServerAction(
+                actionId,
+                senderRole,
+                type,
+                payload
+        ));
     }
 
     private void broadcast(MatchAction action) {
@@ -256,7 +369,12 @@ public final class MatchRoom {
             case ZOMBIE_DIED,
                  ENTITY_CORRECTION,
                  REACTION,
+                 PLAYER_READY,
+                 PAUSE_CHANGED,
+                 FORFEIT,
                  GAME_OVER -> true;
+
+            case MATCH_READY -> false;
         };
 
         if (!permitted) {
@@ -276,6 +394,62 @@ public final class MatchRoom {
         }
 
         closeWith(reason);
+    }
+
+    public synchronized void peerDisconnected(String token) {
+        MatchRole disconnectedRole = roleOf(token);
+        if (closed || disconnectedRole == null) {
+            return;
+        }
+
+        MatchRole winner = opposite(disconnectedRole);
+        MatchPeer remainingPeer = winner == MatchRole.PLANTS
+                ? plants
+                : zombies;
+
+        closed = true;
+        remainingPeer.sendMatchAction(
+                createGameOverAction(winner, "server-disconnect-game-over")
+        );
+        remainingPeer.sendMatchClosed(
+                matchId,
+                "OPPONENT_DISCONNECTED"
+        );
+    }
+
+    private void concludeWithWinner(
+            MatchRole winner,
+            String reason
+    ) {
+        if (closed) {
+            return;
+        }
+
+        broadcast(createGameOverAction(
+                winner,
+                "server-game-over-" + sequenceCounter.get()
+        ));
+        closeWith(reason);
+    }
+
+    private MatchAction createGameOverAction(
+            MatchRole winner,
+            String actionId
+    ) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("winnerRole", winner.name());
+        return createServerAction(
+                actionId,
+                winner,
+                MatchActionType.GAME_OVER,
+                payload
+        );
+    }
+
+    private static MatchRole opposite(MatchRole role) {
+        return role == MatchRole.PLANTS
+                ? MatchRole.ZOMBIES
+                : MatchRole.PLANTS;
     }
 
     private void closeWith(String reason) {
