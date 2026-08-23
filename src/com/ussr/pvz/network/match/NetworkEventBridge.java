@@ -63,11 +63,32 @@ public final class NetworkEventBridge {
 
     private void receiveAction(MatchAction incoming) {
         for (MatchAction action : actionBuffer.offer(incoming)) {
+
+            // ── Reactions are UI-only: never go through actionApplier ─────────
+            // Both the sender and the recipient receive this broadcast from the
+            // server. We show it only when it came from the OPPONENT.
+            if (action.type() == MatchActionType.REACTION) {
+                if (action.senderRole() != context.role()) {
+                    ReactionPayload reaction = ReactionPayload.fromJson(action.payload());
+                    eventBus.publish(new GameEvent.ReactionReceivedEvent(reaction));
+                }
+                continue; // never reaches actionApplier
+            }
+
+            // ── All other actions: skip own, apply remote ─────────────────────
             if (action.senderRole() == context.role()) continue;
             applyingRemoteAction = true;
             try { actionApplier.apply(action); }
             finally { applyingRemoteAction = false; }
         }
+    }
+
+    // ── Sending a reaction ────────────────────────────────────────────────────
+    // Called by MultiplayerIZombieService.sendReaction() on the game thread.
+
+    public void sendReaction(ReactionKind kind, int index) {
+        if (!canSendAnyRole()) return;
+        send(MatchActionType.REACTION, new ReactionPayload(kind, index).toJson());
     }
 
     private void plantPlaced(GameEvent.PlantPlanted event) {
@@ -111,7 +132,6 @@ public final class NetworkEventBridge {
                 || !"brain".equalsIgnoreCase(event.structureType())) {
             return;
         }
-
         JsonObject payload = new JsonObject();
         payload.addProperty("entityId", "brain-" + event.row());
         payload.addProperty("lane", event.row());

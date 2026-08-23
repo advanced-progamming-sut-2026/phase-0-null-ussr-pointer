@@ -19,6 +19,7 @@ import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
 import com.ussr.pvz.service.game.GameService;
 import com.ussr.pvz.service.minigame.BeghouledService;
 import com.ussr.pvz.service.minigame.IZombieService;
+import com.ussr.pvz.service.minigame.MultiplayerIZombieService;
 import com.ussr.pvz.service.minigame.VaseBreakerService;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 

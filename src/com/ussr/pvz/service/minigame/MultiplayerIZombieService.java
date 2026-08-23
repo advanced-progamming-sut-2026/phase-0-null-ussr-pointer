@@ -18,6 +18,7 @@ import com.ussr.pvz.network.match.RemoteActionApplier;
 import com.ussr.pvz.shared.multiplayer.MatchDescriptor;
 import com.ussr.pvz.shared.multiplayer.MatchRole;
 import com.ussr.pvz.shared.multiplayer.MatchServerMessage;
+import com.ussr.pvz.shared.multiplayer.ReactionKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,15 +247,7 @@ public final class MultiplayerIZombieService {
                         ),
                         new Level.AllowedZombie(
                                 "ZombieDefault",
-                                500
-                        ),
-                        new Level.AllowedZombie(
-                                "ZombieArmor1",
-                                400
-                        ),
-                        new Level.AllowedZombie(
-                                "ZombieArmor2",
-                                300
+                                50
                         ),
                         new Level.AllowedZombie(
                                 "ZombieNewspaper",
@@ -263,14 +256,6 @@ public final class MultiplayerIZombieService {
                         new Level.AllowedZombie(
                                 "ZombieExplorer",
                                 250
-                        ),
-                        new Level.AllowedZombie(
-                                "ZombieCrystalSkull",
-                                200
-                        ),
-                        new Level.AllowedZombie(
-                                "ZombiePiano",
-                                200
                         ),
                         new Level.AllowedZombie(
                                 "ZombieProspector",
@@ -409,7 +394,10 @@ public final class MultiplayerIZombieService {
         return activeContext != null
                 && activeContext.isActive();
     }
-
+    public void sendReaction(ReactionKind kind, int index) {
+        if (activeBridge == null || !hasActiveMatch()) return;
+        activeBridge.sendReaction(kind, index);
+    }
     public MatchContext getActiveContext() {
         return activeContext;
     }

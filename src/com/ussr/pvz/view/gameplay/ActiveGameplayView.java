@@ -64,7 +64,7 @@ public class ActiveGameplayView extends Table implements Disposable {
 
         GlacierRenderLayer glacierLayer = new GlacierRenderLayer(pamPlayer);
 
-        this.inGameHud = new InGameHud(skin, textures, controller);
+        this.inGameHud = new InGameHud(skin, textures, controller,pamPlayer);
 
         LawnWidget lawnWidget = new LawnWidget(controller);
 

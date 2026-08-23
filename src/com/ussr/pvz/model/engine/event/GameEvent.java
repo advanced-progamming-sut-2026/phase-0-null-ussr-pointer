@@ -2,18 +2,9 @@ package com.ussr.pvz.model.engine.event;
 
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Zombie;
+import com.ussr.pvz.shared.multiplayer.ReactionPayload;
 
-public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
-        GameEvent.GameOver, GameEvent.GameWon, GameEvent.GlowingZombieDroppedPlantFood,
-        GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.PlantDamaged,
-        GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed,
-        GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked,
-        GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.SandstormTriggered,
-        GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected,
-        GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling,
-        GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied,
-        GameEvent.ZombieReachedHouse, GameEvent.SpecialLevelAnnouncement, GameEvent.ZombieSpawned
-        ,GameEvent.MeowScoreMilestone{
+public sealed interface GameEvent permits GameEvent.FreezingWindTriggered, GameEvent.GameOver, GameEvent.GameWon, GameEvent.GlowingZombieDroppedPlantFood, GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.MeowScoreMilestone, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked, GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.ReactionReceivedEvent, GameEvent.SandstormTriggered, GameEvent.SpecialLevelAnnouncement, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned {
 
 
     record ZombieSpawned(Zombie zombie) implements GameEvent {
@@ -127,4 +118,5 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered,
     }
 
     record MeowScoreMilestone(int threshold, int milestoneIndex) implements GameEvent {}
+     record ReactionReceivedEvent(ReactionPayload reaction) implements GameEvent {}
 }

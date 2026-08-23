@@ -7,6 +7,7 @@ import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 
 public class IZombieService {
 
@@ -16,12 +17,14 @@ public class IZombieService {
 
         LevelBehavior behavior = session.getLevel().getBehavior();
         int redLineColumn;
-        if (behavior instanceof IZombieBehavior iZombieBehavior) {
-            redLineColumn = iZombieBehavior.getRedLineColumn();
-        } else if (behavior instanceof CouchIZombieBehavior couchBehavior) {
-            redLineColumn = couchBehavior.getRedLineColumn();
-        } else {
-            return "Current level is not an i,Zombie minigame.";
+        switch (behavior) {
+            case IZombieBehavior iZombieBehavior -> redLineColumn = iZombieBehavior.getRedLineColumn();
+            case CouchIZombieBehavior couchBehavior -> redLineColumn = couchBehavior.getRedLineColumn();
+            case MultiplayerIZombieBehavior multiplayerBehavior ->
+                    redLineColumn = multiplayerBehavior.getRedLineColumn();
+            case null, default -> {
+                return "Current level is not an i,Zombie minigame.";
+            }
         }
 
         // 1. Prevent spawning the special Sun-Producing Zombie

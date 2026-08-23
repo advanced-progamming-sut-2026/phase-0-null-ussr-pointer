@@ -275,7 +275,7 @@ public class ClientHandler implements Runnable, MatchPeer {
             case LEAVE_RANDOM_QUEUE  -> handleLeaveRandomQueue(request);
             case CHECK_RANDOM_MATCH  -> handleCheckRandomMatch(request);
             case CHECK_INVITE_RESULT -> handleCheckInviteResult(request);
-
+            case SEND_REACTION -> handleSendReaction(request);
             case GAME_ACTION -> handleGameAction(request);
 
             default -> NetworkResponse.error("Request not implemented.");
@@ -1001,6 +1001,49 @@ public class ClientHandler implements Runnable, MatchPeer {
         JsonObject data = new JsonObject();
         data.addProperty("status", result.status().name());
         return new NetworkResponse(success, result.message(), data);
+    }
+    private NetworkResponse handleSendReaction(NetworkRequest request) {
+        if (!validSession(request.getToken())) {
+            return NetworkResponse.error("Invalid session.");
+        }
+
+        if (request.getData() == null) {
+            return NetworkResponse.error("Missing reaction data.");
+        }
+
+        // Expect: { "kind": "EMOJI", "index": 1 }
+        ReactionPayload payload;
+        try {
+            payload = ReactionPayload.fromJson(request.getData());
+        } catch (Exception e) {
+            return NetworkResponse.error("Invalid reaction payload: " + e.getMessage());
+        }
+
+        if (payload.index() < 0 || payload.index() > 2) {
+            return NetworkResponse.error("Reaction index must be 0, 1 or 2.");
+        }
+
+        try {
+            // Reuse GAME_ACTION relay: wrap in a MatchCommand and hand to MatchManager.
+            // A unique actionId prevents retransmission collisions.
+            String actionId = "reaction-" + sessionToken + "-" + System.nanoTime();
+
+            MatchCommand command = new MatchCommand(
+                    matchManager.findRoomByToken(request.getToken()) != null
+                            ? matchManager.findRoomByToken(request.getToken()).matchId()
+                            : "",
+                    actionId,
+                    MatchActionType.REACTION,
+                    payload.toJson()
+            );
+
+            matchManager.handleCommand(command, request.getToken());
+            return NetworkResponse.success("Reaction sent.");
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return NetworkResponse.error(e.getMessage() != null
+                    ? e.getMessage() : "Reaction rejected.");
+        }
     }
 
     private NetworkResponse profileResponse(String message) {
