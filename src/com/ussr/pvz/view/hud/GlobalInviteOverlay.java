@@ -1,31 +1,52 @@
 package com.ussr.pvz.view.hud;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.LobbyService;
+import pvz.libpvz.textures.TextureBank;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
+/**
+ * Stage-level overlay that shows incoming invite alerts and outgoing-invite
+ * results from any screen.
+ *
+ * Styled with the same TextureBank/atlas approach used by SettingMenu:
+ * NinePatch panel backgrounds, TextureRegion images and ImageButtons.
+ *
+ * Bug fix: the card now correctly disappears when a game session starts,
+ * regardless of which OverlayMode is active (not just WAITING_FOR_SERVER).
+ */
 public class GlobalInviteOverlay extends Table {
 
-    // ── Listener — called when an invite result is processed ──────────────────
+    // ── Atlas texture keys (same atlas as SettingMenu) ────────────────────────
 
-    /**
-     * Implement this in LobbyMenu and pass it via setInviteListener().
-     * The overlay calls it whenever it resolves an outgoing-invite result
-     * so the lobby UI can reset itself without polling on its own.
-     */
+    private static final String CONTENT_PANEL  = "IMAGE_UI_SETTINGS_CONTENT_PANEL";
+    private static final String ROW_LARGE      = "IMAGE_UI_SETTINGS_ROW_LARGE";
+    private static final String TAB_GREEN      = "IMAGE_UI_SETTINGS_TAB_GREEN";
+    private static final String TAB_DARK       = "IMAGE_UI_SETTINGS_TAB_DARK";
+    private static final String VALUE_PANEL    = "IMAGE_UI_SETTINGS_VALUE_PANEL";
+    private static final String APPLY          = "IMAGE_UI_SETTINGS_BUTTON_APPLY";   // Accept
+    private static final String RESET          = "IMAGE_UI_SETTINGS_BUTTON_RESET";   // Reject / OK
+
+    // ── Listener ──────────────────────────────────────────────────────────────
+
     public interface InviteListener {
-        /** Called when the invite WE sent was accepted. */
         void onInviteAccepted(String opponentUsername);
-        /** Called when the invite WE sent was rejected. */
         void onInviteRejected(String opponentUsername);
     }
 
@@ -43,74 +64,102 @@ public class GlobalInviteOverlay extends Table {
         WAITING_FOR_SERVER
     }
 
-    private OverlayMode mode = OverlayMode.HIDDEN;
-    private String pendingInviteTarget;
-    private String incomingInviter;
-    private boolean inRandomQueue = false;
+    private OverlayMode mode               = OverlayMode.HIDDEN;
+    private String      pendingInviteTarget;
+    private String      incomingInviter;
+    private boolean     inRandomQueue      = false;
 
-    /** Registered by LobbyMenu; null when lobby is not on screen */
     private InviteListener inviteListener;
 
     // ── Services ──────────────────────────────────────────────────────────────
 
     private final LobbyService lobbyService = new LobbyService();
+    private final TextureBank  textures;
 
     // ── Widgets ───────────────────────────────────────────────────────────────
 
-    private final Table card;
-    private final Label titleLabel;
-    private final Label bodyLabel;
-    private final TextButton acceptButton;
-    private final TextButton rejectButton;
-    private final TextButton okButton;
+    private final Table       card;
+    private final Label       titleLabel;
+    private final Label       bodyLabel;
+    private final ImageButton acceptButton;
+    private final ImageButton rejectButton;
+    private final ImageButton okButton;
+    private final Label       acceptLabel;
+    private final Label       rejectLabel;
+    private final Label       okLabel;
 
-    // ── Constructor ───────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Constructor
+    // ─────────────────────────────────────────────────────────────────────────
 
     public GlobalInviteOverlay(Skin skin) {
+        this.textures = new TextureBank("768", Gdx.files.local("pvz-assets"));
+
         setFillParent(true);
         setTouchable(Touchable.disabled);
 
+        // ── Card shell (CONTENT_PANEL nine-patch, same as SettingMenu panel) ──
         card = new Table();
-        card.setBackground(skin.newDrawable(
-                "white-pixel",
-                new Color(0.08f, 0.12f, 0.08f, 0.96f)
-        ));
-        card.pad(18f, 22f, 18f, 22f);
+        card.setBackground(panelDrawable(CONTENT_PANEL, 28, 28, 28, 28));
+        card.pad(16f, 22f, 16f, 22f);
 
+        // ── Header bar: icon + title ──────────────────────────────────────────
         titleLabel = new Label("", skin, "medium_outline");
         titleLabel.setAlignment(Align.center);
 
+        // Decorate the title row with the value-panel texture as a badge strip
+        Stack titleRow = new Stack();
+        Image titleBg = image(VALUE_PANEL);
+        titleBg.setScaling(Scaling.stretchX);
+        titleBg.setTouchable(Touchable.disabled);
+        titleRow.add(titleBg);
+        titleRow.add(titleLabel);
+
+        // ── Body text (ROW_LARGE card background) ─────────────────────────────
         bodyLabel = new Label("", skin, "default");
         bodyLabel.setWrap(true);
         bodyLabel.setAlignment(Align.center);
 
-        acceptButton = new TextButton("", skin, "default");
-        rejectButton = new TextButton("", skin, "default");
-        okButton     = new TextButton("OK", skin, "default");
+        Table bodyCard = new Table();
+        bodyCard.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
+        bodyCard.pad(12f, 16f, 12f, 16f);
+        bodyCard.add(bodyLabel).width(300f);
 
-        acceptButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) { onAccept(); }
-        });
-        rejectButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) { onReject(); }
-        });
-        okButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) { onOk(); }
-        });
+        // ── Buttons ───────────────────────────────────────────────────────────
+        // Accept — APPLY texture (green-ish)
+        acceptLabel = new Label("✔  Accept", skin, "default");
+        acceptLabel.setColor(new Color(0.25f, 0.95f, 0.35f, 1f));
+        acceptButton = iconButton(APPLY);
+        acceptButton.addListener(click(this::onAccept));
 
-        card.add(titleLabel).fillX().padBottom(8f).row();
-        card.add(bodyLabel).width(280f).padBottom(14f).row();
+        // Reject — RESET texture (reddish tint)
+        rejectLabel = new Label("✗  Reject", skin, "default");
+        rejectLabel.setColor(new Color(0.95f, 0.30f, 0.25f, 1f));
+        rejectButton = iconButton(RESET);
+        rejectButton.addListener(click(this::onReject));
 
+        // OK — RESET texture (neutral)
+        okLabel = new Label("OK", skin, "default");
+        okLabel.setAlignment(Align.center);
+        okButton = iconButton(RESET);
+        okButton.addListener(click(this::onOk));
+
+        // ── Button row ────────────────────────────────────────────────────────
         Table buttons = new Table();
-        buttons.add(acceptButton).width(120f).padRight(8f);
-        buttons.add(rejectButton).width(120f);
-        card.add(buttons).padBottom(4f).row();
-        card.add(okButton).width(120f);
+        buttons.add(labeledButton(acceptButton, acceptLabel)).width(148f).height(58f).padRight(10f);
+        buttons.add(labeledButton(rejectButton, rejectLabel)).width(148f).height(58f);
+        buttons.add(labeledButton(okButton,     okLabel    )).width(148f).height(58f);
 
+        // ── Assemble card ─────────────────────────────────────────────────────
+        card.add(titleRow ).width(340f).height(52f).padBottom(12f).row();
+        card.add(bodyCard ).padBottom(14f).row();
+        card.add(buttons  ).padBottom(4f).row();
+
+        // Anchor to bottom-right corner
         Table anchor = new Table();
         anchor.setFillParent(true);
         anchor.bottom().right();
-        anchor.add(card).pad(24f);
+        anchor.add(card).pad(28f);
         addActor(anchor);
 
         hideCard();
@@ -120,10 +169,6 @@ public class GlobalInviteOverlay extends Table {
     // Public API
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Register a listener that will be notified when an outgoing-invite result
-     * is processed. Call setInviteListener(null) when LobbyMenu is destroyed.
-     */
     public void setInviteListener(InviteListener listener) {
         this.inviteListener = listener;
     }
@@ -134,18 +179,11 @@ public class GlobalInviteOverlay extends Table {
 
     public void notifyInviteCancelled() {
         this.pendingInviteTarget = null;
-        if (mode == OverlayMode.INVITE_REJECTED) {
-            hideCard();
-        }
+        if (mode == OverlayMode.INVITE_REJECTED) hideCard();
     }
 
-    public void notifyJoinedRandomQueue() {
-        this.inRandomQueue = true;
-    }
-
-    public void notifyLeftRandomQueue() {
-        this.inRandomQueue = false;
-    }
+    public void notifyJoinedRandomQueue()  { this.inRandomQueue = true;  }
+    public void notifyLeftRandomQueue()    { this.inRandomQueue = false; }
 
     // ─────────────────────────────────────────────────────────────────────────
     // act() — polling heartbeat
@@ -155,17 +193,19 @@ public class GlobalInviteOverlay extends Table {
     public void act(float delta) {
         super.act(delta);
 
+        // ── FIX: hide the card as soon as any game session is active ──────────
+        // The original code only hid the card in WAITING_FOR_SERVER mode; but if
+        // the player accepted an invite and the session starts before the next
+        // poll tick, INCOMING_INVITE mode could be left visible.  Now we hide
+        // for ALL non-HIDDEN modes the moment a session exists.
         if (App.getGameSession() != null) {
-            /*
-             * MATCH_STARTED has already been handled and the gameplay session
-             * now exists. This overlay is attached globally, so it must clear
-             * its waiting card explicitly instead of merely stopping polling.
-             */
-            if (mode == OverlayMode.WAITING_FOR_SERVER) {
+            if (mode != OverlayMode.HIDDEN) {
                 hideCard();
             }
             return;
         }
+
+        // Only poll when the card is not already showing something
         if (mode != OverlayMode.HIDDEN) return;
 
         pollTimer += delta;
@@ -184,15 +224,12 @@ public class GlobalInviteOverlay extends Table {
             String result = lobbyService.checkInviteResult();
             if (result != null) {
                 String target = pendingInviteTarget;
-                pendingInviteTarget = null; // clear before callbacks
+                pendingInviteTarget = null;
 
                 if ("ACCEPTED".equals(result)) {
-                    // Notify the lobby menu first so it resets its UI
                     if (inviteListener != null) inviteListener.onInviteAccepted(target);
                     showInviteAccepted(target);
                 } else {
-                    // Notify the lobby menu so it resets its UI immediately,
-                    // before the player even dismisses the card
                     if (inviteListener != null) inviteListener.onInviteRejected(target);
                     showInviteRejected(target);
                 }
@@ -216,15 +253,19 @@ public class GlobalInviteOverlay extends Table {
     private void showIncomingInvite(String inviterUsername) {
         incomingInviter = inviterUsername;
         mode = OverlayMode.INCOMING_INVITE;
+
         titleLabel.setText("⚔  Game Invite!");
+        titleLabel.setColor(new Color(0.95f, 0.82f, 0.28f, 1f));
+
         bodyLabel.setText(inviterUsername + " wants to play against you.");
-        acceptButton.setText("✔  Accept");
-        acceptButton.getLabel().setColor(new Color(0.3f, 0.9f, 0.3f, 1f));
-        rejectButton.setText("✗  Reject");
-        rejectButton.getLabel().setColor(new Color(0.9f, 0.3f, 0.3f, 1f));
+
+        acceptLabel.setVisible(true);
+        rejectLabel.setVisible(true);
+        okLabel    .setVisible(false);
         acceptButton.setVisible(true);
         rejectButton.setVisible(true);
-        okButton.setVisible(false);
+        okButton    .setVisible(false);
+
         showCard();
     }
 
@@ -234,27 +275,41 @@ public class GlobalInviteOverlay extends Table {
 
     private void showInviteRejected(String targetUsername) {
         mode = OverlayMode.INVITE_REJECTED;
+
         titleLabel.setText("✗  Invite Rejected");
+        titleLabel.setColor(new Color(0.95f, 0.35f, 0.25f, 1f));
+
         bodyLabel.setText(targetUsername + " declined your invite.");
+
         acceptButton.setVisible(false);
         rejectButton.setVisible(false);
-        okButton.setVisible(true);
+        okButton    .setVisible(true);
+        acceptLabel .setVisible(false);
+        rejectLabel .setVisible(false);
+        okLabel     .setVisible(true);
+
         showCard();
     }
 
     private void showMatchFound(String opponentUsername) {
-        showWaitingForServer("Opponent: " + opponentUsername);
+        showWaitingForServer("Opponent found: " + opponentUsername);
     }
 
     private void showWaitingForServer(String detail) {
         mode = OverlayMode.WAITING_FOR_SERVER;
-        titleLabel.setText("Match Confirmed");
-        bodyLabel.setText(
-                detail + "\n\nWaiting for the server to start the match..."
-        );
+
+        titleLabel.setText("✔  Match Confirmed");
+        titleLabel.setColor(new Color(0.25f, 0.95f, 0.35f, 1f));
+
+        bodyLabel.setText(detail + "\n\nWaiting for the server to start the match…");
+
         acceptButton.setVisible(false);
         rejectButton.setVisible(false);
-        okButton.setVisible(false);
+        okButton    .setVisible(false);
+        acceptLabel .setVisible(false);
+        rejectLabel .setVisible(false);
+        okLabel     .setVisible(false);
+
         showCard();
     }
 
@@ -263,12 +318,9 @@ public class GlobalInviteOverlay extends Table {
     // ─────────────────────────────────────────────────────────────────────────
 
     private void onAccept() {
-        if (mode != OverlayMode.INCOMING_INVITE) {
-            return;
-        }
+        if (mode != OverlayMode.INCOMING_INVITE) return;
 
         String error = lobbyService.respondToInvite(true);
-
         if (error != null) {
             incomingInviter = null;
             hideCard();
@@ -279,32 +331,23 @@ public class GlobalInviteOverlay extends Table {
         String opponent = incomingInviter;
         incomingInviter = null;
         showWaitingForServer(
-                opponent == null
-                        ? "Invitation accepted."
-                        : "Opponent: " + opponent
+                opponent == null ? "Invitation accepted." : "Opponent: " + opponent
         );
     }
 
     private void onReject() {
-        if (mode != OverlayMode.INCOMING_INVITE) {
-            return;
-        }
+        if (mode != OverlayMode.INCOMING_INVITE) return;
 
         String error = lobbyService.respondToInvite(false);
         incomingInviter = null;
         hideCard();
 
-        if (error != null) {
-            NotificationCenter.error(error);
-        } else {
-            NotificationCenter.info("Invite declined.");
-        }
+        if (error != null) NotificationCenter.error(error);
+        else               NotificationCenter.info("Invite declined.");
     }
 
     private void onOk() {
-        if (mode == OverlayMode.INVITE_REJECTED) {
-            hideCard();
-        }
+        if (mode == OverlayMode.INVITE_REJECTED) hideCard();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -328,5 +371,63 @@ public class GlobalInviteOverlay extends Table {
                 fadeOut(0.18f, Interpolation.fade),
                 run(() -> card.setVisible(false))
         ));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Widget helpers (mirrors SettingMenu pattern)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private Image image(String name) {
+        Image i = new Image(required(name));
+        i.setScaling(Scaling.fit);
+        return i;
+    }
+
+    private TextureRegionDrawable drawable(String name) {
+        return new TextureRegionDrawable(required(name));
+    }
+
+    private NinePatchDrawable panelDrawable(String name, int left, int right, int top, int bottom) {
+        return new NinePatchDrawable(new NinePatch(required(name), left, right, top, bottom));
+    }
+
+    /**
+     * An ImageButton with tab-style up/down states (mirrors SettingMenu's imageButton helper).
+     * The visible label is layered on top separately via {@link #labeledButton}.
+     */
+    private ImageButton iconButton(String name) {
+        TextureRegionDrawable up = drawable(name);
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp   = up;
+        style.imageDown = up.tint(new Color(0.78f, 0.78f, 0.78f, 1f));
+        ImageButton b = new ImageButton(style);
+        b.getImage().setScaling(Scaling.fit);
+        return b;
+    }
+
+    /**
+     * Stacks a label centred over an ImageButton so the button shows both the
+     * atlas texture and a readable text label.
+     */
+    private Stack labeledButton(ImageButton button, Label label) {
+        label.setAlignment(Align.center);
+        Stack s = new Stack();
+        s.add(button);
+        Table centred = new Table();
+        centred.add(label).center();
+        s.add(centred);
+        return s;
+    }
+
+    private TextureRegion required(String name) {
+        TextureRegion region = textures.region(name);
+        if (region == null) throw new IllegalStateException("Missing overlay texture: " + name);
+        return region;
+    }
+
+    private ClickListener click(Runnable r) {
+        return new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) { r.run(); }
+        };
     }
 }

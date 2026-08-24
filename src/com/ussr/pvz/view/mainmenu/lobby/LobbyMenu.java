@@ -1,29 +1,60 @@
 package com.ussr.pvz.view.mainmenu.lobby;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.LobbyService;
 import com.ussr.pvz.view.hud.GlobalInviteOverlay;
+import pvz.libpvz.textures.TextureBank;
 
 import java.util.List;
 
 /**
- * Multiplayer lobby screen.
+ * Multiplayer lobby screen — styled with the same TextureBank/atlas approach
+ * used by SettingMenu (NinePatch panels, TextureRegion images, ImageButtons).
  *
- * Invite/random-match polling is now handled by {@link GlobalInviteOverlay}
- * so notifications reach the user from any screen.  LobbyMenu only manages
- * the player list and the UI state for actions initiated here.
+ * Invite/random-match polling is handled by {@link GlobalInviteOverlay}.
  */
 public class LobbyMenu extends Table {
+
+    // ── Atlas texture keys ────────────────────────────────────────────────────
+
+    /** Shared background (same as SettingMenu). */
+    private static final String BG              = "IMAGE_MAINMENU_BACKGROUND";
+
+    /** Panel / card backgrounds. */
+    private static final String CONTENT_PANEL   = "IMAGE_UI_SETTINGS_CONTENT_PANEL";
+    private static final String ROW_LARGE       = "IMAGE_UI_SETTINGS_ROW_LARGE";
+    private static final String TAB_DARK        = "IMAGE_UI_SETTINGS_TAB_DARK";
+    private static final String TAB_GREEN       = "IMAGE_UI_SETTINGS_TAB_GREEN";
+
+    /** Header image (reused from settings — or swap for a lobby-specific one). */
+
+    /** Buttons. */
+    private static final String CLOSE           = "IMAGE_UI_SETTINGS_CLOSE";
+    private static final String APPLY           = "IMAGE_UI_SETTINGS_BUTTON_APPLY";   // "Search" action
+    private static final String RESET           = "IMAGE_UI_SETTINGS_BUTTON_RESET";   // "Cancel" action
+
+    /** Value panel — used for the online-count badge. */
+    private static final String VALUE_PANEL     = "IMAGE_UI_SETTINGS_VALUE_PANEL";
+
+    /** Icons for the right-column section headings. */
+    private static final String ICON_GAMEPLAY   = "IMAGE_UI_SETTINGS_ICON_GAMEPLAY";
+    private static final String ICON_AUDIO      = "IMAGE_UI_SETTINGS_ICON_AUDIO";
 
     // ── Configuration ─────────────────────────────────────────────────────────
 
@@ -31,170 +62,210 @@ public class LobbyMenu extends Table {
 
     // ── Dependencies ──────────────────────────────────────────────────────────
 
-    private final Skin skin;
+    private final Skin        skin;
+    private final TextureBank textures;
     private final LobbyService lobbyService = new LobbyService();
-
-    /**
-     * Reference to the stage-level overlay so LobbyMenu can notify it when
-     * the user performs actions (invite sent, joined queue, etc.).
-     * Passed in from AppView or retrieved from the stage.
-     */
     private final GlobalInviteOverlay inviteOverlay;
 
     // ── UI state ──────────────────────────────────────────────────────────────
 
-    private enum LobbyState {
-        BROWSING,
-        INVITE_SENT,
-        SEARCHING_RANDOM
-    }
+    private enum LobbyState { BROWSING, INVITE_SENT, SEARCHING_RANDOM }
 
-    private LobbyState lobbyState = LobbyState.BROWSING;
-    private String pendingInviteTarget;
-    private List<String> cachedPlayerList = List.of();
-
-    // ── Polling timer (player-list only) ──────────────────────────────────────
-
-    private float pollTimer = 0f;
+    private LobbyState      lobbyState        = LobbyState.BROWSING;
+    private String          pendingInviteTarget;
+    private List<String>    cachedPlayerList  = List.of();
+    private float           pollTimer         = 0f;
 
     // ── Widgets ───────────────────────────────────────────────────────────────
 
-    private Table playerListTable;
-    private Label statusLabel;
-    private TextButton randomButton;
-    private TextButton cancelRandomButton;
-    private Label playerCountLabel;
+    private Table       playerListTable;
+    private Label       statusLabel;
+    private ImageButton randomButton;
+    private ImageButton cancelRandomButton;
+    private Label       playerCountLabel;
+    private ImageButton cancelInviteButton;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Constructor
     // ─────────────────────────────────────────────────────────────────────────
 
     public LobbyMenu(Skin skin, GlobalInviteOverlay inviteOverlay) {
-        this.skin = skin;
+        this.skin          = skin;
         this.inviteOverlay = inviteOverlay;
+        this.textures      = new TextureBank("768", Gdx.files.local("pvz-assets"));
+
         setFillParent(true);
         buildUi();
         refreshPlayerList();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // UI
+    // UI construction
     // ─────────────────────────────────────────────────────────────────────────
 
     private void buildUi() {
-        setBackground(skin.newDrawable(
-                "white-pixel",
-                new Color(0.07f, 0.09f, 0.07f, 0.92f)
-        ));
-        pad(24f);
+        // Full-screen stack: background → dim → centred panel
+        Stack root = new Stack();
+        root.add(background());
 
-        // ── Header ────────────────────────────────────────────────────────────
-        Table header = new Table();
+        Image dim = new Image(skin.newDrawable("white-pixel", new Color(0f, 0f, 0f, 0.54f)));
+        dim.setTouchable(Touchable.disabled);
+        root.add(dim);
 
-        TextButton backButton = new TextButton("← Back", skin, "default");
-        backButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) { leaveLobby(); }
-        });
+        Table centre = new Table();
+        centre.add(panel()).width(1080f).height(680f);
+        root.add(centre);
 
-        Label titleLabel = new Label("Multiplayer Lobby", skin, "big_outline");
-        titleLabel.setAlignment(Align.center);
-
-        playerCountLabel = new Label("", skin, "default");
-        playerCountLabel.setAlignment(Align.right);
-
-        header.add(backButton).left().width(120f);
-        header.add(titleLabel).expandX().center();
-        header.add(playerCountLabel).right().width(120f);
-
-        add(header).fillX().padBottom(16f).row();
-
-        // ── Content ───────────────────────────────────────────────────────────
-        Table content = new Table();
-        content.add(buildPlayerListColumn()).width(620f).growY().padRight(20f);
-        content.add(buildRightColumn()).width(340f).growY();
-        add(content).grow().row();
+        add(root).grow();
     }
+
+    // ── Outer panel ───────────────────────────────────────────────────────────
+
+    private Actor panel() {
+        Table p = new Table();
+        p.setBackground(panelDrawable(CONTENT_PANEL, 28, 28, 28, 28));
+        p.pad(14f, 18f, 14f, 18f);
+
+        p.add(header()).colspan(2).growX().height(100f).row();
+
+        p.add(buildPlayerListColumn()).width(620f).growY().padRight(18f);
+        p.add(buildRightColumn()).grow().row();
+
+        p.add(footer()).colspan(2).growX().height(72f);
+        return p;
+    }
+
+    // ── Header ────────────────────────────────────────────────────────────────
+
+    private Actor header() {
+        Table t = new Table();
+        t.add().width(72f); // balance the close button on the right
+
+        // Reuse the settings header image; swap for "IMAGE_UI_LOBBY_HEADER" when available
+
+        ImageButton close = imageButton(CLOSE);
+        close.addListener(click(this::leaveLobby));
+        t.add(close).size(72f).right();
+        return t;
+    }
+
+    // ── Footer ────────────────────────────────────────────────────────────────
+
+    private Actor footer() {
+        Table f = new Table();
+
+        // Left: cancel invite / cancel random (context-sensitive)
+        cancelInviteButton = imageButton(RESET);
+        cancelInviteButton.setVisible(false);
+        cancelInviteButton.addListener(click(this::cancelSentInvite));
+
+        cancelRandomButton = imageButton(RESET);
+        cancelRandomButton.setVisible(false);
+        cancelRandomButton.addListener(click(this::cancelRandomSearch));
+
+        f.add(cancelInviteButton).width(230f).height(58f).left();
+        f.add(cancelRandomButton).width(230f).height(58f).left();
+
+        f.add().growX();
+
+        // Status label in the centre
+        statusLabel = new Label("", skin, "default");
+        statusLabel.setAlignment(Align.center);
+        statusLabel.setColor(new Color(0.9f, 0.86f, 0.70f, 1f));
+        f.add(statusLabel).expandX().center();
+
+        f.add().growX();
+
+        // Right: random-match button
+        randomButton = imageButton(APPLY);
+        randomButton.addListener(click(this::joinRandomQueue));
+        f.add(randomButton).width(250f).height(68f).right();
+
+        return f;
+    }
+
+    // ── Player-list column (left) ─────────────────────────────────────────────
 
     private Table buildPlayerListColumn() {
         Table col = new Table();
+        col.top();
 
-        col.add(new Label("Online Players", skin, "medium_outline"))
-                .left().padBottom(8f).row();
+        // Section heading with icon
+        col.add(sectionHeading("Online Players", ICON_GAMEPLAY))
+                .fillX().padBottom(10f).row();
 
         playerListTable = new Table();
         playerListTable.top();
 
         ScrollPane scroll = new ScrollPane(playerListTable, skin);
         scroll.setFadeScrollBars(false);
-        col.add(scroll).grow().padBottom(8f).row();
 
-        TextButton refreshButton = new TextButton("↺  Refresh", skin, "default");
-        refreshButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) {
-                refreshPlayerList();
-            }
-        });
-        col.add(refreshButton).right().width(140f);
+        // Wrap in a ROW_LARGE-backed container so it has the same panel feel
+        Table scrollCard = new Table();
+        scrollCard.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
+        scrollCard.add(scroll).grow().pad(8f);
+
+        col.add(scrollCard).grow().padBottom(10f).row();
+
+        // Refresh button (right-aligned, styled like a tab)
+        Button refreshBtn = tabButton("↺  Refresh");
+        refreshBtn.addListener(click(this::refreshPlayerList));
+        col.add(refreshBtn).right().width(160f).height(56f);
 
         return col;
     }
+
+    // ── Right column ─────────────────────────────────────────────────────────
 
     private Table buildRightColumn() {
         Table col = new Table();
         col.top();
 
-        col.add(new Label("Quick Match", skin, "medium_outline"))
-                .left().padBottom(8f).row();
+        col.add(sectionHeading("Quick Match", ICON_AUDIO))
+                .fillX().padBottom(10f).row();
 
-        randomButton = new TextButton("🎲  Random Opponent", skin, "default");
-        randomButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) {
-                joinRandomQueue();
-            }
-        });
-        col.add(randomButton).fillX().padBottom(6f).row();
+        // Description card
+        Table infoCard = new Table();
+        infoCard.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
+        infoCard.pad(14f, 18f, 14f, 18f);
 
-        cancelRandomButton = new TextButton("✕  Cancel Search", skin, "default");
-        cancelRandomButton.setVisible(false);
-        cancelRandomButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) {
-                cancelRandomSearch();
-            }
-        });
-        col.add(cancelRandomButton).fillX().padBottom(20f).row();
+        Label infoText = new Label(
+                "Select a player from the list and press Invite,\n" +
+                        "or use Quick Match to find a random opponent.",
+                skin, "default"
+        );
+        infoText.setWrap(true);
+        infoText.setAlignment(Align.center);
+        infoText.setColor(new Color(0.82f, 0.78f, 0.62f, 1f));
+        infoCard.add(infoText).width(300f);
 
-        statusLabel = new Label("", skin, "default");
-        statusLabel.setWrap(true);
-        statusLabel.setAlignment(Align.center);
-        col.add(statusLabel).fillX().padBottom(16f).row();
+        col.add(infoCard).fillX().padBottom(14f).row();
 
-        // ── "Cancel sent invite" button (hidden initially) ────────────────────
-        TextButton cancelInviteButton = new TextButton("✕  Cancel Invite", skin, "default");
-        cancelInviteButton.setVisible(false);
-        cancelInviteButton.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) {
-                cancelSentInvite();
-            }
-        });
-        col.add(cancelInviteButton).fillX().row();
+        // Online count badge
+        Stack badge = new Stack();
+        Image valueBg = image(VALUE_PANEL);
+        valueBg.setScaling(Scaling.stretch);
+        valueBg.setTouchable(Touchable.disabled);
+        badge.add(valueBg);
 
-        // Keep a reference so we can toggle it
-        this.cancelInviteButtonRef = cancelInviteButton;
+        playerCountLabel = new Label("0 online", skin, "medium_outline");
+        playerCountLabel.setAlignment(Align.center);
+        playerCountLabel.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        badge.add(playerCountLabel);
 
+        col.add(badge).width(200f).height(58f).center().padBottom(14f).row();
+
+        col.add().growY();
         return col;
     }
 
-    // Stored so we can show/hide it without rebuilding the column
-    private TextButton cancelInviteButtonRef;
-
     // ─────────────────────────────────────────────────────────────────────────
-    // act() — player-list polling only
+    // act() — player-list polling
     // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void act(float delta) {
         super.act(delta);
-
         pollTimer += delta;
         if (pollTimer >= POLL_INTERVAL_SECONDS) {
             pollTimer = 0f;
@@ -214,18 +285,14 @@ public class LobbyMenu extends Table {
 
     private void rebuildPlayerListUi(List<String> players) {
         playerListTable.clearChildren();
-
         playerCountLabel.setText(players.size() + " online");
 
         if (players.isEmpty()) {
             Label empty = new Label("No other players online.", skin, "default");
             empty.setAlignment(Align.center);
-            empty.setColor(new Color(0.6f, 0.6f, 0.6f, 1f));
-            playerListTable.add(empty).padTop(20f);
+            empty.setColor(new Color(0.55f, 0.55f, 0.55f, 1f));
+            playerListTable.add(empty).padTop(24f);
 
-            // Disable random only if nobody is in the queue either — keep
-            // enabled so a second player can still match with you.
-            // We disable if list is empty AND we are not already searching.
             if (lobbyState != LobbyState.SEARCHING_RANDOM) {
                 randomButton.setDisabled(true);
                 randomButton.setColor(new Color(0.5f, 0.5f, 0.5f, 1f));
@@ -239,46 +306,71 @@ public class LobbyMenu extends Table {
         }
 
         for (String username : players) {
-            playerListTable.add(buildPlayerRow(username)).fillX().padBottom(4f).row();
+            playerListTable.add(buildPlayerRow(username)).fillX().padBottom(6f).row();
         }
     }
 
     private Table buildPlayerRow(String username) {
         Table row = new Table();
-        row.setBackground(skin.newDrawable(
-                "white-pixel", new Color(0.12f, 0.16f, 0.12f, 0.85f)
-        ));
-        row.pad(6f, 10f, 6f, 10f);
+        // Use the TAB_DARK nine-patch so rows share the same visual language as
+        // the settings navigation tabs rather than a plain solid rectangle.
+        row.setBackground(panelDrawable(TAB_DARK, 24, 24, 24, 24));
+        row.pad(8f, 14f, 8f, 10f);
 
-        Label nameLabel = new Label(username, skin, "default");
+        // Avatar placeholder (coloured square using the settings value-panel)
+        Stack avatar = new Stack();
+        Image avatarBg = image(VALUE_PANEL);
+        avatarBg.setScaling(Scaling.stretch);
+        avatarBg.setTouchable(Touchable.disabled);
+        Label initLabel = new Label(
+                username.substring(0, 1).toUpperCase(),
+                skin, "medium_outline"
+        );
+        initLabel.setAlignment(Align.center);
+        initLabel.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        avatar.add(avatarBg);
+        avatar.add(initLabel);
+
+        Label nameLabel = new Label(username, skin, "medium_outline");
         nameLabel.setAlignment(Align.left);
+        nameLabel.setColor(new Color(0.95f, 0.90f, 0.72f, 1f));
 
         boolean canInvite = lobbyState == LobbyState.BROWSING;
-        TextButton inviteBtn = new TextButton("Invite", skin, "default");
-        inviteBtn.setDisabled(!canInvite);
-        if (!canInvite) inviteBtn.setColor(new Color(0.5f, 0.5f, 0.5f, 1f));
 
-        inviteBtn.addListener(new ChangeListener() {
-            @Override public void changed(ChangeEvent event, Actor actor) {
+        // Invite uses TAB_GREEN when active, TAB_DARK when disabled
+        Button.ButtonStyle invStyle = new Button.ButtonStyle();
+        invStyle.up      = panelDrawable(canInvite ? TAB_GREEN : TAB_DARK, 24, 24, 24, 24);
+        invStyle.down    = panelDrawable(TAB_GREEN, 24, 24, 24, 24);
+        invStyle.checked = invStyle.up;
+
+        Button inviteBtn = new Button(invStyle);
+        Label inviteLbl = new Label(canInvite ? "Invite" : "Busy", skin, "default");
+        inviteLbl.setAlignment(Align.center);
+        inviteLbl.setColor(canInvite
+                ? new Color(0.25f, 0.95f, 0.35f, 1f)
+                : new Color(0.5f, 0.5f, 0.5f, 1f));
+        inviteBtn.add(inviteLbl);
+        inviteBtn.setDisabled(!canInvite);
+
+        inviteBtn.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
                 if (!inviteBtn.isDisabled()) sendInviteTo(username);
             }
         });
 
+        // Hover highlight: swap background to TAB_GREEN tinted
         row.addListener(new ClickListener() {
             @Override public void enter(InputEvent e, float x, float y, int p, Actor f) {
-                row.setBackground(skin.newDrawable(
-                        "white-pixel", new Color(0.18f, 0.26f, 0.18f, 0.9f)
-                ));
+                row.setBackground(panelDrawable(TAB_GREEN, 24, 24, 24, 24));
             }
             @Override public void exit(InputEvent e, float x, float y, int p, Actor t) {
-                row.setBackground(skin.newDrawable(
-                        "white-pixel", new Color(0.12f, 0.16f, 0.12f, 0.85f)
-                ));
+                row.setBackground(panelDrawable(TAB_DARK, 24, 24, 24, 24));
             }
         });
 
+        row.add(avatar).size(42f).padRight(12f);
         row.add(nameLabel).expandX().left();
-        row.add(inviteBtn).right().width(90f);
+        row.add(inviteBtn).width(100f).height(42f).right();
         return row;
     }
 
@@ -288,34 +380,25 @@ public class LobbyMenu extends Table {
 
     private void sendInviteTo(String targetUsername) {
         String error = lobbyService.sendInvite(targetUsername);
-        if (error != null) {
-            NotificationCenter.error(error);
-            return;
-        }
+        if (error != null) { NotificationCenter.error(error); return; }
 
         pendingInviteTarget = targetUsername;
         lobbyState = LobbyState.INVITE_SENT;
 
-        // Tell the global overlay to start polling for the result
-        if (inviteOverlay != null) {
-            inviteOverlay.notifyInviteSent(targetUsername);
-        }
+        if (inviteOverlay != null) inviteOverlay.notifyInviteSent(targetUsername);
 
         setStatus("Invite sent to " + targetUsername + ". Waiting for reply…");
-        cancelInviteButtonRef.setVisible(true);
+        cancelInviteButton.setVisible(true);
         rebuildPlayerListUi(cachedPlayerList);
     }
 
     private void cancelSentInvite() {
         lobbyService.cancelInvite();
-
-        if (inviteOverlay != null) {
-            inviteOverlay.notifyInviteCancelled();
-        }
+        if (inviteOverlay != null) inviteOverlay.notifyInviteCancelled();
 
         pendingInviteTarget = null;
         lobbyState = LobbyState.BROWSING;
-        cancelInviteButtonRef.setVisible(false);
+        cancelInviteButton.setVisible(false);
         setStatus("");
         rebuildPlayerListUi(cachedPlayerList);
     }
@@ -326,17 +409,10 @@ public class LobbyMenu extends Table {
 
     private void joinRandomQueue() {
         String error = lobbyService.joinRandomQueue();
-        if (error != null) {
-            NotificationCenter.error(error);
-            return;
-        }
+        if (error != null) { NotificationCenter.error(error); return; }
 
         lobbyState = LobbyState.SEARCHING_RANDOM;
-
-        // Tell the global overlay to poll for a match result
-        if (inviteOverlay != null) {
-            inviteOverlay.notifyJoinedRandomQueue();
-        }
+        if (inviteOverlay != null) inviteOverlay.notifyJoinedRandomQueue();
 
         randomButton.setVisible(false);
         cancelRandomButton.setVisible(true);
@@ -348,10 +424,7 @@ public class LobbyMenu extends Table {
 
     private void cancelRandomSearch() {
         lobbyService.leaveRandomQueue();
-
-        if (inviteOverlay != null) {
-            inviteOverlay.notifyLeftRandomQueue();
-        }
+        if (inviteOverlay != null) inviteOverlay.notifyLeftRandomQueue();
 
         lobbyState = LobbyState.BROWSING;
         randomButton.setVisible(true);
@@ -377,10 +450,81 @@ public class LobbyMenu extends Table {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
+    // Widget helpers (mirrors SettingMenu pattern exactly)
     // ─────────────────────────────────────────────────────────────────────────
 
+    /** Full-screen background image (same atlas key as SettingMenu). */
+    private Image background() {
+        TextureRegion region = textures.region(BG);
+        Image i = region == null ? new Image() : new Image(region);
+        i.setScaling(Scaling.fill);
+        i.setTouchable(Touchable.disabled);
+        return i;
+    }
+
+    private Image image(String name) {
+        Image i = new Image(required(name));
+        i.setScaling(Scaling.fit);
+        return i;
+    }
+
+    private TextureRegionDrawable drawable(String name) {
+        return new TextureRegionDrawable(required(name));
+    }
+
+    private NinePatchDrawable panelDrawable(String name, int left, int right, int top, int bottom) {
+        return new NinePatchDrawable(new NinePatch(required(name), left, right, top, bottom));
+    }
+
+    private ImageButton imageButton(String name) {
+        TextureRegionDrawable up = drawable(name);
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp   = up;
+        style.imageDown = up.tint(new Color(0.82f, 0.82f, 0.82f, 1f));
+        ImageButton b = new ImageButton(style);
+        b.getImage().setScaling(Scaling.fit);
+        return b;
+    }
+
+    /** A tab-styled text button (no texture needed for the label). */
+    private Button tabButton(String text) {
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up      = panelDrawable(TAB_DARK,  24, 24, 24, 24);
+        style.down    = panelDrawable(TAB_GREEN, 24, 24, 24, 24);
+        style.checked = style.up;
+
+        Button b = new Button(style);
+        Label l = new Label(text, skin, "medium_outline");
+        l.setAlignment(Align.center);
+        b.add(l).center();
+        return b;
+    }
+
+    /** Icon + label heading row (matches settings navigation style). */
+    private Table sectionHeading(String text, String iconRegion) {
+        Table t = new Table();
+        t.setBackground(panelDrawable(TAB_DARK, 24, 24, 24, 24));
+        t.pad(6f, 14f, 6f, 14f);
+        t.add(image(iconRegion)).size(36f).padRight(10f);
+        Label l = new Label(text, skin, "medium_outline");
+        l.setAlignment(Align.left);
+        t.add(l).growX().left();
+        return t;
+    }
+
+    private TextureRegion required(String name) {
+        TextureRegion region = textures.region(name);
+        if (region == null) throw new IllegalStateException("Missing lobby texture: " + name);
+        return region;
+    }
+
+    private ClickListener click(Runnable r) {
+        return new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) { r.run(); }
+        };
+    }
+
     private void setStatus(String text) {
-        statusLabel.setText(text);
+        if (statusLabel != null) statusLabel.setText(text);
     }
 }
