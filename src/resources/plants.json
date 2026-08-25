@@ -14,6 +14,7 @@
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 50.0,
     "plantFoodType": "SPAWN_SUN",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 150.0,
     "instantMaxGrowth": false,
     "pamLocation": "768/INITIAL/PLANT/SUNFLOWER/SUNFLOWER.PAM",
@@ -53,6 +54,7 @@
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 100.0,
     "plantFoodType": "SPAWN_SUN",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 250.0,
     "instantMaxGrowth": false,
     "pamLocation": "768/INITIAL/PLANT/SUNFLOWER_TWIN/SUNFLOWER_TWIN.PAM",
@@ -94,6 +96,7 @@
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 25.0,
     "plantFoodType": "SPAWN_SUN",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 225.0,
     "instantMaxGrowth": true,
     "pamLocation": "768/FULL/PLANT/SUNSHROOM/SUNSHROOM.PAM",
@@ -143,6 +146,7 @@
     "abilityType": "PRODUCE_SUN",
     "abilityValue": 75.0,
     "plantFoodType": "SPAWN_SUN",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 225.0,
     "instantMaxGrowth": false,
     "pamLocation": "768/FULL/PLANT/PRIMAL_SUNFLOWER/PRIMAL_SUNFLOWER.PAM",
@@ -659,6 +663,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "RANDOM_HYPNOTIZE",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/CAULIPOWER/CAULIPOWER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/CAULIPOWER_PROJECTILE/CAULIPOWER_PROJECTILE.PAM",
@@ -705,6 +710,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "INSTANT_KILL",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/ELECTRICBLUEBERRY/ELECTRICBLUEBERRY.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_FIRE_PEA_BLUE/T_FIRE_PEA_BLUE.PAM",
@@ -1148,6 +1154,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 3.0,
     "plantFoodType": "KNOCKBACK_BLAST",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/FUMESHROOM/FUMESHROOM.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/FUMESHROOM_BUBBLES/FUMESHROOM_BUBBLES.PAM",
@@ -1193,6 +1200,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/CABBAGEPULT/CABBAGEPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_CABBAGEPULT_PROJECTILE/T_CABBAGEPULT_PROJECTILE.PAM",
@@ -1238,6 +1246,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/KERNALPULT/KERNALPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_KERNALPULT_PROJECTILE/T_KERNALPULT_PROJECTILE.PAM",
@@ -1285,6 +1294,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/MELONPULT/MELONPULT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_MELON_PROJECTILE/T_MELON_PROJECTILE.PAM",
@@ -1333,6 +1343,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/WINTERMELON/WINTERMELON.PAM",
     "projectilePam": "768/FULL/EFFECTS/T_WINTERMELON_PROJECTILE/T_WINTERMELON_PROJECTILE.PAM",
@@ -1381,6 +1392,7 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 1.0,
     "plantFoodType": "LOBBER_BARRAGE",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/PEPPERPULT/PEPPERPULT.PAM",
     "projectilePam": "768/FULL/EFFECTS/PEPPERPULT_PROJECTILE/PEPPERPULT_PROJECTILE.PAM",
@@ -1428,6 +1440,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 1.0,
     "plantFoodType": "SPAWN_CLONES",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 2.0,
     "pamLocation": "768/INITIAL/PLANT/POTATOMINE/POTATOMINE.PAM",
     "upgrades": [
@@ -1467,6 +1480,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 2.0,
     "plantFoodType": "SPAWN_CLONES",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 2.0,
     "pamLocation": "768/FULL/PLANT/PRIMAL_POTATOMINE/PRIMAL_POTATOMINE.PAM",
     "upgrades": [
@@ -1542,6 +1556,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 5.0,
     "plantFoodType": "INSTANT_KILL",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 2.0,
     "pamLocation": "768/INITIAL/PLANT/SQUASH/SQUASH.PAM",
     "upgrades": [
@@ -1693,6 +1708,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 1.0,
     "plantFoodType": "PULL_UNDERWATER",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 3.0,
     "pamLocation": "768/FULL/PLANT/TANGLEKELP/TANGLEKELP.PAM",
     "upgrades": [
@@ -1732,6 +1748,7 @@
     "abilityType": "DELAYED_EXPLOSIVE",
     "abilityValue": 1.0,
     "plantFoodType": "MAP_WIDE_FREEZE",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/ICEBURG/ICEBURG.PAM",
     "upgrades": [
@@ -1847,6 +1864,7 @@
     "abilityType": "MELEE_ATTACK",
     "abilityValue": 4.0,
     "plantFoodType": "INSTANT_KILL",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/CHOMPER/CHOMPER.PAM",
     "upgrades": [
@@ -1976,6 +1994,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 4000.0,
     "pamLocation": "768/INITIAL/PLANT/WALLNUT/WALLNUT.PAM",
     "upgrades": [
@@ -2012,6 +2031,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 8000.0,
     "pamLocation": "768/FULL/PLANT/TALLNUT/TALLNUT.PAM",
     "upgrades": [
@@ -2048,6 +2068,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 1.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 3000.0,
     "pamLocation": "768/FULL/PLANT/ENDURIAN/ENDURIAN.PAM",
     "upgrades": [
@@ -2086,6 +2107,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 2.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/GARLIC/GARLIC.PAM",
     "upgrades": [
@@ -2124,6 +2146,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 3.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 3000.0,
     "pamLocation": "768/INITIAL/PLANT/SWEETPOTATO/SWEETPOTATO.PAM",
     "upgrades": [
@@ -2162,6 +2185,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 4.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 4000.0,
     "pamLocation": "768/INITIAL/PLANT/EXPLODEONUT/EXPLODEONUT.PAM",
     "upgrades": [
@@ -2200,6 +2224,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 0.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 4000.0,
     "pamLocation": "768/INITIAL/PLANT/PUMPKIN/PUMPKIN.PAM",
     "upgrades": [
@@ -2238,6 +2263,7 @@
     "abilityType": "PASSIVE_SHIELD",
     "abilityValue": 5.0,
     "plantFoodType": "GRANT_PERMANENT_ARMOR",
+    "plantFoodDuration": 2.5,
     "plantFoodValue": 1000.0,
     "pamLocation": "768/FULL/PLANT/SUNBEAN/SUNBEAN.PAM",
     "upgrades": [
@@ -2276,6 +2302,7 @@
     "abilityType": "MODIFIER_UTILITY",
     "abilityValue": 2.0,
     "plantFoodType": "PROJECTILE_BURST",
+    "plantFoodDuration": 4.0,
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/TORCHWOOD/TORCHWOOD.PAM",
     "upgrades": [
@@ -2315,6 +2342,7 @@
     "abilityType": "MODIFIER_UTILITY",
     "abilityValue": 1.0,
     "plantFoodType": "METAL_ABSORB",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 10.0,
     "pamLocation": "768/FULL/PLANT/MAGNETSHROOM/MAGNETSHROOM.PAM",
     "upgrades": [
@@ -2354,6 +2382,7 @@
     "abilityType": "MODIFIER_UTILITY",
     "abilityValue": 3.0,
     "plantFoodType": "RANDOM_HYPNOTIZE",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 1.0,
     "pamLocation": "768/INITIAL/PLANT/HYPNOSHROOM/HYPNOSHROOM.PAM",
     "upgrades": [
@@ -2467,6 +2496,7 @@
     "abilityType": "INSTANT_EXPLOSIVE",
     "abilityValue": 4.0,
     "plantFoodType": "MAP_WIDE_FREEZE",
+    "plantFoodDuration": 2.0,
     "plantFoodValue": 0.0,
     "pamLocation": "768/FULL/PLANT/ICESHROOM/ICESHROOM.PAM",
     "upgrades": [
@@ -2506,6 +2536,7 @@
     "abilityType": "MODIFIER_UTILITY",
     "abilityValue": 1.0,
     "plantFoodType": "SPAWN_CLONES",
+    "plantFoodDuration": 3.0,
     "plantFoodValue": 4.0,
     "pamLocation": "768/FULL/PLANT/LILYPAD/LILYPAD.PAM",
     "upgrades": [

@@ -64,6 +64,9 @@ public class Plant extends GameEntity implements Damageable {
     private final PlantAnimationController animationController =
             new PlantAnimationController();
     private double plantFoodTimer = 0.0;
+    // Visual fallback: how long the "plantfood" animation state is held when
+    // the triggered PlantFoodEffect doesn't drive its own gameplay-tied timer.
+    private double plantFoodDuration = 4.0;
     // True while Cactus's one-shot "plantfood" transform clip is still
     // playing. Set when plant food is applied; cleared by the render layer
     // once it observes the real PAM clip has finished (see
@@ -172,6 +175,7 @@ public class Plant extends GameEntity implements Damageable {
         this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
         this.actStrategy = blueprint.actStrategy;
         this.plantFoodTimer = blueprint.plantFoodTimer;
+        this.plantFoodDuration = blueprint.plantFoodDuration;
         this.armor = blueprint.armor;
         this.plantFoodEffect = blueprint.plantFoodEffect;
         this.projectilePam = blueprint.projectilePam;
@@ -706,6 +710,14 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodTimer = duration;
     }
 
+    public double getPlantFoodDuration() {
+        return plantFoodDuration;
+    }
+
+    public void setPlantFoodDuration(double plantFoodDuration) {
+        this.plantFoodDuration = plantFoodDuration;
+    }
+
     public boolean isPlantFoodIntroActive() {
         return plantFoodIntroActive;
     }
@@ -750,6 +762,9 @@ public class Plant extends GameEntity implements Damageable {
             if (this.plantFoodEffect != null) {
                 plantFoodEffect.applyStatusModifiers(this);
                 plantFoodEffect.triggerSuperpower(this, App.getGameSession());
+            }
+            if (this.plantFoodTimer <= 0.0) {
+                this.plantFoodTimer = this.plantFoodDuration;
             }
         }
     }

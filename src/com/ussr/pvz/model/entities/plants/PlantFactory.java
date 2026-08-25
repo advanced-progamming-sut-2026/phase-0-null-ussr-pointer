@@ -88,6 +88,10 @@ public class PlantFactory {
         if (plantFoodHitPam != null) {
             plant.setPlantFoodHitPam(plantFoodHitPam);
         }
+        if (data.containsKey("plantFoodDuration")) {
+            plant.setPlantFoodDuration(
+                    ((Number) data.get("plantFoodDuration")).doubleValue());
+        }
         try {
             plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
                     Math.max(0.0, result.runtimeRecharge()));
