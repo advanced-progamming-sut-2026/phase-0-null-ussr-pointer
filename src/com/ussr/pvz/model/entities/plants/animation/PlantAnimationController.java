@@ -38,6 +38,35 @@ public class PlantAnimationController {
         );
     }
 
+    public void playGrow(
+            String plantName,
+            int growthStage,
+            float duration
+    ) {
+        playTemporary(
+                PlantAnimationState.GROWING,
+                growClip(plantName, growthStage),
+                duration
+        );
+    }
+
+    private String growClip(String plantName, int growthStage) {
+        if (plantName != null && plantName.equalsIgnoreCase("Kiwibeast")) {
+            int targetStage = Math.max(2, Math.min(3, growthStage));
+            int fromStage = targetStage - 1;
+            return "growth_stage" + fromStage;
+        }
+        return "grow";
+    }
+
+    public void playKiwiPlantFoodGrowth(float duration) {
+        playTemporary(
+                PlantAnimationState.GROWING,
+                "growth_stage1_2",
+                duration
+        );
+    }
+
     public void playProduce(String plantName, float duration) {
         playTemporary(
                 PlantAnimationState.PRODUCING,
@@ -66,6 +95,11 @@ public class PlantAnimationController {
 
         if (plantName.equalsIgnoreCase("Chomper")) {
             return "swallow";
+        }
+
+        if (plantName.equalsIgnoreCase("Kiwibeast")) {
+            int stage = Math.max(1, Math.min(3, growthStage));
+            return "attack_stage_" + stage;
         }
 
         return "attack";

@@ -1938,7 +1938,7 @@
       "WRAMP-UP"
     ],
     "cost": 175,
-    "baseHp": 300,
+    "baseHp": 2000,
     "damage": 15,
     "actionInterval": 2.0,
     "attackOffset": 0.25,

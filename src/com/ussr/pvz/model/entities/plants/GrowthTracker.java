@@ -75,6 +75,18 @@ public class GrowthTracker {
         return currentStage;
     }
 
+    public void setStage(int stage) {
+        int maxStage = 1;
+        if (hasStages()) {
+            for (Map<String, Object> stageData : stages) {
+                if (stageData.get("stage") instanceof Number stageNum) {
+                    maxStage = Math.max(maxStage, stageNum.intValue());
+                }
+            }
+        }
+        currentStage = Math.max(1, Math.min(maxStage, stage));
+    }
+
     public double getAgeInSeconds() {
         return ageInSeconds;
     }
