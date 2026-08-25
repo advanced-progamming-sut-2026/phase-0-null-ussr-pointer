@@ -92,6 +92,10 @@ public class PlantFactory {
             plant.setPlantFoodDuration(
                     ((Number) data.get("plantFoodDuration")).doubleValue());
         }
+        if (data.containsKey("plantFoodAnimReplays")) {
+            plant.setPlantFoodAnimReplays(
+                    ((Number) data.get("plantFoodAnimReplays")).intValue());
+        }
         try {
             plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
                     Math.max(0.0, result.runtimeRecharge()));

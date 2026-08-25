@@ -226,6 +226,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/PEASHOOTER/PEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -274,6 +275,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/REPEATER/REPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -328,6 +330,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/THREEPEATER/THREEPEATER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -385,6 +388,7 @@
     "plantFoodType": "SNOW_PEA_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_SNOW_PEA/T_SNOW_PEA.PAM",
     "projectileOrigins": [
@@ -431,6 +435,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/FULL/PLANT/ROTORUTABAGA/ROTORUTABAGA.PAM",
     "projectilePam": "768/FULL/EFFECTS/ROTORUTABAGA_PROJECTILE2/ROTORUTABAGA_PROJECTILE2.PAM",
     "projectileOrigins": [
@@ -492,6 +497,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 0.0,
     "plantFoodStrikeRate": 0.0,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/FULL/PLANT/PEAPOD/PEAPOD.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -558,6 +564,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/FULL/PLANT/SPLITPEA/SPLITPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PEA_PROJECTILE/T_PEA_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -760,6 +767,7 @@
     "plantFoodType": "BOWLING_BULB_ATTACK",
     "plantFoodDuration": 0.0,
     "plantFoodStrikeRate": 0.0,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/FULL/PLANT/BOWLINGBULB/BOWLINGBULB.PAM",
     "projectilePam": "768/FULL/EFFECTS/BOWLINGBULB_PROJECTILE2/BOWLINGBULB_PROJECTILE2.PAM",
     "projectileOrigins": [
@@ -856,6 +864,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/FIREPEASHOOTER/FIREPEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_FIRE_PEA/T_FIRE_PEA.PAM",
     "projectileOrigins": [
@@ -902,6 +911,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/STARFRUIT/STARFRUIT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_STARFRUIT_PROJECTILE/T_STARFRUIT_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -966,6 +976,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/GOOPEASHOOTER/GOOPEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/GOOPEASHOOTER_PROJECTILES/GOOPEASHOOTER_PROJECTILES.PAM",
     "projectileOrigins": [
@@ -1014,6 +1025,7 @@
     "plantFoodType": "REPEATER_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 4,
     "pamLocation": "768/INITIAL/PLANT/MEGAGATLING/MEGAGATLING.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/MEGAGATLING_PROJECTILE/MEGAGATLING_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -1062,6 +1074,7 @@
     "plantFoodType": "GLOBAL_SHROOM_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/FULL/PLANT/SEASHROOM/SEASHROOM.PAM",
     "projectilePam": "768/FULL/EFFECTS/SEASHROOM_PROJECTILE/SEASHROOM_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -1109,6 +1122,7 @@
     "plantFoodType": "GLOBAL_SHROOM_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/INITIAL/PLANT/PUFFSHROOM/PUFFSHROOM.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_PUFFSHROOM_PROJECTILE/T_PUFFSHROOM_PROJECTILE.PAM",
     "projectileOrigins": [
@@ -1789,6 +1803,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/INITIAL/PLANT/BONKCHOY/BONKCHOY.PAM",
     "upgrades": [
       {
@@ -1829,6 +1844,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 0.1,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/FULL/PLANT/PHATBEETS/PHATBEETS.PAM",
     "upgrades": [
       {
@@ -1907,6 +1923,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/INITIAL/PLANT/WASABIWHIP/WASABIWHIP.PAM",
     "upgrades": [
       {
@@ -1948,6 +1965,7 @@
     "plantFoodType": "AREA_3X3_ATTACK",
     "plantFoodDuration": 0.1,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 2,
     "pamLocation": "768/INITIAL/PLANT/KIWIBEAST/KIWIBEAST.PAM",
     "wramp-up": [
       {
@@ -2304,6 +2322,7 @@
     "abilityValue": 2.0,
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
+    "plantFoodAnimReplays": 2,
     "plantFoodValue": 3.0,
     "pamLocation": "768/INITIAL/PLANT/TORCHWOOD/TORCHWOOD.PAM",
     "upgrades": [
@@ -2423,6 +2442,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
+    "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/HOMINGTHISTLE/HOMINGTHISTLE.PAM",
     "upgrades": [
       {

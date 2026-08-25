@@ -206,12 +206,14 @@ public class EntityRenderLayer extends Group {
             });
 
             String clip = plant.getAnimationClip();
-            boolean isCactusPlantFoodIntro = "plantfood".equals(clip)
-                    && "Cactus".equalsIgnoreCase(plant.getName());
-            actor.setLooping(!isCactusPlantFoodIntro);
+            boolean isPlantFoodIntro = "plantfood".equals(clip)
+                    && plant.isPlantFoodIntroActive();
+            actor.setLooping(!isPlantFoodIntro);
             actor.setClip(clip);
-            if (isCactusPlantFoodIntro && !actor.isPlaying()) {
-                plant.setPlantFoodIntroActive(false);
+            if (isPlantFoodIntro && !actor.isPlaying()) {
+                if (plant.onPlantFoodIntroClipFinished()) {
+                    actor.resetAnimation();
+                }
             }
             actor.setPosition(
                     LawnGridLayout.cellX(plant.getLocation().x())

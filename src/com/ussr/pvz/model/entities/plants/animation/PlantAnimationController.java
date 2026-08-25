@@ -1,14 +1,5 @@
 package com.ussr.pvz.model.entities.plants.animation;
 
-/**
- * Owns clip-name resolution AND, since the recent PAM-driven timing pass,
- * duration resolution for temporary (non-looping) plant animation states.
- * Durations are no longer passed in by callers — they're looked up from
- * PamClipTimings by (pamPath, resolved clip name) so the model timer always
- * matches the actual PAM clip length. If a duration isn't cached yet (PAM
- * still loading), the play* methods no-op and return false rather than
- * guessing a fallback.
- */
 public class PlantAnimationController {
 
     private PlantAnimationState state =
