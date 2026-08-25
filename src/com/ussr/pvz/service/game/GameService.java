@@ -248,6 +248,16 @@ public class GameService {
 
             Plant blueprint = getPlantBlueprint(request.type());
 
+            Plant imitationTarget = null;
+            if ("Imitater".equalsIgnoreCase(blueprint.getName())) {
+                imitationTarget = session.getLastPlantedPlant();
+                if (imitationTarget == null || !imitationTarget.isAlive()) {
+                    throw new IllegalStateException(
+                            "Imitater has nothing to imitate yet - plant another plant first"
+                    );
+                }
+            }
+
             if (!conveyorPacket) {
                 synchronizeRechargeFromAccount(blueprint);
             }
@@ -277,6 +287,9 @@ public class GameService {
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
             session.addPlant(plant);
+            if (imitationTarget != null) {
+                plant.beginImitation(imitationTarget);
+            }
             if (plant.hasSpecialUpgrade(SpecialUpgrade.AUTO_PLANTFOOD_ON_ENTER)
                     && plant.getPlantFoodEffect() != null) {
                 plant.setBuffed(true);

@@ -1,5 +1,6 @@
 package com.ussr.pvz.view.animation;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -27,6 +28,12 @@ public class PamActor extends Actor {
     protected String currentClipName;
     protected Map<String, Boolean> partVisibility;
     protected float rotationDegrees = 0f;
+    private boolean greyTint = false;
+    private static final Color IMITATED_TINT = new Color(0.55f, 0.55f, 0.55f, 1f);
+
+    public void setGreyTint(boolean greyTint) {
+        this.greyTint = greyTint;
+    }
 
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
         this.player = player;
@@ -167,6 +174,11 @@ public class PamActor extends Actor {
         transform.scale(pamScale, pamScale, 1f);
         batch.setTransformMatrix(transform);
 
+        Color oldColor = greyTint ? batch.getColor().cpy() : null;
+        if (greyTint) {
+            batch.setColor(IMITATED_TINT.r, IMITATED_TINT.g, IMITATED_TINT.b, oldColor.a);
+        }
+
         try {
             if (partVisibility == null || partVisibility.isEmpty()) {
                 player.draw(batch, clipRef, stateTime, 0, 0, looping);
@@ -174,6 +186,10 @@ public class PamActor extends Actor {
                 player.draw(batch, clipRef, stateTime, 0, 0, looping, partVisibility);
             }
         } catch (Exception ignored) {
+        }
+
+        if (greyTint) {
+            batch.setColor(oldColor);
         }
 
         batch.setTransformMatrix(oldTransform);

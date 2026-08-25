@@ -24,8 +24,10 @@ import com.ussr.pvz.model.level.chaptereffect.ChapterEffectRegistry;
 import com.ussr.pvz.model.quest.QuestEventTracker;
 import com.ussr.pvz.model.util.Vec2;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class GameSession {
     private boolean progressTracked = true;
@@ -232,9 +234,9 @@ public class GameSession {
 
     public void registerTickable(Tickable tickable) {
         if (tickable != null) {
-                updater.registerEntity(tickable);
-            }
+            updater.registerEntity(tickable);
         }
+    }
 
     public void spawnZombie(Zombie zombie) {
         if (!zombie.isGlowing() && Math.random() < 0.05) {
@@ -260,11 +262,35 @@ public class GameSession {
         concludeDefeat();
     }
 
+    private Plant lastNonImitaterPlant;
+    private final Map<String, Integer> imitatedTypeCounts = new HashMap<>();
+
+    public Plant getLastPlantedPlant() {
+        return lastNonImitaterPlant;
+    }
+
+    public void registerImitatedType(String plantName) {
+        if (plantName == null) return;
+        imitatedTypeCounts.merge(plantName, 1, Integer::sum);
+    }
+
+    public void unregisterImitatedType(String plantName) {
+        if (plantName == null) return;
+        imitatedTypeCounts.computeIfPresent(plantName, (k, v) -> v <= 1 ? null : v - 1);
+    }
+
+    public boolean isPlantTypeImitated(String plantName) {
+        return plantName != null && imitatedTypeCounts.getOrDefault(plantName, 0) > 0;
+    }
+
     public void addPlant(Plant plant) {
         if (plant == null) return;
         plants.add(plant);
         updater.registerEntity(plant);
         notifyPlantPlanted(plant);
+        if (!"Imitater".equalsIgnoreCase(plant.getName())) {
+            lastNonImitaterPlant = plant;
+        }
     }
 
     public void notifyPlantFoodUsed(Plant plant) {

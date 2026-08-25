@@ -35,7 +35,13 @@ public final class ActStrategyRegistry {
             return new MeleeStrategy();
         });
         register(AbilityType.PASSIVE_SHIELD, data -> new WallNutStrategy());
-        register(AbilityType.MODIFIER_UTILITY, data -> new ModifyStrategy(1));
+        register(AbilityType.MODIFIER_UTILITY, data -> {
+            String plantName = (String) data.get("name");
+            if ("Imitater".equalsIgnoreCase(plantName)) {
+                return new ImitaterStrategy();
+            }
+            return new ModifyStrategy(1);
+        });
         register(AbilityType.MINT_FAMILY_BOOST, data -> new MintStrategy());
     }
 

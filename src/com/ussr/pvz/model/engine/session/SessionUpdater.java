@@ -338,8 +338,14 @@ public final class SessionUpdater {
 
     private void cleanupDeadGridStructures() {
         session.getPlants()
-                .removeIf(plant -> !plant.isAlive()
-                        && plant.getState() != Plant.PlantState.DYING);
+                .removeIf(plant -> {
+                    boolean removable = !plant.isAlive()
+                            && plant.getState() != Plant.PlantState.DYING;
+                    if (removable && plant.getImitationTargetName() != null) {
+                        session.unregisterImitatedType(plant.getImitationTargetName());
+                    }
+                    return removable;
+                });
 
         session.getZombies().removeIf(zombie -> !zombie.isAlive() && zombie.isDeathAnimDone());
         session.getItems()

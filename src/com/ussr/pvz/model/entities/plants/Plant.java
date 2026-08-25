@@ -8,6 +8,7 @@ import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.engine.modifiers.ModifiableStat;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.ImitaterStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.ShockwaveStrategy;
@@ -132,8 +133,27 @@ public class Plant extends GameEntity implements Damageable {
         ACTIVE,
         INCAPACITATED,
         PREPPING,
-        DYING
+        DYING,
+        // Imitater-only: plays its own idle clip once, then its own attack
+        // clip once, before fully turning into the last plant planted.
+        IMITATE_IDLE,
+        IMITATE_ATTACK
     }
+
+    // ---- Imitater support -------------------------------------------------
+    // Set on THIS plant instance when some Imitater elsewhere on the lawn is
+    // currently copying it. Drives the grey lawn overlay and persists until
+    // the resulting Imitater clone dies (not until this plant itself dies).
+    private boolean imitationOverlayActive = false;
+    // Set on the Imitater instance: the name of the plant it locked onto at
+    // plant-time, and the specific instance it copied (used purely so we can
+    // clear that instance's overlay bookkeeping through the session).
+    private String imitationTargetName;
+    private Plant imitationSourcePlant;
+    // One-shot flag the render layer consumes to know it must rebuild this
+    // plant's PamActor (pamPath changed because the Imitater just turned
+    // into an entirely different plant).
+    private boolean justTransformed = false;
 
     private PlantState state;
     private float deathAnimationTimer;
@@ -232,6 +252,14 @@ public class Plant extends GameEntity implements Damageable {
 
         if (state == PlantState.INCAPACITATED) {
             animationController.playIncapacitated();
+            return;
+        }
+
+        if (state == PlantState.IMITATE_IDLE || state == PlantState.IMITATE_ATTACK) {
+            // Clip selection and stage advancement for these two states is
+            // driven by EntityRenderLayer via onImitateIdleClipFinished() /
+            // onImitateAttackClipFinished(), which fire off the actual PAM
+            // clip finishing (never a guessed duration). Nothing to tick here.
             return;
         }
 
@@ -852,6 +880,13 @@ public class Plant extends GameEntity implements Damageable {
             return "attack";
         }
 
+        if (state == PlantState.IMITATE_IDLE) {
+            return "idle";
+        }
+        if (state == PlantState.IMITATE_ATTACK) {
+            return "attack";
+        }
+
         // 2. Plant Food State
         if (plantFoodTimer > 0 || isBuffed) {
             if (plantFoodIntroActive) {
@@ -962,5 +997,110 @@ public class Plant extends GameEntity implements Damageable {
         }
         remainingSmashes--;
         return remainingSmashes > 0;
+    }
+
+    public boolean isImitationOverlayActive() {
+        return imitationOverlayActive;
+    }
+
+    public void setImitationOverlayActive(boolean active) {
+        this.imitationOverlayActive = active;
+    }
+
+    public String getImitationTargetName() {
+        return imitationTargetName;
+    }
+
+    public void setImitationTargetName(String imitationTargetName) {
+        this.imitationTargetName = imitationTargetName;
+    }
+
+    public Plant getImitationSourcePlant() {
+        return imitationSourcePlant;
+    }
+
+    public void setImitationSourcePlant(Plant imitationSourcePlant) {
+        this.imitationSourcePlant = imitationSourcePlant;
+    }
+
+    public boolean consumeJustTransformed() {
+        boolean value = justTransformed;
+        justTransformed = false;
+        return value;
+    }
+
+    public void markJustTransformed() {
+        this.justTransformed = true;
+    }
+
+    public void beginImitation(Plant target) {
+        if (actStrategy instanceof ImitaterStrategy imitater) {
+            imitater.beginImitation(this, target);
+        }
+    }
+
+    public void onImitateIdleClipFinished() {
+        if (actStrategy instanceof ImitaterStrategy imitater) {
+            imitater.onIdleClipFinished(this);
+        }
+    }
+
+    public void onImitateAttackClipFinished() {
+        if (actStrategy instanceof ImitaterStrategy imitater) {
+            imitater.onAttackClipFinished(this);
+        }
+    }
+
+    public void transformInto(String targetPlantName) {
+        Plant copy = PlantFactory.createPlantByName(targetPlantName, 1);
+
+        this.id = copy.id;
+        this.name = copy.name;
+        this.level = copy.level;
+        this.type = copy.type;
+        this.tags.clear();
+        this.tags.addAll(copy.tags);
+        this.specialUpgrades.clear();
+        this.specialUpgrades.putAll(copy.specialUpgrades);
+        this.actStrategy = copy.actStrategy;
+        this.plantFoodEffect = copy.plantFoodEffect;
+        this.setWrampUp(copy.getWrampUp());
+        this.plantFoodType = copy.plantFoodType;
+        this.shootingVectors = new ArrayList<>(copy.shootingVectors);
+        this.projectileOrigins = new ArrayList<>(copy.projectileOrigins);
+
+        this.hp = copy.hp;
+        this.maxHp = copy.maxHp;
+        this.cost = copy.cost;
+        this.damage = copy.damage;
+        this.actionInterval = copy.actionInterval;
+        this.attackOffset = copy.attackOffset;
+        this.recharge = copy.recharge;
+        this.maxRecharge = copy.maxRecharge;
+        this.abilityValue = copy.abilityValue;
+        this.lifetime = copy.lifetime;
+        this.remainingSmashes = copy.remainingSmashes;
+
+        this.hpStat = new ModifiableStat(this.hp);
+        this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
+        this.plantFoodTimer = 0.0;
+        this.plantFoodDuration = copy.plantFoodDuration;
+        this.armor = copy.armor;
+        this.projectilePam = copy.projectilePam;
+        this.hitPam = copy.hitPam;
+        this.plantFoodHitPam = copy.plantFoodHitPam;
+        this.plantFoodProjectilePam = copy.plantFoodProjectilePam;
+        this.growthTracker = copy.growthTracker;
+        this.pamPath = copy.pamPath;
+
+        if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
+            this.internalTimer = this.actionInterval;
+        } else {
+            this.internalTimer = 0.0;
+        }
+
+        this.animationController.playIdle();
+        this.state = PlantState.ACTIVE;
+        this.justTransformed = true;
     }
 }

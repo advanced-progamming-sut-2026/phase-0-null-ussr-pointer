@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.view.components.PlantCard;
 import pvz.libpvz.textures.TextureBank;
@@ -22,6 +23,7 @@ import pvz.libpvz.textures.TextureBank;
 public class SeedPacketWidget extends Stack {
     private static final Color AFFORDABLE = Color.WHITE;
     private static final Color UNAFFORDABLE = new Color(0.5f, 0.5f, 0.5f, 1f);
+    private static final Color IMITATED = new Color(0.45f, 0.45f, 0.45f, 1f);
 
     private final Plant blueprint;
     private final Image portraitBackground;
@@ -108,7 +110,9 @@ public class SeedPacketWidget extends Stack {
         cooldownOverlay.setProgress(fraction);
 
         affordable = currentSun >= blueprint.getCost();
-        Color tint = affordable ? AFFORDABLE : UNAFFORDABLE;
+        boolean imitated = App.getGameSession() != null
+                && App.getGameSession().isPlantTypeImitated(blueprint.getName());
+        Color tint = imitated ? IMITATED : (affordable ? AFFORDABLE : UNAFFORDABLE);
         portraitBackground.setColor(tint);
         portraitIcon.setColor(tint);
         costLabel.setColor(affordable ? Color.WHITE : new Color(0.85f, 0.35f, 0.3f, 1f));

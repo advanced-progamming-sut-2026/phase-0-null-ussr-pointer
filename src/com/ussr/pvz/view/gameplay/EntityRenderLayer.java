@@ -199,6 +199,11 @@ public class EntityRenderLayer extends Group {
             if (!plant.isAlive() && plant.getState() != Plant.PlantState.DYING) continue;
             live.add(plant);
 
+            if (plant.consumeJustTransformed()) {
+                PamActor stale = plantActors.remove(plant);
+                if (stale != null) plantGroup.removeActor(stale);
+            }
+
             PamActor actor = plantActors.computeIfAbsent(plant, p -> {
                 PlantPamActor pa = new PlantPamActor(pamPlayer, plant.getPamPath(), plant.getAnimationClip());
                 plantGroup.addActor(pa);
@@ -208,13 +213,22 @@ public class EntityRenderLayer extends Group {
             String clip = plant.getAnimationClip();
             boolean isPlantFoodIntro = "plantfood".equals(clip)
                     && plant.isPlantFoodIntroActive();
-            actor.setLooping(!isPlantFoodIntro);
+            boolean isImitateIdle = plant.getState() == Plant.PlantState.IMITATE_IDLE;
+            boolean isImitateAttack = plant.getState() == Plant.PlantState.IMITATE_ATTACK;
+            actor.setLooping(!isPlantFoodIntro && !isImitateIdle && !isImitateAttack);
             actor.setClip(clip);
             if (isPlantFoodIntro && !actor.isPlaying()) {
                 if (plant.onPlantFoodIntroClipFinished()) {
                     actor.resetAnimation();
                 }
+            } else if (isImitateIdle && !actor.isPlaying()) {
+                plant.onImitateIdleClipFinished();
+                actor.resetAnimation();
+            } else if (isImitateAttack && !actor.isPlaying()) {
+                plant.onImitateAttackClipFinished();
+                actor.resetAnimation();
             }
+            actor.setGreyTint(plant.isImitationOverlayActive());
             actor.setPosition(
                     LawnGridLayout.cellX(plant.getLocation().x())
                             + LawnGridLayout.CELL_WIDTH / 2f
