@@ -7,15 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.board.structures.IceBlock;
 import com.ussr.pvz.model.board.structures.LawnMower;
 import com.ussr.pvz.model.board.structures.OctopusWrap;
 import com.ussr.pvz.model.board.structures.PushableStructure;
 import com.ussr.pvz.model.engine.session.GameSession;
-import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
-import com.ussr.pvz.model.level.behavior.IZombieBehavior;
-import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
@@ -171,15 +167,6 @@ public class EntityRenderLayer extends Group {
 
     // ---- LawnMowers / Brains ------------------------------------------------
     private void syncLawnMowers(GameSession session, Set<Object> live) {
-        // In i,Zombie modes the lawnmower list is cleared and replaced with brains.
-        // Render brains in the same slot (zombieGroup, same position formula) so
-        // they appear exactly where lawnmowers would normally stand.
-        List<Brain> brains = getBrainsFromBehavior(session);
-        if (brains != null) {
-            syncBrains(session, live, brains);
-            return;
-        }
-
         for (LawnMower mower : session.getLawnMowers()) {
             if (!mower.isAlive()) continue;
             live.add(mower);
@@ -206,39 +193,6 @@ public class EntityRenderLayer extends Group {
         }
     }
 
-    private void syncBrains(GameSession session, Set<Object> live, List<Brain> brains) {
-        for (Brain brain : brains) {
-            if (!brain.isAlive()) continue;
-            live.add(brain);
-
-            PamActor actor = zombieGroupActors.computeIfAbsent(brain, b -> {
-                PamActor pa = new PamActor(pamPlayer, ((Brain) b).getPamLocation(), "animation");
-                pa.setPamScale(0.5f);
-                pa.setLooping(true);
-                zombieGroup.addActor(pa);
-                return pa;
-            });
-
-            // Position using the same formula as lawnmowers — brain.position is (-0.5, lane)
-            actor.setPosition(
-                    LawnGridLayout.worldX(brain.getPosition().x())
-                            + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.MOWER_DRAW_OFFSET_X,
-                    LawnGridLayout.worldY(brain.getPosition().y())
-                            + LawnGridLayout.MOWER_DRAW_OFFSET_Y
-            );
-        }
-    }
-
-    private List<Brain> getBrainsFromBehavior(GameSession session) {
-        if (session.getLevel() == null) return null;
-        Object behavior = session.getLevel().getBehavior();
-        if (behavior instanceof IZombieBehavior iz) return new ArrayList<>(iz.getBrains());
-        if (behavior instanceof MultiplayerIZombieBehavior mp) return new ArrayList<>(mp.getBrains());
-        if (behavior instanceof CouchIZombieBehavior couch) return new ArrayList<>(couch.getBrains());
-        return null;
-    }
-
     // ---- Plants -------------------------------------------------------------
     private void syncPlants(GameSession session, Set<Plant> live) {
         for (Plant plant : session.getPlants()) {
@@ -251,7 +205,14 @@ public class EntityRenderLayer extends Group {
                 return pa;
             });
 
-            actor.setClip(plant.getAnimationClip());
+            String clip = plant.getAnimationClip();
+            boolean isCactusPlantFoodIntro = "plantfood".equals(clip)
+                    && "Cactus".equalsIgnoreCase(plant.getName());
+            actor.setLooping(!isCactusPlantFoodIntro);
+            actor.setClip(clip);
+            if (isCactusPlantFoodIntro && !actor.isPlaying()) {
+                plant.setPlantFoodIntroActive(false);
+            }
             actor.setPosition(
                     LawnGridLayout.cellX(plant.getLocation().x())
                             + LawnGridLayout.CELL_WIDTH / 2f
@@ -411,7 +372,7 @@ public class EntityRenderLayer extends Group {
                     boolean bossLocked = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
                     String idleClip = bossStunned ? boss.getStunClip()
                             : bossLocked ? boss.getLockedClip()
-                              : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                            : (boss != null ? boss.resolveClip(currentClip) : currentClip);
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> animSeq = zombie.pollAnimSequence();
                         if (animSeq != null) {
@@ -576,6 +537,7 @@ public class EntityRenderLayer extends Group {
             ProjectilePamActor actor = projectileActors.computeIfAbsent(proj, p -> {
                 String projPam;
                 String hitPam;
+                boolean plantFoodVariant = false;
                 if (p instanceof BowlingNutProjectile nut) {
                     projPam = nut.getVisualPamPath();
                     hitPam = null;
@@ -583,8 +545,11 @@ public class EntityRenderLayer extends Group {
                     Plant user = p.getUser();
                     projPam = user != null ? user.getProjectilePam() : null;
                     hitPam = user != null ? user.getHitPam() : null;
+                    plantFoodVariant = user != null
+                            && "Cactus".equalsIgnoreCase(user.getName())
+                            && user.isBuffed();
                 }
-                ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
+                ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam, plantFoodVariant);
                 if (p instanceof BowlingNutProjectile nut) {
                     pa.setPamScale(nut.getVisualScale());
                     pa.setClockwiseSpinDegPerSec(nut.getRollSpinDegPerSec());

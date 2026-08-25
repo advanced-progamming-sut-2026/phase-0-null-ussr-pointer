@@ -8,13 +8,21 @@ public class ProjectilePamActor extends PamActor {
 
     public Phase phase = Phase.FLYING;
     private final String hitPamPath;   // may be null
+    private final boolean plantFoodVariant;
     private float hitTimer = 0f;
     private static final float HIT_ANIM_DURATION = 0.5f;
     private float clockwiseDegPerSec = 0f;
 
     public ProjectilePamActor(PamPlayer player, String projectilePamPath, String hitPamPath) {
-        super(player, projectilePamPath != null ? projectilePamPath : "", "idle");
+        this(player, projectilePamPath, hitPamPath, false);
+    }
+
+    public ProjectilePamActor(PamPlayer player, String projectilePamPath, String hitPamPath,
+                              boolean plantFoodVariant) {
+        super(player, projectilePamPath != null ? projectilePamPath : "",
+                plantFoodVariant ? "idle_plantfood" : "idle");
         this.hitPamPath = hitPamPath;
+        this.plantFoodVariant = plantFoodVariant;
         this.pamScale = 0.4f;
         this.offsetY = 0f;
 
@@ -34,7 +42,7 @@ public class ProjectilePamActor extends PamActor {
 
         if (hitPamPath != null && !hitPamPath.isBlank()) {
             // swap to the hit pam, one-shot
-            switchToPam(hitPamPath, "idle");
+            switchToPam(hitPamPath, plantFoodVariant ? "idle_plantfood" : "idle");
         } else {
             // no hit pam — just disappear
             phase = Phase.DONE;

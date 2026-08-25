@@ -2393,7 +2393,7 @@
     "plantFoodType": "PROJECTILE_BURST",
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
-    "pamLocation": "768/FULL/PLANT/ELECTRICPEEL/ELECTRICPEEL.PAM",
+    "pamLocation": "768/INITIAL/PLANT/HOMINGTHISTLE/HOMINGTHISTLE.PAM",
     "upgrades": [
       {
         "level": 2,

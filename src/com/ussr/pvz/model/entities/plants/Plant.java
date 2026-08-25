@@ -64,6 +64,12 @@ public class Plant extends GameEntity implements Damageable {
     private final PlantAnimationController animationController =
             new PlantAnimationController();
     private double plantFoodTimer = 0.0;
+    // True while Cactus's one-shot "plantfood" transform clip is still
+    // playing. Set when plant food is applied; cleared by the render layer
+    // once it observes the real PAM clip has finished (see
+    // EntityRenderLayer#syncPlants / PamActor#isPlaying), not a guessed
+    // duration, since the actual clip length comes from the PAM asset itself.
+    private boolean plantFoodIntroActive = false;
 
     private PlantArmor armor;
 
@@ -282,6 +288,10 @@ public class Plant extends GameEntity implements Damageable {
 
         if (plantFoodTimer <= 0f) {
             isBuffed = false;
+            // Safety cleanup: if the buff somehow ends before the render
+            // layer told us the intro clip finished (e.g. a very short
+            // plant food duration), don't leave the plant stuck.
+            plantFoodIntroActive = false;
             return;
         }
 
@@ -696,6 +706,14 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodTimer = duration;
     }
 
+    public boolean isPlantFoodIntroActive() {
+        return plantFoodIntroActive;
+    }
+
+    public void setPlantFoodIntroActive(boolean plantFoodIntroActive) {
+        this.plantFoodIntroActive = plantFoodIntroActive;
+    }
+
     public int getStackNumber() {
         return this.stackNumber;
     }
@@ -726,6 +744,9 @@ public class Plant extends GameEntity implements Damageable {
     public void setBuffed(boolean isBuffed) {
         this.isBuffed = isBuffed;
         if (isBuffed) {
+            if ("Cactus".equalsIgnoreCase(name)) {
+                plantFoodIntroActive = true;
+            }
             if (this.plantFoodEffect != null) {
                 plantFoodEffect.applyStatusModifiers(this);
                 plantFoodEffect.triggerSuperpower(this, App.getGameSession());
@@ -777,6 +798,12 @@ public class Plant extends GameEntity implements Damageable {
 
         // 2. Plant Food State
         if (plantFoodTimer > 0 || isBuffed) {
+            if ("Cactus".equalsIgnoreCase(name)) {
+                if (plantFoodIntroActive) {
+                    return "plantfood";
+                }
+                return animationController.getCurrentClip() + "_plantfood";
+            }
             return "plantfood"; // Note: If your PamActor uses "plantfood_on" as a fallback, handle that inside PlantPamActor.
         }
 
