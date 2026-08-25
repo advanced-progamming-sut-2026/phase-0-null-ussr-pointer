@@ -14,7 +14,7 @@ public class ShockwaveStrategy implements ActStrategy {
     @Override
     public void act(Plant user, GameSession session) {
         if (hasHpDrivenGrowth(user) && updateStage(user)) {
-            user.triggerGrowAnimation(0.4f);
+            user.triggerGrowAnimation();
             return;
         }
 
@@ -41,7 +41,7 @@ public class ShockwaveStrategy implements ActStrategy {
         }
 
         user.setInternalTimer(0.0);
-        user.triggerActionAnimation(0.25f);
+        user.triggerActionAnimation();
     }
 
     private boolean hasHpDrivenGrowth(Plant user) {

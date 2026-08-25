@@ -62,7 +62,7 @@ public class ExplodeStrategy implements ActStrategy {
         if (targets == null || targets.isEmpty()) return;
         if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
             userAct(user, targets);
-            user.triggerActionAnimation(0.5f);
+            user.triggerActionAnimation();
             user.setInternalTimer(0.0);
             return;
         }

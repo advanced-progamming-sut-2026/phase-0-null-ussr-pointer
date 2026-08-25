@@ -3,10 +3,14 @@ package com.ussr.pvz.view.animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.ussr.pvz.model.entities.plants.animation.PamClipTimings;
 import pvz.libpvz.pam.ClipRef;
 import pvz.libpvz.pam.PamPlayer;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PamActor extends Actor {
 
@@ -33,6 +37,8 @@ public class PamActor extends Actor {
         this.currentClipName = preferredClip;
     }
 
+    private static final Set<String> WARMED_PAM_PATHS = ConcurrentHashMap.newKeySet();
+
     public static ClipRef resolveClip(PamPlayer player, String pamPath, String preferredClip) {
         if (player == null || pamPath == null) return null;
 
@@ -40,6 +46,8 @@ public class PamActor extends Actor {
             player.loadSync(pamPath);
         } catch (Exception ignored) {
         }
+
+        warmClipTimings(player, pamPath);
 
         String[] candidates = {preferredClip, "idle", "almanac_idle", "animation", "main", "sprout", "grow", "boost", "default", ""};
         for (String candidate : candidates) {
@@ -58,6 +66,20 @@ public class PamActor extends Actor {
         }
 
         return null;
+    }
+
+    private static void warmClipTimings(PamPlayer player, String pamPath) {
+        if (WARMED_PAM_PATHS.contains(pamPath)) return;
+        try {
+            List<String> clips = player.clips(pamPath);
+            if (clips == null) return;
+            for (String clip : clips) {
+                float duration = player.clipDurationSeconds(pamPath, clip);
+                PamClipTimings.put(pamPath, clip, duration);
+            }
+            WARMED_PAM_PATHS.add(pamPath);
+        } catch (Exception ignored) {
+        }
     }
 
     public void setClip(String clipName) {

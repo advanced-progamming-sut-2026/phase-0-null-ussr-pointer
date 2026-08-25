@@ -1,5 +1,14 @@
 package com.ussr.pvz.model.entities.plants.animation;
 
+/**
+ * Owns clip-name resolution AND, since the recent PAM-driven timing pass,
+ * duration resolution for temporary (non-looping) plant animation states.
+ * Durations are no longer passed in by callers — they're looked up from
+ * PamClipTimings by (pamPath, resolved clip name) so the model timer always
+ * matches the actual PAM clip length. If a duration isn't cached yet (PAM
+ * still loading), the play* methods no-op and return false rather than
+ * guessing a fallback.
+ */
 public class PlantAnimationController {
 
     private PlantAnimationState state =
@@ -26,55 +35,44 @@ public class PlantAnimationController {
         remainingDuration = 0f;
     }
 
-    public void playAttack(
+    public boolean playAttack(
             String plantName,
             int growthStage,
-            float duration
+            String pamPath
     ) {
-        playTemporary(
-                PlantAnimationState.ATTACKING,
-                attackClip(plantName, growthStage),
-                duration
-        );
+        String clip = attackClip(plantName, growthStage);
+        Float duration = PamClipTimings.get(pamPath, clip);
+        if (duration == null) return false;
+        playTemporary(PlantAnimationState.ATTACKING, clip, duration);
+        return true;
     }
 
-    public void playGrow(
+    public boolean playGrow(
             String plantName,
             int growthStage,
-            float duration
+            String pamPath
     ) {
-        playTemporary(
-                PlantAnimationState.GROWING,
-                growClip(plantName, growthStage),
-                duration
-        );
+        String clip = growClip(plantName, growthStage);
+        Float duration = PamClipTimings.get(pamPath, clip);
+        if (duration == null) return false;
+        playTemporary(PlantAnimationState.GROWING, clip, duration);
+        return true;
     }
 
     private String growClip(String plantName, int growthStage) {
         if (plantName != null && plantName.equalsIgnoreCase("Kiwibeast")) {
-            int targetStage = Math.max(2, Math.min(3, growthStage));
-            int fromStage = targetStage - 1;
-            return "growth_stage" + fromStage;
+            int stage = Math.max(1, Math.min(3, growthStage));
+            return "growth_stage" + stage;
         }
         return "grow";
     }
 
-    public void playKiwiPlantFoodGrowth(float duration) {
-        playTemporary(
-                PlantAnimationState.GROWING,
-                "growth_stage1_2",
-                duration
-        );
-    }
-
-    public void playProduce(String plantName, float duration) {
-        playTemporary(
-                PlantAnimationState.PRODUCING,
-                "Gold Bloom".equalsIgnoreCase(plantName)
-                        ? "attack"
-                        : "special",
-                duration
-        );
+    public boolean playProduce(String plantName, String pamPath) {
+        String clip = "Gold Bloom".equalsIgnoreCase(plantName) ? "attack" : "special";
+        Float duration = PamClipTimings.get(pamPath, clip);
+        if (duration == null) return false;
+        playTemporary(PlantAnimationState.PRODUCING, clip, duration);
+        return true;
     }
 
     private String attackClip(String plantName, int growthStage) {
@@ -99,7 +97,7 @@ public class PlantAnimationController {
 
         if (plantName.equalsIgnoreCase("Kiwibeast")) {
             int stage = Math.max(1, Math.min(3, growthStage));
-            return "attack_stage_" + stage;
+            return "attack_stage" + stage;
         }
 
         return "attack";

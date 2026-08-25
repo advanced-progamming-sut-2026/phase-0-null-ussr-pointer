@@ -29,7 +29,7 @@ public class StrikeStrategy implements ActStrategy {
         );
         projectile.setVisualLaunchOrigin(user.getProjectileOrigin(0));
         session.addProjectile(projectile);
-        user.triggerActionAnimation(0.5f);
+        user.triggerActionAnimation();
     }
 
 

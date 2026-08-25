@@ -771,10 +771,6 @@ public class Plant extends GameEntity implements Damageable {
             if ("Cactus".equalsIgnoreCase(name)) {
                 plantFoodIntroActive = true;
             }
-            if ("Kiwibeast".equalsIgnoreCase(name) && getCurrentStage() == 1) {
-                setGrowthStage(3);
-                triggerKiwiPlantFoodGrowthAnimation(0.6f);
-            }
             if (this.plantFoodEffect != null) {
                 plantFoodEffect.applyStatusModifiers(this);
                 plantFoodEffect.triggerSuperpower(this, App.getGameSession());
@@ -785,16 +781,12 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
-    public void triggerActionAnimation(float duration) {
-        animationController.playAttack(name, getCurrentStage(), duration);
+    public boolean triggerActionAnimation() {
+        return animationController.playAttack(name, getCurrentStage(), pamPath);
     }
 
-    public void triggerGrowAnimation(float duration) {
-        animationController.playGrow(name, getCurrentStage(), duration);
-    }
-
-    public void triggerKiwiPlantFoodGrowthAnimation(float duration) {
-        animationController.playKiwiPlantFoodGrowth(duration);
+    public boolean triggerGrowAnimation() {
+        return animationController.playGrow(name, getCurrentStage(), pamPath);
     }
 
     public void scheduleAttack(float delay, Runnable action) {
@@ -809,8 +801,8 @@ public class Plant extends GameEntity implements Damageable {
         pendingAttackAction = action;
     }
 
-    public void triggerProduceAnimation(float duration) {
-        animationController.playProduce(name, duration);
+    public boolean triggerProduceAnimation() {
+        return animationController.playProduce(name, pamPath);
     }
 
     public PlantAnimationController getAnimationController() {
@@ -842,10 +834,6 @@ public class Plant extends GameEntity implements Damageable {
                     return "plantfood";
                 }
                 return animationController.getCurrentClip() + "_plantfood";
-            }
-            if ("Kiwibeast".equalsIgnoreCase(name)
-                    && "growth_stage1_2".equals(animationController.getCurrentClip())) {
-                return "growth_stage1_2";
             }
             return "plantfood"; // Note: If your PamActor uses "plantfood_on" as a fallback, handle that inside PlantPamActor.
         }
@@ -894,7 +882,7 @@ public class Plant extends GameEntity implements Damageable {
         // clips are already stage-tagged by PlantAnimationController).
         if ("Kiwibeast".equalsIgnoreCase(name)
                 && "idle".equals(animationController.getCurrentClip())) {
-            return "idle_stage" + Math.max(1, Math.min(3, getCurrentStage())) + "_";
+            return "idle_stage" + Math.max(1, Math.min(3, getCurrentStage()));
         }
 
         // 5. Default Action or Idle State

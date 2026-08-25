@@ -59,7 +59,7 @@ public class SunProduceStrategy implements ActStrategy {
         session.addItem(sun);
 
         user.setInternalTimer(0.0);
-        user.triggerProduceAnimation(0.5f);
+        user.triggerProduceAnimation();
     }
 
     private void setInstantBurst(Plant user) {

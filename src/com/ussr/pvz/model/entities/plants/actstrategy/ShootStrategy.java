@@ -55,7 +55,7 @@ public class ShootStrategy implements ActStrategy {
             projectile.setVisualLaunchOrigin(user.getProjectileOrigin(index));
             session.addProjectile(projectile);
         }
-        user.triggerActionAnimation(0.5f);
+        user.triggerActionAnimation();
         double autoFoodChance = user.getSpecialUpgradeValue(
                 SpecialUpgrade.AUTO_PLANT_FOOD_CHANCE);
         if (!user.isBuffed() && user.getPlantFoodEffect() != null
