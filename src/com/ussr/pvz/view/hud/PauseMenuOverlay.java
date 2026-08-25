@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.service.ChoosePlantService;
 import com.ussr.pvz.service.minigame.MultiplayerIZombieService;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
@@ -235,7 +236,8 @@ public final class PauseMenuOverlay extends WidgetGroup {
                                 .getId()
                 );
 
-                App.setMenuState(MenuState.CHOOSE_PLANT);
+                App.setGameSession(null);
+                ChoosePlantService.proceedPastLevelStart();
             }
         });
 

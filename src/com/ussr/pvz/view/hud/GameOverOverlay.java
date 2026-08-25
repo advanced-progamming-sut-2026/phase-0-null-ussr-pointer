@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.service.ChoosePlantService;
+import com.ussr.pvz.view.mainmenu.gamemenu.chooseplant.ChoosePlantMenu;
 import pvz.libpvz.textures.TextureBank;
 
 /** Displays distinct, persistent victory and defeat actions. */
@@ -231,7 +233,7 @@ public class GameOverOverlay extends Table {
         }
 
         App.setGameSession(null);
-        App.setMenuState(MenuState.CHOOSE_PLANT);
+        ChoosePlantService.proceedPastLevelStart();
     }
 
     private void replayLevel() {
@@ -246,7 +248,7 @@ public class GameOverOverlay extends Table {
         App.getLevelManager().startChapter(chapterId);
         App.getLevelManager().startLevel(levelId);
         App.setGameSession(null);
-        App.setMenuState(MenuState.CHOOSE_PLANT);
+        ChoosePlantService.proceedPastLevelStart();
     }
 
     private void goToGameMenu() {
