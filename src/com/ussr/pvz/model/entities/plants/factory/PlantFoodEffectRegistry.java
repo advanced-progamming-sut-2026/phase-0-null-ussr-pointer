@@ -27,6 +27,9 @@ public final class PlantFoodEffectRegistry {
             //String name = (String) data.get("name");
             double duration = ((Number) data.getOrDefault("plantFoodDuration", 4.0)).doubleValue();
             double strikeRate = ((Number) data.getOrDefault("plantFoodStrikeRate", 0.1)).doubleValue();
+            if ("Cactus".equalsIgnoreCase((String) data.get("name"))) {
+                return new PierceThroughAttack(duration);
+            }
             return new LocalAttack(duration , strikeRate);
 
         });

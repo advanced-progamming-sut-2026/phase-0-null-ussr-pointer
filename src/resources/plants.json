@@ -804,10 +804,11 @@
     "abilityType": "SHOOT_PROJECTILE",
     "abilityValue": 3.0,
     "plantFoodType": "PROJECTILE_BURST",
-    "plantFoodDuration": 4.0,
+    "plantFoodDuration": 20.0,
     "plantFoodStrikeRate": 0.1,
     "pamLocation": "768/INITIAL/PLANT/CACTUS/CACTUS.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_CACTUS_PROJECTILE/T_CACTUS_PROJECTILE.PAM",
+    "plantFoodProjectilePam": "768/INITIAL/EFFECTS/CACTUS_PROJECTILE_PLANTFOOD/CACTUS_PROJECTILE_PLANTFOOD.PAM",
     "projectileOrigins": [
       {
         "x": 0.68,

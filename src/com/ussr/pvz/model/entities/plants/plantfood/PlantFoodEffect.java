@@ -9,4 +9,8 @@ public interface PlantFoodEffect {
     void applyStatusModifiers(Plant user);
 
     void tickDurationEffect(Plant user, GameSession session, double deltaTime);
+
+    default boolean pausesNormalAction() {
+        return true;
+    }
 }

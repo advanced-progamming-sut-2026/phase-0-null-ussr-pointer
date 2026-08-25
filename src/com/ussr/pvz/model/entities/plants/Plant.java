@@ -244,7 +244,9 @@ public class Plant extends GameEntity implements Damageable {
         updateStats(delta);
         updatePlantFood(delta);
         updateGrowth(delta);
-        if (isBuffed || actStrategy == null) {
+        boolean pauseAction = isBuffed
+                && (plantFoodEffect == null || plantFoodEffect.pausesNormalAction());
+        if (pauseAction || actStrategy == null) {
             return;
         }
 

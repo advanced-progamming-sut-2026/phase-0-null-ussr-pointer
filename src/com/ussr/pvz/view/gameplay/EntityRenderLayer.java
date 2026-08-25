@@ -537,19 +537,26 @@ public class EntityRenderLayer extends Group {
             ProjectilePamActor actor = projectileActors.computeIfAbsent(proj, p -> {
                 String projPam;
                 String hitPam;
-                boolean plantFoodVariant = false;
                 if (p instanceof BowlingNutProjectile nut) {
                     projPam = nut.getVisualPamPath();
                     hitPam = null;
                 } else {
                     Plant user = p.getUser();
-                    projPam = user != null ? user.getProjectilePam() : null;
-                    hitPam = user != null ? user.getHitPam() : null;
-                    plantFoodVariant = user != null
-                            && "Cactus".equalsIgnoreCase(user.getName())
-                            && user.isBuffed();
+                    boolean useFoodVariant = user != null
+                            && user.isBuffed()
+                            && user.getPlantFoodProjectilePam() != null
+                            && !user.getPlantFoodProjectilePam().isBlank();
+                    if (useFoodVariant) {
+                        projPam = user.getPlantFoodProjectilePam();
+                        String foodHitPam = user.getPlantFoodHitPam();
+                        hitPam = (foodHitPam != null && !foodHitPam.isBlank())
+                                ? foodHitPam : user.getHitPam();
+                    } else {
+                        projPam = user != null ? user.getProjectilePam() : null;
+                        hitPam = user != null ? user.getHitPam() : null;
+                    }
                 }
-                ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam, plantFoodVariant);
+                ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
                 if (p instanceof BowlingNutProjectile nut) {
                     pa.setPamScale(nut.getVisualScale());
                     pa.setClockwiseSpinDegPerSec(nut.getRollSpinDegPerSec());
