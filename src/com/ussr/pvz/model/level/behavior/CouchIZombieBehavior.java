@@ -40,6 +40,7 @@ public class CouchIZombieBehavior extends LevelBehavior {
 
     private int zombieSun;
     private boolean missionFailed;
+    private boolean mowersRemoved = false;
 
     public CouchIZombieBehavior(int redLineColumn, int startingSun) {
         this.redLineColumn = redLineColumn;
@@ -60,7 +61,6 @@ public class CouchIZombieBehavior extends LevelBehavior {
         int rows = session.getLawn().getRows();
         int columns = session.getLawn().getCols();
 
-        session.getLawnMowers().clear();
         placeBrains(session, rows);
         placeSunProducers(session, rows, columns);
     }
@@ -102,18 +102,25 @@ public class CouchIZombieBehavior extends LevelBehavior {
 
     @Override
     public void tick(GameSession session, double deltaTime) {
-        super.tick(session, deltaTime);
+        if (!mowersRemoved) {
+            session.getLawnMowers().forEach(mower -> mower.setAlive(false));
+            session.getLawnMowers().clear();
+            mowersRemoved = true;
+        }
 
         if (levelCompleted || missionFailed || session.isGameOver()) return;
 
+        // Zombie side wins: all brains eaten → zombie player wins, plant player loses.
         if (allBrainsEaten()) {
-            onComplete(session.getLevel());
+            missionFailed = true;         // plant side loses
+            session.concludeDefeat();     // session ends as defeat (for the plant player)
             return;
         }
 
+        // Plant side wins: zombie side is completely stuck → plant player wins, zombie player loses.
         if (zombieSidePlayerIsStuck(session)) {
-            missionFailed = true;
-            session.getEventBus().publish(new GameEvent.GameOver());
+            levelCompleted = true;        // plant side wins
+            session.concludeVictory();    // session ends as victory (for the plant player)
         }
     }
 
@@ -174,5 +181,9 @@ public class CouchIZombieBehavior extends LevelBehavior {
                 .filter(brain -> (int) brain.getPosition().y() == lane)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<Brain> getBrains() {
+        return List.copyOf(brains);
     }
 }

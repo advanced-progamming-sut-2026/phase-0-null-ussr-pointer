@@ -28,6 +28,7 @@ public class IZombieBehavior extends LevelBehavior {
     private final List<Brain> brains = new ArrayList<>();
 
     private boolean missionFailed = false;
+    private boolean mowersRemoved = false;
     private final Random random = new Random();
 
     public IZombieBehavior(int redLineColumn, int startingSun) {
@@ -58,9 +59,6 @@ public class IZombieBehavior extends LevelBehavior {
     }
 
     private void placeBrains(GameSession session, int rows) {
-        // Remove standard lawnmowers
-        session.getLawnMowers().clear();
-
         for (int r = 0; r < rows; r++) {
             Brain brain = new Brain();
             // Place brains outside the grid where LawnMowers normally sit
@@ -129,7 +127,11 @@ public class IZombieBehavior extends LevelBehavior {
 
     @Override
     public void tick(GameSession session, double deltaTime) {
-        super.tick(session, deltaTime);
+        if (!mowersRemoved) {
+            session.getLawnMowers().forEach(mower -> mower.setAlive(false));
+            session.getLawnMowers().clear();
+            mowersRemoved = true;
+        }
 
         if (levelCompleted || session.isGameOver() || missionFailed) return;
 
@@ -173,6 +175,10 @@ public class IZombieBehavior extends LevelBehavior {
 
     public boolean isWon() {
         return brains.stream().noneMatch(Brain::isAlive);
+    }
+
+    public List<Brain> getBrains() {
+        return List.copyOf(brains);
     }
 
     public int getRedLineColumn() {

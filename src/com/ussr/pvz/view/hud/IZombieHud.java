@@ -38,20 +38,20 @@ import java.util.Map;
  */
 public class IZombieHud extends Table {
 
-    // Match SeedBankHud's vertical slot dimensions exactly
-    private static final int SLOT_W = 100;
-    private static final int SLOT_H = 95;
+    private static final int   SLOT_W           = 100;
+    private static final int   SLOT_H           = 95;
+    private static final float PLACE_COOLDOWN_S = 5f;   // hard-coded per-zombie cooldown
 
-    private final Skin skin;
-    private final TextureBank textures;
+    private final Skin               skin;
+    private final TextureBank        textures;
     private final GameplayController controller;
 
     private final Label sunLabel;
     private final Table cardColumn;
     private final Map<String, ZombieSlotWidget> slots = new LinkedHashMap<>();
 
-    private String selectedZombieKey = null;
-    private GameSession lastSession = null;
+    private String      selectedZombieKey = null;
+    private GameSession lastSession       = null;
 
     public IZombieHud(Skin skin, TextureBank textures, GameplayController controller) {
         this.skin       = skin;
@@ -59,7 +59,7 @@ public class IZombieHud extends Table {
         this.controller = controller;
         top().right();
         setTouchable(Touchable.childrenOnly);
-        setVisible(false); // hidden until confirmed IZombie level
+        setVisible(false);
 
         sunLabel = new Label("0", skin, "default");
 
@@ -90,9 +90,7 @@ public class IZombieHud extends Table {
 
         GameSession session = App.getGameSession();
         if (!shouldShowFor(session)) {
-            if (isVisible()) {
-                clearSelection();
-            }
+            if (isVisible()) clearSelection();
             setVisible(false);
             setTouchable(Touchable.disabled);
             lastSession = null;
@@ -110,7 +108,9 @@ public class IZombieHud extends Table {
         int sun = getZombieSunCount(session);
         sunLabel.setText(String.valueOf(sun));
 
+        // Tick cooldowns and refresh affordability every frame
         for (ZombieSlotWidget slot : slots.values()) {
+            slot.tick(delta);
             slot.refreshAffordability(sun);
         }
     }
@@ -124,16 +124,9 @@ public class IZombieHud extends Table {
     }
 
     private boolean shouldShowFor(GameSession session) {
-        if (session == null || session.getLevel() == null) {
-            return false;
-        }
-
+        if (session == null || session.getLevel() == null) return false;
         LevelBehavior behavior = session.getLevel().getBehavior();
-
-        if (behavior instanceof IZombieBehavior || behavior instanceof CouchIZombieBehavior) {
-            return true;
-        }
-
+        if (behavior instanceof IZombieBehavior || behavior instanceof CouchIZombieBehavior) return true;
         return behavior instanceof MultiplayerIZombieBehavior multiplayer
                 && multiplayer.isZombiesPlayer();
     }
@@ -148,14 +141,11 @@ public class IZombieHud extends Table {
 
         for (var entry : session.getLevel().getAllowedZombies()) {
             String id = entry.id();
-            if ("SunProducerZombie".equalsIgnoreCase(id)) continue; // not placeable
+            if ("SunProducerZombie".equalsIgnoreCase(id)) continue;
 
             int cost = IZombiePricing.getCost(session, id);
             ZombieSlotWidget slot = new ZombieSlotWidget(
-                    id,
-                    cost,
-                    skin,
-                    textures,
+                    id, cost, skin, textures,
                     () -> selectZombie(id)
             );
             slots.put(id, slot);
@@ -175,6 +165,17 @@ public class IZombieHud extends Table {
         }
     }
 
+    /**
+     * Called by the controller after a zombie has been successfully placed.
+     * Deselects the current slot and starts its cooldown.
+     */
+    public void onZombiePlaced(String zombieKey) {
+        if (zombieKey != null && slots.containsKey(zombieKey)) {
+            slots.get(zombieKey).startCooldown(PLACE_COOLDOWN_S);
+        }
+        clearSelection();
+    }
+
     public void clearSelection() {
         selectedZombieKey = null;
         controller.setSelectedZombieKey(null);
@@ -190,14 +191,19 @@ public class IZombieHud extends Table {
         private static final Color UNAFFORDABLE = new Color(0.5f, 0.5f, 0.5f, 1f);
         private static final Color BORDER_COLOR = new Color(1f, 0.72f, 0.08f, 1f);
 
-        private final String  zombieId;
-        private final int      cost;
-        private final Image   portrait;
-        private final Label   costLabel;
-        private final Actor   selectionFrame;
+        private final String          zombieId;
+        private final int             cost;
+        private final Image           portrait;
+        private final Label           costLabel;
+        private final Actor           selectionFrame;
+        private final CooldownOverlay cooldownOverlay;
 
-        private boolean selected    = false;
-        private boolean affordable  = true;
+        private boolean selected   = false;
+        private boolean affordable = true;
+
+        // cooldown state
+        private float cooldownTotal     = 0f;
+        private float cooldownRemaining = 0f;
 
         ZombieSlotWidget(
                 String zombieId,
@@ -207,7 +213,7 @@ public class IZombieHud extends Table {
                 Runnable onClick
         ) {
             this.zombieId = zombieId;
-            this.cost = cost;
+            this.cost     = cost;
             setTouchable(Touchable.enabled);
 
             // Card background
@@ -215,6 +221,7 @@ public class IZombieHud extends Table {
                 add(new Image(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10")));
             }
 
+            // Portrait
             String texKey = com.ussr.pvz.model.entities.zombies.ZombieFactory.getZombieTextureRegion(zombieId);
             TextureRegion portRegion = textures.region(texKey);
             portrait = portRegion != null ? new Image(portRegion) : new Image();
@@ -225,7 +232,7 @@ public class IZombieHud extends Table {
             portraitLayer.add(portrait).grow().pad(4f);
             add(portraitLayer);
 
-            // Zombie name label (small, centered, used as fallback when no portrait)
+            // Fallback name label when no portrait
             if (portRegion == null) {
                 Table nameLayer = new Table();
                 nameLayer.setTouchable(Touchable.disabled);
@@ -247,6 +254,10 @@ public class IZombieHud extends Table {
             costLayer.add(costLabel).pad(2f);
             add(costLayer);
 
+            // Cooldown overlay — reuses the same class as SeedPacketWidget
+            cooldownOverlay = new CooldownOverlay();
+            add(cooldownOverlay);
+
             // Gold selection frame
             Drawable goldPixel = skin.has("white-pixel", Drawable.class)
                     ? skin.newDrawable("white-pixel", BORDER_COLOR) : null;
@@ -258,17 +269,43 @@ public class IZombieHud extends Table {
             addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    // Blocked while cooling down
+                    if (isOnCooldown()) return;
                     onClick.run();
                 }
             });
         }
 
+        // ── Cooldown ──────────────────────────────────────────────────────────
+
+        void startCooldown(float seconds) {
+            cooldownTotal     = seconds;
+            cooldownRemaining = seconds;
+            cooldownOverlay.setProgress(1f);
+        }
+
+        boolean isOnCooldown() {
+            return cooldownRemaining > 0f;
+        }
+
+        void tick(float delta) {
+            if (cooldownRemaining <= 0f) return;
+            cooldownRemaining = Math.max(0f, cooldownRemaining - delta);
+            // progress goes from 1 → 0 as cooldown drains (curtain retracts downward)
+            float progress = cooldownTotal > 0f ? cooldownRemaining / cooldownTotal : 0f;
+            cooldownOverlay.setProgress(progress);
+        }
+
+        // ── Affordability ─────────────────────────────────────────────────────
+
         void refreshAffordability(int sun) {
-            affordable = sun >= cost;
+            affordable = sun >= cost && !isOnCooldown();
             Color tint = affordable ? AFFORDABLE : UNAFFORDABLE;
             portrait.setColor(tint);
             costLabel.setColor(affordable ? Color.WHITE : new Color(0.85f, 0.35f, 0.3f, 1f));
         }
+
+        // ── Selection ─────────────────────────────────────────────────────────
 
         void setSelected(boolean sel) {
             selected = sel;
@@ -278,12 +315,11 @@ public class IZombieHud extends Table {
         }
 
         private static String shortName(String id) {
-            // "ZombieGargantuar" → "Gargantuar"
             return id.startsWith("Zombie") ? id.substring(6) : id;
         }
     }
 
-    // ── Border frame (same as SeedPacketWidget.SelectionFrame) ───────────────
+    // ── Border frame ──────────────────────────────────────────────────────────
     private static final class BorderFrameActor extends Actor {
         private static final float BW = 5f;
         private final Drawable pixel;

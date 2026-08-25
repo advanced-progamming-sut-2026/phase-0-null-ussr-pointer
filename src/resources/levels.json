@@ -1073,6 +1073,7 @@
       "name": "Zomboss Arcade",
       "gameMode": "MINIGAME",
       "lawnRegion": "IMAGE_BACKGROUNDS_FRONTLAWN_PADDYS_TEXTURE",
+      "mowerPam": "768/INITIAL/MOWERS/MOWER_TUTORIAL/MOWER_TUTORIAL.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",
@@ -1833,6 +1834,7 @@
       "name": "Meow Mode",
       "gameMode": "MEOW",
       "lawnRegion": "IMAGE_BACKGROUNDS_FRONTLAWN_SPRING_TEXTURE",
+      "mowerPam": "768/INITIAL/MOWERS/MOWER_TUTORIAL/MOWER_TUTORIAL.PAM",
       "allowedPlants": [
         "Sunflower",
         "Twin Sunflower",

@@ -10,6 +10,10 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.Level;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
+import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
+import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
+import com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +170,11 @@ public class ChoosePlantService {
      * pre-game loadout, so we skip the choose-plant menu and jump straight into the game.
      */
     public static void proceedPastLevelStart() {
-        if (isConveyorLevel(App.getLevelManager().getCurrentLevel())) {
+        Level level = App.getLevelManager().getCurrentLevel();
+        if (isConveyorLevel(level) || level.getBehavior() instanceof BeghouledBehavior
+                || level.getBehavior() instanceof WallnutBowlingBehavior
+                || level.getBehavior() instanceof VaseBreakerBehavior
+                || level.getBehavior() instanceof IZombieBehavior) {
             new ChoosePlantService().startGame();
         } else {
             App.setMenuState(MenuState.CHOOSE_PLANT);

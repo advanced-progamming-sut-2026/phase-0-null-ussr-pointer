@@ -164,7 +164,7 @@ public class TerrainRenderLayer extends Group {
 
         } else if (structure instanceof Brain brain) {
             PamActor actor = structureActors.computeIfAbsent(brain,
-                    k -> createSimplePamActor(brain.getPamLocation(), 0.5f, "idle"));
+                    k -> createSimplePamActor(brain.getPamLocation(), 0.5f, "animation"));
             actor.setPosition(worldX, worldY);
 
         } else if (structure instanceof Container) {

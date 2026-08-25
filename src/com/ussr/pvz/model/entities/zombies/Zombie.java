@@ -19,6 +19,7 @@ import com.ussr.pvz.model.entities.zombies.move.JumpMove;
 import com.ussr.pvz.model.entities.zombies.move.MoveBehavior;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.IZombieBehavior;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.util.Vec2;
@@ -318,6 +319,8 @@ public class Zombie extends GameEntity implements Damageable {
                     brain = iZombie.getBrainInLane(lane);
                 } else if (behavior instanceof MultiplayerIZombieBehavior multiplayer) {
                     brain = multiplayer.getBrainInLane(lane);
+                } else if (behavior instanceof CouchIZombieBehavior couch) {
+                    brain = couch.getBrainInLane(lane);
                 }
             }
 

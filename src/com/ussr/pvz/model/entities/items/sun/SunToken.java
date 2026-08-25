@@ -48,7 +48,7 @@ public class SunToken extends GroundItem {
         this.falling = true;
         this.currentY = 0.0;
         this.fallTargetY = targetRow;
-        this.setPosition(com.ussr.pvz.model.util.Vec2.of(targetCol, targetRow)); // <-- add this
+        this.setPosition(com.ussr.pvz.model.util.Vec2.of(targetCol, targetRow));
 
         App.getGameSession().getEventBus()
                 .publish(new GameEvent.SunStartedFalling(selectedType.toString(), targetCol, targetRow));
@@ -83,10 +83,11 @@ public class SunToken extends GroundItem {
             for (com.ussr.pvz.model.entities.zombies.Zombie zombie : session.getZombies()) {
                 if (!zombie.isAlive()) continue;
 
-                double zY = zombie.getPosition().y();
-                double zX = zombie.getPosition().x();
+                // getPosition() returns continuous coords — round to nearest grid cell
+                int zRow = (int) Math.round(zombie.getPosition().y());
+                int zCol = (int) Math.round(zombie.getPosition().x());
 
-                if (Math.abs(zY - rCenter) <= 2 && Math.abs(zX - cCenter) <= 2) {
+                if (Math.abs(zRow - rCenter) <= 2 && Math.abs(zCol - cCenter) <= 2) {
                     zombie.takeDamage(150);
                 }
             }
@@ -96,10 +97,12 @@ public class SunToken extends GroundItem {
             for (com.ussr.pvz.model.entities.plants.Plant plant : session.getPlants()) {
                 if (!plant.isAlive()) continue;
 
-                int pY = plant.getLocation().y();
-                int pX = plant.getLocation().x();
+                // plants are grid-placed — getPosition() holds their integer cell coords
+                if (plant.getPosition() == null) continue;
+                int pRow = (int) Math.round(plant.getPosition().y());
+                int pCol = (int) Math.round(plant.getPosition().x());
 
-                if (Math.abs(pY - rCenter) <= 1 && Math.abs(pX - cCenter) <= 1) {
+                if (Math.abs(pRow - rCenter) <= 1 && Math.abs(pCol - cCenter) <= 1) {
                     plant.takeDamage(80, null);
                 }
             }
