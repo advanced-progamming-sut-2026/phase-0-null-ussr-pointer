@@ -789,6 +789,10 @@ public class Plant extends GameEntity implements Damageable {
         return animationController.playGrow(name, getCurrentStage(), pamPath);
     }
 
+    public void triggerGrowAnimation(float duration) {
+        animationController.playGrow(name, getCurrentStage(), duration);
+    }
+
     public void scheduleAttack(float delay, Runnable action) {
         if (action == null) {
             return;
