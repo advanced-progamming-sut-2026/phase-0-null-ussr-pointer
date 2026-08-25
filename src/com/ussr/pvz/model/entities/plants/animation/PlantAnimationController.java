@@ -38,6 +38,26 @@ public class PlantAnimationController {
         );
     }
 
+    public void playGrow(
+            String plantName,
+            int growthStage,
+            float duration
+    ) {
+        playTemporary(
+                PlantAnimationState.GROWING,
+                growClip(plantName, growthStage),
+                duration
+        );
+    }
+
+    private String growClip(String plantName, int growthStage) {
+        if (plantName != null && plantName.equalsIgnoreCase("Kiwibeast")) {
+            int stage = Math.max(1, Math.min(3, growthStage));
+            return "growth_stage" + stage;
+        }
+        return "grow";
+    }
+
     public void playProduce(String plantName, float duration) {
         playTemporary(
                 PlantAnimationState.PRODUCING,
@@ -66,6 +86,11 @@ public class PlantAnimationController {
 
         if (plantName.equalsIgnoreCase("Chomper")) {
             return "swallow";
+        }
+
+        if (plantName.equalsIgnoreCase("Kiwibeast")) {
+            int stage = Math.max(1, Math.min(3, growthStage));
+            return "attack_stage" + stage;
         }
 
         return "attack";

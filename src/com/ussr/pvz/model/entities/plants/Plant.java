@@ -10,6 +10,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.actstrategy.ActStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.ShockwaveStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
@@ -184,7 +185,7 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodProjectilePam = blueprint.plantFoodProjectilePam;
         this.growthTracker = blueprint.growthTracker;
         this.pamPath = blueprint.pamPath;
-        if (this.actStrategy instanceof MeleeStrategy) {
+        if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
             this.internalTimer = this.actionInterval;
         } else {
             this.internalTimer = 0.0;
@@ -405,7 +406,9 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void updateGrowth(double deltaTimeSeconds) {
-        if (growthTracker != null) {
+        // Kiwibeast's stage is driven by its own HP (see ShockwaveStrategy),
+        // not by elapsed time, so skip the generic time-based advance here.
+        if (growthTracker != null && !"Kiwibeast".equalsIgnoreCase(name)) {
             double reduction = getSpecialUpgradeValue(SpecialUpgrade.GROW_TIME_REDUCTION);
             double speedMultiplier = reduction < 0 ? 1.0 + (-reduction / 24.0) : 1.0;
             growthTracker.update(deltaTimeSeconds * speedMultiplier);
@@ -610,6 +613,13 @@ public class Plant extends GameEntity implements Damageable {
         return growthTracker != null ? growthTracker.getCurrentStage() : 1;
     }
 
+    /** Forces the growth stage directly (see ShockwaveStrategy). No-op without a growthTracker. */
+    public void setGrowthStage(int stage) {
+        if (growthTracker != null) {
+            growthTracker.setStage(stage);
+        }
+    }
+
     public record Location(int x, int y) {
 
         @Override
@@ -775,6 +785,10 @@ public class Plant extends GameEntity implements Damageable {
         animationController.playAttack(name, getCurrentStage(), duration);
     }
 
+    public void triggerGrowAnimation(float duration) {
+        animationController.playGrow(name, getCurrentStage(), duration);
+    }
+
     public void scheduleAttack(float delay, Runnable action) {
         if (action == null) {
             return;
@@ -862,6 +876,13 @@ public class Plant extends GameEntity implements Damageable {
             if (!mineArmed) return "plant_idle";
             if (mineRecoverTimer > 0f) return "recover";
             return "idle";
+        }
+
+        // 4b. Kiwibeast: HP-driven stage changes idle art (attack/grow
+        // clips are already stage-tagged by PlantAnimationController).
+        if ("Kiwibeast".equalsIgnoreCase(name)
+                && "idle".equals(animationController.getCurrentClip())) {
+            return "idle_stage" + Math.max(1, Math.min(3, getCurrentStage()));
         }
 
         // 5. Default Action or Idle State

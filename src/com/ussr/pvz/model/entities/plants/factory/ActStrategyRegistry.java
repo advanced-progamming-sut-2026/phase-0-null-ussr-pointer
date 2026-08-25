@@ -26,7 +26,14 @@ public final class ActStrategyRegistry {
         });
         register(AbilityType.DELAYED_EXPLOSIVE, data -> new ExplodeStrategy());
         register(AbilityType.INSTANT_EXPLOSIVE, data -> new ExplodeStrategy());
-        register(AbilityType.MELEE_ATTACK, data -> new MeleeStrategy());
+        register(AbilityType.MELEE_ATTACK, data -> {
+            String plantName = (String) data.get("name");
+            if ("Kiwibeast".equalsIgnoreCase(plantName)
+                    || "Phat Beet".equalsIgnoreCase(plantName)) {
+                return new ShockwaveStrategy();
+            }
+            return new MeleeStrategy();
+        });
         register(AbilityType.PASSIVE_SHIELD, data -> new WallNutStrategy());
         register(AbilityType.MODIFIER_UTILITY, data -> new ModifyStrategy(1));
         register(AbilityType.MINT_FAMILY_BOOST, data -> new MintStrategy());

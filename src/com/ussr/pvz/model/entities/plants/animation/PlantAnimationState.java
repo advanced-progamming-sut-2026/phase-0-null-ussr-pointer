@@ -6,6 +6,7 @@ public enum PlantAnimationState {
     PRODUCING,
     PREPARING,
     PLANT_FOOD,
+    GROWING,
     DAMAGED,
     INCAPACITATED,
     DYING
