@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.ussr.pvz.controller.GlobalController;
 import com.ussr.pvz.audio.AudioManager;
+import com.ussr.pvz.audio.AudioService;
 import com.ussr.pvz.audio.AudioSettings;
 import com.ussr.pvz.audio.GdxAudioManager;
 import com.ussr.pvz.audio.GameplayMusicCue;
@@ -129,6 +130,7 @@ public class AppView implements ApplicationListener {
         skin = PvzSkin.get();
         configureFontRendering();
         audioManager = new GdxAudioManager(new AudioSettings());
+        AudioService.set(audioManager);
         installMissingSkinStyles();
 
         screenRoot = new Table();

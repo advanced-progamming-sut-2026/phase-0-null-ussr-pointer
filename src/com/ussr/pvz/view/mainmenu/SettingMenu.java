@@ -22,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
+import com.ussr.pvz.audio.AudioManager;
+import com.ussr.pvz.audio.AudioService;
 import com.ussr.pvz.controller.maincontroller.SettingController;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
@@ -78,6 +80,7 @@ public final class SettingMenu extends Table {
 
     private int difficulty;
     private float gameSpeed;
+    private float masterVolume;
     private boolean grid;
     private boolean debug;
     private boolean keyboardFocusInitialized;
@@ -89,6 +92,7 @@ public final class SettingMenu extends Table {
 
         difficulty = currentDifficulty();
         gameSpeed = controller.getGameSpeed();
+        masterVolume = AudioService.get() != null ? AudioService.get().getMasterVolume() : 1f;
         grid = App.isGridEnabled();
         debug = App.isDebugModeEnabled();
 
@@ -248,15 +252,7 @@ public final class SettingMenu extends Table {
     private Actor audioContent() {
         Table box = section();
         box.add(title("Audio")).growX().left().padBottom(12f).row();
-
-        Table card = rowCard();
-        Label heading = title("Audio");
-        Label copy = description(
-                "Audio controls can be wired to your game's audio manager here."
-        );
-        card.add(copyBlock(heading, copy)).growX().left();
-
-        box.add(card).growX().height(125f).row();
+        box.add(volumeRow()).growX().height(126f).row();
         box.add().growY();
         return box;
     }
@@ -394,6 +390,64 @@ public final class SettingMenu extends Table {
             private void update() {
                 gameSpeed = slider.getValue();
                 value.setText(String.format("%.2fx", gameSpeed));
+            }
+        });
+
+        Table controls = new Table();
+        controls.add(value).width(90f).padRight(8f);
+        controls.add(slider).width(260f).height(46f);
+
+        row.add(copy).growX().left();
+        row.add(controls).width(370f).right().padRight(12f);
+        return row;
+    }
+
+    private Table volumeRow() {
+        Table row = rowCard();
+
+        Table copy = copyBlock(
+                title("Master Volume"),
+                description("Controls all music and sound effects")
+        );
+
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = drawable(SLIDER_TRACK);
+        sliderStyle.knob = drawable(SLIDER_KNOB);
+        sliderStyle.knobBefore = drawable(SLIDER_FILL);
+
+        Slider slider = new Slider(0f, 1f, 0.05f, false, sliderStyle);
+        slider.setValue(masterVolume);
+        slider.setAnimateDuration(0.08f);
+        slider.setVisualInterpolation(Interpolation.smooth);
+
+        Label value = new Label(
+                String.format("%.0f%%", masterVolume * 100f),
+                skin,
+                "medium_outline"
+        );
+        value.setAlignment(Align.center);
+        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+
+        slider.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
+                update();
+                return false;
+            }
+
+            @Override
+            public void touchDragged(InputEvent e, float x, float y, int pointer) {
+                update();
+            }
+
+            @Override
+            public void touchUp(InputEvent e, float x, float y, int pointer, int button) {
+                update();
+            }
+
+            private void update() {
+                masterVolume = slider.getValue();
+                value.setText(String.format("%.0f%%", masterVolume * 100f));
             }
         });
 
@@ -546,6 +600,7 @@ public final class SettingMenu extends Table {
     private void resetDefaults() {
         difficulty = 2;
         gameSpeed = 1f;
+        masterVolume = 1f;
         grid = false;
         debug = false;
         show(selected);
@@ -568,6 +623,11 @@ public final class SettingMenu extends Table {
         if (!ok(speedResult)) {
             NotificationCenter.error(speedResult);
             return;
+        }
+
+        AudioManager audioManager = AudioService.get();
+        if (audioManager != null) {
+            audioManager.setMasterVolume(masterVolume);
         }
 
         App.setGridEnabled(grid);

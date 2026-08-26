@@ -143,6 +143,17 @@ public final class GdxAudioManager implements AudioManager {
     }
 
     @Override
+    public void setMasterVolume(float volume) {
+        settings.setMasterVolume(volume);
+        applyMusicVolumes();
+    }
+
+    @Override
+    public float getMasterVolume() {
+        return settings.getMasterVolume();
+    }
+
+    @Override
     public void setMuted(boolean muted) {
         settings.setMuted(muted);
         applyMusicVolumes();

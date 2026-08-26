@@ -10,7 +10,10 @@ public interface AudioManager {
 
     void setMusicVolume(float volume);
     void setSfxVolume(float volume);
+    void setMasterVolume(float volume);
     void setMuted(boolean muted);
+
+    float getMasterVolume();
 
     void update(float delta);
     void pause();
