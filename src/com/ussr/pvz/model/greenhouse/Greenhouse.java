@@ -14,6 +14,7 @@ public class Greenhouse {
     private static final long MINUTE = 60 * SECOND;
     private static final long HOUR = 60 * MINUTE;
     public static final long MAX_POTS = 12;
+    private static final int GEMS_PER_HOUR = 4;
 
     private static final Random RAND = new Random();
 
@@ -76,7 +77,7 @@ public class Greenhouse {
         if (RAND.nextInt(2) == 0) {
             plant = randomPlant(unlockedPlants);
         } else {
-            plant = new SproutPlant("MARIGOLD", true, PlantState.GROWING,
+            plant = new SproutPlant("MARIGOLD", true, PlantState.UNWATERED,
                     "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
 
@@ -104,15 +105,31 @@ public class Greenhouse {
         }
     }
 
+    public void water(int x, int y) {
+        Pot pot = pots.get(new Location(x, y));
+        if (pot == null || pot.getPlant() == null) {
+            throw new IllegalStateException("No plant present");
+        }
+        SproutPlant plant = pot.getPlant();
+        if (!plant.isUnwatered()) {
+            throw new IllegalStateException("Plant is already watered");
+        }
+        plant.water();
+    }
+
     public int speedUp(int x, int y) {
         Pot pot = pots.get(new Location(x, y));
         if (pot == null || pot.getPlant() == null) {
             throw new IllegalStateException("No plant present");
         }
-        if (pot.getPlant().isReady()) {
+        SproutPlant plant = pot.getPlant();
+        if (plant.isUnwatered()) {
+            throw new IllegalStateException("Plant needs to be watered first");
+        }
+        if (plant.isReady()) {
             throw new IllegalStateException("SproutPlant is ready");
         }
-        return pot.getPlant().getRemainingHoursCeil();
+        return plant.getRemainingHoursCeil() * GEMS_PER_HOUR;
     }
 
     public void grow(int x, int y) {
@@ -120,11 +137,14 @@ public class Greenhouse {
         if (pot == null || pot.getPlant() == null) {
             throw new IllegalStateException("No plant present");
         }
-        if (pot.getPlant().isReady()) {
+        SproutPlant plant = pot.getPlant();
+        if (plant.isUnwatered()) {
+            throw new IllegalStateException("Plant needs to be watered first");
+        }
+        if (plant.isReady()) {
             throw new IllegalStateException("SproutPlant is ready");
         }
 
-        SproutPlant plant = pot.getPlant();
         plant.setPlantedAtMillis(System.currentTimeMillis());
         plant.setGrowthDurationMillis(0);
         plant.setState(PlantState.READY);
@@ -181,7 +201,7 @@ public class Greenhouse {
     private SproutPlant randomPlant(List<Plant> unlockedPlants) {
         if (unlockedPlants == null || unlockedPlants.isEmpty()) {
             return new SproutPlant("MARIGOLD", true,
-                    PlantState.GROWING, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
+                    PlantState.UNWATERED, "MARIGOLD", System.currentTimeMillis(), 2 * HOUR);
         }
 
         int max = unlockedPlants.size();
@@ -197,17 +217,17 @@ public class Greenhouse {
             }
         }
 
-        return new SproutPlant(typePlant.getName(), false, PlantState.GROWING, typePlant.getName(),
+        return new SproutPlant(typePlant.getName(), false, PlantState.UNWATERED, typePlant.getName(),
                 System.currentTimeMillis(), 8 * HOUR);
     }
 
     private record Location(int x, int y) {
 
         @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (!(o instanceof Location(int x1, int y1))) return false;
-                return x == x1 && y == y1;
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location(int x1, int y1))) return false;
+            return x == x1 && y == y1;
+        }
     }
 }

@@ -110,6 +110,22 @@ public class GreenHouseService {
         }
     }
 
+    public String water(GreenhousePotRequest request) {
+        int[] coords = parseCoordinates(request);
+        int x = coords[0];
+        int y = coords[1];
+
+        validatePotUnlocked(x, y);
+        validatePotOccupied(x, y);
+
+        try {
+            App.getAccount().getGreenhouse().water(x, y);
+            return "The plant has been watered and is now growing!";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
     public String grow(GreenhousePotRequest request) {
         int[] coords = parseCoordinates(request);
         int x = coords[0];
@@ -203,6 +219,14 @@ public class GreenHouseService {
 
         if (ready) {
             return "[READY]";
+        }
+
+        if ("UNWATERED".equals(plant.get("state"))) {
+            String unwateredName = (String) plant.get("type");
+            if (Boolean.TRUE.equals(plant.get("isMarigold"))) {
+                unwateredName = "Marigold";
+            }
+            return String.format("[%s: needs watering]", unwateredName);
         }
 
         String name = (String) plant.get("type");

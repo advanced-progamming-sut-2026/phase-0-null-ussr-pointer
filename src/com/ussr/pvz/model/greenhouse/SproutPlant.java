@@ -30,6 +30,9 @@ public class SproutPlant {
     }
 
     public long getRemainingMillis() {
+        if (state == PlantState.UNWATERED) {
+            return growthDurationMillis;
+        }
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - plantedAtMillis;
         long remaining = growthDurationMillis - elapsedTime;
@@ -42,7 +45,22 @@ public class SproutPlant {
         return (int) remainingHours;
     }
 
+    public boolean isUnwatered() {
+        return state == PlantState.UNWATERED;
+    }
+
+    public void water() {
+        if (state != PlantState.UNWATERED) {
+            return;
+        }
+        this.plantedAtMillis = System.currentTimeMillis();
+        this.state = PlantState.GROWING;
+    }
+
     public boolean isReady() {
+        if (state == PlantState.UNWATERED) {
+            return false;
+        }
         return getRemainingMillis() == 0 || state == PlantState.READY;
     }
     public Map<String, Object> toMap() {

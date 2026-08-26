@@ -38,6 +38,15 @@ public class GreenHouseController {
         }
     }
 
+    public String handleWater(int x, int y) {
+        try {
+            GreenhousePotRequest request = new GreenhousePotRequest(String.valueOf(x), String.valueOf(y));
+            return greenHouseService.water(request);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
     public String handleGrow(int x, int y) {
         try {
             GreenhousePotRequest request = new GreenhousePotRequest(String.valueOf(x), String.valueOf(y));

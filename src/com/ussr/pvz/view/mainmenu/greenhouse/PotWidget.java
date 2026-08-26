@@ -21,6 +21,9 @@ public class PotWidget extends Table {
 
     public static final String STATIC_POT_REGION = "IMAGE_ZEN_GARDEN_GROWING_PLANT_SLOT_GROWING_PLANT_SLOT_184X161";
     public static final String PAM_POT_PATH = "768/INITIAL/ZEN_GARDEN/GROWING_PLANT_SLOT/GROWING_PLANT_SLOT.PAM";
+    // Cost to instantly finish a watered/growing sprout. Must match
+    // Greenhouse.GEMS_PER_HOUR — kept here only for the button's label text.
+    private static final int GEMS_PER_HOUR = 4;
 
     private final Skin skin;
     private final PamPlayer pamPlayer;
@@ -142,10 +145,12 @@ public class PotWidget extends Table {
         // 4. ACTION BUTTONS (Water / Collect)
         // ----------------------------------------------------
         assert plantMap != null;
+        boolean isUnwatered = "UNWATERED".equals(plantMap.get("state"));
         long plantedAt = ((Number) plantMap.getOrDefault("plantedAtMillis", 0L)).longValue();
         long duration = ((Number) plantMap.getOrDefault("growthDurationMillis", 0L)).longValue();
         long finishTime = plantedAt + duration;
-        boolean isReady = System.currentTimeMillis() >= finishTime || "READY".equals(plantMap.get("state"));
+        boolean isReady = !isUnwatered
+                && (System.currentTimeMillis() >= finishTime || "READY".equals(plantMap.get("state")));
 
         if (isReady) {
             TextButton collectButton = new TextButton("Collect!", skin, "green");
@@ -158,29 +163,43 @@ public class PotWidget extends Table {
                 }
             });
             add(collectButton).width(85f).height(32f).padTop(2f);
-        } else {
-            long remainingMillis = Math.max(0, finishTime - System.currentTimeMillis());
-            long remainingHours = (remainingMillis + 3599999) / 3600000;
-
-            TextButton speedBtn = new TextButton(remainingHours + "h [Water]", skin, "brown");
-            speedBtn.addListener(new ChangeListener() {
+        } else if (isUnwatered) {
+            TextButton waterButton = new TextButton("Water", skin, "brown");
+            waterButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     Stage stage = getStage();
-                    if (stage != null) {
-                        float waterX = getX() + 25f; // +25 moves it Righter
-                        float waterY = getY() + 30f;
-                        WateringEffectActor waterAnim = new WateringEffectActor(pamPlayer, waterX, waterY, () -> {
-                            String msg = controller.handleGrow(x, y);
-                            NotificationCenter.info(msg);
-                            onStateChanged.run();
-                        });
-                        stage.addActor(waterAnim);
-                    } else {
-                        String msg = controller.handleGrow(x, y);
+                    Runnable doWater = () -> {
+                        String msg = controller.handleWater(x, y);
                         NotificationCenter.info(msg);
                         onStateChanged.run();
+                    };
+                    if (stage != null) {
+                        float waterX = getX() + 25f;
+                        float waterY = getY() + 30f;
+                        WateringEffectActor waterAnim =
+                                new WateringEffectActor(pamPlayer, waterX, waterY, doWater);
+                        stage.addActor(waterAnim);
+                    } else {
+                        doWater.run();
                     }
+                }
+            });
+            add(waterButton).width(105f).height(32f).padTop(2f);
+        } else {
+            // Watered and growing: offer to skip the remaining time for gems.
+            long remainingMillis = Math.max(0, finishTime - System.currentTimeMillis());
+            long remainingHours = (remainingMillis + 3599999) / 3600000;
+            long gemCost = remainingHours * GEMS_PER_HOUR;
+
+            TextButton speedBtn = new TextButton(
+                    remainingHours + "h [" + gemCost + " Gems]", skin, "brown");
+            speedBtn.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    String msg = controller.handleGrow(x, y);
+                    NotificationCenter.info(msg);
+                    onStateChanged.run();
                 }
             });
             add(speedBtn).width(105f).height(32f).padTop(2f);
