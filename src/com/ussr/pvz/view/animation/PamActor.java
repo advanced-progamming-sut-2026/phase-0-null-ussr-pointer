@@ -117,6 +117,16 @@ public class PamActor extends Actor {
         this.looping = looping;
     }
 
+    public void switchPam(String newPamPath, String clip, boolean oneShot) {
+        ClipRef ref = resolveClip(player, newPamPath, clip);
+        if (ref == null) return;
+        this.clipRef = ref;
+        this.currentClipName = clip;
+        this.stateTime = 0f;
+        this.looping = !oneShot;
+        this.playing = true;
+    }
+
     public void setPamScale(float pamScale) {
         this.pamScale = pamScale;
     }

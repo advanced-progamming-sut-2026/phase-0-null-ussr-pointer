@@ -11,13 +11,19 @@ import com.ussr.pvz.model.util.Vec2;
 public class IceAgeHunterEffect implements EffectStatus {
     private final double farAttackRange;
     private final double nearAttackRange;
+    private final String snowballHitPam;
 
     private final double throwCooldown = 2.0;
     private double timer;
 
     public IceAgeHunterEffect(double farAttackRange, double nearAttackRange) {
+        this(farAttackRange, nearAttackRange, null);
+    }
+
+    public IceAgeHunterEffect(double farAttackRange, double nearAttackRange, String snowballHitPam) {
         this.farAttackRange = farAttackRange;
         this.nearAttackRange = nearAttackRange;
+        this.snowballHitPam = snowballHitPam;
         this.timer = this.throwCooldown;
     }
 
@@ -60,7 +66,7 @@ public class IceAgeHunterEffect implements EffectStatus {
             if (closestPlant != null && closestDistance >= nearAttackRange && closestDistance <= farAttackRange) {
                 Vec2 targetPos = Vec2.of(closestPlant.getLocation().x(), closestPlant.getLocation().y());
                 zombie.queueAnimEvent("throw");
-                session.addZombieProjectile(new SnowballProjectile(startPos, targetPos, 0.8));
+                session.addZombieProjectile(new SnowballProjectile(startPos, targetPos, 0.8, snowballHitPam));
                 return true;
             }
         } else {
@@ -80,7 +86,7 @@ public class IceAgeHunterEffect implements EffectStatus {
 
             if (closestZombie != null && closestDistance >= nearAttackRange && closestDistance <= farAttackRange) {
                 zombie.queueAnimEvent("throw");
-                session.addZombieProjectile(new SnowballProjectile(startPos, closestZombie.getPosition(), 0.8));
+                session.addZombieProjectile(new SnowballProjectile(startPos, closestZombie.getPosition(), 0.8, snowballHitPam));
                 return true;
             }
         }

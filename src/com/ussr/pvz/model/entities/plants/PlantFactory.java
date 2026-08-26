@@ -88,6 +88,10 @@ public class PlantFactory {
         if (plantFoodHitPam != null) {
             plant.setPlantFoodHitPam(plantFoodHitPam);
         }
+        String butterHitPam = (String) data.get("butterHitPam");
+        if (butterHitPam != null) {
+            plant.setButterHitPam(butterHitPam);
+        }
         if (data.containsKey("plantFoodDuration")) {
             plant.setPlantFoodDuration(
                     ((Number) data.get("plantFoodDuration")).doubleValue());

@@ -1251,7 +1251,9 @@
     "id": 26,
     "name": "Kernel-pult",
     "category": "LOBBER",
-    "tags": [],
+    "tags": [
+      "BUTTER"
+    ],
     "cost": 100,
     "baseHp": 300,
     "damage": 20,
@@ -1272,6 +1274,7 @@
       }
     ],
     "hitPam": "768/INITIAL/EFFECTS/SPLAT_KERNALPULT_KERNAL/SPLAT_KERNALPULT_KERNAL.PAM",
+    "butterHitPam": "768/INITIAL/EFFECTS/SPLAT_KERNALPULT_BUTTER/SPLAT_KERNALPULT_BUTTER.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1319,7 +1322,7 @@
         "y": 0.78
       }
     ],
-    "hitPAm": "768/INITIAL/EFFECTS/T_SPLAT_MELONPULT/T_SPLAT_MELONPULT.PAM",
+    "hitPam": "768/INITIAL/EFFECTS/T_SPLAT_MELONPULT/T_SPLAT_MELONPULT.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1418,6 +1421,7 @@
       }
     ],
     "hitPam": "768/FULL/EFFECTS/PEPPERPULT_PROJECTILE_SPLAT/PEPPERPULT_PROJECTILE_SPLAT.PAM",
+    "plantFoodHitPam": "768/FULL/EFFECTS/PEPPERPULT_PROJECTILE_PF_SPLAT/PEPPERPULT_PROJECTILE_PF_SPLAT.PAM",
     "upgrades": [
       {
         "level": 2,

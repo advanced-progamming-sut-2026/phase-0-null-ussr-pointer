@@ -16,6 +16,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
 import com.ussr.pvz.model.entities.projectiles.BowlingNutProjectile;
 import com.ussr.pvz.model.entities.projectiles.move.ArcMove;
+import com.ussr.pvz.model.entities.projectiles.hit.ButterHit;
 import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.ZombieActivity;
 import com.ussr.pvz.model.entities.zombies.armor.Armor;
@@ -67,6 +68,7 @@ public class EntityRenderLayer extends Group {
     private final Map<Projectile, ProjectilePamActor> projectileActors = new HashMap<>();
     private final Map<Object, PamActor> zombieGroupActors = new HashMap<>(); // Zombie, LawnMower, PushableStructure
     private final Map<ZombieProjectile, PamActor> zombieProjActors = new HashMap<>();
+    private final Set<ZombieProjectile> zombieProjHitTriggered = new HashSet<>();
 
     // Last commanded render target per projectile, used so we only issue a new
     // tween when the underlying model actually advanced a physics tick, instead
@@ -562,6 +564,7 @@ public class EntityRenderLayer extends Group {
                             && user.isBuffed()
                             && user.getPlantFoodProjectilePam() != null
                             && !user.getPlantFoodProjectilePam().isBlank();
+                    boolean isButterHit = p.getHitEffectStrategy() instanceof ButterHit;
                     if (useFoodVariant) {
                         projPam = user.getPlantFoodProjectilePam();
                         String foodHitPam = user.getPlantFoodHitPam();
@@ -569,7 +572,10 @@ public class EntityRenderLayer extends Group {
                                 ? foodHitPam : user.getHitPam();
                     } else {
                         projPam = user != null ? user.getProjectilePam() : null;
-                        hitPam = user != null ? user.getHitPam() : null;
+                        String butterHitPam = user != null ? user.getButterHitPam() : null;
+                        hitPam = (isButterHit && butterHitPam != null && !butterHitPam.isBlank())
+                                ? butterHitPam
+                                : (user != null ? user.getHitPam() : null);
                     }
                 }
                 ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
@@ -664,7 +670,10 @@ public class EntityRenderLayer extends Group {
         Set<ZombieProjectile> liveSet = new HashSet<>(live);
 
         for (ZombieProjectile proj : live) {
-            if (!proj.isAlive()) continue;
+            if (!proj.isAlive()) {
+                triggerZombieProjectileHit(proj);
+                continue;
+            }
 
             // Missile projectiles show only the ground reticle during TARGETING —
             // the missile actor itself doesn't exist yet.
@@ -733,12 +742,35 @@ public class EntityRenderLayer extends Group {
         Iterator<Map.Entry<ZombieProjectile, PamActor>> it = zombieProjActors.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<ZombieProjectile, PamActor> entry = it.next();
-            if (!liveSet.contains(entry.getKey()) || !entry.getKey().isAlive()) {
-                entry.getValue().remove();
-                it.remove();
-                zombieProjectileRenderTargets.remove(entry.getKey());
+            ZombieProjectile proj = entry.getKey();
+            boolean orphaned = !liveSet.contains(proj) || !proj.isAlive();
+            if (!orphaned) continue;
+
+            if (!liveSet.contains(proj)) {
+                triggerZombieProjectileHit(proj);
             }
+
+            String hitPam = proj.getHitPam();
+            boolean stillPlayingHit = hitPam != null && !hitPam.isBlank()
+                    && zombieProjHitTriggered.contains(proj)
+                    && entry.getValue().isPlaying();
+            if (stillPlayingHit) continue;
+
+            entry.getValue().remove();
+            it.remove();
+            zombieProjHitTriggered.remove(proj);
+            zombieProjectileRenderTargets.remove(proj);
         }
+    }
+
+    private void triggerZombieProjectileHit(ZombieProjectile proj) {
+        if (zombieProjHitTriggered.contains(proj)) return;
+        String hitPam = proj.getHitPam();
+        if (hitPam == null || hitPam.isBlank()) return;
+        PamActor actor = zombieProjActors.get(proj);
+        if (actor == null) return;
+        actor.switchPam(hitPam, "idle", true);
+        zombieProjHitTriggered.add(proj);
     }
 
     private String resolveZombieProjectileClip(ZombieProjectile proj) {

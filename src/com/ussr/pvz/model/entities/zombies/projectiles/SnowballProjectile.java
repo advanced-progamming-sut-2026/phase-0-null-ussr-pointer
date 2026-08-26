@@ -8,8 +8,20 @@ import com.ussr.pvz.model.util.Vec2;
 
 public class SnowballProjectile extends ZombieProjectile {
 
+    private final String hitPam;
+
     public SnowballProjectile(Vec2 startPosition, Vec2 targetPosition, double flightTime) {
+        this(startPosition, targetPosition, flightTime, null);
+    }
+
+    public SnowballProjectile(Vec2 startPosition, Vec2 targetPosition, double flightTime, String hitPam) {
         super(startPosition, targetPosition, flightTime, "IceAgeHunter");
+        this.hitPam = hitPam;
+    }
+
+    @Override
+    public String getHitPam() {
+        return hitPam;
     }
 
     @Override

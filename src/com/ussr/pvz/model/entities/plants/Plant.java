@@ -62,6 +62,7 @@ public class Plant extends GameEntity implements Damageable {
     private String hitPam;
     private String plantFoodProjectilePam;
     private String plantFoodHitPam;
+    private String butterHitPam;
     // Animation State Manager Variables
     private final PlantAnimationController animationController =
             new PlantAnimationController();
@@ -127,6 +128,14 @@ public class Plant extends GameEntity implements Damageable {
 
     public void setPlantFoodHitPam(String plantFoodHitPam) {
         this.plantFoodHitPam = plantFoodHitPam;
+    }
+
+    public String getButterHitPam() {
+        return butterHitPam;
+    }
+
+    public void setButterHitPam(String butterHitPam) {
+        this.butterHitPam = butterHitPam;
     }
 
     public enum PlantState {
@@ -209,6 +218,7 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodEffect = blueprint.plantFoodEffect;
         this.projectilePam = blueprint.projectilePam;
         this.hitPam = blueprint.hitPam;
+        this.butterHitPam = blueprint.butterHitPam;
         this.plantFoodHitPam = blueprint.plantFoodHitPam;
         this.plantFoodProjectilePam = blueprint.plantFoodProjectilePam;
         this.growthTracker = blueprint.growthTracker;
@@ -1089,6 +1099,7 @@ public class Plant extends GameEntity implements Damageable {
         this.projectilePam = copy.projectilePam;
         this.hitPam = copy.hitPam;
         this.plantFoodHitPam = copy.plantFoodHitPam;
+        this.butterHitPam = copy.butterHitPam;
         this.plantFoodProjectilePam = copy.plantFoodProjectilePam;
         this.growthTracker = copy.growthTracker;
         this.pamPath = copy.pamPath;
