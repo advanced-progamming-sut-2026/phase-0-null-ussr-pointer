@@ -35,7 +35,7 @@ public class SpawnMinionsMove implements ZombossMove {
 
         for (int i = 0; i < count; i++) {
             int row = random.nextInt(session.getLawn().getRows());
-            int col = session.getLawn().getCols() - 1;
+            int col = session.getLawn().getCols();
             String alias = minionPool.get(random.nextInt(minionPool.size()));
             try {
                 Zombie minion = ZombieFactory.create(alias, row, col);

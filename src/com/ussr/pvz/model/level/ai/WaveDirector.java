@@ -146,7 +146,7 @@ public class WaveDirector {
         Level.AllowedZombie choice = pickWeighted(pool);
         int cost = ZombieFactory.getZombieCost(choice.id());
         if (cost <= remainingBudget) {
-            deploy(session, choice.id(), random.nextInt(rows), cols - 1, cost);
+            deploy(session, choice.id(), random.nextInt(rows), cols, cost);
         }
     }
 
@@ -155,7 +155,7 @@ public class WaveDirector {
         int cost = ZombieFactory.getZombieCost(choice.id());
         if (cost <= remainingBudget) {
             int targetedRow = calculateSmartTargetRow(session, rows);
-            deploy(session, choice.id(), targetedRow, cols - 1, cost);
+            deploy(session, choice.id(), targetedRow, cols, cost);
         }
     }
 
@@ -174,7 +174,7 @@ public class WaveDirector {
                 Level.AllowedZombie choice = pickWeighted(pool);
                 int cost = ZombieFactory.getZombieCost(choice.id());
                 if (cost <= remainingBudget) {
-                    deploy(session, choice.id(), targetedRow, cols - 1, cost);
+                    deploy(session, choice.id(), targetedRow, cols, cost);
                 }
             }
         }
