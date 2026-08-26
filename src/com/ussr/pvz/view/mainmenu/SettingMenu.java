@@ -316,7 +316,7 @@ public final class SettingMenu extends Table {
                 "medium_outline"
         );
         value.setAlignment(Align.center);
-        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        value.setColor(Color.WHITE);
 
         Stack valueBox = new Stack();
         Image valueBg = image(VALUE_PANEL);
@@ -369,7 +369,7 @@ public final class SettingMenu extends Table {
                 "medium_outline"
         );
         value.setAlignment(Align.center);
-        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        value.setColor(Color.WHITE);
 
         slider.addListener(new ChangeListener() {
             @Override
@@ -412,7 +412,7 @@ public final class SettingMenu extends Table {
                 "medium_outline"
         );
         value.setAlignment(Align.center);
-        value.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        value.setColor(Color.WHITE);
 
         slider.addListener(new ChangeListener() {
             @Override
@@ -475,7 +475,7 @@ public final class SettingMenu extends Table {
 
     private Label title(String text) {
         Label l = new Label(text, skin, "medium_outline");
-        l.setColor(new Color(0.27f, 0.13f, 0.05f, 1f));
+        l.setColor(Color.WHITE);
         return l;
     }
 

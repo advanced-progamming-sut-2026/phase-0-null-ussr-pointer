@@ -93,7 +93,7 @@ public final class LevelIntroOverlay extends Table {
         dialogueLabel = new Label("", skin, "big_outline");
         dialogueLabel.setWrap(true);
         dialogueLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
-        dialogueLabel.setColor(new Color(0.22f, 0.12f, 0.04f, 1f));
+        dialogueLabel.setColor(Color.WHITE);
         speechBubble = createSpeechBubble(skin, textures);
 
         // ── Objective card ────────────────────────────────────────────────────
@@ -183,7 +183,7 @@ public final class LevelIntroOverlay extends Table {
 
             Label tapHint = new Label("Tap to continue", skin, "medium_outline");
             tapHint.setAlignment(com.badlogic.gdx.utils.Align.center);
-            tapHint.setColor(new Color(0.5f, 0.4f, 0.2f, 0.8f));
+            tapHint.setColor(new Color(1f, 1f, 1f, 0.8f));
             content.add(tapHint).padTop(12f);
             stack.add(content);
             card.add(stack).width(560f).height(280f);
@@ -193,7 +193,7 @@ public final class LevelIntroOverlay extends Table {
             card.add(objectiveLabel).width(420f).growY().row();
             Label tapHint = new Label("Tap to continue", skin, "medium_outline");
             tapHint.setAlignment(com.badlogic.gdx.utils.Align.center);
-            tapHint.setColor(new Color(0.5f, 0.4f, 0.2f, 0.8f));
+            tapHint.setColor(new Color(1f, 1f, 1f, 0.8f));
             card.add(tapHint).padTop(12f);
         }
 

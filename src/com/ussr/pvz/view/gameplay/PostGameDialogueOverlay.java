@@ -58,7 +58,7 @@ public final class PostGameDialogueOverlay extends Table {
         dialogueLabel = new Label("", skin, "big_outline");
         dialogueLabel.setWrap(true);
         dialogueLabel.setAlignment(Align.center);
-        dialogueLabel.setColor(new Color(0.22f, 0.12f, 0.04f, 1f));
+        dialogueLabel.setColor(Color.WHITE);
         speechBubble = buildSpeechBubble(skin, textures);
 
         // Layout: Dave bottom-left, bubble beside him

@@ -250,7 +250,7 @@ public class LobbyMenu extends Table {
 
         playerCountLabel = new Label("0 online", skin, "medium_outline");
         playerCountLabel.setAlignment(Align.center);
-        playerCountLabel.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        playerCountLabel.setColor(Color.WHITE);
         badge.add(playerCountLabel);
 
         col.add(badge).width(200f).height(58f).center().padBottom(14f).row();
@@ -327,7 +327,7 @@ public class LobbyMenu extends Table {
                 skin, "medium_outline"
         );
         initLabel.setAlignment(Align.center);
-        initLabel.setColor(new Color(0.28f, 0.14f, 0.06f, 1f));
+        initLabel.setColor(Color.WHITE);
         avatar.add(avatarBg);
         avatar.add(initLabel);
 
