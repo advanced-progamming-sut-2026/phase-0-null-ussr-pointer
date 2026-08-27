@@ -21,6 +21,7 @@ public final class MoveBehaviorRegistry {
         });
 
         register("PusherMove", (params, data) -> new PusherMove());
+        register("IceBlockPusherMove", (params, data) -> new IceBlockPusherMove());
         register("ProspectorMove", (params, data) -> new ProspectorMove());
 
         register("JumpMove", (params, data) -> {

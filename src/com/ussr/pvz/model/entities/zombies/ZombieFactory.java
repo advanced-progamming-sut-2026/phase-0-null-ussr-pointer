@@ -254,14 +254,32 @@ public class ZombieFactory {
 
         if (type == null) return;
 
-        PushableStructure structure = new PushableStructure(type, zombie.getPosition());
+        // Zombies now spawn a column off-screen to the right (see WaveDirector),
+        // so a pushed structure can no longer just be placed at the zombie's own
+        // spawn position (that cell would be off the lawn). Ice blocks in
+        // particular belong on the lawn's last column, waiting for the
+        // Troglobite to walk up to them.
+        Vec2 spawnPosition = (type == PushableType.ICE_BLOCK)
+                ? lastColumnPosition(zombie)
+                : zombie.getPosition();
+
+        PushableStructure structure = new PushableStructure(type, spawnPosition);
         zombie.setPushedStructure(structure);
-        placeOnLawnIfPossible(zombie, structure);
+        placeStructureAt(structure, spawnPosition);
 
         if (type == PushableType.ICE_BLOCK) {
             int totalIceBlocks = ((Number) data.getOrDefault("NumberOfIceblocksToSpawnWith", 1)).intValue();
             zombie.setPushableRespawnsRemaining(Math.max(0, totalIceBlocks - 1));
         }
+    }
+
+    private static Vec2 lastColumnPosition(Zombie zombie) {
+        GameSession session = App.getGameSession();
+        int row = (int) zombie.getPosition().y();
+        int lastCol = (session != null && session.getLawn() != null)
+                ? session.getLawn().getCols() - 1
+                : (int) zombie.getPosition().x();
+        return new Vec2(lastCol, row);
     }
 
     public static void respawnPushedStructureIfNeeded(Zombie zombie) {
@@ -273,15 +291,15 @@ public class ZombieFactory {
         PushableStructure fresh = new PushableStructure(current.getType(), zombie.getPosition());
         zombie.setPushedStructure(fresh);
         zombie.setPushableRespawnsRemaining(zombie.getPushableRespawnsRemaining() - 1);
-        placeOnLawnIfPossible(zombie, fresh);
+        placeStructureAt(fresh, zombie.getPosition());
     }
 
-    private static void placeOnLawnIfPossible(Zombie zombie, PushableStructure structure) {
+    private static void placeStructureAt(PushableStructure structure, Vec2 position) {
         GameSession session = App.getGameSession();
         if (session == null || session.getLawn() == null) return;
 
-        int row = (int) zombie.getPosition().y();
-        int col = (int) zombie.getPosition().x();
+        int row = (int) position.y();
+        int col = (int) position.x();
         Cell cell = session.getLawn().getCell(row, col);
 
         if (cell != null && cell.getInteractableStructure() == null) {

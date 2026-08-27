@@ -6,6 +6,9 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.level.Level;
 
 public class DeadlineBehavior extends LevelBehavior {
+
+    private static final double ZOMBIE_HITBOX_WIDTH = 0.5;
+
     private boolean failed;
 
     @Override
@@ -18,7 +21,8 @@ public class DeadlineBehavior extends LevelBehavior {
         if (level == null) return;
 
         for (Zombie zombie : session.getZombies()) {
-            if (zombie.isAlive() && zombie.getPosition().x() < level.getDeadlineColumn()) {
+            if (zombie.isAlive()
+                    && zombie.getPosition().x() < level.getDeadlineColumn() - ZOMBIE_HITBOX_WIDTH) {
                 session.getEventBus().publish(new GameEvent.GameOver());
                 failed = true;
                 break;

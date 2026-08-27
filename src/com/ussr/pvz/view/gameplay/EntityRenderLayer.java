@@ -76,6 +76,7 @@ public class EntityRenderLayer extends Group {
     private final Map<Projectile, float[]> plantProjectileRenderTargets = new HashMap<>();
     private final Map<ZombieProjectile, float[]> zombieProjectileRenderTargets = new HashMap<>();
     private final Map<Zombie, float[]> zombieRenderTargets = new HashMap<>();
+    private final Map<PushableStructure, float[]> pushableRenderTargets = new HashMap<>();
 
     // Pending immediate draw calls (atlas textures, not actors)
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
@@ -104,6 +105,9 @@ public class EntityRenderLayer extends Group {
 
     /** Speed of the red flicker sine wave (radians per second). Slower = more menacing. */
     private static final float DANGER_FLICKER_SPEED = 2.0f;
+
+    /** How long a pushed structure (e.g. Troglobite's ice block) takes to visually slide one column. */
+    private static final float PUSHABLE_SLIDE_DURATION = 0.5f;
 
     // Constructor
     public EntityRenderLayer(PamPlayer pamPlayer, TextureBank textures) {
@@ -156,6 +160,7 @@ public class EntityRenderLayer extends Group {
         newspaperPhase.keySet().removeIf(z -> !session.getZombies().contains(z));
         dangerTime.keySet().removeIf(z -> !session.getZombies().contains(z));
         zombieRenderTargets.keySet().removeIf(z -> !session.getZombies().contains(z));
+        pushableRenderTargets.keySet().removeIf(p -> !liveZombieGroup.contains(p));
 
         // Y-sort each group independently
         sortByY(plantGroup);
@@ -469,6 +474,7 @@ public class EntityRenderLayer extends Group {
             case WALKING -> "walk";
             case DEAD -> "die";
             case EATING -> "eat";
+            case PUSHING -> "push";
             case null -> "idle";
         };
     }
@@ -481,6 +487,7 @@ public class EntityRenderLayer extends Group {
                 case WALKING -> "walk2";
                 case EATING -> "eat2";
                 case DEAD -> "die2";
+                case PUSHING -> "walk2";
                 case null -> "idle2";
             };
         }
@@ -515,6 +522,7 @@ public class EntityRenderLayer extends Group {
                 case EATING -> "eat_newspaper";
                 case WALKING -> "walk_newspaper";
                 case DEAD -> "die";
+                case PUSHING -> "walk_newspaper";
                 case null -> "idle";
             };
             case GONE -> resolveZombieClip(zombie);
@@ -536,13 +544,21 @@ public class EntityRenderLayer extends Group {
                 return pa;
             });
 
-            actor.setPosition(
-                    LawnGridLayout.worldX(pushable.getPosition().x())
-                            + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_X,
-                    LawnGridLayout.worldY(pushable.getPosition().y())
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_Y
-            );
+            float targetX = LawnGridLayout.worldX(pushable.getPosition().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f
+                    + LawnGridLayout.PLANT_DRAW_OFFSET_X;
+            float targetY = LawnGridLayout.worldY(pushable.getPosition().y())
+                    + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
+
+            float[] lastTarget = pushableRenderTargets.get(pushable);
+            if (lastTarget == null) {
+                actor.setPosition(targetX, targetY);
+                pushableRenderTargets.put(pushable, new float[]{targetX, targetY});
+            } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
+                actor.clearActions();
+                actor.addAction(Actions.moveTo(targetX, targetY, PUSHABLE_SLIDE_DURATION));
+                pushableRenderTargets.put(pushable, new float[]{targetX, targetY});
+            }
         }
     }
 
