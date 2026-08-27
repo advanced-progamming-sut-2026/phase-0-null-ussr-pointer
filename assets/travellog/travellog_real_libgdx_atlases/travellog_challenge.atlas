@@ -1,0 +1,166 @@
+travellog_challenge.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+challenge_blueprint_board
+  rotate: false
+  xy: 4, 4
+  size: 322, 214
+  orig: 322, 214
+  offset: 0, 0
+  index: -1
+challenge_scanner_orb
+  rotate: false
+  xy: 363, 226
+  size: 88, 90
+  orig: 88, 90
+  offset: 0, 0
+  index: -1
+challenge_passed_stamp
+  rotate: false
+  xy: 608, 226
+  size: 86, 75
+  orig: 86, 75
+  offset: 0, 0
+  index: -1
+challenge_hazard_strip
+  rotate: false
+  xy: 186, 342
+  size: 93, 37
+  orig: 93, 37
+  offset: 0, 0
+  index: -1
+challenge_screwdriver
+  rotate: false
+  xy: 435, 342
+  size: 138, 31
+  orig: 138, 31
+  offset: 0, 0
+  index: -1
+challenge_panel_blue
+  rotate: false
+  xy: 720, 4
+  size: 170, 114
+  orig: 170, 114
+  offset: 0, 0
+  index: -1
+challenge_hazard_tile
+  rotate: false
+  xy: 327, 342
+  size: 62, 35
+  orig: 62, 35
+  offset: 0, 0
+  index: -1
+challenge_cable
+  rotate: false
+  xy: 898, 4
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: -1
+challenge_zombie_notebook
+  rotate: false
+  xy: 179, 226
+  size: 101, 91
+  orig: 101, 91
+  offset: 0, 0
+  index: -1
+challenge_coffee_mug
+  rotate: false
+  xy: 533, 226
+  size: 67, 79
+  orig: 67, 79
+  offset: 0, 0
+  index: -1
+challenge_panel_orange
+  rotate: false
+  xy: 4, 226
+  size: 167, 108
+  orig: 167, 108
+  offset: 0, 0
+  index: -1
+challenge_device
+  rotate: false
+  xy: 121, 342
+  size: 57, 40
+  orig: 57, 40
+  offset: 0, 0
+  index: -1
+challenge_panel_cyan
+  rotate: false
+  xy: 334, 4
+  size: 184, 140
+  orig: 184, 140
+  offset: 0, 0
+  index: -1
+challenge_check_large
+  rotate: false
+  xy: 702, 226
+  size: 70, 70
+  orig: 70, 70
+  offset: 0, 0
+  index: -1
+challenge_report_paper
+  rotate: false
+  xy: 288, 226
+  size: 67, 91
+  orig: 67, 91
+  offset: 0, 0
+  index: -1
+challenge_warning
+  rotate: false
+  xy: 780, 226
+  size: 61, 69
+  orig: 61, 69
+  offset: 0, 0
+  index: -1
+challenge_pen
+  rotate: false
+  xy: 907, 226
+  size: 37, 52
+  orig: 37, 52
+  offset: 0, 0
+  index: -1
+challenge_map_note
+  rotate: false
+  xy: 459, 226
+  size: 66, 81
+  orig: 66, 81
+  offset: 0, 0
+  index: -1
+challenge_panel_purple
+  rotate: false
+  xy: 526, 4
+  size: 186, 117
+  orig: 186, 117
+  offset: 0, 0
+  index: -1
+challenge_footer_frame
+  rotate: false
+  xy: 4, 342
+  size: 109, 43
+  orig: 109, 43
+  offset: 0, 0
+  index: -1
+challenge_check_small
+  rotate: false
+  xy: 849, 226
+  size: 50, 56
+  orig: 50, 56
+  offset: 0, 0
+  index: -1
+challenge_x_small
+  rotate: false
+  xy: 287, 342
+  size: 32, 37
+  orig: 32, 37
+  offset: 0, 0
+  index: -1
+challenge_status_green
+  rotate: false
+  xy: 397, 342
+  size: 30, 35
+  orig: 30, 35
+  offset: 0, 0
+  index: -1

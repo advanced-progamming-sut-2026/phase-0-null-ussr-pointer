@@ -1,0 +1,278 @@
+travellog_shared.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+shared_back_button
+  rotate: false
+  xy: 614, 241
+  size: 53, 53
+  orig: 53, 53
+  offset: 0, 0
+  index: -1
+shared_coin
+  rotate: false
+  xy: 425, 306
+  size: 49, 43
+  orig: 49, 43
+  offset: 0, 0
+  index: -1
+shared_gem
+  rotate: false
+  xy: 330, 362
+  size: 61, 39
+  orig: 61, 39
+  offset: 0, 0
+  index: -1
+shared_currency_slot
+  rotate: false
+  xy: 235, 362
+  size: 87, 39
+  orig: 87, 39
+  offset: 0, 0
+  index: -1
+shared_coin_small
+  rotate: false
+  xy: 221, 409
+  size: 34, 34
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+shared_key
+  rotate: false
+  xy: 50, 306
+  size: 20, 48
+  orig: 20, 48
+  offset: 0, 0
+  index: -1
+shared_progress_green
+  rotate: false
+  xy: 526, 409
+  size: 172, 29
+  orig: 172, 29
+  offset: 0, 0
+  index: -1
+shared_progress_orange
+  rotate: false
+  xy: 399, 362
+  size: 223, 37
+  orig: 223, 37
+  offset: 0, 0
+  index: -1
+shared_progress_blue
+  rotate: false
+  xy: 4, 362
+  size: 223, 39
+  orig: 223, 39
+  offset: 0, 0
+  index: -1
+shared_progress_purple
+  rotate: false
+  xy: 630, 362
+  size: 218, 37
+  orig: 218, 37
+  offset: 0, 0
+  index: -1
+shared_check_green
+  rotate: false
+  xy: 726, 241
+  size: 50, 51
+  orig: 50, 51
+  offset: 0, 0
+  index: -1
+shared_x_red
+  rotate: false
+  xy: 925, 241
+  size: 53, 50
+  orig: 53, 50
+  offset: 0, 0
+  index: -1
+shared_button_play
+  rotate: false
+  xy: 318, 167
+  size: 118, 61
+  orig: 118, 61
+  offset: 0, 0
+  index: -1
+shared_button_enter
+  rotate: false
+  xy: 170, 167
+  size: 140, 61
+  orig: 140, 61
+  offset: 0, 0
+  index: -1
+shared_button_claim
+  rotate: false
+  xy: 895, 167
+  size: 108, 49
+  orig: 108, 49
+  offset: 0, 0
+  index: -1
+shared_button_locked
+  rotate: false
+  xy: 784, 241
+  size: 133, 50
+  orig: 133, 50
+  offset: 0, 0
+  index: -1
+shared_progress_locked
+  rotate: false
+  xy: 263, 409
+  size: 255, 31
+  orig: 255, 31
+  offset: 0, 0
+  index: -1
+shared_dark_panel
+  rotate: false
+  xy: 709, 4
+  size: 271, 73
+  orig: 271, 73
+  offset: 0, 0
+  index: -1
+shared_done_stamp
+  rotate: false
+  xy: 463, 4
+  size: 157, 77
+  orig: 157, 77
+  offset: 0, 0
+  index: -1
+shared_progress_hot
+  rotate: false
+  xy: 78, 306
+  size: 191, 47
+  orig: 191, 47
+  offset: 0, 0
+  index: -1
+shared_progress_empty
+  rotate: false
+  xy: 482, 306
+  size: 203, 41
+  orig: 203, 41
+  offset: 0, 0
+  index: -1
+shared_torn_paper
+  rotate: false
+  xy: 614, 167
+  size: 90, 60
+  orig: 90, 60
+  offset: 0, 0
+  index: -1
+shared_torn_paper_small
+  rotate: false
+  xy: 529, 241
+  size: 77, 53
+  orig: 77, 53
+  offset: 0, 0
+  index: -1
+shared_new_badge
+  rotate: false
+  xy: 628, 4
+  size: 73, 75
+  orig: 73, 75
+  offset: 0, 0
+  index: -1
+shared_paper_card
+  rotate: false
+  xy: 4, 4
+  size: 128, 155
+  orig: 128, 155
+  offset: 0, 0
+  index: -1
+shared_note_beige
+  rotate: false
+  xy: 321, 4
+  size: 134, 97
+  orig: 134, 97
+  offset: 0, 0
+  index: -1
+shared_tape_green
+  rotate: false
+  xy: 277, 306
+  size: 140, 47
+  orig: 140, 47
+  offset: 0, 0
+  index: -1
+shared_speech_bubble
+  rotate: false
+  xy: 140, 4
+  size: 173, 105
+  orig: 173, 105
+  offset: 0, 0
+  index: -1
+shared_tab_beige
+  rotate: false
+  xy: 444, 167
+  size: 162, 60
+  orig: 162, 60
+  offset: 0, 0
+  index: -1
+shared_tab_yellow
+  rotate: false
+  xy: 356, 241
+  size: 165, 56
+  orig: 165, 56
+  offset: 0, 0
+  index: -1
+shared_tab_green
+  rotate: false
+  xy: 4, 241
+  size: 166, 57
+  orig: 166, 57
+  offset: 0, 0
+  index: -1
+shared_tab_blue
+  rotate: false
+  xy: 178, 241
+  size: 170, 56
+  orig: 170, 56
+  offset: 0, 0
+  index: -1
+shared_tab_purple
+  rotate: false
+  xy: 712, 167
+  size: 175, 57
+  orig: 175, 57
+  offset: 0, 0
+  index: -1
+shared_star_row
+  rotate: false
+  xy: 4, 409
+  size: 209, 35
+  orig: 209, 35
+  offset: 0, 0
+  index: -1
+shared_star_full
+  rotate: false
+  xy: 833, 306
+  size: 78, 41
+  orig: 78, 41
+  offset: 0, 0
+  index: -1
+shared_star_mixed
+  rotate: false
+  xy: 693, 306
+  size: 132, 41
+  orig: 132, 41
+  offset: 0, 0
+  index: -1
+shared_heart
+  rotate: false
+  xy: 675, 241
+  size: 43, 53
+  orig: 43, 53
+  offset: 0, 0
+  index: -1
+shared_status_red
+  rotate: false
+  xy: 4, 306
+  size: 38, 48
+  orig: 38, 48
+  offset: 0, 0
+  index: -1
+shared_laurel
+  rotate: false
+  xy: 4, 167
+  size: 158, 66
+  orig: 158, 66
+  offset: 0, 0
+  index: -1

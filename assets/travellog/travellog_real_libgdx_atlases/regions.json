@@ -1,0 +1,1372 @@
+{
+  "challenge": {
+    "challenge_blueprint_board": {
+      "xy": [
+        4,
+        4
+      ],
+      "size": [
+        322,
+        214
+      ]
+    },
+    "challenge_scanner_orb": {
+      "xy": [
+        363,
+        226
+      ],
+      "size": [
+        88,
+        90
+      ]
+    },
+    "challenge_passed_stamp": {
+      "xy": [
+        608,
+        226
+      ],
+      "size": [
+        86,
+        75
+      ]
+    },
+    "challenge_hazard_strip": {
+      "xy": [
+        186,
+        342
+      ],
+      "size": [
+        93,
+        37
+      ]
+    },
+    "challenge_screwdriver": {
+      "xy": [
+        435,
+        342
+      ],
+      "size": [
+        138,
+        31
+      ]
+    },
+    "challenge_panel_blue": {
+      "xy": [
+        720,
+        4
+      ],
+      "size": [
+        170,
+        114
+      ]
+    },
+    "challenge_hazard_tile": {
+      "xy": [
+        327,
+        342
+      ],
+      "size": [
+        62,
+        35
+      ]
+    },
+    "challenge_cable": {
+      "xy": [
+        898,
+        4
+      ],
+      "size": [
+        72,
+        50
+      ]
+    },
+    "challenge_zombie_notebook": {
+      "xy": [
+        179,
+        226
+      ],
+      "size": [
+        101,
+        91
+      ]
+    },
+    "challenge_coffee_mug": {
+      "xy": [
+        533,
+        226
+      ],
+      "size": [
+        67,
+        79
+      ]
+    },
+    "challenge_panel_orange": {
+      "xy": [
+        4,
+        226
+      ],
+      "size": [
+        167,
+        108
+      ]
+    },
+    "challenge_device": {
+      "xy": [
+        121,
+        342
+      ],
+      "size": [
+        57,
+        40
+      ]
+    },
+    "challenge_panel_cyan": {
+      "xy": [
+        334,
+        4
+      ],
+      "size": [
+        184,
+        140
+      ]
+    },
+    "challenge_check_large": {
+      "xy": [
+        702,
+        226
+      ],
+      "size": [
+        70,
+        70
+      ]
+    },
+    "challenge_report_paper": {
+      "xy": [
+        288,
+        226
+      ],
+      "size": [
+        67,
+        91
+      ]
+    },
+    "challenge_warning": {
+      "xy": [
+        780,
+        226
+      ],
+      "size": [
+        61,
+        69
+      ]
+    },
+    "challenge_pen": {
+      "xy": [
+        907,
+        226
+      ],
+      "size": [
+        37,
+        52
+      ]
+    },
+    "challenge_map_note": {
+      "xy": [
+        459,
+        226
+      ],
+      "size": [
+        66,
+        81
+      ]
+    },
+    "challenge_panel_purple": {
+      "xy": [
+        526,
+        4
+      ],
+      "size": [
+        186,
+        117
+      ]
+    },
+    "challenge_footer_frame": {
+      "xy": [
+        4,
+        342
+      ],
+      "size": [
+        109,
+        43
+      ]
+    },
+    "challenge_check_small": {
+      "xy": [
+        849,
+        226
+      ],
+      "size": [
+        50,
+        56
+      ]
+    },
+    "challenge_x_small": {
+      "xy": [
+        287,
+        342
+      ],
+      "size": [
+        32,
+        37
+      ]
+    },
+    "challenge_status_green": {
+      "xy": [
+        397,
+        342
+      ],
+      "size": [
+        30,
+        35
+      ]
+    }
+  },
+  "daily": {
+    "daily_notebook_page": {
+      "xy": [
+        4,
+        4
+      ],
+      "size": [
+        334,
+        192
+      ]
+    },
+    "daily_pen_green": {
+      "xy": [
+        346,
+        4
+      ],
+      "size": [
+        32,
+        170
+      ]
+    },
+    "daily_wood_pencil": {
+      "xy": [
+        908,
+        4
+      ],
+      "size": [
+        31,
+        124
+      ]
+    },
+    "daily_sunflower_badge": {
+      "xy": [
+        408,
+        204
+      ],
+      "size": [
+        77,
+        79
+      ]
+    },
+    "daily_doodle_note": {
+      "xy": [
+        4,
+        204
+      ],
+      "size": [
+        85,
+        122
+      ]
+    },
+    "daily_blue_tape": {
+      "xy": [
+        780,
+        204
+      ],
+      "size": [
+        59,
+        54
+      ]
+    },
+    "daily_crumpled_leaf": {
+      "xy": [
+        631,
+        204
+      ],
+      "size": [
+        58,
+        60
+      ]
+    },
+    "daily_note_large": {
+      "xy": [
+        712,
+        4
+      ],
+      "size": [
+        188,
+        124
+      ]
+    },
+    "daily_note_small": {
+      "xy": [
+        97,
+        204
+      ],
+      "size": [
+        117,
+        120
+      ]
+    },
+    "daily_yellow_tape": {
+      "xy": [
+        328,
+        334
+      ],
+      "size": [
+        79,
+        33
+      ]
+    },
+    "daily_peashooter": {
+      "xy": [
+        554,
+        4
+      ],
+      "size": [
+        150,
+        140
+      ]
+    },
+    "daily_ticket": {
+      "xy": [
+        697,
+        204
+      ],
+      "size": [
+        75,
+        57
+      ]
+    },
+    "daily_gold_tape": {
+      "xy": [
+        415,
+        334
+      ],
+      "size": [
+        81,
+        31
+      ]
+    },
+    "daily_gray_tape": {
+      "xy": [
+        102,
+        334
+      ],
+      "size": [
+        85,
+        36
+      ]
+    },
+    "daily_coin_token": {
+      "xy": [
+        847,
+        204
+      ],
+      "size": [
+        65,
+        52
+      ]
+    },
+    "daily_note_stack": {
+      "xy": [
+        386,
+        4
+      ],
+      "size": [
+        160,
+        143
+      ]
+    },
+    "daily_note_green": {
+      "xy": [
+        222,
+        204
+      ],
+      "size": [
+        178,
+        104
+      ]
+    },
+    "daily_note_tiny": {
+      "xy": [
+        567,
+        204
+      ],
+      "size": [
+        56,
+        65
+      ]
+    },
+    "daily_peashooter_sticker": {
+      "xy": [
+        493,
+        204
+      ],
+      "size": [
+        66,
+        75
+      ]
+    },
+    "daily_stars": {
+      "xy": [
+        920,
+        204
+      ],
+      "size": [
+        65,
+        42
+      ]
+    },
+    "daily_progress_bar": {
+      "xy": [
+        4,
+        334
+      ],
+      "size": [
+        90,
+        38
+      ]
+    },
+    "daily_orange_pencil": {
+      "xy": [
+        195,
+        334
+      ],
+      "size": [
+        125,
+        33
+      ]
+    }
+  },
+  "epic": {
+    "epic_wood_board": {
+      "xy": [
+        190,
+        4
+      ],
+      "size": [
+        302,
+        217
+      ]
+    },
+    "epic_wanted_poster": {
+      "xy": [
+        4,
+        4
+      ],
+      "size": [
+        178,
+        258
+      ]
+    },
+    "epic_hammer": {
+      "xy": [
+        538,
+        270
+      ],
+      "size": [
+        51,
+        72
+      ]
+    },
+    "epic_narrow_note": {
+      "xy": [
+        613,
+        4
+      ],
+      "size": [
+        86,
+        154
+      ]
+    },
+    "epic_narrow_note_2": {
+      "xy": [
+        707,
+        4
+      ],
+      "size": [
+        60,
+        141
+      ]
+    },
+    "epic_large_note": {
+      "xy": [
+        500,
+        4
+      ],
+      "size": [
+        105,
+        170
+      ]
+    },
+    "epic_skull_badge": {
+      "xy": [
+        194,
+        270
+      ],
+      "size": [
+        81,
+        106
+      ]
+    },
+    "epic_blood_splat": {
+      "xy": [
+        906,
+        4
+      ],
+      "size": [
+        66,
+        38
+      ]
+    },
+    "epic_zombie_threat": {
+      "xy": [
+        775,
+        4
+      ],
+      "size": [
+        78,
+        126
+      ]
+    },
+    "epic_skull_coin": {
+      "xy": [
+        467,
+        270
+      ],
+      "size": [
+        63,
+        72
+      ]
+    },
+    "epic_gold_coin": {
+      "xy": [
+        861,
+        4
+      ],
+      "size": [
+        37,
+        43
+      ]
+    },
+    "epic_blue_gem": {
+      "xy": [
+        980,
+        4
+      ],
+      "size": [
+        36,
+        30
+      ]
+    },
+    "epic_claw_marks": {
+      "xy": [
+        283,
+        270
+      ],
+      "size": [
+        100,
+        91
+      ]
+    },
+    "epic_torn_note": {
+      "xy": [
+        391,
+        270
+      ],
+      "size": [
+        68,
+        89
+      ]
+    },
+    "epic_skull": {
+      "xy": [
+        665,
+        270
+      ],
+      "size": [
+        55,
+        67
+      ]
+    },
+    "epic_red_weapon": {
+      "xy": [
+        862,
+        270
+      ],
+      "size": [
+        92,
+        55
+      ]
+    },
+    "epic_skull_medallion": {
+      "xy": [
+        785,
+        270
+      ],
+      "size": [
+        69,
+        63
+      ]
+    },
+    "epic_gold_star": {
+      "xy": [
+        597,
+        270
+      ],
+      "size": [
+        60,
+        67
+      ]
+    },
+    "epic_bronze_coin": {
+      "xy": [
+        728,
+        270
+      ],
+      "size": [
+        49,
+        64
+      ]
+    },
+    "epic_yellow_candy": {
+      "xy": [
+        962,
+        270
+      ],
+      "size": [
+        51,
+        49
+      ]
+    },
+    "epic_defeated_poster": {
+      "xy": [
+        4,
+        270
+      ],
+      "size": [
+        182,
+        124
+      ]
+    }
+  },
+  "minigames": {
+    "minigames_daves_arcade_sign": {
+      "xy": [
+        4,
+        330
+      ],
+      "size": [
+        176,
+        132
+      ]
+    },
+    "minigames_wallnut": {
+      "xy": [
+        273,
+        330
+      ],
+      "size": [
+        121,
+        92
+      ]
+    },
+    "minigames_star_purple": {
+      "xy": [
+        704,
+        470
+      ],
+      "size": [
+        40,
+        37
+      ]
+    },
+    "minigames_zombie_card": {
+      "xy": [
+        691,
+        330
+      ],
+      "size": [
+        104,
+        77
+      ]
+    },
+    "minigames_star_blue": {
+      "xy": [
+        592,
+        470
+      ],
+      "size": [
+        34,
+        42
+      ]
+    },
+    "minigames_star_red": {
+      "xy": [
+        487,
+        470
+      ],
+      "size": [
+        45,
+        43
+      ]
+    },
+    "minigames_ticket_orange_small": {
+      "xy": [
+        885,
+        330
+      ],
+      "size": [
+        84,
+        65
+      ]
+    },
+    "minigames_trophy": {
+      "xy": [
+        531,
+        330
+      ],
+      "size": [
+        79,
+        80
+      ]
+    },
+    "minigames_paperclip": {
+      "xy": [
+        402,
+        330
+      ],
+      "size": [
+        54,
+        92
+      ]
+    },
+    "minigames_joystick_ball": {
+      "xy": [
+        423,
+        470
+      ],
+      "size": [
+        56,
+        50
+      ]
+    },
+    "minigames_capsule": {
+      "xy": [
+        634,
+        470
+      ],
+      "size": [
+        62,
+        41
+      ]
+    },
+    "minigames_gem": {
+      "xy": [
+        618,
+        330
+      ],
+      "size": [
+        65,
+        80
+      ]
+    },
+    "minigames_arcade_machine": {
+      "xy": [
+        4,
+        4
+      ],
+      "size": [
+        155,
+        318
+      ]
+    },
+    "minigames_pink_ticket": {
+      "xy": [
+        136,
+        470
+      ],
+      "size": [
+        60,
+        57
+      ]
+    },
+    "minigames_red_candy": {
+      "xy": [
+        4,
+        470
+      ],
+      "size": [
+        56,
+        59
+      ]
+    },
+    "minigames_panel_orange": {
+      "xy": [
+        804,
+        4
+      ],
+      "size": [
+        201,
+        160
+      ]
+    },
+    "minigames_panel_blue": {
+      "xy": [
+        594,
+        4
+      ],
+      "size": [
+        202,
+        163
+      ]
+    },
+    "minigames_panel_purple": {
+      "xy": [
+        383,
+        4
+      ],
+      "size": [
+        203,
+        173
+      ]
+    },
+    "minigames_panel_green": {
+      "xy": [
+        167,
+        4
+      ],
+      "size": [
+        208,
+        174
+      ]
+    },
+    "minigames_popcorn": {
+      "xy": [
+        464,
+        330
+      ],
+      "size": [
+        59,
+        89
+      ]
+    },
+    "minigames_ticket_blue": {
+      "xy": [
+        68,
+        470
+      ],
+      "size": [
+        60,
+        58
+      ]
+    },
+    "minigames_coin": {
+      "xy": [
+        258,
+        470
+      ],
+      "size": [
+        58,
+        56
+      ]
+    },
+    "minigames_vase": {
+      "xy": [
+        188,
+        330
+      ],
+      "size": [
+        77,
+        123
+      ]
+    },
+    "minigames_ticket_long": {
+      "xy": [
+        803,
+        330
+      ],
+      "size": [
+        74,
+        67
+      ]
+    },
+    "minigames_star_bottom_red": {
+      "xy": [
+        795,
+        470
+      ],
+      "size": [
+        33,
+        29
+      ]
+    },
+    "minigames_star_bottom_gray": {
+      "xy": [
+        752,
+        470
+      ],
+      "size": [
+        35,
+        31
+      ]
+    },
+    "minigames_ticket_bottom": {
+      "xy": [
+        324,
+        470
+      ],
+      "size": [
+        91,
+        54
+      ]
+    },
+    "minigames_red_ball": {
+      "xy": [
+        938,
+        470
+      ],
+      "size": [
+        26,
+        26
+      ]
+    },
+    "minigames_power_meter": {
+      "xy": [
+        836,
+        470
+      ],
+      "size": [
+        94,
+        28
+      ]
+    },
+    "minigames_mushroom": {
+      "xy": [
+        540,
+        470
+      ],
+      "size": [
+        44,
+        43
+      ]
+    },
+    "minigames_candy_slice": {
+      "xy": [
+        204,
+        470
+      ],
+      "size": [
+        46,
+        57
+      ]
+    }
+  },
+  "shared": {
+    "shared_back_button": {
+      "xy": [
+        614,
+        241
+      ],
+      "size": [
+        53,
+        53
+      ]
+    },
+    "shared_coin": {
+      "xy": [
+        425,
+        306
+      ],
+      "size": [
+        49,
+        43
+      ]
+    },
+    "shared_gem": {
+      "xy": [
+        330,
+        362
+      ],
+      "size": [
+        61,
+        39
+      ]
+    },
+    "shared_currency_slot": {
+      "xy": [
+        235,
+        362
+      ],
+      "size": [
+        87,
+        39
+      ]
+    },
+    "shared_coin_small": {
+      "xy": [
+        221,
+        409
+      ],
+      "size": [
+        34,
+        34
+      ]
+    },
+    "shared_key": {
+      "xy": [
+        50,
+        306
+      ],
+      "size": [
+        20,
+        48
+      ]
+    },
+    "shared_progress_green": {
+      "xy": [
+        526,
+        409
+      ],
+      "size": [
+        172,
+        29
+      ]
+    },
+    "shared_progress_orange": {
+      "xy": [
+        399,
+        362
+      ],
+      "size": [
+        223,
+        37
+      ]
+    },
+    "shared_progress_blue": {
+      "xy": [
+        4,
+        362
+      ],
+      "size": [
+        223,
+        39
+      ]
+    },
+    "shared_progress_purple": {
+      "xy": [
+        630,
+        362
+      ],
+      "size": [
+        218,
+        37
+      ]
+    },
+    "shared_check_green": {
+      "xy": [
+        726,
+        241
+      ],
+      "size": [
+        50,
+        51
+      ]
+    },
+    "shared_x_red": {
+      "xy": [
+        925,
+        241
+      ],
+      "size": [
+        53,
+        50
+      ]
+    },
+    "shared_button_play": {
+      "xy": [
+        318,
+        167
+      ],
+      "size": [
+        118,
+        61
+      ]
+    },
+    "shared_button_enter": {
+      "xy": [
+        170,
+        167
+      ],
+      "size": [
+        140,
+        61
+      ]
+    },
+    "shared_button_claim": {
+      "xy": [
+        895,
+        167
+      ],
+      "size": [
+        108,
+        49
+      ]
+    },
+    "shared_button_locked": {
+      "xy": [
+        784,
+        241
+      ],
+      "size": [
+        133,
+        50
+      ]
+    },
+    "shared_progress_locked": {
+      "xy": [
+        263,
+        409
+      ],
+      "size": [
+        255,
+        31
+      ]
+    },
+    "shared_dark_panel": {
+      "xy": [
+        709,
+        4
+      ],
+      "size": [
+        271,
+        73
+      ]
+    },
+    "shared_done_stamp": {
+      "xy": [
+        463,
+        4
+      ],
+      "size": [
+        157,
+        77
+      ]
+    },
+    "shared_progress_hot": {
+      "xy": [
+        78,
+        306
+      ],
+      "size": [
+        191,
+        47
+      ]
+    },
+    "shared_progress_empty": {
+      "xy": [
+        482,
+        306
+      ],
+      "size": [
+        203,
+        41
+      ]
+    },
+    "shared_torn_paper": {
+      "xy": [
+        614,
+        167
+      ],
+      "size": [
+        90,
+        60
+      ]
+    },
+    "shared_torn_paper_small": {
+      "xy": [
+        529,
+        241
+      ],
+      "size": [
+        77,
+        53
+      ]
+    },
+    "shared_new_badge": {
+      "xy": [
+        628,
+        4
+      ],
+      "size": [
+        73,
+        75
+      ]
+    },
+    "shared_paper_card": {
+      "xy": [
+        4,
+        4
+      ],
+      "size": [
+        128,
+        155
+      ]
+    },
+    "shared_note_beige": {
+      "xy": [
+        321,
+        4
+      ],
+      "size": [
+        134,
+        97
+      ]
+    },
+    "shared_tape_green": {
+      "xy": [
+        277,
+        306
+      ],
+      "size": [
+        140,
+        47
+      ]
+    },
+    "shared_speech_bubble": {
+      "xy": [
+        140,
+        4
+      ],
+      "size": [
+        173,
+        105
+      ]
+    },
+    "shared_tab_beige": {
+      "xy": [
+        444,
+        167
+      ],
+      "size": [
+        162,
+        60
+      ]
+    },
+    "shared_tab_yellow": {
+      "xy": [
+        356,
+        241
+      ],
+      "size": [
+        165,
+        56
+      ]
+    },
+    "shared_tab_green": {
+      "xy": [
+        4,
+        241
+      ],
+      "size": [
+        166,
+        57
+      ]
+    },
+    "shared_tab_blue": {
+      "xy": [
+        178,
+        241
+      ],
+      "size": [
+        170,
+        56
+      ]
+    },
+    "shared_tab_purple": {
+      "xy": [
+        712,
+        167
+      ],
+      "size": [
+        175,
+        57
+      ]
+    },
+    "shared_star_row": {
+      "xy": [
+        4,
+        409
+      ],
+      "size": [
+        209,
+        35
+      ]
+    },
+    "shared_star_full": {
+      "xy": [
+        833,
+        306
+      ],
+      "size": [
+        78,
+        41
+      ]
+    },
+    "shared_star_mixed": {
+      "xy": [
+        693,
+        306
+      ],
+      "size": [
+        132,
+        41
+      ]
+    },
+    "shared_heart": {
+      "xy": [
+        675,
+        241
+      ],
+      "size": [
+        43,
+        53
+      ]
+    },
+    "shared_status_red": {
+      "xy": [
+        4,
+        306
+      ],
+      "size": [
+        38,
+        48
+      ]
+    },
+    "shared_laurel": {
+      "xy": [
+        4,
+        167
+      ],
+      "size": [
+        158,
+        66
+      ]
+    }
+  }
+}

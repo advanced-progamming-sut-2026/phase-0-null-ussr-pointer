@@ -1,0 +1,159 @@
+travellog_daily.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+daily_notebook_page
+  rotate: false
+  xy: 4, 4
+  size: 334, 192
+  orig: 334, 192
+  offset: 0, 0
+  index: -1
+daily_pen_green
+  rotate: false
+  xy: 346, 4
+  size: 32, 170
+  orig: 32, 170
+  offset: 0, 0
+  index: -1
+daily_wood_pencil
+  rotate: false
+  xy: 908, 4
+  size: 31, 124
+  orig: 31, 124
+  offset: 0, 0
+  index: -1
+daily_sunflower_badge
+  rotate: false
+  xy: 408, 204
+  size: 77, 79
+  orig: 77, 79
+  offset: 0, 0
+  index: -1
+daily_doodle_note
+  rotate: false
+  xy: 4, 204
+  size: 85, 122
+  orig: 85, 122
+  offset: 0, 0
+  index: -1
+daily_blue_tape
+  rotate: false
+  xy: 780, 204
+  size: 59, 54
+  orig: 59, 54
+  offset: 0, 0
+  index: -1
+daily_crumpled_leaf
+  rotate: false
+  xy: 631, 204
+  size: 58, 60
+  orig: 58, 60
+  offset: 0, 0
+  index: -1
+daily_note_large
+  rotate: false
+  xy: 712, 4
+  size: 188, 124
+  orig: 188, 124
+  offset: 0, 0
+  index: -1
+daily_note_small
+  rotate: false
+  xy: 97, 204
+  size: 117, 120
+  orig: 117, 120
+  offset: 0, 0
+  index: -1
+daily_yellow_tape
+  rotate: false
+  xy: 328, 334
+  size: 79, 33
+  orig: 79, 33
+  offset: 0, 0
+  index: -1
+daily_peashooter
+  rotate: false
+  xy: 554, 4
+  size: 150, 140
+  orig: 150, 140
+  offset: 0, 0
+  index: -1
+daily_ticket
+  rotate: false
+  xy: 697, 204
+  size: 75, 57
+  orig: 75, 57
+  offset: 0, 0
+  index: -1
+daily_gold_tape
+  rotate: false
+  xy: 415, 334
+  size: 81, 31
+  orig: 81, 31
+  offset: 0, 0
+  index: -1
+daily_gray_tape
+  rotate: false
+  xy: 102, 334
+  size: 85, 36
+  orig: 85, 36
+  offset: 0, 0
+  index: -1
+daily_coin_token
+  rotate: false
+  xy: 847, 204
+  size: 65, 52
+  orig: 65, 52
+  offset: 0, 0
+  index: -1
+daily_note_stack
+  rotate: false
+  xy: 386, 4
+  size: 160, 143
+  orig: 160, 143
+  offset: 0, 0
+  index: -1
+daily_note_green
+  rotate: false
+  xy: 222, 204
+  size: 178, 104
+  orig: 178, 104
+  offset: 0, 0
+  index: -1
+daily_note_tiny
+  rotate: false
+  xy: 567, 204
+  size: 56, 65
+  orig: 56, 65
+  offset: 0, 0
+  index: -1
+daily_peashooter_sticker
+  rotate: false
+  xy: 493, 204
+  size: 66, 75
+  orig: 66, 75
+  offset: 0, 0
+  index: -1
+daily_stars
+  rotate: false
+  xy: 920, 204
+  size: 65, 42
+  orig: 65, 42
+  offset: 0, 0
+  index: -1
+daily_progress_bar
+  rotate: false
+  xy: 4, 334
+  size: 90, 38
+  orig: 90, 38
+  offset: 0, 0
+  index: -1
+daily_orange_pencil
+  rotate: false
+  xy: 195, 334
+  size: 125, 33
+  orig: 125, 33
+  offset: 0, 0
+  index: -1

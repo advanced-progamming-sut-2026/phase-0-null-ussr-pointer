@@ -1,0 +1,222 @@
+travellog_minigames.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+minigames_daves_arcade_sign
+  rotate: false
+  xy: 4, 330
+  size: 176, 132
+  orig: 176, 132
+  offset: 0, 0
+  index: -1
+minigames_wallnut
+  rotate: false
+  xy: 273, 330
+  size: 121, 92
+  orig: 121, 92
+  offset: 0, 0
+  index: -1
+minigames_star_purple
+  rotate: false
+  xy: 704, 470
+  size: 40, 37
+  orig: 40, 37
+  offset: 0, 0
+  index: -1
+minigames_zombie_card
+  rotate: false
+  xy: 691, 330
+  size: 104, 77
+  orig: 104, 77
+  offset: 0, 0
+  index: -1
+minigames_star_blue
+  rotate: false
+  xy: 592, 470
+  size: 34, 42
+  orig: 34, 42
+  offset: 0, 0
+  index: -1
+minigames_star_red
+  rotate: false
+  xy: 487, 470
+  size: 45, 43
+  orig: 45, 43
+  offset: 0, 0
+  index: -1
+minigames_ticket_orange_small
+  rotate: false
+  xy: 885, 330
+  size: 84, 65
+  orig: 84, 65
+  offset: 0, 0
+  index: -1
+minigames_trophy
+  rotate: false
+  xy: 531, 330
+  size: 79, 80
+  orig: 79, 80
+  offset: 0, 0
+  index: -1
+minigames_paperclip
+  rotate: false
+  xy: 402, 330
+  size: 54, 92
+  orig: 54, 92
+  offset: 0, 0
+  index: -1
+minigames_joystick_ball
+  rotate: false
+  xy: 423, 470
+  size: 56, 50
+  orig: 56, 50
+  offset: 0, 0
+  index: -1
+minigames_capsule
+  rotate: false
+  xy: 634, 470
+  size: 62, 41
+  orig: 62, 41
+  offset: 0, 0
+  index: -1
+minigames_gem
+  rotate: false
+  xy: 618, 330
+  size: 65, 80
+  orig: 65, 80
+  offset: 0, 0
+  index: -1
+minigames_arcade_machine
+  rotate: false
+  xy: 4, 4
+  size: 155, 318
+  orig: 155, 318
+  offset: 0, 0
+  index: -1
+minigames_pink_ticket
+  rotate: false
+  xy: 136, 470
+  size: 60, 57
+  orig: 60, 57
+  offset: 0, 0
+  index: -1
+minigames_red_candy
+  rotate: false
+  xy: 4, 470
+  size: 56, 59
+  orig: 56, 59
+  offset: 0, 0
+  index: -1
+minigames_panel_orange
+  rotate: false
+  xy: 804, 4
+  size: 201, 160
+  orig: 201, 160
+  offset: 0, 0
+  index: -1
+minigames_panel_blue
+  rotate: false
+  xy: 594, 4
+  size: 202, 163
+  orig: 202, 163
+  offset: 0, 0
+  index: -1
+minigames_panel_purple
+  rotate: false
+  xy: 383, 4
+  size: 203, 173
+  orig: 203, 173
+  offset: 0, 0
+  index: -1
+minigames_panel_green
+  rotate: false
+  xy: 167, 4
+  size: 208, 174
+  orig: 208, 174
+  offset: 0, 0
+  index: -1
+minigames_popcorn
+  rotate: false
+  xy: 464, 330
+  size: 59, 89
+  orig: 59, 89
+  offset: 0, 0
+  index: -1
+minigames_ticket_blue
+  rotate: false
+  xy: 68, 470
+  size: 60, 58
+  orig: 60, 58
+  offset: 0, 0
+  index: -1
+minigames_coin
+  rotate: false
+  xy: 258, 470
+  size: 58, 56
+  orig: 58, 56
+  offset: 0, 0
+  index: -1
+minigames_vase
+  rotate: false
+  xy: 188, 330
+  size: 77, 123
+  orig: 77, 123
+  offset: 0, 0
+  index: -1
+minigames_ticket_long
+  rotate: false
+  xy: 803, 330
+  size: 74, 67
+  orig: 74, 67
+  offset: 0, 0
+  index: -1
+minigames_star_bottom_red
+  rotate: false
+  xy: 795, 470
+  size: 33, 29
+  orig: 33, 29
+  offset: 0, 0
+  index: -1
+minigames_star_bottom_gray
+  rotate: false
+  xy: 752, 470
+  size: 35, 31
+  orig: 35, 31
+  offset: 0, 0
+  index: -1
+minigames_ticket_bottom
+  rotate: false
+  xy: 324, 470
+  size: 91, 54
+  orig: 91, 54
+  offset: 0, 0
+  index: -1
+minigames_red_ball
+  rotate: false
+  xy: 938, 470
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+minigames_power_meter
+  rotate: false
+  xy: 836, 470
+  size: 94, 28
+  orig: 94, 28
+  offset: 0, 0
+  index: -1
+minigames_mushroom
+  rotate: false
+  xy: 540, 470
+  size: 44, 43
+  orig: 44, 43
+  offset: 0, 0
+  index: -1
+minigames_candy_slice
+  rotate: false
+  xy: 204, 470
+  size: 46, 57
+  orig: 46, 57
+  offset: 0, 0
+  index: -1

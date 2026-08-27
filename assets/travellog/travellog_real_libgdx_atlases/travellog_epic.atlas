@@ -1,0 +1,152 @@
+travellog_epic.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+epic_wood_board
+  rotate: false
+  xy: 190, 4
+  size: 302, 217
+  orig: 302, 217
+  offset: 0, 0
+  index: -1
+epic_wanted_poster
+  rotate: false
+  xy: 4, 4
+  size: 178, 258
+  orig: 178, 258
+  offset: 0, 0
+  index: -1
+epic_hammer
+  rotate: false
+  xy: 538, 270
+  size: 51, 72
+  orig: 51, 72
+  offset: 0, 0
+  index: -1
+epic_narrow_note
+  rotate: false
+  xy: 613, 4
+  size: 86, 154
+  orig: 86, 154
+  offset: 0, 0
+  index: -1
+epic_narrow_note_2
+  rotate: false
+  xy: 707, 4
+  size: 60, 141
+  orig: 60, 141
+  offset: 0, 0
+  index: -1
+epic_large_note
+  rotate: false
+  xy: 500, 4
+  size: 105, 170
+  orig: 105, 170
+  offset: 0, 0
+  index: -1
+epic_skull_badge
+  rotate: false
+  xy: 194, 270
+  size: 81, 106
+  orig: 81, 106
+  offset: 0, 0
+  index: -1
+epic_blood_splat
+  rotate: false
+  xy: 906, 4
+  size: 66, 38
+  orig: 66, 38
+  offset: 0, 0
+  index: -1
+epic_zombie_threat
+  rotate: false
+  xy: 775, 4
+  size: 78, 126
+  orig: 78, 126
+  offset: 0, 0
+  index: -1
+epic_skull_coin
+  rotate: false
+  xy: 467, 270
+  size: 63, 72
+  orig: 63, 72
+  offset: 0, 0
+  index: -1
+epic_gold_coin
+  rotate: false
+  xy: 861, 4
+  size: 37, 43
+  orig: 37, 43
+  offset: 0, 0
+  index: -1
+epic_blue_gem
+  rotate: false
+  xy: 980, 4
+  size: 36, 30
+  orig: 36, 30
+  offset: 0, 0
+  index: -1
+epic_claw_marks
+  rotate: false
+  xy: 283, 270
+  size: 100, 91
+  orig: 100, 91
+  offset: 0, 0
+  index: -1
+epic_torn_note
+  rotate: false
+  xy: 391, 270
+  size: 68, 89
+  orig: 68, 89
+  offset: 0, 0
+  index: -1
+epic_skull
+  rotate: false
+  xy: 665, 270
+  size: 55, 67
+  orig: 55, 67
+  offset: 0, 0
+  index: -1
+epic_red_weapon
+  rotate: false
+  xy: 862, 270
+  size: 92, 55
+  orig: 92, 55
+  offset: 0, 0
+  index: -1
+epic_skull_medallion
+  rotate: false
+  xy: 785, 270
+  size: 69, 63
+  orig: 69, 63
+  offset: 0, 0
+  index: -1
+epic_gold_star
+  rotate: false
+  xy: 597, 270
+  size: 60, 67
+  orig: 60, 67
+  offset: 0, 0
+  index: -1
+epic_bronze_coin
+  rotate: false
+  xy: 728, 270
+  size: 49, 64
+  orig: 49, 64
+  offset: 0, 0
+  index: -1
+epic_yellow_candy
+  rotate: false
+  xy: 962, 270
+  size: 51, 49
+  orig: 51, 49
+  offset: 0, 0
+  index: -1
+epic_defeated_poster
+  rotate: false
+  xy: 4, 270
+  size: 182, 124
+  orig: 182, 124
+  offset: 0, 0
+  index: -1
