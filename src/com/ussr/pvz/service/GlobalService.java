@@ -149,6 +149,8 @@ public class GlobalService {
             return "you are not logged in";
         }
 
+        AccountSyncService.sync();
+
         boolean loggedOut =
                 loginService.logout();
 
@@ -174,6 +176,8 @@ public class GlobalService {
 
 
     public String handleQuit() {
+
+        AccountSyncService.sync();
 
         Gdx.app.exit();
 

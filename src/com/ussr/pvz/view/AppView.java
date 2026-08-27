@@ -24,6 +24,7 @@ import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.util.SessionManager;
 import com.ussr.pvz.network.NetworkClient;
 import com.ussr.pvz.notification.NotificationCenter;
+import com.ussr.pvz.service.AccountSyncService;
 import com.ussr.pvz.shared.dto.LoginResult;
 import com.ussr.pvz.shared.dto.enums.LoginStatus;
 import com.ussr.pvz.view.hud.DebugOverlay;
@@ -624,6 +625,8 @@ public class AppView implements ApplicationListener {
     @Override
     public void dispose() {
         NotificationCenter.clear();
+
+        AccountSyncService.sync();
 
         if (audioManager != null) {
             audioManager.dispose();

@@ -19,6 +19,7 @@ public enum RequestType {
     CHANGE_NICKNAME,
     CHANGE_EMAIL,
     CHANGE_PASSWORD,
+    SYNC_ACCOUNT,
 
     GET_LEADERBOARD,
 

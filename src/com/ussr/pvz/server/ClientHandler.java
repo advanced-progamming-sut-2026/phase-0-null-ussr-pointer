@@ -261,6 +261,7 @@ public class ClientHandler implements Runnable, MatchPeer {
             case GET_PROFILE      -> handleGetProfile(request);
             case CHANGE_USERNAME  -> handleChangeUsername(request);
             case CHANGE_NICKNAME  -> handleChangeNickname(request);
+            case SYNC_ACCOUNT     -> handleSyncAccount(request);
             case CHANGE_EMAIL     -> handleChangeEmail(request);
             case CHANGE_PASSWORD  -> handleChangePassword(request);
 
@@ -598,6 +599,27 @@ public class ClientHandler implements Runnable, MatchPeer {
         return profileResponse(
                 authService.getProfileService()
                         .changePassword(request.getToken(), changeRequest));
+    }
+
+
+    private NetworkResponse handleSyncAccount(NetworkRequest request) {
+        Account account = authService.getSessionManager().getAccount(request.getToken());
+        if (account == null) {
+            return NetworkResponse.error("you are not logged in");
+        }
+        if (request.getData() == null) {
+            return NetworkResponse.error("Missing account state data.");
+        }
+
+        try {
+            AccountState state = gson.fromJson(request.getData(), AccountState.class);
+            account.applyProgressState(state);
+            authService.getAccountRepository().save();
+        } catch (Exception e) {
+            return NetworkResponse.error("Failed to sync account: " + e.getMessage());
+        }
+
+        return NetworkResponse.success("Account synced.");
     }
 
     // =========================================================

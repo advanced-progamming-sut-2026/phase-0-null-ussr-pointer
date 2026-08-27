@@ -22,9 +22,9 @@ public class Account {
     private final Gender gender;
     private final SecurityQuestion securityQuestion;
     private final String securityAnswer;
-    private final AdventureProgress adventureProgress;
-    private final ScoreRecord scoreRecord;
-    private final List<NewsItem> personalNews;
+    private AdventureProgress adventureProgress;
+    private ScoreRecord scoreRecord;
+    private List<NewsItem> personalNews;
     private Collection collection;
     private Greenhouse greenhouse;
     private int difficultyLvl;
@@ -43,6 +43,13 @@ public class Account {
         this.gender = state.gender();
         this.securityQuestion = state.securityQuestion();
         this.securityAnswer = state.securityAnswer();
+        this.collection = collection;
+
+        applyProgressState(state);
+        checkAndResetDailyQuests();
+    }
+
+    public void applyProgressState(AccountState state) {
         this.difficultyLvl = state.difficultyLvl();
         this.gameSpeed = normalizeGameSpeed(
                 state.gameSpeed()
@@ -63,7 +70,6 @@ public class Account {
 
         this.scoreRecord = new ScoreRecord(state.score());
         this.personalNews = new ArrayList<>(state.personalNews());
-        this.collection = collection;
         this.greenhouse = state.greenhouse() != null ? Greenhouse.fromMap(state.greenhouse()) : new Greenhouse();
 
         this.savedBoosts = new SavedBoosts();
@@ -83,8 +89,6 @@ public class Account {
 
         this.lastLoginTime = (state.lastLoginTime() > 0) ? state.lastLoginTime() : System.currentTimeMillis();
         this.lastDailyResetTime = (state.lastDailyResetTime() > 0) ? state.lastDailyResetTime() : this.lastLoginTime;
-
-        checkAndResetDailyQuests();
     }
 
     public float getGameSpeed() {

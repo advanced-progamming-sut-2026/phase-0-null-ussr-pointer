@@ -57,6 +57,7 @@ public class GreenHouseService {
 
         App.getAccount().getAdventureProgress().addGem(-unlockCostGems);
         App.getAccount().getGreenhouse().unlockPot(x, y);
+        AccountSyncService.sync();
 
         return "Pot (" + x + ", " + y + ") unlocked for " + unlockCostGems + " gems!";
     }
@@ -76,6 +77,7 @@ public class GreenHouseService {
             }
         }
         App.getAccount().getGreenhouse().plant(x, y, plants);
+        AccountSyncService.sync();
         return "Plant planted in " + x + " " + y + " successfully";
     }
 
@@ -96,10 +98,12 @@ public class GreenHouseService {
 
         if (result.isMarigold()) {
             App.getAccount().getAdventureProgress().addCoin(500);
+            AccountSyncService.sync();
             return "The plant collected successfully and 500 coins added to your wallet";
         } else {
             String plantName = result.getType();
             boolean boostAdded = App.getAccount().getSavedBoosts().addBoost(plantName);
+            AccountSyncService.sync();
 
             if (boostAdded) {
                 return "The plant collected successfully and a boost for " + plantName + " has been added.";
@@ -120,6 +124,7 @@ public class GreenHouseService {
 
         try {
             App.getAccount().getGreenhouse().water(x, y);
+            AccountSyncService.sync();
             return "The plant has been watered and is now growing!";
         } catch (Exception e) {
             return e.getMessage();
@@ -143,6 +148,7 @@ public class GreenHouseService {
             } else {
                 App.getAccount().getGreenhouse().grow(x, y);
                 App.getAccount().getAdventureProgress().addGem(-cost);
+                AccountSyncService.sync();
                 return "The plant grew successfully and is ready to collect";
             }
         } catch (Exception e) {

@@ -20,6 +20,7 @@ public class SettingService {
 
         // Save the raw integer choice to the profile session
         App.getAccount().setDifficultyLvl(newDifficulty);
+        AccountSyncService.sync();
         return "new difficulty lvl applied successfully.";
     }
 
@@ -43,6 +44,7 @@ public class SettingService {
         }
 
         App.getAccount().setGameSpeed(speed);
+        AccountSyncService.sync();
         return "game speed applied successfully.";
     }
 }
