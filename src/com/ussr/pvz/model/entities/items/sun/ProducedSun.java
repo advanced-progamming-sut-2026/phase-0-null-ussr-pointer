@@ -12,6 +12,11 @@ public class ProducedSun extends GroundItem {
     private final int y;
     private final int value;
 
+    private static final float POP_DURATION = 0.7f;
+
+    private boolean popping = true;
+    private float popElapsed = 0f;
+
     public ProducedSun(int x, int y, int value, String sourcePlantName) {
         super(ItemType.SUN, 40f, 20f);
         this.x = x;
@@ -19,6 +24,24 @@ public class ProducedSun extends GroundItem {
         this.value = value;
         this.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
         App.getGameSession().getEventBus().publish(new GameEvent.SunProduced(sourcePlantName, value, x, y));
+    }
+
+    @Override
+    public void update(float delta) {
+        if (!popping) return;
+        popElapsed += delta;
+        if (popElapsed >= POP_DURATION) {
+            popElapsed = POP_DURATION;
+            popping = false;
+        }
+    }
+
+    public boolean isPopping() {
+        return popping;
+    }
+
+    public float getPopProgress() {
+        return popElapsed / POP_DURATION;
     }
 
     @Override
