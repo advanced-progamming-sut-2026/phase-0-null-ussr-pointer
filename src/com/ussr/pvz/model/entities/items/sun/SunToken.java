@@ -12,10 +12,11 @@ import java.util.Random;
 public class SunToken extends GroundItem {
     private static final Random RAND = new Random();
     private static final double SECONDS_TO_FALL = 5.0;
-    private static final int TOTAL_FALL_TICKS = (int) (SECONDS_TO_FALL / 0.1);
-
     private static final double SECONDS_TO_EXPIRE_ON_GROUND = 15.0;
-    private static final int TOTAL_EXPIRE_TICKS = (int) (SECONDS_TO_EXPIRE_ON_GROUND / 0.1);
+
+    public static double getFallDurationSeconds() {
+        return SECONDS_TO_FALL;
+    }
 
     private final SunDropType dropType;
     private boolean falling;
@@ -24,8 +25,8 @@ public class SunToken extends GroundItem {
     private final int targetCol;
     private double currentY;
     private final double fallTargetY;
-    private int elapsedTicks = 0;
-    private int groundedTicks = 0;
+    private double fallElapsedSeconds = 0.0;
+    private double groundedElapsedSeconds = 0.0;
 
     public SunToken(int maxRows, int maxCols) {
         super(ItemType.SUN, 40f, 20f);
@@ -114,23 +115,24 @@ public class SunToken extends GroundItem {
         if (!this.isAlive) return;
 
         if (falling) {
-            elapsedTicks++;
+            fallElapsedSeconds += delta;
 
-            double progress = (double) elapsedTicks / TOTAL_FALL_TICKS;
-            currentY = progress * fallTargetY;
-
-            if (elapsedTicks >= TOTAL_FALL_TICKS) {
+            double progress = fallElapsedSeconds / SECONDS_TO_FALL;
+            if (progress >= 1.0) {
+                progress = 1.0;
                 falling = false;
                 currentY = fallTargetY;
                 App.getGameSession().getEventBus().publish(new GameEvent.SunGrounded(targetCol, targetRow));
+            } else {
+                currentY = progress * fallTargetY;
             }
             return;
         }
 
         if (isCollected()) return;
 
-        groundedTicks++;
-        if (groundedTicks >= TOTAL_EXPIRE_TICKS) {
+        groundedElapsedSeconds += delta;
+        if (groundedElapsedSeconds >= SECONDS_TO_EXPIRE_ON_GROUND) {
             this.isAlive = false;
             App.getGameSession().getEventBus().publish(new GameEvent.SunExpired(targetCol, targetRow));
         }

@@ -25,8 +25,14 @@ public class SunActor extends Actor {
     private static final float EXPLODE_DURATION = 0.8f;
     private static final float FALL_START_Y = 8f;   // world-unit height sun falls from
 
+    private static final float BASE_SCALE = 0.45f;
+    private static final float MIN_SCALE_MULTIPLIER = 0.5f;
+    private static final float MAX_SCALE_MULTIPLIER = 1.5f;
+    private static final int SCALE_PIVOT_VALUE = 50;
+
     private final PamPlayer player;
     private final GroundItem item;
+    private final float drawScale;
 
     private SunPhase phase;
     private ClipRef clipRef;
@@ -61,8 +67,18 @@ public class SunActor extends Actor {
 
         this.phase = isSunToken ? SunPhase.FALLING : SunPhase.IDLE;
         this.clipRef = resolveClip(phase);
+        this.drawScale = computeDrawScale(item);
 
         setSize(60f, 60f);
+    }
+
+    private static float computeDrawScale(GroundItem item) {
+        if (!(item instanceof ProducedSun producedSun)) {
+            return BASE_SCALE;
+        }
+        float ratio = producedSun.getValue() / (float) SCALE_PIVOT_VALUE;
+        float multiplier = Math.max(MIN_SCALE_MULTIPLIER, Math.min(MAX_SCALE_MULTIPLIER, ratio));
+        return BASE_SCALE * multiplier;
     }
 
     // ── public API ──────────────────────────────────────────────────────────
@@ -81,6 +97,10 @@ public class SunActor extends Actor {
 
     public boolean isDone() {
         return phase == SunPhase.COLLECTED;
+    }
+
+    public float getStateTime() {
+        return stateTime;
     }
 
     // ── Actor overrides ──────────────────────────────────────────────────────
@@ -141,7 +161,7 @@ public class SunActor extends Actor {
         Matrix4 old = batch.getTransformMatrix().cpy();
         Matrix4 t = batch.getTransformMatrix().cpy();
         t.translate(cx, cy, 0);
-        t.scale(0.45f, 0.45f, 1f);
+        t.scale(drawScale, drawScale, 1f);
         batch.setTransformMatrix(t);
 
         try {

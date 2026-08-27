@@ -10,6 +10,7 @@ import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
+import com.ussr.pvz.model.entities.items.sun.ProducedSun;
 import com.ussr.pvz.model.entities.items.sun.SunToken;
 import com.ussr.pvz.model.entities.items.sun.SunDropType;
 import com.ussr.pvz.view.animation.SunActor;
@@ -26,6 +27,12 @@ public class SunRenderLayer extends Group {
 
     // collect radius in screen pixels — tune as needed
     private static final float COLLECT_RADIUS_PX = 55f;
+
+    private static final float PLANT_ACTOR_HALF_WIDTH = 40f;
+    private static final float PLANT_ACTOR_VISUAL_CENTER_Y = 20f; // 40 (half height) - 20 (offsetY)
+
+    /** How high above the plant's own PAM anchor the sun pops before falling to rest, in world pixels. */
+    private static final float SUN_POP_HEIGHT_PX = 90f;
 
     public SunRenderLayer(PamPlayer pamPlayer) {
         this.pamPlayer = pamPlayer;
@@ -65,16 +72,42 @@ public class SunRenderLayer extends Group {
                         + LawnGridLayout.CELL_WIDTH / 2f;
 
                 if (token.isFalling()) {
-                    float progress = (float)(token.getCurrentY() /
-                            Math.max(token.getTargetRow(), 1));
+                    float progress = Math.min(1f,
+                            actor.getStateTime() / (float) SunToken.getFallDurationSeconds());
                     float startY = getStage().getViewport().getWorldHeight() + 40f;
                     screenY = startY + (targetScreenY - startY) * progress;
                 } else {
                     screenY = targetScreenY;
                 }
                 screenX = targetScreenX;
+            } else if (item instanceof ProducedSun sun) {
+                float plantCenterX = LawnGridLayout.cellX((int) item.getPosition().x())
+                        + LawnGridLayout.CELL_WIDTH / 2f
+                        + LawnGridLayout.PLANT_DRAW_OFFSET_X
+                        + PLANT_ACTOR_HALF_WIDTH;
+                float plantCenterY = LawnGridLayout.cellY((int) item.getPosition().y())
+                        + LawnGridLayout.PLANT_DRAW_OFFSET_Y
+                        + PLANT_ACTOR_VISUAL_CENTER_Y;
+
+                float restX = plantCenterX + sun.getOffsetX();
+                float restY = plantCenterY + sun.getOffsetY();
+
+                if (sun.isPopping()) {
+                    float startX = plantCenterX;
+                    float startY = plantCenterY;
+
+                    float t = Math.min(1f,
+                            actor.getStateTime() / ProducedSun.getPopDurationSeconds());
+                    float peakY = Math.max(startY, restY) + SUN_POP_HEIGHT_PX;
+                    float arc = 4f * t * (1f - t); // 0 -> 1 -> 0 across the pop
+                    screenX = startX + (restX - startX) * t;
+                    screenY = startY + (restY - startY) * t + arc * (peakY - Math.max(startY, restY));
+                } else {
+                    screenX = restX;
+                    screenY = restY;
+                }
             } else {
-                // ProducedSun — fixed position
+                // Fallback for any other fixed-position sun item.
                 screenX = LawnGridLayout.worldX(item.getPosition().x())
                         + LawnGridLayout.CELL_WIDTH / 2f;
                 screenY = LawnGridLayout.worldY(item.getPosition().y());

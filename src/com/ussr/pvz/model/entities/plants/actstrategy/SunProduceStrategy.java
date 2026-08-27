@@ -3,10 +3,14 @@ package com.ussr.pvz.model.entities.plants.actstrategy;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.sun.ProducedSun;
+import com.ussr.pvz.model.entities.items.sun.SunSplitter;
+import com.ussr.pvz.model.entities.items.sun.SunSpreadUtil;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.badlogic.gdx.math.MathUtils;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
+
+import java.util.List;
 
 public class SunProduceStrategy implements ActStrategy {
     private boolean isInstantBurst;
@@ -46,17 +50,22 @@ public class SunProduceStrategy implements ActStrategy {
         if (doubleChance > 0 && MathUtils.random() < Math.min(1.0, doubleChance)) {
             sunValue *= 2;
         }
-        ProducedSun sun = null;
-        if(isInstantBurst) {
-            sun = new ProducedSun(x , y , sunValue , user.getName());
+        if (isInstantBurst) {
+            // Gold Bloom: split the big burst into several 25/50/75 suns instead of one huge one
+            List<Integer> denominations = SunSplitter.split(sunValue);
+            int count = denominations.size();
+            for (int i = 0; i < count; i++) {
+                float[] offset = SunSpreadUtil.offsetFor(i, count);
+                session.addItem(new ProducedSun(x, y, denominations.get(i), user.getName(),
+                        offset[0], offset[1]));
+            }
             //todo : we may should make the plant of the sell null
             // when a plant dies ( we can do it somewhere else like in the set alive method)
             user.setAlive(false);
+        } else {
+            ProducedSun sun = new ProducedSun(x, y, sunValue, user.getName());
+            session.addItem(sun);
         }
-        else {
-            sun = new ProducedSun(x, y, sunValue, user.getName());
-        }
-        session.addItem(sun);
 
         user.setInternalTimer(0.0);
         user.triggerProduceAnimation();
