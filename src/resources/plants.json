@@ -391,6 +391,7 @@
     "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_SNOW_PEA/T_SNOW_PEA.PAM",
+    "plantFoodSpecialPam": "768/INITIAL/EFFECTS/SNOWPEA_PLANTFOOD/SNOWPEA_PLANTFOOD.PAM",
     "projectileOrigins": [
       {
         "x": 0.9,
@@ -867,6 +868,7 @@
     "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/FIREPEASHOOTER/FIREPEASHOOTER.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_FIRE_PEA/T_FIRE_PEA.PAM",
+    "plantFoodSpecialPam": "768/INITIAL/EFFECTS/FIREPEASHOOTER_FIRE/FIREPEASHOOTER_FIRE.PAM",
     "projectileOrigins": [
       {
         "x": 0.72,
@@ -914,6 +916,7 @@
     "plantFoodAnimReplays": 3,
     "pamLocation": "768/INITIAL/PLANT/STARFRUIT/STARFRUIT.PAM",
     "projectilePam": "768/INITIAL/EFFECTS/T_STARFRUIT_PROJECTILE/T_STARFRUIT_PROJECTILE.PAM",
+    "plantFoodProjectilePam": "768/INITIAL/EFFECTS/STARFRUIT_PROJECTILE_PLANTFOOD/STARFRUIT_PROJECTILE_PLANTFOOD.PAM",
     "projectileOrigins": [
       {
         "x": 0.3,
@@ -1652,6 +1655,7 @@
     "plantFoodType": "NONE",
     "plantFoodValue": 0.0,
     "pamLocation": "768/INITIAL/PLANT/JALAPENO/JALAPENO.PAM",
+    "plantFoodSpecialPam": "768/INITIAL/EFFECTS/JALAPENO_FIRE/JALAPENO_FIRE.PAM",
     "upgrades": [
       {
         "level": 2,
@@ -1971,6 +1975,7 @@
     "plantFoodStrikeRate": 0.1,
     "plantFoodAnimReplays": 2,
     "pamLocation": "768/INITIAL/PLANT/KIWIBEAST/KIWIBEAST.PAM",
+    "plantFoodSpecialPam": "768/INITIAL/EFFECTS/KIWIBEAST_PF_PULSE/KIWIBEAST_PF_PULSE.PAM",
     "wramp-up": [
       {
         "stage": 2,
@@ -2447,7 +2452,8 @@
     "plantFoodDuration": 4.0,
     "plantFoodStrikeRate": 0.1,
     "plantFoodAnimReplays": 3,
-    "pamLocation": "768/INITIAL/PLANT/HOMINGTHISTLE/HOMINGTHISTLE.PAM",
+    "pamLocation": "768/FULL/PLANT/BLAZINGKNIGHT/BLAZINGKNIGHT.PAM",
+    "projectilePam": "768/FULL/EFFECTS/BLAZINGKNIGHT_PROJECTILE/BLAZINGKNIGHT_PROJECTILE.PAM",
     "upgrades": [
       {
         "level": 2,
