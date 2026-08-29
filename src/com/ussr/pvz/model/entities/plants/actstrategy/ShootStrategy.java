@@ -32,8 +32,6 @@ public class ShootStrategy implements ActStrategy {
                 .anyMatch(v -> findTargetAlongVector(user, v, session) != null);
         if (!anyTarget) return;
 
-        user.setInternalTimer(0.0);
-
         HitEffectStrategy hitEffect = buildHitEffect(user);
 
         for (int index = 0; index < vectors.size(); index++) {

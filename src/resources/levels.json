@@ -101,26 +101,25 @@
           "rewardPlantAliases": [
             "Bonk Choy",
             "Cabbage-pult",
-            "Grave Buster",
             "Repeater",
             "Twin Sunflower"
           ],
           "allowedZombies": [
             {
               "id": "ZombieDefault",
-              "weight": 100
+              "weight": 1000
             },
             {
               "id": "ZombieArmor1",
-              "weight": 400
-            },
-            {
-              "id": "ZombieBarrelRoller",
-              "weight": 150
-            },
-            {
-              "id": "ZombieDarkKing",
               "weight": 200
+            },
+            {
+              "id": "ZombieExplorer",
+              "weight": 100
+            },
+            {
+              "id": "ZombieRa",
+              "weight": 100
             }
           ],
           "sandstorms": [
@@ -420,7 +419,7 @@
           "rewardPlantAliases": [
             "Citron",
             "Endurian",
-            "Iceberg Lettuce",
+            "",
             "Phat Beet"
           ],
           "allowedZombies": [

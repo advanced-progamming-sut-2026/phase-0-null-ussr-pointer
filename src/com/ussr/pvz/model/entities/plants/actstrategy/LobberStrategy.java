@@ -21,8 +21,6 @@ public class LobberStrategy implements ActStrategy {
         Zombie target = findNearestInLane(user, session);
         if (target == null) return;
 
-        user.setInternalTimer(0.0);
-
         Vec2 startPos = user.getPosition();
         Vec2 targetPos = target.getPosition();
         double distanceX = targetPos.x() - startPos.x();

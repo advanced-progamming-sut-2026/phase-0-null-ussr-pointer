@@ -63,7 +63,6 @@ public class ExplodeStrategy implements ActStrategy {
         if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
             userAct(user, targets);
             user.triggerActionAnimation();
-            user.setInternalTimer(0.0);
             return;
         }
         // Keep the entity rendered long enough for its one-shot explosion PAM
