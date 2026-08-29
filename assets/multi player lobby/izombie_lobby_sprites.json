@@ -1,0 +1,213 @@
+{
+  "schema": "libgdx-real-sprite-atlas/v2",
+  "coordinateSystem": "top-left origin; pixels",
+  "page": {
+    "file": "izombie_lobby_sprites.png",
+    "width": 1024,
+    "height": 2048,
+    "format": "RGBA8888",
+    "filter": [
+      "Linear",
+      "Linear"
+    ]
+  },
+  "important": "Every region is an independent transparent sprite. This is not a flattened lobby screenshot.",
+  "regions": [
+    {
+      "name": "frame_main",
+      "x": 8,
+      "y": 8,
+      "width": 264,
+      "height": 259,
+      "purpose": "Scalable outer lobby frame",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 66,
+        "right": 66,
+        "top": 64,
+        "bottom": 64
+      }
+    },
+    {
+      "name": "header_stone",
+      "x": 280,
+      "y": 8,
+      "width": 250,
+      "height": 84,
+      "purpose": "Scalable neutral section header",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 62,
+        "right": 62,
+        "top": 21,
+        "bottom": 21
+      }
+    },
+    {
+      "name": "header_purple",
+      "x": 538,
+      "y": 8,
+      "width": 255,
+      "height": 84,
+      "purpose": "Scalable iZombie section header",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 63,
+        "right": 63,
+        "top": 21,
+        "bottom": 21
+      }
+    },
+    {
+      "name": "panel_parchment",
+      "x": 8,
+      "y": 275,
+      "width": 225,
+      "height": 229,
+      "purpose": "Scalable content/list panel",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 56,
+        "right": 56,
+        "top": 57,
+        "bottom": 57
+      }
+    },
+    {
+      "name": "button_green",
+      "x": 241,
+      "y": 275,
+      "width": 267,
+      "height": 97,
+      "purpose": "Scalable primary/ready/find-match button",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 66,
+        "right": 66,
+        "top": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "name": "button_orange",
+      "x": 516,
+      "y": 275,
+      "width": 251,
+      "height": 98,
+      "purpose": "Scalable refresh/secondary button",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 62,
+        "right": 62,
+        "top": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "name": "button_blue",
+      "x": 8,
+      "y": 512,
+      "width": 243,
+      "height": 96,
+      "purpose": "Scalable invite button",
+      "scalable": true,
+      "ninePatchSplit": {
+        "left": 60,
+        "right": 60,
+        "top": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "name": "button_close",
+      "x": 259,
+      "y": 512,
+      "width": 175,
+      "height": 177,
+      "purpose": "Close lobby",
+      "scalable": false
+    },
+    {
+      "name": "button_back",
+      "x": 442,
+      "y": 512,
+      "width": 178,
+      "height": 182,
+      "purpose": "Navigate back",
+      "scalable": false
+    },
+    {
+      "name": "badge_izombie",
+      "x": 628,
+      "y": 512,
+      "width": 209,
+      "height": 233,
+      "purpose": "Always-on iZombie game-mode badge",
+      "scalable": false
+    },
+    {
+      "name": "icon_players_online",
+      "x": 8,
+      "y": 753,
+      "width": 204,
+      "height": 130,
+      "purpose": "Online players indicator",
+      "scalable": false
+    },
+    {
+      "name": "icon_players_pair",
+      "x": 220,
+      "y": 753,
+      "width": 155,
+      "height": 129,
+      "purpose": "Player-count indicator",
+      "scalable": false
+    },
+    {
+      "name": "icon_refresh",
+      "x": 383,
+      "y": 753,
+      "width": 150,
+      "height": 158,
+      "purpose": "Refresh action",
+      "scalable": false
+    },
+    {
+      "name": "icon_objective",
+      "x": 541,
+      "y": 753,
+      "width": 180,
+      "height": 183,
+      "purpose": "Objective/rules marker",
+      "scalable": false
+    },
+    {
+      "name": "icon_clock",
+      "x": 729,
+      "y": 753,
+      "width": 168,
+      "height": 172,
+      "purpose": "Round-time marker",
+      "scalable": false
+    },
+    {
+      "name": "icon_speaker",
+      "x": 8,
+      "y": 944,
+      "width": 155,
+      "height": 141,
+      "purpose": "Audio/quick-match marker",
+      "scalable": false
+    }
+  ],
+  "files": {
+    "izombie_lobby_sprites.png": {
+      "bytes": 818806,
+      "sha256": "a948303cd8c5d223138d8d5cd4909206bb08e38ac9857b148d704a13ac7733e0"
+    },
+    "izombie_lobby_sprites.atlas": {
+      "bytes": 2054,
+      "sha256": "75ee6e3ffc88ee99a377cd9377b26c0130fac444b8bac65bff473bbc4f0bdbee"
+    }
+  }
+}

@@ -3,6 +3,7 @@ package com.ussr.pvz.view.hud;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
@@ -40,8 +40,8 @@ public class GlobalInviteOverlay extends Table {
     private static final String TAB_GREEN      = "IMAGE_UI_SETTINGS_TAB_GREEN";
     private static final String TAB_DARK       = "IMAGE_UI_SETTINGS_TAB_DARK";
     private static final String VALUE_PANEL    = "IMAGE_UI_SETTINGS_VALUE_PANEL";
-    private static final String APPLY          = "IMAGE_UI_SETTINGS_BUTTON_APPLY";   // Accept
-    private static final String RESET          = "IMAGE_UI_SETTINGS_BUTTON_RESET";   // Reject / OK
+    private static final String ACCEPT_BUTTON  = "button_green";
+    private static final String REJECT_BUTTON  = "button_orange";
 
     // ── Listener ──────────────────────────────────────────────────────────────
 
@@ -75,6 +75,7 @@ public class GlobalInviteOverlay extends Table {
 
     private final LobbyService lobbyService = new LobbyService();
     private final TextureBank  textures;
+    private final TextureAtlas lobbyAtlas;
 
     // ── Widgets ───────────────────────────────────────────────────────────────
 
@@ -94,6 +95,9 @@ public class GlobalInviteOverlay extends Table {
 
     public GlobalInviteOverlay(Skin skin) {
         this.textures = new TextureBank("768", Gdx.files.local("pvz-assets"));
+        this.lobbyAtlas = new TextureAtlas(Gdx.files.local(
+                "assets/multi player lobby/izombie_lobby_sprites.atlas"
+        ));
 
         setFillParent(true);
         setTouchable(Touchable.disabled);
@@ -101,7 +105,7 @@ public class GlobalInviteOverlay extends Table {
         // ── Card shell (CONTENT_PANEL nine-patch, same as SettingMenu panel) ──
         card = new Table();
         card.setBackground(panelDrawable(CONTENT_PANEL, 28, 28, 28, 28));
-        card.pad(16f, 22f, 16f, 22f);
+        card.pad(10f, 14f, 10f, 14f);
 
         // ── Header bar: icon + title ──────────────────────────────────────────
         titleLabel = new Label("", skin, "medium_outline");
@@ -122,44 +126,44 @@ public class GlobalInviteOverlay extends Table {
 
         Table bodyCard = new Table();
         bodyCard.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
-        bodyCard.pad(12f, 16f, 12f, 16f);
-        bodyCard.add(bodyLabel).width(300f);
+        bodyCard.pad(8f, 12f, 8f, 12f);
+        bodyCard.add(bodyLabel).width(250f);
 
         // ── Buttons ───────────────────────────────────────────────────────────
-        // Accept — APPLY texture (green-ish)
+        // Accept — blank green lobby button with a separate caption.
         acceptLabel = new Label("✔  Accept", skin, "default");
         acceptLabel.setColor(new Color(0.25f, 0.95f, 0.35f, 1f));
-        acceptButton = iconButton(APPLY);
+        acceptButton = lobbyButton(ACCEPT_BUTTON);
         acceptButton.addListener(click(this::onAccept));
 
-        // Reject — RESET texture (reddish tint)
+        // Reject — blank orange lobby button with a separate caption.
         rejectLabel = new Label("✗  Reject", skin, "default");
         rejectLabel.setColor(new Color(0.95f, 0.30f, 0.25f, 1f));
-        rejectButton = iconButton(RESET);
+        rejectButton = lobbyButton(REJECT_BUTTON);
         rejectButton.addListener(click(this::onReject));
 
-        // OK — RESET texture (neutral)
+        // OK — same blank orange lobby button.
         okLabel = new Label("OK", skin, "default");
         okLabel.setAlignment(Align.center);
-        okButton = iconButton(RESET);
+        okButton = lobbyButton(REJECT_BUTTON);
         okButton.addListener(click(this::onOk));
 
         // ── Button row ────────────────────────────────────────────────────────
         Table buttons = new Table();
-        buttons.add(labeledButton(acceptButton, acceptLabel)).width(148f).height(58f).padRight(10f);
-        buttons.add(labeledButton(rejectButton, rejectLabel)).width(148f).height(58f);
-        buttons.add(labeledButton(okButton,     okLabel    )).width(148f).height(58f);
+        buttons.add(labeledButton(acceptButton, acceptLabel)).width(108f).height(44f).padRight(7f);
+        buttons.add(labeledButton(rejectButton, rejectLabel)).width(108f).height(44f);
+        buttons.add(labeledButton(okButton,     okLabel    )).width(108f).height(44f);
 
         // ── Assemble card ─────────────────────────────────────────────────────
-        card.add(titleRow ).width(340f).height(52f).padBottom(12f).row();
-        card.add(bodyCard ).padBottom(14f).row();
-        card.add(buttons  ).padBottom(4f).row();
+        card.add(titleRow ).width(280f).height(42f).padBottom(8f).row();
+        card.add(bodyCard ).padBottom(9f).row();
+        card.add(buttons  ).padBottom(2f).row();
 
         // Anchor to bottom-right corner
         Table anchor = new Table();
         anchor.setFillParent(true);
         anchor.bottom().right();
-        anchor.add(card).pad(28f);
+        anchor.add(card).pad(18f);
         addActor(anchor);
 
         hideCard();
@@ -383,10 +387,6 @@ public class GlobalInviteOverlay extends Table {
         return i;
     }
 
-    private TextureRegionDrawable drawable(String name) {
-        return new TextureRegionDrawable(required(name));
-    }
-
     private NinePatchDrawable panelDrawable(String name, int left, int right, int top, int bottom) {
         return new NinePatchDrawable(new NinePatch(required(name), left, right, top, bottom));
     }
@@ -395,14 +395,13 @@ public class GlobalInviteOverlay extends Table {
      * An ImageButton with tab-style up/down states (mirrors SettingMenu's imageButton helper).
      * The visible label is layered on top separately via {@link #labeledButton}.
      */
-    private ImageButton iconButton(String name) {
-        TextureRegionDrawable up = drawable(name);
+    /** A scalable button from the dedicated lobby atlas (its artwork has no baked caption). */
+    private ImageButton lobbyButton(String name) {
+        NinePatchDrawable up = new NinePatchDrawable(lobbyAtlas.createPatch(name));
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.imageUp   = up;
-        style.imageDown = up.tint(new Color(0.78f, 0.78f, 0.78f, 1f));
-        ImageButton b = new ImageButton(style);
-        b.getImage().setScaling(Scaling.fit);
-        return b;
+        style.up = up;
+        style.down = up.tint(new Color(0.78f, 0.78f, 0.78f, 1f));
+        return new ImageButton(style);
     }
 
     /**
@@ -411,9 +410,11 @@ public class GlobalInviteOverlay extends Table {
      */
     private Stack labeledButton(ImageButton button, Label label) {
         label.setAlignment(Align.center);
+        label.setTouchable(Touchable.disabled);
         Stack s = new Stack();
         s.add(button);
         Table centred = new Table();
+        centred.setTouchable(Touchable.disabled);
         centred.add(label).center();
         s.add(centred);
         return s;
