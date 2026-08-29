@@ -1,0 +1,124 @@
+izombie_lobby_sprites.png
+size: 1024,2048
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+frame_main
+  rotate: false
+  xy: 8, 8
+  size: 264, 259
+  orig: 264, 259
+  offset: 0, 0
+  index: -1
+  split: 66, 66, 64, 64
+header_stone
+  rotate: false
+  xy: 280, 8
+  size: 250, 84
+  orig: 250, 84
+  offset: 0, 0
+  index: -1
+  split: 62, 62, 21, 21
+header_purple
+  rotate: false
+  xy: 538, 8
+  size: 255, 84
+  orig: 255, 84
+  offset: 0, 0
+  index: -1
+  split: 63, 63, 21, 21
+panel_parchment
+  rotate: false
+  xy: 8, 275
+  size: 225, 229
+  orig: 225, 229
+  offset: 0, 0
+  index: -1
+  split: 56, 56, 57, 57
+button_green
+  rotate: false
+  xy: 241, 275
+  size: 267, 97
+  orig: 267, 97
+  offset: 0, 0
+  index: -1
+  split: 66, 66, 24, 24
+button_orange
+  rotate: false
+  xy: 516, 275
+  size: 251, 98
+  orig: 251, 98
+  offset: 0, 0
+  index: -1
+  split: 62, 62, 24, 24
+button_blue
+  rotate: false
+  xy: 8, 512
+  size: 243, 96
+  orig: 243, 96
+  offset: 0, 0
+  index: -1
+  split: 60, 60, 24, 24
+button_close
+  rotate: false
+  xy: 259, 512
+  size: 175, 177
+  orig: 175, 177
+  offset: 0, 0
+  index: -1
+button_back
+  rotate: false
+  xy: 442, 512
+  size: 178, 182
+  orig: 178, 182
+  offset: 0, 0
+  index: -1
+badge_izombie
+  rotate: false
+  xy: 628, 512
+  size: 209, 233
+  orig: 209, 233
+  offset: 0, 0
+  index: -1
+icon_players_online
+  rotate: false
+  xy: 8, 753
+  size: 204, 130
+  orig: 204, 130
+  offset: 0, 0
+  index: -1
+icon_players_pair
+  rotate: false
+  xy: 220, 753
+  size: 155, 129
+  orig: 155, 129
+  offset: 0, 0
+  index: -1
+icon_refresh
+  rotate: false
+  xy: 383, 753
+  size: 150, 158
+  orig: 150, 158
+  offset: 0, 0
+  index: -1
+icon_objective
+  rotate: false
+  xy: 541, 753
+  size: 180, 183
+  orig: 180, 183
+  offset: 0, 0
+  index: -1
+icon_clock
+  rotate: false
+  xy: 729, 753
+  size: 168, 172
+  orig: 168, 172
+  offset: 0, 0
+  index: -1
+icon_speaker
+  rotate: false
+  xy: 8, 944
+  size: 155, 141
+  orig: 155, 141
+  offset: 0, 0
+  index: -1

@@ -30,7 +30,7 @@ public enum MenuState {
 
     public boolean showsGlobalHud() {
         return switch (this) {
-            case LOGIN, REGISTER -> false;
+            case LOGIN, REGISTER, LOBBY -> false;
             default -> true;
         };
     }
