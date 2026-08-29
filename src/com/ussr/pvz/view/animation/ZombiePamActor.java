@@ -97,6 +97,10 @@ public class ZombiePamActor extends PamActor {
         this.dangerAlpha = Math.max(0f, Math.min(1f, dangerAlpha));
     }
 
+    public void setFrozenSolid(boolean frozenSolid) {
+        setPaused(frozenSolid);
+    }
+
     // -------------------------------------------------------------------------
     // act — advance glow timer
     // -------------------------------------------------------------------------

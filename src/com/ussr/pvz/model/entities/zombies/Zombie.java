@@ -172,7 +172,7 @@ public class Zombie extends GameEntity implements Damageable {
         this.zombossController = zombossController;
     }
 
-    public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED}
+    public enum Status{NORMAL , FREEZE , FIRED , POISONED , BUTTER , HYPNOTIZED , FROZEN_SOLID}
     private Status status = Status.NORMAL;
 
     private Vulnerability vulnerabilityState = Vulnerability.FULLY_VULNERABLE;
@@ -233,7 +233,8 @@ public class Zombie extends GameEntity implements Damageable {
             if (status == Status.FREEZE
                     || status == Status.BUTTER
                     || status == Status.POISONED
-                    || status == Status.FIRED) {
+                    || status == Status.FIRED
+                    || status == Status.FROZEN_SOLID) {
                 status = Status.NORMAL;
                 poisonTickDamage = 0;
             }
@@ -253,6 +254,10 @@ public class Zombie extends GameEntity implements Damageable {
             GameSession session,
             float delta
     ) {
+        if (status == Status.FROZEN_SOLID) {
+            return;
+        }
+
         float movementDelta = delta * getMovementSpeedMultiplier();
 
         if (updateSlipperySlide(movementDelta)) {
@@ -291,6 +296,7 @@ public class Zombie extends GameEntity implements Damageable {
         return switch (status) {
             case FREEZE -> FREEZE_SPEED_MULTIPLIER;
             case BUTTER -> BUTTER_SPEED_MULTIPLIER;
+            case FROZEN_SOLID -> 0f;
             default -> 1.0f;
         };
     }
@@ -571,6 +577,7 @@ public class Zombie extends GameEntity implements Damageable {
             case BUTTER -> DEFAULT_BUTTER_DURATION;
             case POISONED -> DEFAULT_POISON_DURATION;
             case FIRED -> DEFAULT_FIRE_DURATION;
+            case FROZEN_SOLID -> DEFAULT_FREEZE_DURATION;
             default -> 0.0;
         };
     }
@@ -584,6 +591,10 @@ public class Zombie extends GameEntity implements Damageable {
 
     public double getStatusTimeRemaining() {
         return statusTimeRemaining;
+    }
+
+    public boolean isAnimationPaused() {
+        return status == Status.FROZEN_SOLID;
     }
 
     public void setArmor(Armor armor) {

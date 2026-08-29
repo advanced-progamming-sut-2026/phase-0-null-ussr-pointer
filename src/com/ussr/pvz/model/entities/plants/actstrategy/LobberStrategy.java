@@ -1,5 +1,9 @@
 package com.ussr.pvz.model.entities.plants.actstrategy;
 
+import com.ussr.pvz.model.board.structures.Grave;
+import com.ussr.pvz.model.board.structures.InteractableStructure;
+import com.ussr.pvz.model.engine.Damageable;
+import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
@@ -18,7 +22,7 @@ public class LobberStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-        Zombie target = findNearestInLane(user, session);
+        GameEntity target = findTargetInLane(user, session);
         if (target == null) return;
 
         Vec2 startPos = user.getPosition();
@@ -30,11 +34,12 @@ public class LobberStrategy implements ActStrategy {
         Vec2 initialVelocity = new Vec2(HORIZONTAL_SPEED, initialVelocityY);
         HitEffectStrategy hitEffect = buildHitEffect(user);
         Projectile projectile = new Projectile(
+                (Damageable) target,
                 user.getPosition(),
-                initialVelocity, target,
+                initialVelocity,
                 user.getDamage(),
                 new ArcMove(GRAVITY),
-                hitEffect,user
+                hitEffect, user
         );
         projectile.setVisualLaunchOrigin(user.getProjectileOrigin(0));
         session.addProjectile(projectile);
@@ -60,8 +65,13 @@ public class LobberStrategy implements ActStrategy {
         return new NormalHit(areaLength);
     }
 
+    private GameEntity findTargetInLane(Plant user, GameSession session) {
+        Zombie zombie = findNearestZombieInLane(user, session);
+        if (zombie != null) return zombie;
+        return findNearestGraveInLane(user, session);
+    }
 
-    private Zombie findNearestInLane(Plant user, GameSession session) {
+    private Zombie findNearestZombieInLane(Plant user, GameSession session) {
         double plantRow = user.getPosition().y();
         Zombie nearest = null;
         double minX = Double.MAX_VALUE;
@@ -74,6 +84,28 @@ public class LobberStrategy implements ActStrategy {
                 if (zp.x() < minX) {
                     minX = zp.x();
                     nearest = zombie;
+                }
+            }
+        }
+        return nearest;
+    }
+
+    private Grave findNearestGraveInLane(Plant user, GameSession session) {
+        if (session.getLawn() == null) return null;
+
+        double plantRow = user.getPosition().y();
+        Grave nearest = null;
+        double minX = Double.MAX_VALUE;
+
+        for (InteractableStructure structure : session.getLawn().getAllInteractable()) {
+            if (!(structure instanceof Grave grave) || !grave.isAlive()) continue;
+            Vec2 gp = grave.getPosition();
+            if (gp == null) continue;
+
+            if (Math.abs(gp.y() - plantRow) < 0.5 && gp.x() > user.getPosition().x()) {
+                if (gp.x() < minX) {
+                    minX = gp.x();
+                    nearest = grave;
                 }
             }
         }

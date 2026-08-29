@@ -191,8 +191,13 @@ public class ExplodeStrategy implements ActStrategy {
                 double extraDuration = user.getSpecialUpgradeValue(
                         SpecialUpgrade.FREEZE_DURATION_EXT)
                         + user.getSpecialUpgradeValue(SpecialUpgrade.CHILL_DURATION_EXT);
-                zombie.setStatus(Zombie.Status.FREEZE,
-                        Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
+                if (isInstantIceTrap(user)) {
+                    zombie.setStatus(Zombie.Status.FROZEN_SOLID,
+                            Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
+                } else {
+                    zombie.setStatus(Zombie.Status.FREEZE,
+                            Zombie.DEFAULT_FREEZE_DURATION + extraDuration);
+                }
             } else if (user.getTags().contains(Tag.FIRE)) {
                 zombie.setStatus(Zombie.Status.FIRED, Zombie.DEFAULT_FIRE_DURATION);
             }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
 import com.ussr.pvz.model.App;
@@ -87,7 +88,7 @@ public class InGameHud extends Table implements Disposable {
         topRow.setTouchable(Touchable.childrenOnly);
         topRow.top().left();
         topRow.add(seedBankHud).top().left().pad(0f, 4f, 0f, 0f);
-        topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f);
+        topRow.add(objectives.topBarWidget()).top().center().expandX().padTop(0f).align(Align.top);
         topRow.add(upgradePanel).top().right().height(82f).padRight(6f);
         topRow.add(iZombieHud).top().right().pad(0f, 0f, 0f, 4f);
 

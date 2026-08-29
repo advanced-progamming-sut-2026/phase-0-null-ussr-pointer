@@ -2,6 +2,8 @@ package com.ussr.pvz.model.level.ai;
 
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +11,9 @@ import java.util.List;
 public class ZombieAIManager {
     private final List<WaveDirector> activeDirectors = new ArrayList<>();
     private int nextWaveIndexToSpawn = 0;
+
+    private static final double INITIAL_WAVE_DELAY = 15.0;
+    private double elapsedSinceStart = 0.0;
 
     private final Difficulty difficulty;
     private final double costMultiplier;
@@ -44,8 +49,16 @@ public class ZombieAIManager {
         List<Level.Wave> waves = level.getWaves();
         if (waves == null || waves.isEmpty()) return;
 
-        // 1. Kick off the first wave if none are active and we have waves left
-        if (activeDirectors.isEmpty() && nextWaveIndexToSpawn < waves.size()) {
+        elapsedSinceStart += deltaTime;
+
+        boolean isConveyorLevel = level.getDeliveryStrategy()
+                instanceof ConveyorDeliveryStrategy;
+        boolean firstWaveDelayPassed = nextWaveIndexToSpawn > 0
+                || isConveyorLevel
+                || elapsedSinceStart >= INITIAL_WAVE_DELAY;
+        if (firstWaveDelayPassed
+                && activeDirectors.isEmpty()
+                && nextWaveIndexToSpawn < waves.size()) {
             spawnNextWaveDirector(waves, session);
         }
 
@@ -134,5 +147,6 @@ public class ZombieAIManager {
         nextWaveIndexToSpawn = 0;
         completedBudget = 0L;
         activeDirectors.clear();
+        elapsedSinceStart = 0.0;
     }
 }

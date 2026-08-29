@@ -409,6 +409,8 @@ public class EntityRenderLayer extends Group {
 
                 zombieActor.setArmor(zombie.getArmor());
 
+                zombieActor.setFrozenSolid(zombie.isAnimationPaused());
+
                 // --- Glow effect -------------------------------------------
                 // Stay glowing until the zombie actually dies (death anim may
                 // still be playing after isAlive goes false).

@@ -403,6 +403,7 @@ public class Plant extends GameEntity implements Damageable {
 //        if(dealer != null)
 //            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
         if (!isAlive || state == PlantState.DYING) return;
+        if (isIndestructibleIceTrap()) return;
 
         int remainingDamage = damage;
 
@@ -1118,5 +1119,11 @@ public class Plant extends GameEntity implements Damageable {
         this.animationController.playIdle();
         this.state = PlantState.ACTIVE;
         this.justTransformed = true;
+    }
+
+    private boolean isIndestructibleIceTrap() {
+        return this.getTags().contains(Tag.ICE)
+                && this.getTags().contains(Tag.TRAP)
+                && this.getDamage() <= 0;
     }
 }

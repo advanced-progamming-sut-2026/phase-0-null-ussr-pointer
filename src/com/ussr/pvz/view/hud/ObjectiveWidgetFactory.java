@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.ussr.pvz.model.App;
@@ -63,6 +64,11 @@ public class ObjectiveWidgetFactory {
                             (BeghouledBehavior) behavior, skin
                     )).pad(10f);
                     break;
+                case "LoveYourPlantsBehavior":
+                    topBar.add(new PlantsRemainingCounter(
+                            (com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior) behavior, skin
+                    )).pad(10f);
+                    break;
                 // TimedWarBehavior, EndlessBehavior, MeowBehavior, AllowedPlantsLost →
                 // all communicated via LevelIntroOverlay, not the top bar.
             }
@@ -113,14 +119,14 @@ public class ObjectiveWidgetFactory {
     // =========================================================================
     // BeghouledMatchCounter — live "X / Y matches" label shown in top bar
     // =========================================================================
-    private static class BeghouledMatchCounter extends com.badlogic.gdx.scenes.scene2d.ui.Table {
+    private static class BeghouledMatchCounter extends Table {
         private final BeghouledBehavior behavior;
-        private final com.badlogic.gdx.scenes.scene2d.ui.Label label;
+        private final Label label;
 
         BeghouledMatchCounter(BeghouledBehavior behavior,
-                              com.badlogic.gdx.scenes.scene2d.ui.Skin skin) {
+                              Skin skin) {
             this.behavior = behavior;
-            label = new com.badlogic.gdx.scenes.scene2d.ui.Label("", skin, "medium_outline");
+            label = new Label("", skin, "medium_outline");
             label.setAlignment(com.badlogic.gdx.utils.Align.center);
             label.setColor(new Color(1f, 0.95f, 0.3f, 1f));
             add(label);
@@ -130,6 +136,30 @@ public class ObjectiveWidgetFactory {
         public void act(float delta) {
             super.act(delta);
             label.setText(behavior.getCurrentMatches() + " / " + behavior.getTargetMatches() + " matches");
+        }
+    }
+
+    private static class PlantsRemainingCounter extends Table {
+        private final com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior behavior;
+        private final Label label;
+
+        PlantsRemainingCounter(com.ussr.pvz.model.level.behavior.LoveYourPlantsBehavior behavior,
+                               Skin skin) {
+            this.behavior = behavior;
+            top();
+            label = new Label("", skin, "big_outline");
+            label.setAlignment(com.badlogic.gdx.utils.Align.center);
+            label.setColor(Color.WHITE);
+            label.setFontScale(1f);
+            add(label).top().padTop(6f);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            int remaining = Math.max(0,
+                    behavior.getMaxAllowedDeaths() - behavior.getCounter());
+            label.setText(remaining + " plant" + (remaining == 1 ? "" : "s") + " left");
         }
     }
 

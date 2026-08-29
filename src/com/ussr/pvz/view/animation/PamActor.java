@@ -29,10 +29,19 @@ public class PamActor extends Actor {
     protected Map<String, Boolean> partVisibility;
     protected float rotationDegrees = 0f;
     private boolean greyTint = false;
+    private boolean paused = false;
     private static final Color IMITATED_TINT = new Color(0.55f, 0.55f, 0.55f, 1f);
 
     public void setGreyTint(boolean greyTint) {
         this.greyTint = greyTint;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     public PamActor(PamPlayer player, String pamPath, String preferredClip) {
@@ -150,7 +159,7 @@ public class PamActor extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (playing) {
+        if (playing && !paused) {
             stateTime += delta;
             if (!looping && clipRef != null) {
                 float duration = clipRef.duration; // whatever the actual method is on ClipRef
