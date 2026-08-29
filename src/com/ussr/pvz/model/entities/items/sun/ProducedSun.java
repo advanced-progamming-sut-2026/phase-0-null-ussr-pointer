@@ -28,6 +28,11 @@ public class ProducedSun extends GroundItem {
     private boolean popping = true;
     private float popElapsed = 0f;
 
+    private static final float POP_DURATION = 0.7f;
+
+    private boolean popping = true;
+    private float popElapsed = 0f;
+
     public ProducedSun(int x, int y, int value, String sourcePlantName) {
         this(x, y, value, sourcePlantName, 0f, 0f);
     }
@@ -49,6 +54,24 @@ public class ProducedSun extends GroundItem {
 
     public float getOffsetY() {
         return offsetY;
+    }
+
+    @Override
+    public void update(float delta) {
+        if (!popping) return;
+        popElapsed += delta;
+        if (popElapsed >= POP_DURATION) {
+            popElapsed = POP_DURATION;
+            popping = false;
+        }
+    }
+
+    public boolean isPopping() {
+        return popping;
+    }
+
+    public float getPopProgress() {
+        return popElapsed / POP_DURATION;
     }
 
     @Override
