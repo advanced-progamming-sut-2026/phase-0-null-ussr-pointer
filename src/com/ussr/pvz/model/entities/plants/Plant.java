@@ -12,6 +12,7 @@ import com.ussr.pvz.model.entities.plants.actstrategy.ImitaterStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.WallNutStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.MeleeStrategy;
 import com.ussr.pvz.model.entities.plants.actstrategy.ShockwaveStrategy;
+import com.ussr.pvz.model.entities.plants.actstrategy.SunProduceStrategy;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodEffect;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
@@ -225,6 +226,8 @@ public class Plant extends GameEntity implements Damageable {
         this.pamPath = blueprint.pamPath;
         if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
             this.internalTimer = this.actionInterval;
+        } else if (this.actStrategy instanceof SunProduceStrategy) {
+            this.internalTimer = this.actionInterval / 2.0;
         } else {
             this.internalTimer = 0.0;
         }
@@ -1106,6 +1109,8 @@ public class Plant extends GameEntity implements Damageable {
 
         if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
             this.internalTimer = this.actionInterval;
+        } else if (this.actStrategy instanceof SunProduceStrategy) {
+            this.internalTimer = this.actionInterval / 2.0;
         } else {
             this.internalTimer = 0.0;
         }

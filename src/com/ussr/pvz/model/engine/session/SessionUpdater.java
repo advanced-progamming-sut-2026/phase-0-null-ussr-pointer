@@ -115,10 +115,7 @@ public final class SessionUpdater {
     }
 
     private double calculateSunInterval() {
-        return Math.max(
-                6.0,
-                12.0 - 0.05 * clock.getElapsedSeconds()
-        );
+        return 10.0 + Math.random() * 2.0;
     }
 
     private double difficultyMultiplier() {

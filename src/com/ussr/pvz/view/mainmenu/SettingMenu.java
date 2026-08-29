@@ -569,7 +569,7 @@ public final class SettingMenu extends Table {
     }
 
     private void resetDefaults() {
-        difficulty = 2;
+        difficulty = 3;
         gameSpeed = 1f;
         masterVolume = 1f;
         grid = false;
@@ -611,7 +611,7 @@ public final class SettingMenu extends Table {
     }
 
     private int currentDifficulty() {
-        if (App.getAccount() == null) return 2;
+        if (App.getAccount() == null) return 3;
         return Math.max(
                 1,
                 Math.min(

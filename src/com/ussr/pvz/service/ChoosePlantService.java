@@ -52,7 +52,7 @@ public class ChoosePlantService {
         if (allPlants != null) {
             for (Map<String, Object> p : allPlants) {
                 String officialName = p.get("name").toString();
-                if (officialName.replaceAll("[\\s_]", "").toUpperCase().equals(strippedInput)) {
+                if (officialName.replaceAll("[\\s_\\-]", "").toUpperCase().equals(strippedInput)) {
                     return strippedInput;
                 }
             }

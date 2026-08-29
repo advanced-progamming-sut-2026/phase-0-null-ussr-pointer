@@ -27,8 +27,12 @@ public class AdventureProgress {
     // A static normalizer so it's fully self-contained and accessible anywhere
     public static String normalizeKey(String rawKey) {
         if (rawKey == null) return "";
-        return rawKey.trim().toUpperCase().replaceAll("[\\s_]", "");
+        return rawKey.trim().toUpperCase().replaceAll("[\\s_\\-]", "");
     }
+
+    private static final String[] STARTER_PLANT_IDS = {
+            "PEASHOOTER", "SUNFLOWER", "WALLNUT", "POTATOMINE", "ICEBERGLETTUCE", "GRAVEBUSTER"
+    };
 
     // UPDATED CONSTRUCTOR to accept completedLevels
     public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin,
@@ -53,6 +57,12 @@ public class AdventureProgress {
                             Math.max(0, Math.min(savedLevel, MAX_PLANT_LEVEL))
                     );
                 }
+            }
+        }
+
+        for (String starterId : STARTER_PLANT_IDS) {
+            if (this.plantLvls.getOrDefault(starterId, 0) <= 0) {
+                this.plantLvls.put(starterId, 1);
             }
         }
 

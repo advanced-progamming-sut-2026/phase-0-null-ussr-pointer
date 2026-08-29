@@ -63,7 +63,11 @@ public class ExplodeStrategy implements ActStrategy {
         if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
             userAct(user, targets);
             user.triggerActionAnimation();
-            user.setInternalTimer(0.0);
+            return;
+        }
+        if (isInstantIceTrap(user)) {
+            userAct(user, targets);
+            user.beginDeathAnimation(0.5f);
             return;
         }
         // Keep the entity rendered long enough for its one-shot explosion PAM
@@ -72,6 +76,12 @@ public class ExplodeStrategy implements ActStrategy {
         ArrayList<Zombie> impactTargets = new ArrayList<>(targets);
         user.beginDeathAnimation(2.0f, 1.75f,
                 () -> userAct(user, impactTargets));
+    }
+
+    private boolean isInstantIceTrap(Plant user) {
+        return user.getTags().contains(Tag.ICE)
+                && user.getTags().contains(Tag.TRAP)
+                && user.getDamage() <= 0;
     }
 
     private boolean isZombieTouch(Plant user, GameSession session) {

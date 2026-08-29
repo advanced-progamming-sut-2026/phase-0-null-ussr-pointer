@@ -39,8 +39,6 @@ public class ShockwaveStrategy implements ActStrategy {
         for (Zombie zombie : targets) {
             zombie.takeDamage(damage, user);
         }
-
-        user.setInternalTimer(0.0);
         user.triggerActionAnimation();
     }
 

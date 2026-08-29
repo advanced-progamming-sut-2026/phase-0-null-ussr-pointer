@@ -47,6 +47,8 @@ public class RegisterService {
         initialPlantMap.put("SUNFLOWER", 1);
         initialPlantMap.put("WALL-NUT", 1);
         initialPlantMap.put("POTATO MINE", 1);
+        initialPlantMap.put("ICEBERG LETTUCE", 1);
+        initialPlantMap.put("GRAVE BUSTER", 1);
 
         long now =
                 System.currentTimeMillis();

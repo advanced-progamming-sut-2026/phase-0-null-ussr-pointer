@@ -35,7 +35,6 @@ public class WallNutStrategy implements ActStrategy {
                 }
             }
         }
-        user.setInternalTimer(0.0);
     }
 
 

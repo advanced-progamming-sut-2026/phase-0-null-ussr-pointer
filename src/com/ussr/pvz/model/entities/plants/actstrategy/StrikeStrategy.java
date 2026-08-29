@@ -16,8 +16,6 @@ public class StrikeStrategy implements ActStrategy {
         Zombie target = findNearestInLane(user, session);
         if (target == null) return;
 
-        user.setInternalTimer(0.0);
-
         int pierceCount = (int) user.getAbilityValue();
         if(user.isBuffed()) pierceCount = Integer.MAX_VALUE;
         Projectile projectile = new Projectile(

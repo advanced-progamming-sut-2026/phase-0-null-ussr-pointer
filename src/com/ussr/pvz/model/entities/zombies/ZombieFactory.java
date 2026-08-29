@@ -197,7 +197,7 @@ public class ZombieFactory {
                 if ("standard".equals(prop.get("Formula"))) {
                     double arg1 = ((Number) prop.get("Arg1")).doubleValue();
                     double arg2 = ((Number) prop.get("Arg2")).doubleValue();
-                    double scale = arg1 + ((diff - 1) * arg2);
+                    double scale = arg1 + ((diff - 3) * arg2);
 
                     if ("Hitpoints".equals(prop.get("Key"))) {
                         zombie.setMaxHp((int)(zombie.getMaxHp() * scale));

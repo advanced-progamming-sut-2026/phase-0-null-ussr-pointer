@@ -26,12 +26,12 @@ public class ZombieAIManager {
 
         // Rule: Scale point budgets larger based on the exact intensity level selected
         this.costMultiplier = switch (difficultyLevel) {
-            case 1 -> 1.0;  // Baseline budget
-            case 2 -> 1.25; // +25% points
-            case 3 -> 1.50; // +50% points
-            case 4 -> 1.75; // +75% points
-            case 5 -> 2.00; // Double the wave budget size!
-            default -> 1.0;
+            case 1 -> 0.50;
+            case 2 -> 0.75;
+            case 3 -> 1.00;
+            case 4 -> 1.25;
+            case 5 -> 1.50;
+            default -> 1.00;
         };
     }
 

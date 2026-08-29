@@ -66,8 +66,6 @@ public class SunProduceStrategy implements ActStrategy {
             ProducedSun sun = new ProducedSun(x, y, sunValue, user.getName());
             session.addItem(sun);
         }
-
-        user.setInternalTimer(0.0);
         user.triggerProduceAnimation();
     }
 
