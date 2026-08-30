@@ -118,26 +118,16 @@ public class GlobalService {
                     + "to exit main menu";
         }
 
-        MenuState parent =
-                current.getParent();
+        MenuState previous =
+                App.goBackMenuState();
 
-        if (parent == null) {
-
-            App.setMenuState(null);
+        if (previous == null) {
 
             return "bye bye";
         }
 
-        if (current == MenuState.GAME &&
-                App.getGameSession() != null) {
-
-            App.setGameSession(null);
-        }
-
-        App.setMenuState(parent);
-
         return "menu changed to "
-                + parent.getName();
+                + previous.getName();
     }
 
 

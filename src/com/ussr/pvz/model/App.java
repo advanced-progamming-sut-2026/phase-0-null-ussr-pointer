@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,18 @@ public class App {
 
     private static MenuState menuState =
             MenuState.REGISTER;
+
+    /*
+     * Real navigation history for the "back" action (global HUD back arrow /
+     * legacy menu-exit command), so back always returns to wherever the user
+     * actually came from instead of a single hardcoded "parent" per menu.
+     *
+     * MenuState.getParent() is kept only as a fallback for when the stack is
+     * empty (e.g. right after login, or a menu entered without going through
+     * setMenuState's tracking).
+     */
+    private static final Deque<MenuState> menuHistory =
+            new ArrayDeque<>();
 
     /*
      * Client-side cache of the currently logged-in account.
@@ -147,6 +161,8 @@ public class App {
 
         App.account =
                 null;
+
+        menuHistory.clear();
     }
 
 
@@ -262,11 +278,78 @@ public class App {
 
 
     public static void setMenuState(
-            MenuState menuState
+            MenuState newState
     ) {
 
+        if (newState == App.menuState) {
+            return;
+        }
+
+        if (shouldRecordMenuHistory(App.menuState, newState)) {
+            menuHistory.push(App.menuState);
+        }
+
+        if (isMenuHistoryResetPoint(newState)) {
+            menuHistory.clear();
+        }
+
         App.menuState =
-                menuState;
+                newState;
+    }
+
+
+    public static MenuState goBackMenuState() {
+
+        MenuState current = App.menuState;
+
+        if (current == MenuState.GAME && App.gameSession != null) {
+            setGameSession(null);
+        }
+
+        MenuState previous =
+                menuHistory.isEmpty() ? null : menuHistory.pop();
+
+        if (previous == null) {
+            previous = current != null ? current.getParent() : null;
+        }
+
+        App.menuState = previous;
+
+        return previous;
+    }
+
+
+    private static boolean shouldRecordMenuHistory(
+            MenuState from,
+            MenuState to
+    ) {
+
+        if (from == null) {
+            return false;
+        }
+
+        if (isMenuHistoryResetPoint(to)) {
+            return false;
+        }
+
+        if (from == MenuState.LOGIN || from == MenuState.REGISTER) {
+            return false;
+        }
+
+        boolean enteringActiveGameplay =
+                to == MenuState.GAME && gameSession != null;
+
+        boolean leavingActiveGameplay =
+                from == MenuState.GAME && gameSession != null;
+
+        return !enteringActiveGameplay && !leavingActiveGameplay;
+    }
+
+
+    private static boolean isMenuHistoryResetPoint(MenuState state) {
+        return state == MenuState.MAIN
+                || state == MenuState.LOGIN
+                || state == MenuState.REGISTER;
     }
 
 

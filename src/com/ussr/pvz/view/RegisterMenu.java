@@ -392,8 +392,10 @@ public final class RegisterMenu extends FadingMenu {
                 controller.pickQuestion(request);
 
         switch (result.status()) {
-            case COMPLETED ->
-                    NotificationCenter.success(result.message());
+            case COMPLETED -> {
+                NotificationCenter.success(result.message());
+                App.setMenuState(MenuState.LOGIN);
+            }
 
             case ERROR ->
                     NotificationCenter.error(result.message());

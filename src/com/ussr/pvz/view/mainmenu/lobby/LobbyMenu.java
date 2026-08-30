@@ -31,6 +31,7 @@ public class LobbyMenu extends Table implements Disposable {
     private Table playerRows;
     private Label count, status;
     private Button find, cancelInvite, cancelSearch;
+    private Label coinLabel, gemLabel;
 
     public LobbyMenu(Skin skin, GlobalInviteOverlay overlay) {
         this.skin = skin;
@@ -68,11 +69,43 @@ public class LobbyMenu extends Table implements Disposable {
 
     private Actor title() {
         Table t = new Table(); t.setBackground(patch("header_stone"));
-        t.add().width(60);
+        t.add(currencyDisplay()).width(230).left().padLeft(10);
         t.add(label("MULTIPLAYER LOBBY", "medium_outline", Color.WHITE)).expandX();
         ImageButton close = imageButton("button_close"); close.addListener(click(this::leave));
         t.add(close).size(60);
         return t;
+    }
+
+    private Table currencyDisplay() {
+        coinLabel = label("", "medium_outline", Color.WHITE);
+        gemLabel  = label("", "medium_outline", Color.WHITE);
+
+        Image coinIcon = new Image(skin.getDrawable("image_ui_generic_coin_icon_small"));
+        Image gemIcon  = new Image(skin.getDrawable("image_ui_generic_gem_icon_small"));
+
+        Table row = new Table();
+        row.add(currencyCounter(coinIcon, coinLabel)).padRight(8);
+        row.add(currencyCounter(gemIcon, gemLabel));
+
+        refreshCurrencies();
+        return row;
+    }
+
+    private Table currencyCounter(Image icon, Label valueLabel) {
+        Table counter = new Table();
+        counter.add(icon).size(26).padRight(4);
+        counter.add(valueLabel).minWidth(48);
+        return counter;
+    }
+
+    private void refreshCurrencies() {
+        if (coinLabel == null || gemLabel == null) return;
+
+        com.ussr.pvz.model.account.Account account = App.getAccount();
+        if (account == null) return;
+
+        coinLabel.setText(account.getAdventureProgress().getCoin());
+        gemLabel.setText(account.getAdventureProgress().getGem());
     }
 
     private Table playerColumn() {
@@ -159,6 +192,7 @@ public class LobbyMenu extends Table implements Disposable {
     @Override public void act(float delta) {
         super.act(delta); timer += delta;
         if (timer >= POLL_SECONDS) { timer = 0; refresh(); }
+        refreshCurrencies();
     }
 
     private void refresh() { players = service.getOnlinePlayers(); rebuild(); }

@@ -204,7 +204,7 @@
             "Cabbage-pult",
             "Grave Buster",
             "Repeater",
-            "Twin Sunflower"
+            "Iceberg Lettuce"
           ],
           "rewardPlantAliases": [
             "Jalapeno",
@@ -227,6 +227,10 @@
             },
             {
               "id": "ZombieCrystalSkull",
+              "weight": 200
+            },
+            {
+              "id": "ZombieExplorer",
               "weight": 200
             }
           ],

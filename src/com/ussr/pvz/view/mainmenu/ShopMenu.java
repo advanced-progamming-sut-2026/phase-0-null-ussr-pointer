@@ -98,11 +98,11 @@ public class ShopMenu extends FadingMenu {
         if (backDrawable != null) {
             ImageButton imgBtn = new ImageButton(backDrawable);
             imgBtn.getImage().setScaling(Scaling.fit);
-            imgBtn.addListener(listener(() -> App.setMenuState(MenuState.GAME)));
+            imgBtn.addListener(listener(App::goBackMenuState));
             backButton = imgBtn;
         } else {
             TextButton txtBtn = new TextButton("Back", skin, "brown");
-            txtBtn.addListener(listener(() -> App.setMenuState(MenuState.GAME)));
+            txtBtn.addListener(listener(App::goBackMenuState));
             backButton = txtBtn;
         }
 

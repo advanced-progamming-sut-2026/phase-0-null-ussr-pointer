@@ -41,7 +41,7 @@ public enum MenuState {
             case GAME, SETTING, NETWORK, NEWS, PROFILE, TRAVEL_LOG -> MAIN;
             case COLLECTION, GREENHOUSE, LEADERBOARD,
                  CHOOSE_PLANT, LEVEL_SELECTION -> GAME;
-            case SHOP -> GREENHOUSE;
+            case SHOP -> GAME;
             case LOBBY  -> GAME;
             case REGISTER, MAIN -> null;
         };
