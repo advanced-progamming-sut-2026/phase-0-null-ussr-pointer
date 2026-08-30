@@ -6,7 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.ussr.pvz.controller.maincontroller.ProfileController;
+import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.account.Account;
+
+import java.util.function.Consumer;
 
 public final class ProfileEditTab extends Table {
     private final Skin skin;
@@ -169,31 +172,37 @@ public final class ProfileEditTab extends Table {
     }
 
     private void submitUsername() {
-        String result = controller.changeUsername(
-                usernameField.getText()
-        );
+        String newUsername = usernameField.getText().trim();
+        String result = controller.changeUsername(newUsername);
 
-        handleProfileResult(result);
+        handleProfileResult(result, account -> account.setName(newUsername));
     }
 
     private void submitNickname() {
-        String result = controller.changeNickname(
-                nicknameField.getText()
-        );
+        String newNickname = nicknameField.getText().trim();
+        String result = controller.changeNickname(newNickname);
 
-        handleProfileResult(result);
+        handleProfileResult(result, account -> account.setNickname(newNickname));
     }
 
     private void submitEmail() {
-        String result = controller.changeEmail(
-                emailField.getText()
-        );
+        String newEmail = emailField.getText().trim();
+        String result = controller.changeEmail(newEmail);
 
-        handleProfileResult(result);
+        handleProfileResult(result, account -> account.setEmail(newEmail));
     }
 
-    private void handleProfileResult(String result) {
+    private void handleProfileResult(
+            String result,
+            Consumer<Account> applyToCachedAccount
+    ) {
         if (ProfileUiFactory.showResult(result)) {
+            Account cachedAccount = App.getAccount();
+
+            if (cachedAccount != null) {
+                applyToCachedAccount.accept(cachedAccount);
+            }
+
             onProfileChanged.run();
         }
     }

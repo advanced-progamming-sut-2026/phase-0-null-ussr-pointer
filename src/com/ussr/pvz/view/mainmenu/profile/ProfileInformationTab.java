@@ -15,6 +15,9 @@ public final class ProfileInformationTab extends Table {
     private final Label emailValue;
     private final Label genderValue;
     private final Label completedLevelsValue;
+    private final Label gamesPlayedValue;
+    private final Label coinValue;
+    private final Label gemValue;
     private final Label scoreValue;
 
     public ProfileInformationTab(
@@ -29,6 +32,9 @@ public final class ProfileInformationTab extends Table {
         emailValue = createValueLabel();
         genderValue = createValueLabel();
         completedLevelsValue = createValueLabel();
+        gamesPlayedValue = createValueLabel();
+        coinValue = createValueLabel();
+        gemValue = createValueLabel();
         scoreValue = createValueLabel();
 
         emailValue.setWrap(true);
@@ -84,8 +90,26 @@ public final class ProfileInformationTab extends Table {
 
         addInformationRow(
                 card,
+                "Games Played",
+                gamesPlayedValue
+        );
+
+        addInformationRow(
+                card,
                 "Completed Levels",
                 completedLevelsValue
+        );
+
+        addInformationRow(
+                card,
+                "Coins",
+                coinValue
+        );
+
+        addInformationRow(
+                card,
+                "Gems",
+                gemValue
         );
 
         addInformationRow(
@@ -154,6 +178,21 @@ public final class ProfileInformationTab extends Table {
                         .size()
                         + " levels"
         );
+
+        gamesPlayedValue.setText(String.format(
+                "%,d",
+                account.getAdventureProgress().getGamesPlayed()
+        ));
+
+        coinValue.setText(String.format(
+                "%,d",
+                account.getAdventureProgress().getCoin()
+        ));
+
+        gemValue.setText(String.format(
+                "%,d",
+                account.getAdventureProgress().getGem()
+        ));
 
         scoreValue.setText(String.format(
                 "%,d",

@@ -25,6 +25,7 @@ import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.view.FadingMenu;
 import pvz.libpvz.textures.TextureBank;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShopMenu extends FadingMenu {
@@ -43,6 +44,17 @@ public class ShopMenu extends FadingMenu {
 
     private Label coinBalanceLabel;
     private Label gemBalanceLabel;
+    private final List<DailyOfferCountdown> dailyOfferCountdowns = new ArrayList<>();
+
+    private static final class DailyOfferCountdown {
+        final ShopItem item;
+        final Label label;
+
+        DailyOfferCountdown(ShopItem item, Label label) {
+            this.item = item;
+            this.label = label;
+        }
+    }
 
     public ShopMenu(Skin skin) {
         this(skin, new ShopController());
@@ -62,6 +74,7 @@ public class ShopMenu extends FadingMenu {
     private void buildShopUI() {
         clearChildren();
         setFillParent(true);
+        dailyOfferCountdowns.clear();
 
         Table dialogTable = new Table();
         dialogTable.setBackground(skin.getDrawable("image_ui_dialog_asset_dialogborder_10"));
@@ -179,6 +192,12 @@ public class ShopMenu extends FadingMenu {
         infoTable.add(costLabel).left().padTop(2f).row();
         infoTable.add(descLabel).growX().left().padTop(4f).row();
 
+        if (item.isDailyOffer()) {
+            Label countdownLabel = new Label(formatRemainingTime(item), skin, "secondary");
+            infoTable.add(countdownLabel).left().padTop(4f).row();
+            dailyOfferCountdowns.add(new DailyOfferCountdown(item, countdownLabel));
+        }
+
         card.add(infoTable).expandX().fillX().left();
 
         // Buy Action
@@ -257,6 +276,41 @@ public class ShopMenu extends FadingMenu {
         } else {
             NotificationCenter.success(result);
             overlay.remove();
+            refreshUI();
+        }
+    }
+
+    private String formatRemainingTime(ShopItem item) {
+        long remaining = item.getLastRefreshedAt() + ShopItem.DAILY_ROTATION_INTERVAL_MILLIS
+                - System.currentTimeMillis();
+        if (remaining < 0) remaining = 0;
+
+        long totalSeconds = remaining / 1000;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        return String.format("Resets in: %02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        updateDailyOfferCountdowns();
+    }
+
+    private void updateDailyOfferCountdowns() {
+        if (dailyOfferCountdowns.isEmpty()) return;
+
+        boolean anyRotationDue = false;
+        for (DailyOfferCountdown countdown : dailyOfferCountdowns) {
+            countdown.label.setText(formatRemainingTime(countdown.item));
+            if (countdown.item.isDailyRotationDue()) {
+                anyRotationDue = true;
+            }
+        }
+
+        if (anyRotationDue) {
             refreshUI();
         }
     }

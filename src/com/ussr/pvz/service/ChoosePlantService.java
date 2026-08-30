@@ -2,6 +2,7 @@ package com.ussr.pvz.service;
 
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.board.Lawn;
 import com.ussr.pvz.model.level.TerrainFactory;
@@ -206,6 +207,10 @@ public class ChoosePlantService {
         session.addSun(INITIAL_SUN);
         session.setProgressTracked(!App.isCheatedLevel());
         App.setGameSession(session);
+        Account account = App.getAccount();
+        if (account != null) {
+            account.getAdventureProgress().incrementGamesPlayed();
+        }
         // A new level always starts with every chosen packet ready. This also
         // repairs accounts loaded before max/current recharge were separated.
         session.removeAllCooldowns();

@@ -65,7 +65,8 @@ public class Account {
                 state.plantLvl(),
                 state.completedLevels() != null ? state.completedLevels() : new ArrayList<>(),
                 state.seedPackets(),
-                state.seenZombies()// <--- PASS HERE
+                state.seenZombies(),// <--- PASS HERE
+                state.gamesPlayed()
         );
 
         this.scoreRecord = new ScoreRecord(state.score());
@@ -141,7 +142,8 @@ public class Account {
                 this.questManager.exportProgressMap(),
                 this.lastLoginTime,
                 this.lastDailyResetTime,
-                adventureProgress.getCompletedLevels()
+                adventureProgress.getCompletedLevels(),
+                adventureProgress.getGamesPlayed()
         );
     }
 

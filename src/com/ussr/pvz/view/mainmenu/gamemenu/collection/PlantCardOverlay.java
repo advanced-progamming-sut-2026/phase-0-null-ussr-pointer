@@ -5,15 +5,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
+import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.CollectionService;
 import com.ussr.pvz.service.CollectionService.PlantData;
 import com.ussr.pvz.view.animation.PlantPamActor;
+import com.ussr.pvz.view.components.SeedPacketPurchaseOverlay;
 import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 
 public class PlantCardOverlay extends Dialog {
 
-    public PlantCardOverlay(PlantData plant, Skin skin, TextureBank textures, PamPlayer pamPlayer, TextureRegionDrawable dimBg, CollectionService service) {
+    public PlantCardOverlay(
+            PlantData plant,
+            Skin skin,
+            TextureBank textures,
+            PamPlayer pamPlayer,
+            TextureRegionDrawable dimBg,
+            CollectionService service,
+            Runnable onChanged
+    ) {
         super("", buildStyle(skin, dimBg));
 
         Table content = getContentTable();
@@ -67,11 +77,44 @@ public class PlantCardOverlay extends Dialog {
         getButtonTable().pad(20);
 
         if (plant.level > 0 && plant.level < 4) {
-            TextButton upgradeBtn = new TextButton("Upgrade (" + (plant.level * 1000) + " Coins)", skin, "green");
+            boolean hasEnoughPackets = currentPackets >= nextLevelCost;
+
+            TextButton upgradeBtn = new TextButton(
+                    "Upgrade (" + (plant.level * 1000) + " Coins)",
+                    skin,
+                    "green"
+            );
             upgradeBtn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    service.upgradePlant(new PlantTypeRequest(plant.id));
+                    if (!hasEnoughPackets) {
+                        com.badlogic.gdx.scenes.scene2d.Stage stage = getStage();
+                        hide();
+                        int missingPackets = nextLevelCost - currentPackets;
+                        int gemCost = CollectionService.seedPacketGemCost(missingPackets);
+
+                        new SeedPacketPurchaseOverlay(
+                                plant,
+                                missingPackets,
+                                gemCost,
+                                skin,
+                                dimBg,
+                                service,
+                                onChanged
+                        ).show(stage);
+                        return;
+                    }
+
+                    String result = service.upgradePlant(new PlantTypeRequest(plant.id));
+                    if (result != null && result.contains("Upgraded")) {
+                        NotificationCenter.success(plant.name + " upgraded!");
+                    } else {
+                        NotificationCenter.error(result);
+                    }
+
+                    if (onChanged != null) {
+                        onChanged.run();
+                    }
                     hide(); // Close dialog after action
                 }
             });
@@ -81,7 +124,16 @@ public class PlantCardOverlay extends Dialog {
             buyBtn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    service.purchasePlant(new PlantTypeRequest(plant.id));
+                    String result = service.purchasePlant(new PlantTypeRequest(plant.id));
+                    if (result != null && result.contains("Purchased")) {
+                        NotificationCenter.success(plant.name + " purchased!");
+                    } else {
+                        NotificationCenter.error(result);
+                    }
+
+                    if (onChanged != null) {
+                        onChanged.run();
+                    }
                     hide(); // Close dialog after action
                 }
             });

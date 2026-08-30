@@ -179,6 +179,33 @@ public class CollectionService {
         return "Upgraded!";
     }
 
+    public String buySeedPacketsWithGems(PlantTypeRequest request, int quantity) {
+        Account account = App.getAccount();
+        if (account == null) return "Please login first.";
+        if (quantity <= 0) return "Cannot upgrade.";
+
+        AdventureProgress progress = account.getAdventureProgress();
+        String canonicalName = ChoosePlantService.normalizePlantKey(request.type());
+
+        int gemCost = seedPacketGemCost(quantity);
+
+        if (progress.getGem() < gemCost) {
+            return "Not enough resources.";
+        }
+
+        progress.addGem(-gemCost);
+        progress.addSeedPackets(canonicalName, quantity);
+
+        return "Purchased!";
+    }
+
+    public static int seedPacketGemCost(int quantity) {
+        double gemsPerPacket = (double) com.ussr.pvz.model.shop.ShopItemType.SEED_PACK_SELECTIVE.getCost()
+                / com.ussr.pvz.model.shop.ShopItemType.SEED_PACK_SELECTIVE.getUnit();
+
+        return Math.max(1, (int) Math.ceil(quantity * gemsPerPacket));
+    }
+
     public String purchasePlant(PlantTypeRequest request) {
         Account account = App.getAccount();
         if (account == null) return "Please login first.";

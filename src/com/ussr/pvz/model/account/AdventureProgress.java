@@ -23,6 +23,7 @@ public class AdventureProgress {
     private final Map<String, Integer> seedPackets;
     private final List<Plant> accountPlants;
     private final List<String> completedLevels; // <--- ADDED FIELD
+    private int gamesPlayed;
 
     // A static normalizer so it's fully self-contained and accessible anywhere
     public static String normalizeKey(String rawKey) {
@@ -37,7 +38,7 @@ public class AdventureProgress {
     // UPDATED CONSTRUCTOR to accept completedLevels
     public AdventureProgress(int currentChapter, int currentLvl, int minigamesWon, int questsCompleted, int coin,
                              int gem, Map<String, Integer> rawPlantLvls, List<String> completedLevels
-            ,Map<String, Integer> seedPackets, List<String> seenZombies) {
+            ,Map<String, Integer> seedPackets, List<String> seenZombies, int gamesPlayed) {
         this.currentChapter = currentChapter;
         this.currentLvl = currentLvl;
         this.minigamesWon = minigamesWon;
@@ -69,6 +70,7 @@ public class AdventureProgress {
         this.seedPackets = seedPackets;
         this.seenZombies = seenZombies;
         this.accountPlants = new ArrayList<>();
+        this.gamesPlayed = Math.max(0, gamesPlayed);
 
         // Initialize completed levels list
         this.completedLevels = new ArrayList<>();
@@ -201,6 +203,18 @@ public class AdventureProgress {
 
     public void setMinigamesWon(int count) {
         this.minigamesWon = count;
+    }
+
+    public int getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public void incrementGamesPlayed() {
+        this.gamesPlayed++;
+    }
+
+    public void setGamesPlayed(int count) {
+        this.gamesPlayed = count;
     }
 
     public int getQuestsCompleted() {

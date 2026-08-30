@@ -86,7 +86,8 @@ public class RegisterService {
                         new HashMap<>(),
                         now,
                         now,
-                        new ArrayList<>()
+                        new ArrayList<>(),
+                        0
                 );
 
         return PendingRegistrationResult.success(

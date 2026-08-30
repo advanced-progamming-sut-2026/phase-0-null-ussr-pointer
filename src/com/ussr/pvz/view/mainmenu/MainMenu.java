@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Align;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.MenuState;
+import com.ussr.pvz.model.account.Account;
 import com.ussr.pvz.view.mainmenu.news.UnreadBadge;
 import pvz.libpvz.textures.TextureBank;
 
@@ -32,6 +33,8 @@ public class MainMenu extends Table {
             "IMAGE_MAINMENU_BACKGROUND";
     private static final String LOGO_REGION =
             "IMAGE_UI_MAINMENU_PVZ2_LOGO_HORIZONTAL";
+    private static final String PROFILE_PICTURE_DRAWABLE =
+            "image_ui_mainmenu_mm_playericon";
 
     private final Skin skin;
     private final TextureBank textures;
@@ -58,6 +61,7 @@ public class MainMenu extends Table {
         layers.add(createCenterActions());
         layers.add(createBottomActions());
         layers.add(createNavigation());
+        layers.add(createPlayerInfoLayer());
 
         add(layers).grow();
     }
@@ -93,6 +97,51 @@ public class MainMenu extends Table {
             );
         }
         return new Image(region);
+    }
+
+    private Table createPlayerInfoLayer() {
+        Table layer = new Table();
+        layer.top().left();
+        layer.add(createPlayerInfoBox())
+                .padTop(72f)
+                .padLeft(15f);
+        return layer;
+    }
+
+    private Table createPlayerInfoBox() {
+        Table box = new Table();
+        box.setBackground(
+                skin.getDrawable(
+                        "image_ui_dialog_asset_inner_bkgd_10"
+                )
+        );
+        box.setTouchable(Touchable.disabled);
+        box.pad(8f, 10f, 8f, 16f);
+
+        Image profilePicture = new Image(
+                skin.getDrawable(PROFILE_PICTURE_DRAWABLE)
+        );
+        profilePicture.setScaling(Scaling.fit);
+
+        Label usernameLabel = new Label(
+                currentUsername(),
+                skin,
+                "medium"
+        );
+
+        box.add(profilePicture).size(44f).padRight(10f);
+        box.add(usernameLabel);
+
+        return box;
+    }
+
+    private String currentUsername() {
+        Account account = App.getAccount();
+        if (account == null || account.getName() == null
+                || account.getName().isBlank()) {
+            return "Guest";
+        }
+        return account.getName();
     }
 
     private Table createNavigation() {

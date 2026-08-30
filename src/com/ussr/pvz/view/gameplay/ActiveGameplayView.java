@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.ussr.pvz.audio.AudioManager;
 import com.ussr.pvz.audio.GameplayMusicDirector;
 import com.ussr.pvz.controller.maincontroller.gamecontroller.GameplayController;
@@ -79,11 +80,12 @@ public class ActiveGameplayView extends Table implements Disposable {
             @Override
             public void act(float delta) {
                 boolean paused = controller.isPauseMenuOpen();
-                com.badlogic.gdx.utils.SnapshotArray<Actor> children = getChildren();
+                float scaledDelta = delta * getGameSpeedMultiplier();
+                SnapshotArray<Actor> children = getChildren();
                 Actor[] actors = children.begin();
                 for (int i = 0, n = children.size; i < n; i++) {
                     Actor child = actors[i];
-                    child.act(child == inGameHud ? delta : (paused ? 0f : delta));
+                    child.act(child == inGameHud ? delta : (paused ? 0f : scaledDelta));
                 }
                 children.end();
             }
@@ -168,12 +170,18 @@ public class ActiveGameplayView extends Table implements Disposable {
         if (session == null || session.isGameOver()) return;
 
         if (!controller.isPaused()) {
-            accumulator += delta;
+            accumulator += delta * getGameSpeedMultiplier();
             while (accumulator >= TICK_RATE) {
                 session.update(TICK_RATE);
                 accumulator -= TICK_RATE;
             }
         }
+    }
+
+    private float getGameSpeedMultiplier() {
+        if (App.getAccount() == null) return 1f;
+        float speed = App.getAccount().getGameSpeed();
+        return speed > 0f ? speed : 1f;
     }
 
     @Override

@@ -32,6 +32,7 @@ public class ShopController {
      * Fetches all registered shop items for display.
      */
     public List<ShopItem> getShopItems() {
+        shopService.ensureDailyOffersRotated();
         return App.getShopManager().getShopItems();
     }
 

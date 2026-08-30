@@ -2,6 +2,8 @@ package com.ussr.pvz.view.mainmenu.gamemenu.chooseplant;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,9 +15,11 @@ import com.badlogic.gdx.utils.Scaling;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.notification.NotificationCenter;
 import com.ussr.pvz.service.ChoosePlantService;
+import com.ussr.pvz.service.CollectionService;
 import com.ussr.pvz.service.CollectionService.PlantData;
 import com.ussr.pvz.view.FadingMenu;
 import com.ussr.pvz.view.components.PlantCard;
+import com.ussr.pvz.view.components.SeedPacketPurchaseOverlay;
 import pvz.libpvz.textures.TextureBank;
 
 import java.util.List;
@@ -31,6 +35,7 @@ public class ChoosePlantMenu extends FadingMenu {
     private final Skin skin;
     private final TextureBank textures;
     private final ChoosePlantService service;
+    private TextureRegionDrawable dimBackground;
 
     private Table selectedSlotsRow;
     private Table plantGrid;
@@ -43,7 +48,16 @@ public class ChoosePlantMenu extends FadingMenu {
         this.skin     = skin;
         this.textures = new TextureBank("ATLASES", Gdx.files.local("pvz-assets"));
         this.service  = new ChoosePlantService();
+        createDimBackground();
         buildUI();
+    }
+
+    private void createDimBackground() {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(new Color(0, 0, 0, 0.85f));
+        pixmap.fill();
+        dimBackground = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
     }
 
     // ── Top-level layout ──────────────────────────────────────────────────────
@@ -260,17 +274,24 @@ public class ChoosePlantMenu extends FadingMenu {
     }
 
     private Actor buildUpgradeButton(PlantData p) {
-        boolean canUpgrade = p.level > 0 && p.level < 4 && p.ownedPackets > 0;
-        int cost = p.level * 1000;
+        boolean upgradable = p.level > 0 && p.level < 4;
+        int coinCost = p.level * 1000;
+        int requiredPackets = p.level * 10;
+        boolean hasEnoughPackets = p.ownedPackets >= requiredPackets;
 
-        TextButton btn = new TextButton("UPGRADE  " + cost, skin, "green");
+        TextButton btn = new TextButton("UPGRADE  " + coinCost, skin, "green");
         btn.getLabel().setFontScale(0.8f);
-        btn.setColor(canUpgrade ? Color.WHITE : Color.GRAY);
+        btn.setColor(upgradable ? Color.WHITE : Color.GRAY);
 
-        if (canUpgrade) {
+        if (upgradable) {
             btn.addListener(new ClickListener() {
                 @Override public void clicked(InputEvent e, float x, float y) {
-                    String res = new com.ussr.pvz.service.CollectionService()
+                    if (!hasEnoughPackets) {
+                        showSeedPacketPurchaseOverlay(p, requiredPackets - p.ownedPackets);
+                        return;
+                    }
+
+                    String res = new CollectionService()
                             .upgradePlant(new com.ussr.pvz.model.dto.PlantTypeRequest(p.id));
                     if (res.contains("Upgraded")) {
                         NotificationCenter.success(p.name + " upgraded!");
@@ -285,6 +306,25 @@ public class ChoosePlantMenu extends FadingMenu {
             });
         }
         return btn;
+    }
+
+    private void showSeedPacketPurchaseOverlay(PlantData p, int missingPackets) {
+        int gemCost = CollectionService.seedPacketGemCost(missingPackets);
+
+        new SeedPacketPurchaseOverlay(
+                p,
+                missingPackets,
+                gemCost,
+                skin,
+                dimBackground,
+                new CollectionService(),
+                () -> {
+                    service.getSelectablePlants().stream()
+                            .filter(pl -> pl.id.equals(p.id))
+                            .findFirst().ifPresent(updated -> focusedPlant = updated);
+                    refresh();
+                }
+        ).show(getStage());
     }
 
     private Actor buildBoostButton(PlantData p) {

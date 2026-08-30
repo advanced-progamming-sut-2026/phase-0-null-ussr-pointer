@@ -51,11 +51,20 @@ public class ShopService {
         AdventureProgress adv = App.getAccount() != null ? App.getAccount().getAdventureProgress() : null;
         if (adv == null) return;
 
-        App.getShopManager().getShopItems().forEach(item -> {
+        boolean rotated = false;
+        for (ShopItem item : App.getShopManager().getShopItems()) {
             if (item.isDailyRotationDue()) {
                 item.rotateDaily(randomUnlockedPlant(adv));
+                rotated = true;
             }
-        });
+        }
+        if (rotated) {
+            App.getShopManager().saveToDisk();
+        }
+    }
+
+    public void ensureDailyOffersRotated() {
+        rotateDailyOffersIfNeeded();
     }
 
     private String makeItem(ShopItem item) {
@@ -97,6 +106,7 @@ public class ShopService {
 
         if (item.isDailyOffer()) {
             item.setExpired(true);
+            App.getShopManager().saveToDisk();
         }
 
         return result;

@@ -32,7 +32,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 public class ChapterCarousel extends Group {
     private static final float CARD_WIDTH = 180f;
-    private static final float CARD_HEIGHT = 250f;
+    private static final float CARD_HEIGHT = 285f;
     private static final float TURN_TIME = 0.28f;
 
     private final Skin skin;
@@ -172,6 +172,7 @@ public class ChapterCarousel extends Group {
         title.setTouchable(Touchable.disabled);
         card.add(image).width(170f).height(205f).row();
         card.add(title).width(180f).height(40f).padTop(4f);
+
         if (!unlocked) {
             Label locked = new Label("LOCKED", skin);
             locked.setColor(Color.LIGHT_GRAY);
@@ -179,7 +180,37 @@ public class ChapterCarousel extends Group {
             card.row();
             card.add(locked).padTop(2f);
         }
+
+        card.row();
+        card.add(createProgressLabel(chapter)).padTop(6f);
+
         return card;
+    }
+
+    private Label createProgressLabel(Chapter chapter) {
+        int totalLevels = chapter.getLevels().size();
+        int completedLevels = countCompletedLevels(chapter);
+
+        Label progress = new Label(
+                completedLevels + "/" + totalLevels, skin
+        );
+        progress.setColor(Color.LIGHT_GRAY);
+        progress.setTouchable(Touchable.disabled);
+        return progress;
+    }
+
+    private int countCompletedLevels(Chapter chapter) {
+        if (App.getAccount() == null
+                || App.getAccount().getAdventureProgress() == null) {
+            return 0;
+        }
+
+        long completed = chapter.getLevels().stream()
+                .filter(level -> App.getAccount().getAdventureProgress()
+                        .isLevelCompleted(level.getId()))
+                .count();
+
+        return (int) completed;
     }
 
     private ImageButton createImageButton(String regionName, boolean unlocked) {
@@ -204,9 +235,9 @@ public class ChapterCarousel extends Group {
         return App.getAccount() != null
                 && App.getAccount().getAdventureProgress() != null
                 && App.getAccount().getAdventureProgress().isChapterUnlocked(
-                        chapter,
-                        App.getLevelManager().getChapters()
-                );
+                chapter,
+                App.getLevelManager().getChapters()
+        );
     }
 
     private void clickCard(int index) {

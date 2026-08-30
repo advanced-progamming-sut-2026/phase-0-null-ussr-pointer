@@ -21,34 +21,55 @@ public class ZombieCardOverlay extends Dialog {
 
         // Add floor background
         if (textures.region("image_ui_dialog_asset_dialogtexture") != null) {
-            animStack.add(new Image(new TextureRegionDrawable(textures.region("image_ui_dialog_asset_dialogtexture"))));
+            Image floorImage = new Image(new TextureRegionDrawable(
+                    textures.region("image_ui_dialog_asset_dialogtexture")
+            ));
+            if (!zombie.encountered) {
+                floorImage.setColor(com.badlogic.gdx.graphics.Color.DARK_GRAY);
+            }
+            animStack.add(floorImage);
         }
 
-        // Add Zombie Animation
-        ZombiePamActor pamActor = new ZombiePamActor(pamPlayer, zombie.pamPath);
-        // Use the larger scale suitable for the overlay
-        pamActor.setPamScale(0.8f);
-        animStack.add(pamActor);
+        // Only show the animation for zombies the player has actually
+        // encountered; unmet zombies should reveal nothing.
+        if (zombie.encountered) {
+            ZombiePamActor pamActor = new ZombiePamActor(pamPlayer, zombie.pamPath);
+            // Use the larger scale suitable for the overlay
+            pamActor.setPamScale(0.8f);
+            animStack.add(pamActor);
+        }
 
         leftSide.add(animStack).size(200, 200);
 
         // Right Side: Title & Stats
-        rightSide.add(new Label(zombie.name, skin, "big_outline")).left().padBottom(15).row();
+        rightSide.add(new Label(
+                zombie.encountered ? zombie.name : "Unknown zombie",
+                skin,
+                "big_outline"
+        )).left().padBottom(15).row();
 
-        Table statsTable = new Table();
+        if (zombie.encountered) {
+            Table statsTable = new Table();
 
-        if (textures.region("image_ui_almanac_zombies_zombietoughness_icon") != null) {
-            statsTable.add(new Image(new TextureRegionDrawable(textures.region("image_ui_almanac_zombies_zombietoughness_icon")))).size(40, 40);
+            if (textures.region("image_ui_almanac_zombies_zombietoughness_icon") != null) {
+                statsTable.add(new Image(new TextureRegionDrawable(textures.region("image_ui_almanac_zombies_zombietoughness_icon")))).size(40, 40);
+            }
+            statsTable.add(new Label("Toughness:\n" + zombie.hitpoints, skin, "medium")).padRight(30);
+
+            if (textures.region("image_ui_almanac_zombies_zombiespeed_icon") != null) {
+                statsTable.add(new Image(new TextureRegionDrawable(textures.region("image_ui_almanac_zombies_zombiespeed_icon")))).size(40, 40);
+            }
+            statsTable.add(new Label("Speed:\n" + String.format("%.2f", zombie.speed), skin, "medium"));
+
+            rightSide.add(statsTable).left().padBottom(10).row();
+            rightSide.add(new Label("Attack Power (DPS): " + zombie.eatDPS, skin, "secondary")).left().row();
+        } else {
+            rightSide.add(new Label(
+                    "Meet it in battle to reveal its stats.",
+                    skin,
+                    "secondary"
+            )).left().row();
         }
-        statsTable.add(new Label("Toughness:\n" + zombie.hitpoints, skin, "medium")).padRight(30);
-
-        if (textures.region("image_ui_almanac_zombies_zombiespeed_icon") != null) {
-            statsTable.add(new Image(new TextureRegionDrawable(textures.region("image_ui_almanac_zombies_zombiespeed_icon")))).size(40, 40);
-        }
-        statsTable.add(new Label("Speed:\n" + String.format("%.2f", zombie.speed), skin, "medium"));
-
-        rightSide.add(statsTable).left().padBottom(10).row();
-        rightSide.add(new Label("Attack Power (DPS): " + zombie.eatDPS, skin, "secondary")).left().row();
 
         content.add(leftSide).pad(20);
         content.add(rightSide).pad(20).top().left();

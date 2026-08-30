@@ -133,10 +133,6 @@ public class PotWidget extends Table {
 
         SproutView sproutView = new SproutView(pamPlayer, plantType);
         potStack.addActor(sproutView);
-        sproutView.setSize(80f, 70f);
-        sproutView.setPamScale(0.35f);
-        sproutView.setOffsetY(8f); // Soil line offset
-        potStack.addActor(sproutView);
 
         // Force exact row height in Table
         add(potStack).size(80f, 70f).row();

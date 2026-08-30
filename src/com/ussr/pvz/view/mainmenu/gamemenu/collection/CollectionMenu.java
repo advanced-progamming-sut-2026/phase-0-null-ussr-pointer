@@ -434,8 +434,15 @@ public class CollectionMenu extends FadingMenu {
     // ── Overlays ──────────────────────────────────────────────────────────────
 
     private void showPlantDetailsOverlay(PlantData plant) {
-        new PlantCardOverlay(plant, skin, textures, pamPlayer, dimBackground, collectionService)
-                .show(getStage());
+        new PlantCardOverlay(
+                plant,
+                skin,
+                textures,
+                pamPlayer,
+                dimBackground,
+                collectionService,
+                this::loadPlantsTab
+        ).show(getStage());
     }
 
     private void showZombieDetailsOverlay(ZombieData zombie) {

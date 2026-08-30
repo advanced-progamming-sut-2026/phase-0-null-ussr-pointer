@@ -89,15 +89,16 @@ public final class ZombieCard extends Table {
             preview.add(floorImage);
         }
 
-        ZombiePamActor animation = new ZombiePamActor(
-                pamPlayer,
-                zombie.pamPath
-        );
-        animation.setPamScale(0.29f);
-        animation.setOffsetY(-12f);
-        animation.setTouchable(Touchable.disabled);
-        animation.getColor().a = zombie.encountered ? 1f : 0.42f;
-        preview.add(animation);
+        if (zombie.encountered) {
+            ZombiePamActor animation = new ZombiePamActor(
+                    pamPlayer,
+                    zombie.pamPath
+            );
+            animation.setPamScale(0.29f);
+            animation.setOffsetY(-12f);
+            animation.setTouchable(Touchable.disabled);
+            preview.add(animation);
+        }
 
         return preview;
     }

@@ -33,7 +33,8 @@ public record AccountState(
         Map<String, List<Integer>> activeQuestProgress,
         long lastLoginTime,
         long lastDailyResetTime,
-        List<String> completedLevels
+        List<String> completedLevels,
+        int gamesPlayed
 ) {
     public AccountState finalizeRegistration(SecurityQuestion question, String answer) {
         return new AccountState(
@@ -64,7 +65,8 @@ public record AccountState(
                 this.activeQuestProgress,
                 this.lastLoginTime,
                 this.lastDailyResetTime,
-                this.completedLevels
+                this.completedLevels,
+                this.gamesPlayed
         );
     }
 }
