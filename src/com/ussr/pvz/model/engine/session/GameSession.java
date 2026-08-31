@@ -124,82 +124,64 @@ public class GameSession {
     }
 
     private void applyReward() {
-
         if (!progressTracked) {
             return;
         }
 
-        Account account =
-                App.getAccount();
-
+        Account account = App.getAccount();
         if (account == null) {
             return;
         }
 
-        boolean firstClear =
-                level != null
-                        && level.getId() != null
-                        && !account
-                        .getAdventureProgress()
-                        .isLevelCompleted(
-                                level.getId()
-                        );
-
+        boolean firstClear = isFirstClear(account);
         App.getLevelManager()
                 .completeCurrentLevel();
 
         if (firstClear) {
-
-            account
-                    .getAdventureProgress()
-                    .addCompletedLevel(
-                            level.getId()
-                    );
-
-            account
-                    .getAdventureProgress()
-                    .addCoin(
-                            LEVEL_COMPLETE_COIN_REWARD
-                    );
-
-            for (String plantAlias :
-                    level.getRewardPlantAliases()) {
-
-                account
-                        .getAdventureProgress()
-                        .upgradePlant(
-                                plantAlias
-                        );
-            }
-
-            if (!level
-                    .getRewardPlantAliases()
-                    .isEmpty()) {
-
-                NewsObserver.triggerNewPlant(
-                        level.getRewardPlantAliases()
-                );
-            }
-
-            NewsObserver.triggerNewLevel(
-                    level
-            );
+            applyFirstClearRewards(account);
         }
 
+        advanceToNextLevel();
+        triggerMinigameNews(firstClear);
+    }
+
+    private boolean isFirstClear(Account account) {
+        return level != null
+                && level.getId() != null
+                && !account.getAdventureProgress()
+                .isLevelCompleted(level.getId());
+    }
+
+    private void applyFirstClearRewards(Account account) {
+        account.getAdventureProgress()
+                .addCompletedLevel(level.getId());
+        account.getAdventureProgress()
+                .addCoin(LEVEL_COMPLETE_COIN_REWARD);
+
+        for (String plantAlias : level.getRewardPlantAliases()) {
+            account.getAdventureProgress()
+                    .upgradePlant(plantAlias);
+        }
+
+        if (!level.getRewardPlantAliases().isEmpty()) {
+            NewsObserver.triggerNewPlant(level.getRewardPlantAliases());
+        }
+
+        NewsObserver.triggerNewLevel(level);
+    }
+
+    private void advanceToNextLevel() {
         try {
-
-            App.getLevelManager()
-                    .nextLevel();
-
+            App.getLevelManager().nextLevel();
         } catch (IllegalStateException e) {
-
             System.err.println(
-                    "[GameSession] Could not advance "
-                            + "to next level: "
+                    "[GameSession] Could not advance to next level: "
                             + e.getMessage()
             );
         }
+    }
 
+    private void triggerMinigameNews(boolean firstClear) {
         com.ussr.pvz.model.level.Chapter
                 completedChapter =
                 level == null

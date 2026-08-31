@@ -47,55 +47,91 @@ public class SeedPacketWidget extends Stack {
         setTouchable(Touchable.enabled);
 
         String packetKey = PlantCard.resolvePacketKey(blueprint.getName());
+        addCardBackground(skin);
 
+        portraitBackground = createPortraitBackground(textures);
+        add(createImageLayer(portraitBackground, 0f));
+        portraitIcon = createPortraitIcon(textures, packetKey);
+        add(createImageLayer(portraitIcon, 3f));
+
+        cooldownOverlay = new CooldownOverlay();
+        add(cooldownOverlay);
+
+        selectionFrame = createSelectionFrame(skin);
+        add(selectionFrame);
+
+        costLabel = createCostLabel(skin);
+        add(createCostLayer(costLabel));
+        cooldownOverlay.setVisible(availabilityRestricted);
+        addClickListener(onClick);
+    }
+
+    private void addCardBackground(Skin skin) {
         if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class)) {
             Image cardBackground = new Image(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10"));
             cardBackground.setTouchable(Touchable.disabled);
             add(cardBackground);
         }
+    }
 
-        Table portraitLayer = new Table();
-        portraitLayer.setTouchable(Touchable.disabled);
-        TextureRegion bgRegion = textures.region(blueprint.isBuffed() ? "IMAGE_UI_PACKETS_BOOST" :
-                "IMAGE_UI_PACKETS_EGYPT");
-        portraitBackground = bgRegion != null ? new Image(bgRegion) : new Image();
-        portraitBackground.setScaling(Scaling.fit);
-        portraitBackground.setTouchable(Touchable.disabled);
-        portraitLayer.add(portraitBackground).grow();
-        add(portraitLayer);
+    private Image createPortraitBackground(TextureBank textures) {
+        TextureRegion bgRegion = textures.region(
+                blueprint.isBuffed()
+                        ? "IMAGE_UI_PACKETS_BOOST"
+                        : "IMAGE_UI_PACKETS_EGYPT"
+        );
+        Image image = bgRegion != null ? new Image(bgRegion) : new Image();
+        image.setScaling(Scaling.fit);
+        image.setTouchable(Touchable.disabled);
+        return image;
+    }
 
+    private Image createPortraitIcon(TextureBank textures, String packetKey) {
         TextureRegion iconRegion = textures.region("IMAGE_UI_PACKETS_" + packetKey);
-        portraitIcon = iconRegion != null ? new Image(iconRegion) : new Image();
-        portraitIcon.setScaling(Scaling.fit);
-        portraitIcon.setTouchable(Touchable.disabled);
-        Table iconLayer = new Table();
-        iconLayer.setTouchable(Touchable.disabled);
-        iconLayer.add(portraitIcon).grow().pad(3f);
-        add(iconLayer);
+        Image image = iconRegion != null ? new Image(iconRegion) : new Image();
+        image.setScaling(Scaling.fit);
+        image.setTouchable(Touchable.disabled);
+        return image;
+    }
 
-        cooldownOverlay = new CooldownOverlay();
-        add(cooldownOverlay);
+    private Table createImageLayer(Image image, float padding) {
+        Table layer = new Table();
+        layer.setTouchable(Touchable.disabled);
+        if (padding > 0f) {
+            layer.add(image).grow().pad(padding);
+        } else {
+            layer.add(image).grow();
+        }
+        return layer;
+    }
 
+    private Actor createSelectionFrame(Skin skin) {
         Drawable goldPixel = skin.has("white-pixel", Drawable.class)
-                ? skin.newDrawable("white-pixel", new Color(1f, 0.72f, 0.08f, 1f))
-                : null;
-        selectionFrame = new SelectionFrame(goldPixel);
-        selectionFrame.setTouchable(Touchable.disabled);
-        selectionFrame.setVisible(false);
-        add(selectionFrame);
+                ? skin.newDrawable("white-pixel", new Color(1f, 0.72f, 0.08f, 1f)) : null;
+        Actor frame = new SelectionFrame(goldPixel);
+        frame.setTouchable(Touchable.disabled);
+        frame.setVisible(false);
+        return frame;
+    }
 
+    private Label createCostLabel(Skin skin) {
+        Label label = new Label(String.valueOf(blueprint.getCost()), skin, "default");
+        label.setFontScale(0.62f);
+        label.setAlignment(Align.left);
+        label.setTouchable(Touchable.disabled);
+        return label;
+    }
+
+    private Table createCostLayer(Label label) {
         Table costLayer = new Table();
         costLayer.setTouchable(Touchable.disabled);
         costLayer.bottom().left();
-        costLabel = new Label(String.valueOf(blueprint.getCost()), skin, "default");
-        costLabel.setFontScale(0.62f);
-        costLabel.setAlignment(Align.left);
-        costLabel.setTouchable(Touchable.disabled);
-        costLayer.add(costLabel).pad(2f);
+        costLayer.add(label).pad(2f);
         costLayer.setVisible(availabilityRestricted);
-        add(costLayer);
-        cooldownOverlay.setVisible(availabilityRestricted);
+        return costLayer;
+    }
 
+    private void addClickListener(Runnable onClick) {
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

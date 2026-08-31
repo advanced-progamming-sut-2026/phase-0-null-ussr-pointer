@@ -274,48 +274,34 @@ public final class TravelLogMenu extends FadingMenu {
         title.setAlignment(Align.center);
         title.setWrap(true);
         content.add(title).growX().padBottom(10f).row();
-        int current = 0;
-        int target = 1;
+        int current = 0 , target = 1;
         if (quest.getCriteria() != null && !quest.getCriteria().isEmpty()) {
             CriterionProgress criterion = quest.getCriteria().get(0);
             current = criterion.getCurrent();
-            target = Math.max(1, criterion.getTarget());
-        }
+            target = Math.max(1, criterion.getTarget());}
         content.add(progressMeter(current, target)).width(230f).height(40f).padBottom(8f).row();
         Label progress = new Label(current + " / " + target, skin, "default");
         content.add(progress).center().row();
         if (quest.getReward() != null) {
             Table reward = new Table();
-            String iconName = quest.getReward().rewardType().contains("GEM")
-                    ? "shared_gem" : "shared_coin";
+            String iconName = quest.getReward().rewardType().contains("GEM") ? "shared_gem" : "shared_coin";
             reward.add(image(sharedAtlas, iconName)).size(30f).padRight(5f);
             reward.add(new Label(String.valueOf(quest.getReward().amount()), skin, "default"));
-            content.add(reward).center().padTop(5f);
-        }
+            content.add(reward).center().padTop(5f);}
         stack.add(content);
         if (quest.isCompleted()) {
             Table stampLayer = new Table();
             stampLayer.bottom().right();
-            if (page == Page.EPIC) {
-                stampLayer.add(image(epicAtlas, "epic_defeated_poster"))
-                        .width(120f).height(70f).pad(8f);
-            } else if (page == Page.CHALLENGE) {
-                stampLayer.add(image(challengeAtlas, "challenge_passed_stamp"))
+            if (page == Page.EPIC)
+                stampLayer.add(image(epicAtlas, "epic_defeated_poster")).width(120f).height(70f).pad(8f);
+            else if (page == Page.CHALLENGE) stampLayer.add(image(challengeAtlas, "challenge_passed_stamp"))
                         .width(90f).height(62f).pad(8f);
-            } else {
-                stampLayer.add(image(sharedAtlas, "shared_done_stamp"))
-                        .width(120f).height(56f).pad(8f);
-            }
+            else stampLayer.add(image(sharedAtlas, "shared_done_stamp")).width(120f).height(56f).pad(8f);
             stampLayer.setTouchable(Touchable.disabled);
-            stack.add(stampLayer);
-        }
-
+            stack.add(stampLayer);}
         stack.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                showQuestDetails(quest);
-            }
-        });
+            public void clicked(InputEvent event, float x, float y) {showQuestDetails(quest);}});
         return stack;
     }
 

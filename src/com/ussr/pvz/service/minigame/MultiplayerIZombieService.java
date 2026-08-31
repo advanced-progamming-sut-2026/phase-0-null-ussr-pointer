@@ -66,53 +66,20 @@ public final class MultiplayerIZombieService {
     /**
      * Must run on the LibGDX rendering thread.
      */
-    public void startMatch(
-            MatchDescriptor descriptor
-    ) {
-        Objects.requireNonNull(
-                descriptor,
-                "descriptor"
-        );
-
-        /*
-         * Ignore a retransmitted MATCH_STARTED for the current
-         * match.
-         */
-        if (activeContext != null
-                && activeContext.matchId().equals(
-                descriptor.matchId()
-        )
-                && activeContext.isActive()) {
+    public void startMatch(MatchDescriptor descriptor) {
+        Objects.requireNonNull(descriptor, "descriptor");
+        if (activeContext != null && activeContext.matchId().equals(descriptor.matchId()) && activeContext.isActive()) {
             return;
         }
-
-        /*
-         * Clean up a previous match before creating another one.
-         */
         disposeActiveMatch();
-
-        GameSession session =
-                buildSession(descriptor);
-
+        GameSession session = buildSession(descriptor);
         App.setGameSession(session);
-
-        MatchContext context =
-                new MatchContext(descriptor);
-
-        NetworkEntityRegistry registry =
-                new NetworkEntityRegistry();
-
-        MatchActionBuffer buffer =
-                new MatchActionBuffer(
-                        descriptor.matchId()
-                );
+        MatchContext context = new MatchContext(descriptor);
+        NetworkEntityRegistry registry = new NetworkEntityRegistry();
+        MatchActionBuffer buffer = new MatchActionBuffer(descriptor.matchId());
 
         RemoteActionApplier applier =
-                new RemoteActionApplier(
-                        session,
-                        registry,
-                        context
-                );
+                new RemoteActionApplier(session, registry, context);
 
         NetworkEventBridge bridge =
                 new NetworkEventBridge(
@@ -136,41 +103,15 @@ public final class MultiplayerIZombieService {
                             }
                         }
                 );
-
         activeContext = context;
         activeRegistry = registry;
         activeBridge = bridge;
-
-        /*
-         * initClock() creates ordinary lawnmowers. The multiplayer
-         * behavior then removes them and replaces them with brains.
-         */
         session.initClock();
-
-        Level level =
-                session.getLevel();
-
+        Level level = session.getLevel();
         level.onStart();
-
-        registerInitialEntities(
-                level,
-                registry
-        );
-
-        /*
-         * Subscribe only after initial entities have been created.
-         * Their creation is deterministic and should not produce
-         * outgoing spawn commands.
-         */
+        registerInitialEntities(level, registry);
         bridge.init();
-
-        /*
-         * Keep the service-level dispatcher installed. Do not
-         * replace it with bridge::receive because this service is
-         * responsible for MATCH_STARTED and MATCH_CLOSED.
-         */
         installNetworkHandler();
-
         App.setMenuState(MenuState.GAME);
     }
 
@@ -226,15 +167,9 @@ public final class MultiplayerIZombieService {
         return session;
     }
 
-    private Level buildLevel(
-            MatchDescriptor descriptor
-    ) {
+    private Level buildLevel(MatchDescriptor descriptor) {
         Level level = new Level();
-
-        level.setId(
-                descriptor.levelId()
-        );
-
+        level.setId(descriptor.levelId());
         level.setChapter("multiplayer");
         level.setSunFalling(false);
         level.setWaves(List.of());

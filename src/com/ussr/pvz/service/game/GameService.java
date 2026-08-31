@@ -245,9 +245,7 @@ public class GameService {
             if ("Imitater".equalsIgnoreCase(blueprint.getName())) {
                 imitationTarget = session.getLastPlantedPlant();
                 if (imitationTarget == null || !imitationTarget.isAlive()) {
-                    throw new IllegalStateException(
-                            "Imitater has nothing to imitate yet - plant another plant first"
-                    );
+                    throw new IllegalStateException("Imitater has nothing to imitate yet - plant another plant first");
                 }
             }
             if (!conveyorPacket) synchronizeRechargeFromAccount(blueprint);

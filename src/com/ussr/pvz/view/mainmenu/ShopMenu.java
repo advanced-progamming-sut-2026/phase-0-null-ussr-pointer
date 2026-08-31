@@ -75,7 +75,6 @@ public class ShopMenu extends FadingMenu {
         clearChildren();
         setFillParent(true);
         dailyOfferCountdowns.clear();
-
         Table dialogTable = new Table();
         dialogTable.setBackground(skin.getDrawable("image_ui_dialog_asset_dialogborder_10"));
         dialogTable.pad(20f, 30f, 20f, 30f);
@@ -83,11 +82,9 @@ public class ShopMenu extends FadingMenu {
         // --- Header ---
         Label titleLabel = new Label("SHOP", skin, "big_outline");
         dialogTable.add(titleLabel).colspan(2).padBottom(6f).row();
-
         // Currency Header Display
         Table currencyHud = createCurrencyHud();
         dialogTable.add(currencyHud).colspan(2).padBottom(16f).row();
-
         // --- Wide Items Scroll Panel ---
         Table itemsTable = new Table();
         itemsTable.top().pad(6f);
@@ -104,8 +101,6 @@ public class ShopMenu extends FadingMenu {
         scrollPane.setScrollingDisabled(true, false);
 
         dialogTable.add(scrollPane).growX().growY().padBottom(14f).row();
-
-        // --- Back Button ---
         Drawable backDrawable = getAtlasDrawable(REGION_BTN_BACK);
         Actor backButton;
         if (backDrawable != null) {
@@ -120,8 +115,6 @@ public class ShopMenu extends FadingMenu {
         }
 
         dialogTable.add(backButton).width(160f).height(50f).colspan(2).row();
-
-        // .grow() fills the screen, .pad() leaves standard ~5% top/bottom and ~4% left/right borders
         add(dialogTable)
                 .grow()
                 .pad(36f, 48f, 36f, 48f);
@@ -159,7 +152,6 @@ public class ShopMenu extends FadingMenu {
         Table card = new Table();
         card.setBackground(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10"));
         card.pad(10f, 16f, 10f, 16f);
-
         // Item Icon (Pot or Seed Packet)
         Drawable itemIconDrawable = getItemDrawable(item);
         if (itemIconDrawable != null) {
@@ -167,23 +159,19 @@ public class ShopMenu extends FadingMenu {
             itemIcon.setScaling(Scaling.fit);
             card.add(itemIcon).size(60f, 60f).padRight(16f);
         }
-
         // Details
         Table infoTable = new Table();
         infoTable.left();
 
         Label nameLabel = new Label(item.getName() + " (ID: " + item.getId() + ")", skin, "medium_outline");
-
         int finalCost = item.getCost();
         if (item.getDiscountPercent() != null && item.getDiscountPercent() > 0) {
             finalCost = (int) (finalCost * (1f - item.getDiscountPercent() / 100f));
         }
-
         String costText = "Cost: " + finalCost + " " + item.getType().getCostType();
         if (item.getDiscountPercent() != null && item.getDiscountPercent() > 0) {
             costText += " (" + item.getDiscountPercent().intValue() + "% OFF)";
         }
-
         Label costLabel = new Label(costText, skin, "secondary");
         Label descLabel = new Label(item.getDescription(), skin, "default");
         descLabel.setWrap(true);
@@ -197,9 +185,7 @@ public class ShopMenu extends FadingMenu {
             infoTable.add(countdownLabel).left().padTop(4f).row();
             dailyOfferCountdowns.add(new DailyOfferCountdown(item, countdownLabel));
         }
-
         card.add(infoTable).expandX().fillX().left();
-
         // Buy Action
         boolean isExpired = item.isExpired();
         TextButton buyBtn = new TextButton(isExpired ? "Expired" : "Buy", skin, isExpired ? "brown" : "green");
@@ -208,9 +194,7 @@ public class ShopMenu extends FadingMenu {
         } else {
             buyBtn.setDisabled(true);
         }
-
         card.add(buyBtn).width(110f).height(46f).right().padLeft(14f);
-
         return card;
     }
 

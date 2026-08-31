@@ -86,7 +86,8 @@ public class GreenHouseMenu extends FadingMenu {
                 Map<String, Object> potMap = potLookup.get(col + "," + row);
 
                 // Passed 'textures' parameter here
-                PotWidget potWidget = new PotWidget(col, row, potMap, skin, pamPlayer, textures, controller, this::refreshGrid);
+                PotWidget potWidget =
+                        new PotWidget(col, row, potMap, skin, pamPlayer, textures, controller, this::refreshGrid);
 
                 potWidget.setPosition(COL_X[col] - 60f, ROW_Y[row] - 60f);
                 potWidget.setSize(120f, 120f);

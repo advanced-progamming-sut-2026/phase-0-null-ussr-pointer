@@ -96,76 +96,51 @@ public class GlobalInviteOverlay extends Table {
     public GlobalInviteOverlay(Skin skin) {
         this.textures = new TextureBank("768", Gdx.files.local("pvz-assets"));
         this.lobbyAtlas = new TextureAtlas(Gdx.files.local(
-                "assets/multi player lobby/izombie_lobby_sprites.atlas"
-        ));
-
+                "assets/multi player lobby/izombie_lobby_sprites.atlas"));
         setFillParent(true);
         setTouchable(Touchable.disabled);
-
-        // ── Card shell (CONTENT_PANEL nine-patch, same as SettingMenu panel) ──
         card = new Table();
         card.setBackground(panelDrawable(CONTENT_PANEL, 28, 28, 28, 28));
         card.pad(10f, 14f, 10f, 14f);
-
-        // ── Header bar: icon + title ──────────────────────────────────────────
         titleLabel = new Label("", skin, "medium_outline");
         titleLabel.setAlignment(Align.center);
-
-        // Decorate the title row with the value-panel texture as a badge strip
         Stack titleRow = new Stack();
         Image titleBg = image(VALUE_PANEL);
         titleBg.setScaling(Scaling.stretchX);
         titleBg.setTouchable(Touchable.disabled);
         titleRow.add(titleBg);
         titleRow.add(titleLabel);
-
-        // ── Body text (ROW_LARGE card background) ─────────────────────────────
         bodyLabel = new Label("", skin, "default");
         bodyLabel.setWrap(true);
         bodyLabel.setAlignment(Align.center);
-
         Table bodyCard = new Table();
         bodyCard.setBackground(panelDrawable(ROW_LARGE, 24, 24, 24, 24));
         bodyCard.pad(8f, 12f, 8f, 12f);
         bodyCard.add(bodyLabel).width(250f);
-
-        // ── Buttons ───────────────────────────────────────────────────────────
-        // Accept — blank green lobby button with a separate caption.
         acceptLabel = new Label("✔  Accept", skin, "default");
         acceptLabel.setColor(new Color(0.25f, 0.95f, 0.35f, 1f));
         acceptButton = lobbyButton(ACCEPT_BUTTON);
         acceptButton.addListener(click(this::onAccept));
-
-        // Reject — blank orange lobby button with a separate caption.
         rejectLabel = new Label("✗  Reject", skin, "default");
         rejectLabel.setColor(new Color(0.95f, 0.30f, 0.25f, 1f));
         rejectButton = lobbyButton(REJECT_BUTTON);
         rejectButton.addListener(click(this::onReject));
-
-        // OK — same blank orange lobby button.
         okLabel = new Label("OK", skin, "default");
         okLabel.setAlignment(Align.center);
         okButton = lobbyButton(REJECT_BUTTON);
         okButton.addListener(click(this::onOk));
-
-        // ── Button row ────────────────────────────────────────────────────────
         Table buttons = new Table();
         buttons.add(labeledButton(acceptButton, acceptLabel)).width(108f).height(44f).padRight(7f);
         buttons.add(labeledButton(rejectButton, rejectLabel)).width(108f).height(44f);
         buttons.add(labeledButton(okButton,     okLabel    )).width(108f).height(44f);
-
-        // ── Assemble card ─────────────────────────────────────────────────────
         card.add(titleRow ).width(280f).height(42f).padBottom(8f).row();
         card.add(bodyCard ).padBottom(9f).row();
         card.add(buttons  ).padBottom(2f).row();
-
-        // Anchor to bottom-right corner
         Table anchor = new Table();
         anchor.setFillParent(true);
         anchor.bottom().right();
         anchor.add(card).pad(18f);
         addActor(anchor);
-
         hideCard();
     }
 

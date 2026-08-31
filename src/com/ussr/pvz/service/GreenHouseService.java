@@ -193,20 +193,14 @@ public class GreenHouseService {
     }
 
     private String formatPotStatus(java.util.Map<String, Object> pot) {
-        if (pot == null) {
-            return "[LOCKED]";
-        }
+        if (pot == null) return "[LOCKED]";
 
         boolean unlocked = (boolean) pot.get("unlocked");
         boolean occupied = (boolean) pot.get("occupied");
 
-        if (!unlocked) {
-            return "[LOCKED]";
-        }
+        if (!unlocked) return "[LOCKED]";
 
-        if (!occupied || !pot.containsKey("plant")) {
-            return "[EMPTY]";
-        }
+        if (!occupied || !pot.containsKey("plant")) return "[EMPTY]";
 
         @SuppressWarnings("unchecked")
         java.util.Map<String, Object> plant =

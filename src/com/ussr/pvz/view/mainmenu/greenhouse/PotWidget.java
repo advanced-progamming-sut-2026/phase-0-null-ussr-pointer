@@ -45,67 +45,76 @@ public class PotWidget extends Table {
         buildUI(x, y, potMap);
     }
 
-    @SuppressWarnings("unchecked")
     private void buildUI(int x, int y, Map<String, Object> potMap) {
         clearChildren();
 
         boolean unlocked = potMap != null && Boolean.TRUE.equals(potMap.get("unlocked"));
         boolean occupied = potMap != null && Boolean.TRUE.equals(potMap.get("occupied"));
 
-        // ----------------------------------------------------
-        // 1. LOCKED SLOT
-        // ----------------------------------------------------
         if (!unlocked) {
-            TextButton unlockButton = new TextButton("Unlock\n[20 Gems]", skin, "brown");
-            unlockButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    String msg = controller.handleUnlock(x, y);
-                    if (msg.contains("unlocked")) {
-                        NotificationCenter.success(msg);
-                    } else {
-                        NotificationCenter.error(msg);
-                    }
-                    onStateChanged.run();
-                }
-            });
-            add(unlockButton).width(100f).height(48f).padTop(20f);
+            buildLockedSlot(x, y);
             return;
         }
 
-        // Standardized Stack Container (Rigid 80x70 bounding box)
+        Group potStack = createPotStack();
+        if (!occupied || potMap == null || !potMap.containsKey("plant")) {
+            buildEmptySlot(x, y, potStack);
+            return;
+        }
+
+        buildOccupiedSlot(x, y, potMap, potStack);
+    }
+
+    private void buildLockedSlot(int x, int y) {
+        TextButton unlockButton = new TextButton("Unlock\n[20 Gems]", skin, "brown");
+        unlockButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String msg = controller.handleUnlock(x, y);
+                if (msg.contains("unlocked")) {
+                    NotificationCenter.success(msg);
+                } else {
+                    NotificationCenter.error(msg);
+                }
+                onStateChanged.run();
+            }
+        });
+        add(unlockButton).width(100f).height(48f).padTop(20f);
+    }
+
+    private Group createPotStack() {
         Group potStack = new Group();
         potStack.setSize(80f, 70f);
+        return potStack;
+    }
 
-        // ----------------------------------------------------
-        // 2. UNLOCKED & EMPTY (Render PAM Pot)
-        // ----------------------------------------------------
-        if (!occupied || potMap == null || !potMap.containsKey("plant")) {
-            PamActor pamPot = new PamActor(pamPlayer, PAM_POT_PATH, "idle");
-            pamPot.setSize(80f, 70f);
-            pamPot.setPamScale(0.36f);
-            pamPot.setOffsetY(-12f); // Align origin with static pot base
-            potStack.addActor(pamPot);
+    private void buildEmptySlot(int x, int y, Group potStack) {
+        PamActor pamPot = new PamActor(pamPlayer, PAM_POT_PATH, "idle");
+        pamPot.setSize(80f, 70f);
+        pamPot.setPamScale(0.36f);
+        pamPot.setOffsetY(-12f);
+        potStack.addActor(pamPot);
+        add(potStack).size(80f, 70f).row();
 
-            // Force exact row height in Table
-            add(potStack).size(80f, 70f).row();
+        TextButton plantButton = new TextButton("Plant", skin, "green");
+        plantButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String msg = controller.handlePlant(x, y);
+                NotificationCenter.info(msg);
+                onStateChanged.run();
+            }
+        });
+        add(plantButton).width(85f).height(32f).padTop(2f);
+    }
 
-            TextButton plantButton = new TextButton("Plant", skin, "green");
-            plantButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    String msg = controller.handlePlant(x, y);
-                    NotificationCenter.info(msg);
-                    onStateChanged.run();
-                }
-            });
-            add(plantButton).width(85f).height(32f).padTop(2f);
-            return;
-        }
-
-        // ----------------------------------------------------
-        // 3. PLANTED / OCCUPIED (Render Static Atlas Pot + Sprout)
-        // ----------------------------------------------------
+    @SuppressWarnings("unchecked")
+    private void buildOccupiedSlot(
+            int x,
+            int y,
+            Map<String, Object> potMap,
+            Group potStack
+    ) {
 
         TextureRegion staticPotRegion = textures != null ? textures.region(STATIC_POT_REGION) : null;
         if (staticPotRegion != null) {
@@ -115,32 +124,36 @@ public class PotWidget extends Table {
             potStack.addActor(staticPot);
         }
 
-        // Sprout PAM centered directly on top of the soil
-        // Inside PotWidget.java under section 3:
-
         Map<String, Object> plantMap = (Map<String, Object>) potMap.get("plant");
-
-        String plantType = "SPROUT";
-        if (plantMap != null) {
-            if (plantMap.containsKey("type")) {
-                plantType = String.valueOf(plantMap.get("type"));
-            } else if (plantMap.containsKey("plantType")) {
-                plantType = String.valueOf(plantMap.get("plantType"));
-            } else if (plantMap.containsKey("species")) {
-                plantType = String.valueOf(plantMap.get("species"));
-            }
-        }
-
-        SproutView sproutView = new SproutView(pamPlayer, plantType);
+        SproutView sproutView = new SproutView(pamPlayer, getPlantType(plantMap));
         potStack.addActor(sproutView);
-
-        // Force exact row height in Table
         add(potStack).size(80f, 70f).row();
 
-        // ----------------------------------------------------
-        // 4. ACTION BUTTONS (Water / Collect)
-        // ----------------------------------------------------
         assert plantMap != null;
+        buildPlantActionButton(x, y, plantMap);
+    }
+
+    private String getPlantType(Map<String, Object> plantMap) {
+        if (plantMap == null) {
+            return "SPROUT";
+        }
+        if (plantMap.containsKey("type")) {
+            return String.valueOf(plantMap.get("type"));
+        }
+        if (plantMap.containsKey("plantType")) {
+            return String.valueOf(plantMap.get("plantType"));
+        }
+        if (plantMap.containsKey("species")) {
+            return String.valueOf(plantMap.get("species"));
+        }
+        return "SPROUT";
+    }
+
+    private void buildPlantActionButton(
+            int x,
+            int y,
+            Map<String, Object> plantMap
+    ) {
         boolean isUnwatered = "UNWATERED".equals(plantMap.get("state"));
         long plantedAt = ((Number) plantMap.getOrDefault("plantedAtMillis", 0L)).longValue();
         long duration = ((Number) plantMap.getOrDefault("growthDurationMillis", 0L)).longValue();
@@ -149,56 +162,67 @@ public class PotWidget extends Table {
                 && (System.currentTimeMillis() >= finishTime || "READY".equals(plantMap.get("state")));
 
         if (isReady) {
-            TextButton collectButton = new TextButton("Collect!", skin, "green");
-            collectButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    String msg = controller.handleCollect(x, y);
-                    NotificationCenter.success(msg);
-                    onStateChanged.run();
-                }
-            });
-            add(collectButton).width(85f).height(32f).padTop(2f);
+            addCollectButton(x, y);
         } else if (isUnwatered) {
-            TextButton waterButton = new TextButton("Water", skin, "brown");
-            waterButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    Stage stage = getStage();
-                    Runnable doWater = () -> {
-                        String msg = controller.handleWater(x, y);
-                        NotificationCenter.info(msg);
-                        onStateChanged.run();
-                    };
-                    if (stage != null) {
-                        float waterX = getX() + 25f;
-                        float waterY = getY() + 30f;
-                        WateringEffectActor waterAnim =
-                                new WateringEffectActor(pamPlayer, waterX, waterY, doWater);
-                        stage.addActor(waterAnim);
-                    } else {
-                        doWater.run();
-                    }
-                }
-            });
-            add(waterButton).width(105f).height(32f).padTop(2f);
+            addWaterButton(x, y);
         } else {
-            // Watered and growing: offer to skip the remaining time for gems.
-            long remainingMillis = Math.max(0, finishTime - System.currentTimeMillis());
-            long remainingHours = (remainingMillis + 3599999) / 3600000;
-            long gemCost = remainingHours * GEMS_PER_HOUR;
+            addGrowButton(x, y, finishTime);
+        }
+    }
 
-            TextButton speedBtn = new TextButton(
-                    remainingHours + "h [" + gemCost + " Gems]", skin, "brown");
-            speedBtn.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    String msg = controller.handleGrow(x, y);
+    private void addCollectButton(int x, int y) {
+        TextButton collectButton = new TextButton("Collect!", skin, "green");
+        collectButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String msg = controller.handleCollect(x, y);
+                NotificationCenter.success(msg);
+                onStateChanged.run();
+            }
+        });
+        add(collectButton).width(85f).height(32f).padTop(2f);
+    }
+
+    private void addWaterButton(int x, int y) {
+        TextButton waterButton = new TextButton("Water", skin, "brown");
+        waterButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Stage stage = getStage();
+                Runnable doWater = () -> {
+                    String msg = controller.handleWater(x, y);
                     NotificationCenter.info(msg);
                     onStateChanged.run();
+                };
+                if (stage != null) {
+                    float waterX = getX() + 25f;
+                    float waterY = getY() + 30f;
+                    WateringEffectActor waterAnim =
+                            new WateringEffectActor(pamPlayer, waterX, waterY, doWater);
+                    stage.addActor(waterAnim);
+                } else {
+                    doWater.run();
                 }
-            });
-            add(speedBtn).width(105f).height(32f).padTop(2f);
-        }
+            }
+        });
+        add(waterButton).width(105f).height(32f).padTop(2f);
+    }
+
+    private void addGrowButton(int x, int y, long finishTime) {
+        long remainingMillis = Math.max(0, finishTime - System.currentTimeMillis());
+        long remainingHours = (remainingMillis + 3599999) / 3600000;
+        long gemCost = remainingHours * GEMS_PER_HOUR;
+
+        TextButton speedBtn = new TextButton(
+                remainingHours + "h [" + gemCost + " Gems]", skin, "brown");
+        speedBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String msg = controller.handleGrow(x, y);
+                NotificationCenter.info(msg);
+                onStateChanged.run();
+            }
+        });
+        add(speedBtn).width(105f).height(32f).padTop(2f);
     }
 }

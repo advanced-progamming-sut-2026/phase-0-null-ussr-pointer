@@ -43,172 +43,53 @@ public class LoginService {
     // LOGIN
     // =========================================================
 
-    public LoginResult login(
-            LoginRequest loginRequest
-    ) {
-
-        JsonObject data =
-                new JsonObject();
-
-        data.addProperty(
-                "username",
-                loginRequest.username()
-        );
-
-        data.addProperty(
-                "password",
-                loginRequest.password()
-        );
-
+    public LoginResult login(LoginRequest loginRequest) {
+        JsonObject data = new JsonObject();
+        data.addProperty("username", loginRequest.username());
+        data.addProperty("password", loginRequest.password());
         data.addProperty("stayLoggedIn", loginRequest.stayLoggedIn());
-
         NetworkRequest request =
                 new NetworkRequest(
                         RequestType.LOGIN,
                         data
                 );
-
         NetworkResponse response =
                 send(request);
+        if (response == null) return LoginResult.error("Could not connect to server.");
 
-        if (response == null) {
-
-            return LoginResult.error(
-                    "Could not connect to server."
-            );
+        if (response.getData() == null || !response.getData().has("status")) {
+            return LoginResult.error(response.getMessage());
         }
-
-        if (response.getData() == null ||
-                !response.getData()
-                        .has("status")) {
-
-            return LoginResult.error(
-                    response.getMessage()
-            );
-        }
-
         LoginStatus status;
-
         try {
-
-            status =
-                    LoginStatus.valueOf(
-                            response
-                                    .getData()
-                                    .get("status")
-                                    .getAsString()
-                    );
-
+            status = LoginStatus.valueOf(response.getData().get("status").getAsString());
         } catch (IllegalArgumentException e) {
-
-            return LoginResult.error(
-                    response.getMessage()
-            );
+            return LoginResult.error(response.getMessage());
         }
-
-
-        // -----------------------------------------
-        // Successful login
-        // -----------------------------------------
-
-        if (status ==
-                LoginStatus.LOGIN_SUCCESS) {
-
-            if (!response
-                    .getData()
-                    .has("token")) {
-
-                return LoginResult.error(
-                        "Server did not return a session token."
-                );
+        if (status == LoginStatus.LOGIN_SUCCESS) {
+            if (!response.getData().has("token")) {
+                return LoginResult.error("Server did not return a session token.");
             }
-
-            String token =
-                    response
-                            .getData()
-                            .get("token")
-                            .getAsString();
-
-            /*
-             * Save the SERVER session token.
-             *
-             * LoginService, ProfileService,
-             * GlobalService, etc. will all use
-             * SessionManager.getToken().
-             */
+            String token = response.getData().get("token").getAsString();
             SessionManager.saveSession(token, loginRequest.stayLoggedIn());
-
-
-            /*
-             * The server should also return the
-             * currently logged-in account state.
-             *
-             * This keeps all of your existing
-             * App.getAccount() game logic working.
-             */
-            if (response
-                    .getData()
-                    .has("accountState")) {
-
+            if (response.getData().has("accountState")) {
                 try {
-
                     AccountState state =
-                            gson.fromJson(
-                                    response
-                                            .getData()
-                                            .get(
-                                                    "accountState"
-                                            ),
-                                    AccountState.class
-                            );
-
+                            gson.fromJson(response.getData().get("accountState"), AccountState.class);
                     Account account =
-                            new Account(
-                                    state,
-                                    new Collection(
-                                            new ArrayList<>(),
-                                            new ArrayList<>()
-                                    )
-                            );
-
-                    App.login(
-                            account
-                    );
-
+                            new Account(state, new Collection(new ArrayList<>(), new ArrayList<>()));
+                    App.login(account);
                 } catch (Exception e) {
-
-                    /*
-                     * The authentication itself already
-                     * succeeded, but without account data
-                     * the rest of the game cannot work
-                     * correctly.
-                     */
-
                     SessionManager.clearSession();
-
-                    return LoginResult.error(
-                            "Could not load account data."
-                    );
+                    return LoginResult.error("Could not load account data.");
                 }
-                NetworkClient.getInstance().setMatchMessageHandler(
-                        MultiplayerIZombieService.getInstance()::dispatch
-                );
-
+                NetworkClient.getInstance().setMatchMessageHandler(MultiplayerIZombieService.getInstance()::dispatch);
             } else {
-
                 SessionManager.clearSession();
-
-                return LoginResult.error(
-                        "Server did not return account data."
-                );
+                return LoginResult.error("Server did not return account data.");
             }
         }
-
-
-        return LoginResult.of(
-                status,
-                response.getMessage()
-        );
+        return LoginResult.of(status, response.getMessage());
     }
 
     public LoginResult restoreSession() {

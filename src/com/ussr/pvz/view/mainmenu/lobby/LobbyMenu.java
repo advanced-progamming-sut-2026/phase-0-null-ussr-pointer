@@ -249,29 +249,53 @@ public class LobbyMenu extends Table implements Disposable {
 
     private void leave() {
         if (state == State.INVITED) { service.cancelInvite(); if (overlay != null) overlay.notifyInviteCancelled(); }
-        if (state == State.SEARCHING) { service.leaveRandomQueue(); if (overlay != null) overlay.notifyLeftRandomQueue(); }
+        if (state == State.SEARCHING) {
+            service.leaveRandomQueue(); if (overlay != null) overlay.notifyLeftRandomQueue();
+        }
         App.setMenuState(MenuState.GAME);
     }
 
-    private Table paper() { Table t = new Table(); t.setBackground(patch("panel_parchment")); return t; }
-    private Image stretch(String name) { Image i = new Image(patch(name)); i.setScaling(Scaling.stretch); return i; }
-    private Image icon(String name) { Image i = new Image(region(name)); i.setScaling(Scaling.fit); i.setTouchable(Touchable.disabled); return i; }
-    private Drawable patch(String name) { return new NinePatchDrawable(atlas.createPatch(name)); }
-    private TextureRegion region(String name) { TextureRegion r = atlas.findRegion(name); if (r == null) throw new IllegalStateException("Missing lobby sprite: " + name); return r; }
-    private Label dark(String text) { return label(text, "default", new Color(.18f, .1f, .05f, 1)); }
-    private Label label(String text, String style, Color color) { Label l = new Label(text, skin, style); l.setColor(color); return l; }
+    private Table paper() {
+        Table t = new Table(); t.setBackground(patch("panel_parchment")); return t;
+    }
+    private Image stretch(String name) {
+        Image i = new Image(patch(name)); i.setScaling(Scaling.stretch); return i;
+    }
+    private Image icon(String name) {
+        Image i = new Image(region(name)); i.setScaling(Scaling.fit); i.setTouchable(Touchable.disabled); return i;
+    }
+    private Drawable patch(String name) {
+        return new NinePatchDrawable(atlas.createPatch(name));
+    }
+    private TextureRegion region(String name) {
+        TextureRegion r = atlas.findRegion(name);
+        if (r == null) throw new IllegalStateException("Missing lobby sprite: " + name);return r;
+    }
+    private Label dark(String text) {
+        return label(text, "default", new Color(.18f, .1f, .05f, 1));
+    }
+    private Label label(String text, String style, Color color) {
+        Label l = new Label(text, skin, style); l.setColor(color); return l;
+    }
     private ImageButton imageButton(String name) {
-        TextureRegionDrawable up = new TextureRegionDrawable(region(name)); ImageButton.ImageButtonStyle s = new ImageButton.ImageButtonStyle();
+        TextureRegionDrawable up = new TextureRegionDrawable
+                (region(name)); ImageButton.ImageButtonStyle s = new ImageButton.ImageButtonStyle();
         s.imageUp = up; s.imageDown = up.tint(Color.LIGHT_GRAY); return new ImageButton(s);
     }
     private Button textButton(String bg, String text) {
-        Button.ButtonStyle s = new Button.ButtonStyle(); s.up = patch(bg); s.down = ((NinePatchDrawable) patch(bg)).tint(Color.LIGHT_GRAY);
+        Button.ButtonStyle s = new Button.ButtonStyle();
+        s.up = patch(bg);
+        s.down = ((NinePatchDrawable) patch(bg)).tint(Color.LIGHT_GRAY);
         Button b = new Button(s); b.add(label(text, "medium_outline", Color.WHITE)).grow(); return b;
     }
     private Button iconButton(String bg, String image, String text) {
-        Button b = textButton(bg, ""); b.clearChildren(); b.add(icon(image)).size(36).padRight(5); b.add(label(text, "medium_outline", Color.WHITE)); return b;
+        Button b = textButton(bg, ""); b.clearChildren();
+        b.add(icon(image)).size(36).padRight(5);
+        b.add(label(text, "medium_outline", Color.WHITE)); return b;
     }
-    private ClickListener click(Runnable action) { return new ClickListener() { @Override public void clicked(InputEvent e, float x, float y) { action.run(); }}; }
+    private ClickListener click(Runnable action) {
+        return new ClickListener() { @Override public void clicked(InputEvent e, float x, float y) { action.run(); }};
+    }
 
     @Override public void dispose() { atlas.dispose(); }
 }

@@ -72,73 +72,35 @@ public class LeaderBoardService {
     public String sort(
             LeaderBoardSortRequest request
     ) {
-
         String rawColumn =
                 request.column() != null
-                        ? request.column()
-                        .toLowerCase()
-                        .trim()
+                        ? request.column().toLowerCase().trim()
                         : "score";
-
         String order =
                 request.order() != null
-                        ? request.order()
-                        .toLowerCase()
-                        .trim()
+                        ? request.order().toLowerCase().trim()
                         : "desc";
-
         boolean ascending =
                 order.equals("asc")
                         || order.equals("ascending")
                         || order.equals("+");
-
-        LeaderboardColumn column =
-                mapColumn(rawColumn);
-
+        LeaderboardColumn column = mapColumn(rawColumn);
         List<LeaderboardEntry> entries =
-                getEntries(
-                        column,
-                        ascending
-                );
+                getEntries(column, ascending);
 
-        StringBuilder result =
-                new StringBuilder();
-
-        result.append(
-                "Leaderboard successfully sorted by '"
-        );
-
-        result.append(
-                rawColumn
-        );
-
-        result.append(
-                "' in "
-        );
-
-        result.append(
-                ascending
-                        ? "ascending"
-                        : "descending"
-        );
-
-        result.append(
-                " order.\n\n"
-        );
+        StringBuilder result = new StringBuilder();
+        result.append("Leaderboard successfully sorted by '");
+        result.append(rawColumn);
+        result.append("' in ");
+        result.append(ascending ? "ascending" : "descending");
+        result.append(" order.\n\n");
 
         if (entries.isEmpty()) {
-
-            result.append(
-                    "No accounts found."
-            );
-
+            result.append("No accounts found.");
             return result.toString();
         }
 
-        result.append(
-                formatEntries(entries)
-        );
-
+        result.append(formatEntries(entries));
         return result.toString();
     }
 
@@ -149,13 +111,10 @@ public class LeaderBoardService {
 
     private List<LeaderboardEntry>
     loadEntriesFromServer() {
-
-        String token =
-                SessionManager.getToken();
+        String token = SessionManager.getToken();
 
         if (token == null ||
                 token.isBlank()) {
-
             return new ArrayList<>();
         }
 
@@ -167,21 +126,13 @@ public class LeaderBoardService {
                 );
 
         NetworkResponse response;
-
         try {
-
-            response =
-                    networkClient.send(
-                            request
-                    );
-
+            response = networkClient.send(request);
         } catch (Exception e) {
-
             System.err.println(
                     "Leaderboard network error: "
                             + e.getMessage()
             );
-
             return new ArrayList<>();
         }
 
@@ -190,28 +141,28 @@ public class LeaderBoardService {
                 response.getData() == null ||
                 !response.getData()
                         .has("entries")) {
-
             return new ArrayList<>();
         }
 
         JsonArray array =
-                response
-                        .getData()
-                        .getAsJsonArray(
-                                "entries"
-                        );
+                response.getData()
+                        .getAsJsonArray("entries");
 
+        return mapEntries(array);
+    }
+
+    private List<LeaderboardEntry> mapEntries(
+            JsonArray array
+    ) {
         List<LeaderboardEntry> entries =
                 new ArrayList<>();
 
         for (JsonElement element : array) {
-
             LeaderboardEntryDto dto =
                     gson.fromJson(
                             element,
                             LeaderboardEntryDto.class
                     );
-
             LeaderboardEntry entry =
                     new LeaderboardEntry(
                             dto.username(),
@@ -222,7 +173,6 @@ public class LeaderBoardService {
                             dto.otherQuests(),
                             dto.score()
                     );
-
             entries.add(entry);
         }
 

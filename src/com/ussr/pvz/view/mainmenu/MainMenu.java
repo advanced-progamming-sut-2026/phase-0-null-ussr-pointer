@@ -251,7 +251,6 @@ public class MainMenu extends Table {
                         )
                 ));
             }
-
             @Override
             public void exit(
                     InputEvent event,
@@ -267,12 +266,7 @@ public class MainMenu extends Table {
                                 0.16f,
                                 Interpolation.fade
                         ),
-                        scaleTo(
-                                1f,
-                                1f,
-                                0.16f,
-                                Interpolation.smooth
-                        )
+                        scaleTo(1f, 1f, 0.16f, Interpolation.smooth)
                 ));
             }
         });
@@ -301,64 +295,31 @@ public class MainMenu extends Table {
     private void configureDrawer() {
         drawer.setTransform(true);
         drawer.top().right();
-
-        drawer.setBackground(
-                skin.getDrawable(
-                        "image_ui_dialog_asset_inner_bkgd_10"
-                )
-        );
-
+        drawer.setBackground(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10"));
         drawer.pad(10f);
-
         TextButton profileButton =
-                createDrawerButton(
-                        "image_ui_mainmenu_mm_playericon"
-                );
+                createDrawerButton("image_ui_mainmenu_mm_playericon");
 
         TextButton newsButton =
-                createDrawerButton(
-                        "image_ui_mainmenu_mm_newsicon"
-                );
-
+                createDrawerButton("image_ui_mainmenu_mm_newsicon");
         TextButton settingsButton =
-                createDrawerButton(
-                        "image_ui_mainmenu_mm_settings"
-                );
-
-        drawer.add(profileButton)
-                .growX()
-                .height(52f)
-                .row();
-
-        // In configureDrawer(), replace the newsButton cell with:
-
+                createDrawerButton("image_ui_mainmenu_mm_settings");
+        drawer.add(profileButton).growX().height(52f).row();
         newsBadge = new UnreadBadge(skin);
-
         Stack newsButtonStack = new Stack();
         newsButtonStack.add(newsButton);
-
-// Anchor table: pushes the badge to top-right corner of the 52px button
         Table badgeAnchor = new Table();
         badgeAnchor.setTouchable(Touchable.disabled);
         badgeAnchor.top().right();
-// pad: -8 top so badge overlaps edge, -8 right for same
         badgeAnchor.add(newsBadge)
                 .size(24f, 24f)
                 .padTop(-8f)
                 .padRight(-8f);
         newsButtonStack.add(badgeAnchor);
 
-        drawer.add(newsButtonStack)
-                .growX()
-                .height(52f)
-                .padTop(6f)
-                .row();
+        drawer.add(newsButtonStack).growX().height(52f).padTop(6f).row();
 
-        drawer.add(settingsButton)
-                .growX()
-                .height(52f)
-                .padTop(6f)
-                .row();
+        drawer.add(settingsButton).growX().height(52f).padTop(6f).row();
 
         profileButton.addListener(
                 listener(this::openProfile)
