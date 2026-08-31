@@ -1,8 +1,11 @@
 package com.ussr.pvz.model.entities.zombies.zomboss.moves;
 
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossMove;
+
+import java.util.List;
 
 /**
  * Egypt Zomboss "ForwardDash": the boss suddenly lunges forward across its
@@ -23,13 +26,26 @@ public class ForwardDashMove implements ZombossMove {
     private static final double MIN_DASH_SECONDS = 0.25;
     // Return trip is slightly slower than the lunge out, for a bit of weight.
     private static final double RETURN_SPEED_SCALE = 0.85;
+    private static final int LETHAL_DAMAGE = 99999;
 
     @Override
     public void execute(ZombossController controller, GameSession session) {
-        for (int row : controller.getOccupiedRows()) {
+        List<Integer> occupiedRows = controller.getOccupiedRows();
+
+        for (int row : occupiedRows) {
             if (row >= session.getLawn().getRows()) continue;
             for (int col = 0; col < session.getLawn().getCols(); col++) {
                 session.removePlantAt(col, row);
+            }
+        }
+
+        for (Zombie zombie : session.getZombies()) {
+            if (controller.isBodyOf(zombie)) continue;
+            if (!zombie.isAlive()) continue;
+
+            int row = (int) zombie.getPosition().y();
+            if (occupiedRows.contains(row)) {
+                zombie.takeDamage(LETHAL_DAMAGE, controller.getPrimary());
             }
         }
 
