@@ -83,6 +83,7 @@ public class AppView implements ApplicationListener {
     private GlobalMenuHud globalMenuHud;
     private MenuState displayedMenu;
     private boolean displayedActiveGameplay;
+    private com.ussr.pvz.model.engine.session.GameSession displayedGameSession;
 
     private static final float HALF_TRANSITION_DURATION = 0.25f;
     private static final long LOADING_FADE_IN_TIME_MS = 180L;
@@ -264,8 +265,9 @@ public class AppView implements ApplicationListener {
         boolean gameplayModeChanged =
                 App.getMenuState() == MenuState.GAME
                         && displayedMenu == MenuState.GAME
-                        && displayedActiveGameplay
-                        != (App.getGameSession() != null);
+                        && (displayedActiveGameplay
+                        != (App.getGameSession() != null)
+                        || App.getGameSession() != displayedGameSession);
 
         if (!transitioning
                 && (App.getMenuState() != displayedMenu
@@ -370,6 +372,8 @@ public class AppView implements ApplicationListener {
         updateMenuMusic(state);
         displayedActiveGameplay = state == MenuState.GAME
                 && App.getGameSession() != null;
+        displayedGameSession = state == MenuState.GAME
+                ? App.getGameSession() : null;
     }
 
     private void configureViewportFor(MenuState state) {

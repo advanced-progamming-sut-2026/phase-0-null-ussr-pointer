@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.ussr.pvz.model.App;
 import com.ussr.pvz.model.board.structures.*;
@@ -77,6 +78,9 @@ public class EntityRenderLayer extends Group {
     private final Map<ZombieProjectile, float[]> zombieProjectileRenderTargets = new HashMap<>();
     private final Map<Zombie, float[]> zombieRenderTargets = new HashMap<>();
     private final Map<PushableStructure, float[]> pushableRenderTargets = new HashMap<>();
+    private final Map<Plant, float[]> plantRenderTargets = new HashMap<>();
+
+    private static final float BEGHOULED_SWAP_DURATION = 0.5f;
 
     // Pending immediate draw calls (atlas textures, not actors)
     private final List<ZombieAtlasDrawCall> pendingZombieAtlasDraws = new ArrayList<>();
@@ -161,6 +165,7 @@ public class EntityRenderLayer extends Group {
         dangerTime.keySet().removeIf(z -> !session.getZombies().contains(z));
         zombieRenderTargets.keySet().removeIf(z -> !session.getZombies().contains(z));
         pushableRenderTargets.keySet().removeIf(p -> !liveZombieGroup.contains(p));
+        plantRenderTargets.keySet().removeIf(p -> !livePlants.contains(p));
 
         // Y-sort each group independently
         sortByY(plantGroup);
@@ -278,13 +283,25 @@ public class EntityRenderLayer extends Group {
                 actor.resetAnimation();
             }
             actor.setGreyTint(plant.isImitationOverlayActive());
-            actor.setPosition(
-                    LawnGridLayout.cellX(plant.getLocation().x())
-                            + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_X,
-                    LawnGridLayout.cellY(plant.getLocation().y())
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_Y
-            );
+
+            float targetX = LawnGridLayout.cellX(plant.getLocation().x())
+                    + LawnGridLayout.CELL_WIDTH / 2f
+                    + LawnGridLayout.PLANT_DRAW_OFFSET_X;
+            float targetY = LawnGridLayout.cellY(plant.getLocation().y())
+                    + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
+
+            float[] lastTarget = plantRenderTargets.get(plant);
+            if (lastTarget == null) {
+                // First time we see this actor — snap instantly so it doesn't
+                // fly in from the origin.
+                actor.setPosition(targetX, targetY);
+            } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
+                // Grid location changed since last frame (e.g. Beghouled swap) —
+                // slide smoothly to the new cell instead of snapping.
+                actor.clearActions();
+                actor.addAction(Actions.moveTo(targetX, targetY, BEGHOULED_SWAP_DURATION, Interpolation.smooth));
+            }
+            plantRenderTargets.put(plant, new float[]{targetX, targetY});
         }
     }
 
@@ -437,7 +454,7 @@ public class EntityRenderLayer extends Group {
                     boolean bossLocked = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
                     String idleClip = bossStunned ? boss.getStunClip()
                             : bossLocked ? boss.getLockedClip()
-                              : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                            : (boss != null ? boss.resolveClip(currentClip) : currentClip);
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> animSeq = zombie.pollAnimSequence();
                         if (animSeq != null) {
