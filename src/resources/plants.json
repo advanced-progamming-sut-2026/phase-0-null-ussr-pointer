@@ -664,7 +664,7 @@
     ],
     "cost": 250,
     "baseHp": 300,
-    "damage": 99999,
+    "damage": 0,
     "actionInterval": 12.0,
     "attackOffset": 0.5,
     "recharge": 15.0,

@@ -26,7 +26,7 @@ public final class SessionResources {
     }
 
     public void addPlantFood() {
-        plantFood++;
+        plantFood = Math.min(plantFood + 1, 3);
     }
 
     public boolean spendPlantFood() {

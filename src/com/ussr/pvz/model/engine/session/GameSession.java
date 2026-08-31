@@ -75,6 +75,10 @@ public class GameSession {
         );
     }
 
+    public boolean isPlantBoosted(String key) {
+        return boostedPlants.contains(key);
+    }
+
     /**
      * Tracks a tile that was set to {@link TileType#Burning} temporarily
      * (e.g. by the Dragon Zomboss's row-ignite move) so it can be reverted

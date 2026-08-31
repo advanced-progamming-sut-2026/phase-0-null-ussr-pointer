@@ -28,10 +28,10 @@ import java.util.*;
 
 public class Zombie extends GameEntity implements Damageable {
 
-    public static final double DEFAULT_FREEZE_DURATION = 5.0;
-    public static final double DEFAULT_BUTTER_DURATION = 4.0;
-    public static final double DEFAULT_POISON_DURATION = 5.0;
-    public static final double DEFAULT_FIRE_DURATION = 5.0;
+    public static final double DEFAULT_FREEZE_DURATION = 10.0;
+    public static final double DEFAULT_BUTTER_DURATION = 8.0;
+    public static final double DEFAULT_POISON_DURATION = 8.0;
+    public static final double DEFAULT_FIRE_DURATION = 8.0;
     public static final float FREEZE_SPEED_MULTIPLIER = 0.5f;
     public static final float BUTTER_SPEED_MULTIPLIER = 0.7f;
 

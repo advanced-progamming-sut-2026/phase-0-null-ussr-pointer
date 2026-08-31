@@ -29,6 +29,7 @@ public class InGameHud extends Table implements Disposable {
     private final ResetTerrainWidget resetTerrainWidget;
     private final ReactionHudWidget reactionHud;
     private final ReactionOverlayWidget reactionOverlay;
+    private final HoverCursorWidget hoverCursorWidget;
     private final Label waitingForOpponentLabel;
     private final PamPlayer pamPlayer;
 
@@ -49,8 +50,10 @@ public class InGameHud extends Table implements Disposable {
         nukeMinionWidget   = new NukeMinionWidget(skin, textures);
         resetTerrainWidget = new ResetTerrainWidget(skin, textures);
         timedWarHudWidget  = new TimedWarHudWidget(skin, textures);
-        reactionHud        = new ReactionHudWidget(skin, textures,pamPlayer);
-        reactionOverlay    = new ReactionOverlayWidget(skin, textures,pamPlayer);
+        reactionHud        = new ReactionHudWidget(skin, textures, pamPlayer);
+        reactionOverlay    = new ReactionOverlayWidget(skin, textures, pamPlayer);
+        hoverCursorWidget   = new HoverCursorWidget(textures, controller, pamPlayer);
+
         waitingForOpponentLabel = new Label(
                 "WAITING FOR OPPONENT...",
                 skin,
@@ -140,8 +143,7 @@ public class InGameHud extends Table implements Disposable {
         bottomRow.add(plantFoodWidget).bottom().right().padRight(10f).padBottom(20f);
         bottomRow.add(shovelWidget).bottom().right().padRight(25f).padBottom(20f);
 
-        // Reaction HUD — its own fillParent layer so it is never clipped by
-        // leftBottomColumn. Floats bottom-left, above the existing bottom widgets.
+        // Reaction HUD
         Table reactionLayer = new Table();
         reactionLayer.setFillParent(true);
         reactionLayer.setTouchable(Touchable.childrenOnly);
@@ -158,7 +160,6 @@ public class InGameHud extends Table implements Disposable {
         PauseMenuOverlay pauseOverlay    = new PauseMenuOverlay(skin, pauseMenuAssets, controller);
         GameOverOverlay  gameOverOverlay = new GameOverOverlay(skin, textures);
 
-        // reactionOverlay is a Group — wrap in a Table so Stack can size it properly
         Table reactionOverlayWrapper = new Table();
         reactionOverlayWrapper.setFillParent(true);
         reactionOverlayWrapper.setTouchable(Touchable.disabled);
@@ -169,7 +170,7 @@ public class InGameHud extends Table implements Disposable {
         waitingLayer.setTouchable(Touchable.disabled);
         waitingLayer.add(waitingForOpponentLabel).center();
 
-        // Root stack — reaction layers added last so they render on top
+        // Root stack — hoverCursorWidget renders cursor highlights & preview animations
         Stack rootStack = new Stack();
         rootStack.setTouchable(Touchable.childrenOnly);
         rootStack.add(lawnStack);
@@ -177,6 +178,7 @@ public class InGameHud extends Table implements Disposable {
         rootStack.add(bottomRow);
         rootStack.add(conveyorLayer);
         rootStack.add(lawnGridDebugOverlay);
+        rootStack.add(hoverCursorWidget);
         rootStack.add(waitingLayer);
         rootStack.add(pauseOverlay);
         rootStack.add(gameOverOverlay);

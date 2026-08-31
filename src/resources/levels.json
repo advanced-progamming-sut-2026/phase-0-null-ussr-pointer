@@ -481,6 +481,10 @@
           "waves": [
             {
               "waveNumber": 1,
+              "cost": 1500
+            },
+            {
+              "waveNumber": 2,
               "cost": 2500
             }
           ]

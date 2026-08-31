@@ -395,7 +395,7 @@ public class EntityRenderLayer extends Group {
                     boolean bossLocked = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
                     String idleClip = bossStunned ? boss.getStunClip()
                             : bossLocked ? boss.getLockedClip()
-                            : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                              : (boss != null ? boss.resolveClip(currentClip) : currentClip);
                     if (!zombieActor.isPlayingSpecial()) {
                         List<String> animSeq = zombie.pollAnimSequence();
                         if (animSeq != null) {
@@ -438,6 +438,16 @@ public class EntityRenderLayer extends Group {
                     dangerTime.remove(zombie);
                     zombieActor.setDangerAlpha(0f);
                 }
+
+                // --- Status colour overlay ----------------------------------
+                zombieActor.setZombieStatus(zombie.getStatus());
+
+                // --- Horizontal mirror (moving right = hypnotized / Prospector reverse) ---
+                zombieActor.setMirroredHorizontally(
+                        zombie.isAlive()
+                                && zombie.getSpeed() != null
+                                && zombie.getSpeed().x() > 0
+                );
 
             } else {
                 actor.setClip(currentClip);

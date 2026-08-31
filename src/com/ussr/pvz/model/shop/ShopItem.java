@@ -109,7 +109,7 @@ public class ShopItem {
         }
         String id = (String) map.get("id");
         ShopItemType type = ShopItemType.fromString((String) map.get("type"));
-        Float discountPercent = (Float) map.get("discountPercent");
+        float discountPercent = ((Number) map.get("discountPercent")).floatValue();
         Boolean expired = (Boolean) map.get("expired");
 
         ShopItem item = new ShopItem(id, type, discountPercent);

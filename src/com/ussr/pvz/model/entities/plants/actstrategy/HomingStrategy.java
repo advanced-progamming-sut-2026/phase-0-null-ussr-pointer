@@ -5,6 +5,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.Tag;
 import com.ussr.pvz.model.entities.plants.upgrades.SpecialUpgrade;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
+import com.ussr.pvz.model.entities.projectiles.hit.HypnotizeHit;
 import com.ussr.pvz.model.entities.projectiles.hit.NormalHit;
 import com.ussr.pvz.model.entities.projectiles.hit.PierceHit;
 import com.ussr.pvz.model.entities.projectiles.move.StraightMove;
@@ -39,18 +40,16 @@ public class HomingStrategy implements ActStrategy {
         Vec2 velocity = new Vec2(20, 0);
 
         if (isMagic) {
-            int pierceCount = (int) user.getAbilityValue();
-            Projectile p = new Projectile(
+            int pierceCount = (int) user.getAbilityValue();  // 1 from your JSON
+            return new Projectile(
                     user.getPosition(), velocity, target,
-                    user.getDamage(), new StraightMove(), new PierceHit(pierceCount),user
+                    0, new StraightMove(), new HypnotizeHit(pierceCount), user
             );
-            p.setStunning(true);
-            return p;
         }
 
         return new Projectile(
                 user.getPosition(), velocity, target,
-                user.getDamage(), new StraightMove(), new NormalHit(1),user
+                user.getDamage(), new StraightMove(), new NormalHit(1), user
         );
     }
 

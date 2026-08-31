@@ -159,6 +159,11 @@ public class SeedBankHud extends Table {
                     .orElse(null);
             if (blueprint == null) continue;
 
+            // Ensure buffed background triggers if plant was boosted in session
+            if (session.isPlantBoosted(key)) {
+                blueprint.setBuffed(true);
+            }
+
             SeedPacketWidget widget = new SeedPacketWidget(
                     blueprint,
                     skin,

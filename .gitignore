@@ -44,6 +44,6 @@ bin/
 build
 users.json
 current_session.txt
-
+shop_state.json
 # Locally extracted PvZ2 game assets (PAM files, atlases, and resource index)
 /pvz-assets/
