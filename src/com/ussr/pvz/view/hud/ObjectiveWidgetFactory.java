@@ -17,6 +17,17 @@ import pvz.libpvz.textures.TextureBank;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generates decoupled sub-widgets for arbitrary level behaviors.
+ *
+ * <p>Text-only objectives (TimedWar, Endless, AllowedPlantsLost) are NOT
+ * rendered here anymore — they are shown in the {@link LevelIntroOverlay}
+ * after Crazy Dave's dialogue finishes so they never fight the seed-bank
+ * layout for horizontal space.</p>
+ *
+ * <p>Persistent visual widgets (BossHealthBar, DeadlineLine) still live
+ * on-lawn because they need to be visible throughout play.</p>
+ */
 public class ObjectiveWidgetFactory {
 
     public record ObjectiveWidgets(Actor topBarWidget, Actor lawnOverlayWidget) {}
@@ -79,9 +90,16 @@ public class ObjectiveWidgetFactory {
         if (session == null || session.getLevel() == null) return lines;
 
         LevelBehavior behavior = session.getLevel().getBehavior();
+        boolean plantsObjectiveCovered = false;
         if (behavior != null) {
             String name = behavior.getClass().getSimpleName();
             switch (name) {
+                case "NormalBehavior":
+                    lines.add("Survive all the zombie waves!\nDon't let any zombie reach your house.");
+                    break;
+                case "DeadlineBehavior":
+                    lines.add("Hold the line!\nDon't let any zombie cross the marked deadline.");
+                    break;
                 case "TimedWarBehavior":
                     lines.add("Survive the timer!");
                     break;
@@ -91,13 +109,17 @@ public class ObjectiveWidgetFactory {
                     break;
                 case "SaveOurSeedsBehavior":
                     lines.add("Protect the marked plants!\nIf any of them die, you lose.");
+                    plantsObjectiveCovered = true;
+                    break;
+                case "LoveYourPlantsBehavior":
+                    lines.add("Keep your plants alive!");
                     break;
             }
         }
 
         try {
             int lost = session.getLevel().getAllowedPlantsLost();
-            if (lost != -1) {
+            if (lost != -1 && !plantsObjectiveCovered) {
                 lines.add("Don't lose more than " + lost + " plant" + (lost == 1 ? "!" : "s!"));
             }
         } catch (Exception ignored) {}
