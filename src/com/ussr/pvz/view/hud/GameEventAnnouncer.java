@@ -20,6 +20,9 @@ public class GameEventAnnouncer extends Table {
     private static final float DEFAULT_DURATION  = 2.0f;
     private static final float RESULT_DURATION   = 3.0f;
     private static final float MILESTONE_DURATION = 2.5f;
+    private static final float BONUS_DURATION = 1.2f;
+
+    private static final Color MEOW_BONUS_COLOUR = new Color(1f, 0.6f, 0.1f, 1f);
 
     // Milestone label colours – must mirror MeowScoreWidget.MILESTONE_COLOURS
     private static final Color[] MILESTONE_COLOURS = {
@@ -65,7 +68,7 @@ public class GameEventAnnouncer extends Table {
         messageLabel = new Label("", skin, "big_outline");
         messageLabel.setFontScale(1.6f);
         messageLabel.setAlignment(Align.center);
-        messageLabel.setWrap(true);
+        messageLabel.setWrap(false);
 
         messageContainer = new Container<>(messageLabel);
         messageContainer.setTransform(true);
@@ -118,6 +121,11 @@ public class GameEventAnnouncer extends Table {
                 GameEvent.MeowScoreMilestone.class,
                 this::onMeowMilestone
         );
+
+        session.getEventBus().subscribe(
+                GameEvent.MeowBonusEarned.class,
+                this::onMeowBonus
+        );
     }
 
     // ── Event handlers ────────────────────────────────────────────────────────
@@ -142,7 +150,11 @@ public class GameEventAnnouncer extends Table {
                 : new Color(1f, 0.85f, 0.2f, 1f);
 
         String scoreText = formatScore(event.threshold());
-        announce(label + "\n" + scoreText + " pts", MILESTONE_DURATION, colour);
+        announce(label + " " + scoreText + " pts", MILESTONE_DURATION, colour);
+    }
+
+    private void onMeowBonus(GameEvent.MeowBonusEarned event) {
+        announce(event.label() + " +" + event.points() + " pts", BONUS_DURATION, MEOW_BONUS_COLOUR);
     }
 
     // ── Announce queue ────────────────────────────────────────────────────────

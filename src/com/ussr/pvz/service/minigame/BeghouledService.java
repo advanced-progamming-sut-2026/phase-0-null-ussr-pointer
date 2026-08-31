@@ -35,8 +35,9 @@ public class BeghouledService {
         boolean success = beghouledBehavior.trySwap(r1, c1, r2, c2);
 
         if (success) {
-            return "Swapped successfully! Current matches: " +
-                    beghouledBehavior.getCurrentMatches() + "/" + beghouledBehavior.getTargetMatches();
+            return "Swapped! Resolving matches...";
+        } else if (beghouledBehavior.isResolving()) {
+            return "Board is still resolving the previous match, please wait.";
         } else {
             return "Invalid swap. Swaps must be adjacent, not into craters, and MUST create a match of 3 or more.";
         }

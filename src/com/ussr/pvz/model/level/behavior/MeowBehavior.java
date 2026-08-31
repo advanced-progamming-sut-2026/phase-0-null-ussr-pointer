@@ -142,7 +142,9 @@ public class MeowBehavior extends LevelBehavior {
 
         if (Math.abs(currentTime - lastKillTime) < 0.05) {
             simultaneousKillCount++;
-            pointsEarned += (15 * simultaneousKillCount);
+            int bonus = 15 * simultaneousKillCount;
+            pointsEarned += bonus;
+            announceBonus(session, "MULTI-KILL x" + (simultaneousKillCount + 1) + "!", bonus);
         } else {
             simultaneousKillCount = 0;
         }
@@ -150,14 +152,17 @@ public class MeowBehavior extends LevelBehavior {
         Double spawnTime = zombieSpawnTimes.get(event.alias());
         if (spawnTime != null && (currentTime - spawnTime) <= 5.0) {
             pointsEarned += 20;
+            announceBonus(session, "QUICK KILL!", 20);
         }
 
         if (event.x() >= 7.0) {
             pointsEarned += 25;
+            announceBonus(session, "DEEP DEFENSE!", 25);
         }
 
         if (event.alias().toLowerCase().contains("gargantuar") || event.alias().toLowerCase().contains("boss")) {
             pointsEarned += 500;
+            announceBonus(session, "BOSS DOWN!", 500);
         }
 
         currentScore += pointsEarned;
@@ -165,6 +170,10 @@ public class MeowBehavior extends LevelBehavior {
         zombieSpawnTimes.remove(event.alias());
 
         syncScoreToProfile();
+    }
+
+    private void announceBonus(GameSession session, String label, int points) {
+        session.getEventBus().publish(new GameEvent.MeowBonusEarned(label, points));
     }
 
     @Override

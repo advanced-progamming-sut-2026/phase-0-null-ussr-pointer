@@ -17,6 +17,8 @@ import java.util.*;
 
 public class BeghouledBehavior extends LevelBehavior {
 
+    private static final double STEP_DELAY = 0.35;
+
     private final int targetMatches;
     private int currentMatches = 0;
 
@@ -25,6 +27,9 @@ public class BeghouledBehavior extends LevelBehavior {
 
     // Maps the root plant type to its currently upgraded form
     private final Map<String, String> activePlantTypes = new HashMap<>();
+
+    private final Deque<Runnable> pendingSteps = new ArrayDeque<>();
+    private double stepTimer = 0;
 
     public BeghouledBehavior(int targetMatches, List<String> startingPlants) {
         this.targetMatches = targetMatches;
@@ -84,9 +89,25 @@ public class BeghouledBehavior extends LevelBehavior {
     @Override
     public void tick(GameSession session, double deltaTime) {
         super.tick(session, deltaTime);
+        processStepQueue(session, deltaTime);
         if (!levelCompleted && !session.isGameOver()) {
             checkWinCondition(session);
         }
+    }
+
+    private void processStepQueue(GameSession session, double deltaTime) {
+        if (pendingSteps.isEmpty()) return;
+
+        stepTimer -= deltaTime;
+        if (stepTimer > 0) return;
+
+        Runnable step = pendingSteps.poll();
+        if (step != null) step.run();
+        stepTimer = STEP_DELAY;
+    }
+
+    public boolean isResolving() {
+        return !pendingSteps.isEmpty();
     }
 
     public boolean isWon() {
@@ -121,6 +142,8 @@ public class BeghouledBehavior extends LevelBehavior {
         GameSession session = App.getGameSession();
         Lawn lawn = session.getLawn();
 
+        if (isResolving()) return false;
+
         // Validate adjacency
         if (Math.abs(r1 - r2) + Math.abs(c1 - c2) != 1) return false;
 
@@ -146,10 +169,7 @@ public class BeghouledBehavior extends LevelBehavior {
             return false;
         }
 
-        // Process matches & cascades
-        processMatches(session, false);
-        checkWinCondition(session);
-        ensurePossibleMoves(session);
+        queueResolvePass(session, false);
         return true;
     }
 
@@ -160,34 +180,43 @@ public class BeghouledBehavior extends LevelBehavior {
         if (p1 != null) { p1.setLocation(new Plant.Location(c2, r2)); p1.setPosition(Vec2.of(c2, r2)); }
     }
 
-    private void processMatches(GameSession session, boolean isCascade) {
+    private void queueResolvePass(GameSession session, boolean isCascade) {
         Lawn lawn = session.getLawn();
 
-        // Collect each distinct match group with its own size so we can
-        // increment currentMatches and award sun per group, not per call.
         List<MatchGroup> groups = findAllMatchGroups(lawn);
-        if (groups.isEmpty()) return;
+        if (groups.isEmpty()) {
+            pendingSteps.add(() -> ensurePossibleMoves(session));
+            return;
+        }
 
         for (MatchGroup group : groups) {
-            applyMatchRewards(session, group.size(), isCascade, group.plants());
-            currentMatches++;
+            pendingSteps.add(() -> removeMatchGroup(session, group, isCascade));
         }
 
-        // Remove all matched plants (union of all groups)
-        Set<Plant> allMatched = new HashSet<>();
-        for (MatchGroup g : groups) allMatched.addAll(g.plants());
+        pendingSteps.add(() -> dropPlants(session));
+        pendingSteps.add(() -> fillBoard(session));
 
-        for (Plant p : allMatched) {
+        pendingSteps.add(() -> {
+            if (hasMatches(session.getLawn())) {
+                queueResolvePass(session, true);
+            } else {
+                ensurePossibleMoves(session);
+            }
+        });
+    }
+
+    private void removeMatchGroup(GameSession session, MatchGroup group, boolean isCascade) {
+        Lawn lawn = session.getLawn();
+
+        applyMatchRewards(session, isCascade, group.plants());
+        currentMatches++;
+
+        for (Plant p : group.plants()) {
+            if (!p.isAlive()) continue; // may already be cleared by an overlapping group
             p.setAlive(false);
             session.getPlants().remove(p);
-            lawn.getCell(p.getLocation().y(), p.getLocation().x()).setPlant(null);
-        }
-
-        dropPlants(session);
-        fillBoard(session);
-
-        if (hasMatches(lawn)) {
-            processMatches(session, true);
+            Cell cell = lawn.getCell(p.getLocation().y(), p.getLocation().x());
+            if (cell.getPlant() == p) cell.setPlant(null);
         }
     }
 
@@ -248,13 +277,10 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private record MatchGroup(Set<Plant> plants, int size) {}
 
-    private void applyMatchRewards(GameSession session, int groupSize, boolean isCascade, Set<Plant> matchedPlants) {
-        int baseSun = 0;
-
-        // Per-doc: 3-match = 1 sun token, 4-match = 2, 5+-match = 3
-        if (groupSize == 3) baseSun = 1;
-        else if (groupSize == 4) baseSun = 2;
-        else if (groupSize >= 5) baseSun = 3;
+    private void applyMatchRewards(GameSession session, boolean isCascade, Set<Plant> matchedPlants) {
+        // Each match is worth a flat 1 sun token, regardless of how many
+        // plants it removes (a 3-match and a 5-match both count as one match).
+        int baseSun = 1;
 
         // Cascades add 1 bonus sun token
         if (isCascade) baseSun += 1;
@@ -275,16 +301,12 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private void dropPlants(GameSession session) {
         Lawn lawn = session.getLawn();
-        // Each column is processed independently. Craters are hard floors —
-        // plants cannot pass through them. We compact each crater-delimited
-        // segment downward so existing plants pile at the bottom, leaving
-        // empty cells at the top of each segment (filled later by fillBoard).
         for (int c = 0; c < lawn.getCols(); c++) {
-            int writeRow = lawn.getRows() - 1;
-            for (int r = lawn.getRows() - 1; r >= 0; r--) {
+            int writeRow = 0;
+            for (int r = 0; r < lawn.getRows(); r++) {
                 Cell cell = lawn.getCell(r, c);
                 if (cell.getTile().getType() == TileType.Crater) {
-                    writeRow = r - 1; // reset write head above this crater
+                    writeRow = r + 1; // reset write head above this crater
                     continue;
                 }
                 if (cell.getPlant() != null) {
@@ -296,7 +318,7 @@ public class BeghouledBehavior extends LevelBehavior {
                         p.setLocation(new Plant.Location(c, writeRow));
                         p.setPosition(Vec2.of(c, writeRow));
                     }
-                    writeRow--;
+                    writeRow++;
                 }
             }
         }

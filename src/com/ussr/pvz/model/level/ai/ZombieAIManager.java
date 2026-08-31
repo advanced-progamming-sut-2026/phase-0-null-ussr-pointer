@@ -2,6 +2,7 @@ package com.ussr.pvz.model.level.ai;
 
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Level;
+import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.delivery.ConveyorDeliveryStrategy;
 
 import java.util.ArrayList;
@@ -53,8 +54,10 @@ public class ZombieAIManager {
 
         boolean isConveyorLevel = level.getDeliveryStrategy()
                 instanceof ConveyorDeliveryStrategy;
+        boolean isBeghouledLevel = level.getBehavior() instanceof BeghouledBehavior;
         boolean firstWaveDelayPassed = nextWaveIndexToSpawn > 0
                 || isConveyorLevel
+                || isBeghouledLevel
                 || elapsedSinceStart >= INITIAL_WAVE_DELAY;
         if (firstWaveDelayPassed
                 && activeDirectors.isEmpty()

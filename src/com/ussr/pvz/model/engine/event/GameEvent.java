@@ -5,7 +5,7 @@ import com.ussr.pvz.model.entities.zombies.Zombie;
 import com.ussr.pvz.shared.multiplayer.ReactionPayload;
 
 public sealed interface GameEvent permits GameEvent.FreezingWindTriggered, GameEvent.GameOver, GameEvent.GameWon,
-        GameEvent.GlowingZombieDroppedPlantFood, GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.MeowScoreMilestone, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked, GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.ReactionReceivedEvent, GameEvent.SandstormTriggered, GameEvent.SpecialLevelAnnouncement, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned {
+        GameEvent.GlowingZombieDroppedPlantFood, GameEvent.GraveDestroyed, GameEvent.LawnMowerTriggered, GameEvent.MeowBonusEarned, GameEvent.MeowScoreMilestone, GameEvent.PlantDamaged, GameEvent.PlantDied, GameEvent.PlantFoodDropped, GameEvent.PlantFoodUsed, GameEvent.PlantIncinerated, GameEvent.PlantPlanted, GameEvent.PlantPlucked, GameEvent.ProjectileFired, GameEvent.ProjectileHit, GameEvent.ReactionReceivedEvent, GameEvent.SandstormTriggered, GameEvent.SpecialLevelAnnouncement, GameEvent.StructureDestroyed, GameEvent.SunAbsorbedByZombie, GameEvent.SunCollected, GameEvent.SunExpired, GameEvent.SunGrounded, GameEvent.SunProduced, GameEvent.SunStartedFalling, GameEvent.WaveStarted, GameEvent.WavesCompleted, GameEvent.ZombieBreachedLane, GameEvent.ZombieDied, GameEvent.ZombieReachedHouse, GameEvent.ZombieSpawned {
 
 
     record ZombieSpawned(Zombie zombie) implements GameEvent {
@@ -119,5 +119,7 @@ public sealed interface GameEvent permits GameEvent.FreezingWindTriggered, GameE
     }
 
     record MeowScoreMilestone(int threshold, int milestoneIndex) implements GameEvent {}
-     record ReactionReceivedEvent(ReactionPayload reaction) implements GameEvent {}
+    record MeowBonusEarned(String label, int points) implements GameEvent {}
+
+    record ReactionReceivedEvent(ReactionPayload reaction) implements GameEvent {}
 }
