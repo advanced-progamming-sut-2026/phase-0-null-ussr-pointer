@@ -52,7 +52,13 @@ public class ObjectiveWidgetFactory {
             String behaviorName = behavior.getClass().getSimpleName();
             switch (behaviorName) {
                 case "DeadlineBehavior":
-                    overlay.addActor(new DeadlineLineActor(session));
+                    overlay.addActor(new ColumnLineActor(session,
+                            () -> session.getLevel().getDeadlineColumn()));
+                    break;
+                case "WallnutBowlingBehavior":
+                    overlay.addActor(new ColumnLineActor(session,
+                            () -> ((com.ussr.pvz.model.level.behavior.WallnutBowlingBehavior) behavior)
+                                    .getRedLineColumn() + 1));
                     break;
                 case "BossBehavior":
                     topBar.add(new BossHealthBarActor(
@@ -113,6 +119,9 @@ public class ObjectiveWidgetFactory {
                     break;
                 case "LoveYourPlantsBehavior":
                     lines.add("Keep your plants alive!");
+                    break;
+                case "WallnutBowlingBehavior":
+                    lines.add("Roll your nuts to crush the zombies!\nYou can't plant past the marked line.");
                     break;
             }
         }
@@ -175,25 +184,27 @@ public class ObjectiveWidgetFactory {
     }
 
     // =========================================================================
-    // DeadlineLineActor — clean red line rendered with WhitePixel
+    // ColumnLineActor — clean red line rendered with WhitePixel
     // =========================================================================
-    private static class DeadlineLineActor extends Actor {
+    private static class ColumnLineActor extends Actor {
         private static final float LINE_WIDTH = 4f;
         private static final Color LINE_COLOR  = new Color(0.92f, 0.10f, 0.10f, 0.88f);
         private static final Color GLOW_COLOR  = new Color(1.00f, 0.30f, 0.20f, 0.32f);
         private static final float GLOW_EXTRA  = 6f; // extra width on each side for soft glow
 
         private final GameSession session;
+        private final java.util.function.IntSupplier columnSupplier;
 
-        DeadlineLineActor(GameSession session) {
+        ColumnLineActor(GameSession session, java.util.function.IntSupplier columnSupplier) {
             this.session = session;
+            this.columnSupplier = columnSupplier;
             setTouchable(Touchable.disabled);
         }
 
         @Override
         public void draw(Batch batch, float parentAlpha) {
             try {
-                int col = session.getLevel().getDeadlineColumn();
+                int col = columnSupplier.getAsInt();
                 if (col < 0) return;
 
                 // Use the same grid layout math the lawn widget uses,

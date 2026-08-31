@@ -19,6 +19,10 @@ public class WallnutBowlingBehavior extends LevelBehavior {
         this.redLineColumn = redLineColumn;
     }
 
+    public int getRedLineColumn() {
+        return redLineColumn;
+    }
+
     @Override
     public void onStart(Level level) {
         super.onStart(level);

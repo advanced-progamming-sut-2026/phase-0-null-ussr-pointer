@@ -465,6 +465,32 @@ public final class GameplayController {
         beghouledSelectedCol = -1;
     }
 
+    public boolean handleBeghouledDrag(
+            int r1,
+            int c1,
+            int r2,
+            int c2
+    ) {
+        if (isPaused()) {
+            return false;
+        }
+
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLevel() == null) {
+            return false;
+        }
+
+        if (!(session.getLevel().getBehavior() instanceof BeghouledBehavior)) {
+            return false;
+        }
+
+        beghouledSelectedRow = -1;
+        beghouledSelectedCol = -1;
+
+        String result = beghouledService.swapPlants(r1, c1, r2, c2);
+        return result != null && result.startsWith("Swapped successfully");
+    }
+
     public int getBeghouledSelectedRow() {
         return beghouledSelectedRow;
     }
