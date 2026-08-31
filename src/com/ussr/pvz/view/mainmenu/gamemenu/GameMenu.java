@@ -112,33 +112,13 @@ public class GameMenu extends Table {
     private Table createTopActions() {
         Table layer = new Table();
         layer.top().right();
-
-        ImageButton greenhouseButton =
-                new ImageButton(skin, "hud_zg");
-
-        greenhouseButton.addListener(
-                listener(this::openGreenhouse)
-        );
-
-        ImageButton collectionButton =
-                new ImageButton(skin, "almanac");
-
-        collectionButton.addListener(
-                listener(this::openCollection)
-        );
-
-        TextButton leaderboardButton =
-                createLeaderboardButton();
-
-        leaderboardButton.addListener(
-                listener(this::openLeaderboard)
-        );
-
-        layer.add(greenhouseButton)
-                .size(72f, 72f)
-                .padTop(18f)
-                .padRight(10f);
-
+        ImageButton greenhouseButton = new ImageButton(skin, "hud_zg");
+        greenhouseButton.addListener(listener(this::openGreenhouse));
+        ImageButton collectionButton = new ImageButton(skin, "almanac");
+        collectionButton.addListener(listener(this::openCollection));
+        TextButton leaderboardButton = createLeaderboardButton();
+        leaderboardButton.addListener(listener(this::openLeaderboard));
+        layer.add(greenhouseButton).size(72f, 72f).padTop(18f).padRight(10f);
         layer.add(collectionButton)
                 .size(72f, 72f)
                 .padTop(18f)

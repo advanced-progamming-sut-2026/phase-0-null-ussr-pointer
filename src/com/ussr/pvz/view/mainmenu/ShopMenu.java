@@ -252,7 +252,8 @@ public class ShopMenu extends FadingMenu {
 
         Actor confirmBtn = confirmDraw != null
                 ? createGraphicButton(confirmDraw, () -> executePurchase(item, countField, plantTypeField, overlay))
-                : createTextButton("Confirm", "green", () -> executePurchase(item, countField, plantTypeField, overlay));
+                : createTextButton("Confirm", "green", () -> executePurchase(item, countField, plantTypeField,
+                overlay));
 
         Table btnTable = new Table();
         btnTable.add(cancelBtn).size(64f, 64f).padRight(20f);

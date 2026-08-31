@@ -220,46 +220,30 @@ public class ChoosePlantMenu extends FadingMenu {
             return;
         }
         PlantData p = focusedPlant;
-
-        // Big card preview
         PlantCard preview = new PlantCard(p, skin, textures, null);
         detailPanel.add(preview).size(190, 110).padBottom(6).row();
-
-        // Plant name
         Label nameLbl = new Label(p.name, skin, "default");
         nameLbl.setAlignment(Align.center);
         nameLbl.setFontScale(0.85f);
         nameLbl.setColor(Color.WHITE);
         detailPanel.add(nameLbl).expandX().fillX().padBottom(4).row();
-
-        // Sun cost row
         detailPanel.add(buildCostRow(p)).padBottom(10).row();
-
         Table statsTable = new Table();
         statsTable.defaults().left().pad(4f);
-
         statsTable.add(new Label("HP:", skin)).width(150f);
         statsTable.add(new Label(formatStat(p.baseHp), skin)).row();
-
         statsTable.add(new Label("Damage:", skin)).width(150f);
         statsTable.add(new Label(formatStat(p.damage), skin)).row();
-
         statsTable.add(new Label("Recharge:", skin)).width(150f);
         statsTable.add(new Label(formatStat(p.recharge) + "s", skin)).row();
-
         if (p.actionInterval > 0) {
             statsTable.add(new Label("Action interval:", skin)).width(150f);
             statsTable.add(
                     new Label(formatStat(p.actionInterval) + "s", skin)
             ).row();
         }
-
         detailPanel.add(statsTable).growX().pad(12f).row();
-
-        // Upgrade button
         detailPanel.add(buildUpgradeButton(p)).expandX().fillX().height(50).padBottom(6).row();
-
-        // Boost button
         detailPanel.add(buildBoostButton(p)).expandX().fillX().height(50);
     }
 

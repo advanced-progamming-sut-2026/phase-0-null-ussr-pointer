@@ -14,6 +14,7 @@ import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.ZombieFactory;
 import com.ussr.pvz.view.animation.PlantPamActor;
+import com.ussr.pvz.view.animation.ZombiePamActor;
 import com.ussr.pvz.view.components.PlantCard;
 import com.ussr.pvz.view.gameplay.LawnGridLayout;
 import pvz.libpvz.pam.PamPlayer;
@@ -27,7 +28,8 @@ public class HoverCursorWidget extends Actor {
     private final TextureBank textures;
     private final GameplayController controller;
     private final PamPlayer pamPlayer;
-
+    private ZombiePamActor currentZombieActor;
+    private String currentZombieKey;
     private PlantPamActor currentPlantActor;
     private String currentPlantKey;
     private TextureRegion whitePixelRegion;
@@ -198,6 +200,44 @@ public class HoverCursorWidget extends Actor {
             Batch batch, float parentAlpha,
             String selectedKey, float mouseX, float mouseY, boolean inBounds
     ) {
+        // Synchronize zombie PAM animation actor when selected zombie changes
+        if (selectedKey != null) {
+            if (!selectedKey.equals(currentZombieKey)) {
+                currentZombieKey = selectedKey;
+                currentZombieActor = null;
+
+                if (pamPlayer != null) {
+                    try {
+                        String sanitized = selectedKey.toUpperCase().replace(" ", "_").replace("-", "");
+                        String pamPath = "768/INITIAL/ZOMBIES/" + sanitized + "/" + sanitized + ".PAM";
+                        currentZombieActor = new ZombiePamActor(pamPlayer, pamPath, "walk");
+                    } catch (Exception e) {
+                        currentZombieActor = null;
+                        Gdx.app.error("HoverCursorWidget",
+                                "[PAM ASSET MISSING] Could not load walk PAM animation for zombie key: '" + selectedKey + "'");
+                    }
+                }
+            }
+
+            if (currentZombieActor != null) {
+                float width  = LawnGridLayout.CELL_WIDTH  * 0.8f;
+                float height = LawnGridLayout.CELL_HEIGHT * 0.8f;
+                currentZombieActor.setSize(width, height);
+                currentZombieActor.setPosition(mouseX - width / 2f, mouseY - height / 2f - 10f);
+                currentZombieActor.act(Gdx.graphics.getDeltaTime());
+
+                Color prev = new Color(batch.getColor());
+                batch.setColor(inBounds ? 1f : 1f, inBounds ? 1f : 0.25f, inBounds ? 1f : 0.25f, 0.8f * parentAlpha);
+                currentZombieActor.draw(batch, parentAlpha);
+                batch.setColor(prev);
+                return;
+            }
+        } else {
+            currentZombieKey = null;
+            currentZombieActor = null;
+        }
+
+        // Fallback to static texture region if PAM is unavailable
         TextureRegion zombieRegion = textures.region(
                 ZombieFactory.getZombieTextureRegion(selectedKey)
         );

@@ -32,7 +32,8 @@ public class ZombossController implements EffectStatus {
         final double cooldown;
         double cooldownRemaining;
 
-        MoveEntry(String name, ZombossMove move, int weight, double cooldown, List<String> clips, boolean randomVariant) {
+        MoveEntry(String name, ZombossMove move, int weight, double cooldown, List<String> clips, boolean randomVariant)
+        {
             this.name = name;
             this.move = move;
             this.weight = weight;

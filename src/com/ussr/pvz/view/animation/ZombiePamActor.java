@@ -254,7 +254,7 @@ public class ZombiePamActor extends PamActor {
             a = pulse * parentAlpha;
         } else {
             switch (zombieStatus) {
-                case FREEZE, FROZEN_SOLID -> { r = 0.45f; g = 0.75f; b = 1.00f; a = STATUS_OVERLAY_ALPHA * parentAlpha; }
+                case FREEZE, FROZEN_SOLID -> { r = 0.45f; g = 0.75f; b = 1.00f; a = STATUS_OVERLAY_ALPHA * parentAlpha;}
                 case FIRED               -> { r = 1.00f; g = 0.45f; b = 0.00f; a = STATUS_OVERLAY_ALPHA * parentAlpha; }
                 case POISONED            -> { r = 0.65f; g = 0.00f; b = 0.90f; a = STATUS_OVERLAY_ALPHA * parentAlpha; }
                 case BUTTER              -> { r = 1.00f; g = 0.90f; b = 0.00f; a = STATUS_OVERLAY_ALPHA * parentAlpha; }

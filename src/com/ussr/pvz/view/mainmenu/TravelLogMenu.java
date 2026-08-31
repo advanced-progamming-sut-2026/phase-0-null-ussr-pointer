@@ -257,35 +257,23 @@ public final class TravelLogMenu extends FadingMenu {
 
     private Actor buildQuestCard(ConfigurableQuest quest, Page page) {
         TextureAtlas atlas = atlasFor(page);
-        String regionName;
-        switch (page) {
-            case DAILY:
-                regionName = quest.isCompleted() ? "daily_note_green" : "daily_note_large";
-                break;
-            case CHALLENGE:
-                regionName = quest.isCompleted() ? "challenge_panel_blue" : "challenge_panel_cyan";
-                break;
-            case EPIC:
-                regionName = "epic_wanted_poster";
-                break;
-            default:
-                throw new IllegalArgumentException("Quest card requested for " + page);
-        }
-
+        String regionName = switch (page) {
+            case DAILY -> quest.isCompleted() ? "daily_note_green" : "daily_note_large";
+            case CHALLENGE -> quest.isCompleted() ? "challenge_panel_blue" : "challenge_panel_cyan";
+            case EPIC -> "epic_wanted_poster";
+            default -> throw new IllegalArgumentException("Quest card requested for " + page);
+        };
         Stack stack = new Stack();
         Image background = image(atlas, regionName);
         background.setScaling(Scaling.stretch);
         background.setTouchable(Touchable.disabled);
         stack.add(background);
-
         Table content = new Table();
         content.pad(page == Page.EPIC ? 30f : 20f);
-
         Label title = new Label(quest.getTitle(), skin, "medium_outline");
         title.setAlignment(Align.center);
         title.setWrap(true);
         content.add(title).growX().padBottom(10f).row();
-
         int current = 0;
         int target = 1;
         if (quest.getCriteria() != null && !quest.getCriteria().isEmpty()) {
@@ -293,12 +281,9 @@ public final class TravelLogMenu extends FadingMenu {
             current = criterion.getCurrent();
             target = Math.max(1, criterion.getTarget());
         }
-
         content.add(progressMeter(current, target)).width(230f).height(40f).padBottom(8f).row();
-
         Label progress = new Label(current + " / " + target, skin, "default");
         content.add(progress).center().row();
-
         if (quest.getReward() != null) {
             Table reward = new Table();
             String iconName = quest.getReward().rewardType().contains("GEM")
@@ -307,9 +292,7 @@ public final class TravelLogMenu extends FadingMenu {
             reward.add(new Label(String.valueOf(quest.getReward().amount()), skin, "default"));
             content.add(reward).center().padTop(5f);
         }
-
         stack.add(content);
-
         if (quest.isCompleted()) {
             Table stampLayer = new Table();
             stampLayer.bottom().right();

@@ -237,17 +237,10 @@ public class GameService {
             int[] location = parseLocation(request.x(), request.y());
             int x = location[0];
             int y = location[1];
-
             GameSession session = requireSession();
-
-            ConveyorDeliveryStrategy conveyor =
-                    getConveyor(session);
-
-            boolean conveyorPacket =
-                    conveyor != null && conveyor.contains(request.type());
-
+            ConveyorDeliveryStrategy conveyor = getConveyor(session);
+            boolean conveyorPacket = conveyor != null && conveyor.contains(request.type());
             Plant blueprint = getPlantBlueprint(request.type());
-
             Plant imitationTarget = null;
             if ("Imitater".equalsIgnoreCase(blueprint.getName())) {
                 imitationTarget = session.getLastPlantedPlant();
@@ -257,41 +250,21 @@ public class GameService {
                     );
                 }
             }
-
-            if (!conveyorPacket) {
-                synchronizeRechargeFromAccount(blueprint);
-            }
-
+            if (!conveyorPacket) synchronizeRechargeFromAccount(blueprint);
             Cell cell = requirePlantableCell(session, x, y, blueprint);
-            if (!conveyorPacket) {
-                checkRechargeAndSpendSun(session, blueprint);
-            }
-
+            if (!conveyorPacket) checkRechargeAndSpendSun(session, blueprint);
             Plant existing = cell.getPlant();
             if (isPeaPod(blueprint) && isPeaPod(existing)) {
-                if (!existing.addPeaPodStack()) {
-                    throw new IllegalStateException(
-                            "Pea Pod already has five heads"
-                    );
-                }
-
-                if (conveyorPacket) {
-                    conveyor.consume(request.type());
-                } else {
-                    applyPlantRecharge(blueprint);
-                }
-                return "plant Pea Pod placed at (" + x + ", " + y
-                        + ") - stack " + existing.getStackNumber();
+                if (!existing.addPeaPodStack()) throw new IllegalStateException("Pea Pod already has five heads");
+                if (conveyorPacket) conveyor.consume(request.type());
+                 else applyPlantRecharge(blueprint);
+                return "plant Pea Pod placed at (" + x + ", " + y + ") - stack " + existing.getStackNumber();
             }
-
             Plant plant = createPreparedPlant(session, blueprint, cell, x, y);
             cell.setPlant(plant);
             session.addPlant(plant);
-            if (imitationTarget != null) {
-                plant.beginImitation(imitationTarget);
-            }
-            if (plant.hasSpecialUpgrade(SpecialUpgrade.AUTO_PLANTFOOD_ON_ENTER)
-                    && plant.getPlantFoodEffect() != null) {
+            if (imitationTarget != null) plant.beginImitation(imitationTarget);
+            if (plant.hasSpecialUpgrade(SpecialUpgrade.AUTO_PLANTFOOD_ON_ENTER) && plant.getPlantFoodEffect() != null) {
                 plant.setBuffed(true);
                 session.notifyPlantFoodUsed(plant);
             }

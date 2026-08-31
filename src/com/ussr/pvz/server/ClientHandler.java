@@ -60,10 +60,10 @@ public class ClientHandler implements Runnable, MatchPeer {
             MatchManager matchManager,
             Map<String, ClientHandler> connectedPeers
     ) {
-        this.socket          = socket;
-        this.authService     = authService;
-        this.matchManager    = matchManager;
-        this.connectedPeers  = connectedPeers;
+        this.socket = socket;
+        this.authService = authService;
+        this.matchManager = matchManager;
+        this.connectedPeers = connectedPeers;
     }
 
     // =========================================================
@@ -178,17 +178,13 @@ public class ClientHandler implements Runnable, MatchPeer {
                             socket.getInputStream()
                     )
             );
-
             writer = new PrintWriter(
                     socket.getOutputStream(),
                     true
             );
-
             String line;
-
             while ((line = reader.readLine()) != null) {
                 NetworkResponse response;
-
                 try {
                     NetworkRequest request =
                             gson.fromJson(
@@ -219,7 +215,6 @@ public class ClientHandler implements Runnable, MatchPeer {
                                 + exception.getMessage()
                 );
             }
-
         } finally {
             closeConnection();
         }
@@ -247,34 +242,34 @@ public class ClientHandler implements Runnable, MatchPeer {
         return switch (request.getType()) {
             case PING -> NetworkResponse.success("PONG");
 
-            case LOGIN               -> handleLogin(request);
-            case AUTH_TOKEN          -> handleAuthToken(request);
-            case REGISTER            -> handleRegister(request);
+            case LOGIN -> handleLogin(request);
+            case AUTH_TOKEN -> handleAuthToken(request);
+            case REGISTER -> handleRegister(request);
             case COMPLETE_REGISTRATION -> handleCompleteRegistration(request);
 
-            case FORGOT_PASSWORD          -> handleForgotPassword(request);
+            case FORGOT_PASSWORD -> handleForgotPassword(request);
             case ANSWER_SECURITY_QUESTION -> handleSecurityAnswer(request);
-            case RESET_PASSWORD           -> handleResetPassword(request);
+            case RESET_PASSWORD -> handleResetPassword(request);
 
             case LOGOUT -> handleLogout(request);
 
-            case GET_PROFILE      -> handleGetProfile(request);
-            case CHANGE_USERNAME  -> handleChangeUsername(request);
-            case CHANGE_NICKNAME  -> handleChangeNickname(request);
-            case SYNC_ACCOUNT     -> handleSyncAccount(request);
-            case CHANGE_EMAIL     -> handleChangeEmail(request);
-            case CHANGE_PASSWORD  -> handleChangePassword(request);
+            case GET_PROFILE -> handleGetProfile(request);
+            case CHANGE_USERNAME -> handleChangeUsername(request);
+            case CHANGE_NICKNAME -> handleChangeNickname(request);
+            case SYNC_ACCOUNT -> handleSyncAccount(request);
+            case CHANGE_EMAIL -> handleChangeEmail(request);
+            case CHANGE_PASSWORD -> handleChangePassword(request);
 
             case GET_LEADERBOARD -> handleGetLeaderboard(request);
 
-            case GET_ONLINE_PLAYERS  -> handleGetOnlinePlayers(request);
-            case SEND_INVITE         -> handleSendInvite(request);
-            case CANCEL_INVITE       -> handleCancelInvite(request);
-            case RESPOND_INVITE      -> handleRespondInvite(request);
-            case CHECK_INVITE        -> handleCheckInvite(request);
-            case JOIN_RANDOM_QUEUE   -> handleJoinRandomQueue(request);
-            case LEAVE_RANDOM_QUEUE  -> handleLeaveRandomQueue(request);
-            case CHECK_RANDOM_MATCH  -> handleCheckRandomMatch(request);
+            case GET_ONLINE_PLAYERS -> handleGetOnlinePlayers(request);
+            case SEND_INVITE -> handleSendInvite(request);
+            case CANCEL_INVITE -> handleCancelInvite(request);
+            case RESPOND_INVITE -> handleRespondInvite(request);
+            case CHECK_INVITE -> handleCheckInvite(request);
+            case JOIN_RANDOM_QUEUE -> handleJoinRandomQueue(request);
+            case LEAVE_RANDOM_QUEUE -> handleLeaveRandomQueue(request);
+            case CHECK_RANDOM_MATCH -> handleCheckRandomMatch(request);
             case CHECK_INVITE_RESULT -> handleCheckInviteResult(request);
             case SEND_REACTION -> handleSendReaction(request);
             case GAME_ACTION -> handleGameAction(request);
@@ -337,44 +332,26 @@ public class ClientHandler implements Runnable, MatchPeer {
      * and marks the player as online in the lobby.
      * Called on both fresh login and token restore.
      */
-    private void registerSession(
-            String token,
-            Account account
-    ) {
+    private void registerSession(String token, Account account) {
         Objects.requireNonNull(account, "account");
-
         if (token == null || token.isBlank()) {
             throw new IllegalArgumentException(
                     "Session token must not be blank."
             );
         }
-
         if (account.getName() == null
                 || account.getName().isBlank()) {
             throw new IllegalArgumentException(
                     "Account username must not be blank."
             );
         }
-
-        /*
-         * Remove a previous token associated with this same
-         * connection before registering the new session.
-         */
         String previousToken = sessionToken;
-
-        if (previousToken != null
-                && !previousToken.equals(token)) {
-            connectedPeers.remove(
-                    previousToken,
-                    this
-            );
-
+        if (previousToken != null && !previousToken.equals(token)) {
+            connectedPeers.remove(previousToken, this);
             lobby.playerLeft(previousToken);
         }
-
         sessionToken = token;
         sessionUsername = account.getName();
-
         ClientHandler previousConnection =
                 connectedPeers.put(
                         token,
@@ -715,96 +692,27 @@ public class ClientHandler implements Runnable, MatchPeer {
     // LOBBY — RESPOND TO INVITE
     // =========================================================
 
-    private NetworkResponse handleRespondInvite(
-            NetworkRequest request
-    ) {
-        if (!validSession(request.getToken())) {
-            return NetworkResponse.error(
-                    "Invalid session."
-            );
-        }
-
-        if (request.getData() == null
-                || !request.getData().has("accepted")) {
-            return NetworkResponse.error(
-                    "Missing 'accepted' field."
-            );
-        }
-
-        boolean accepted =
-                request.getData()
-                        .get("accepted")
-                        .getAsBoolean();
-
-        /*
-         * Capture the exact inviter token before respondToInvite()
-         * removes the pending invitation.
-         */
-        LobbyManager.PendingInvite pendingInvite =
-                lobby.getInviteFor(
-                        request.getToken()
-                );
-
-        if (pendingInvite == null) {
-            return NetworkResponse.error(
-                    "No pending invite found."
-            );
-        }
-
-        String error =
-                lobby.respondToInvite(
-                        request.getToken(),
-                        accepted
-                );
-
-        if (error != null) {
+    private NetworkResponse handleRespondInvite(NetworkRequest request) {
+        if (!validSession(request.getToken()))
+            return NetworkResponse.error("Invalid session.");
+        if (request.getData() == null || !request.getData().has("accepted"))
+            return NetworkResponse.error("Missing 'accepted' field.");
+        boolean accepted = request.getData().get("accepted").getAsBoolean();
+        LobbyManager.PendingInvite pendingInvite = lobby.getInviteFor(request.getToken());
+        if (pendingInvite == null)
+            return NetworkResponse.error("No pending invite found.");
+        String error = lobby.respondToInvite(request.getToken(), accepted);
+        if (error != null)
             return NetworkResponse.error(error);
-        }
-
         if (accepted) {
-            String inviterToken =
-                    pendingInvite.inviterToken();
-
-            String recipientToken =
-                    pendingInvite.invitedToken();
-
-            if (!recipientToken.equals(
-                    request.getToken()
-            )) {
-                return NetworkResponse.error(
-                        "Invite recipient does not match the active session."
-                );
-            }
-
-            /*
-             * Deterministic role assignment:
-             * inviter   -> PLANTS
-             * recipient -> ZOMBIES
-             */
-            matchManager.createRoom(
-                    inviterToken,
-                    recipientToken
-            );
+            String inviterToken = pendingInvite.inviterToken();
+            String recipientToken = pendingInvite.invitedToken();
+            if (!recipientToken.equals(request.getToken()))
+                return NetworkResponse.error("Invite recipient does not match the active session.");
+            matchManager.createRoom(inviterToken, recipientToken);
         }
-
-        return NetworkResponse.success(
-                accepted
-                        ? "Invite accepted."
-                        : "Invite rejected."
-        );
+        return NetworkResponse.success(accepted ? "Invite accepted." : "Invite rejected.");
     }
-
-    /**
-     * After an invite is accepted both tokens are in LobbyManager.confirmedMatches.
-     * Poll both sides and create the room.
-     * The invitee's token is known (recipientToken); we find the inviter by
-     * scanning confirmedMatches — whoever has this username as opponent.
-     */
-
-    // =========================================================
-    // LOBBY — CHECK INCOMING INVITE
-    // =========================================================
-
     private NetworkResponse handleCheckInvite(NetworkRequest request) {
         if (!validSession(request.getToken())) {
             return NetworkResponse.error("Invalid session.");
@@ -946,10 +854,6 @@ public class ClientHandler implements Runnable, MatchPeer {
                     "Invalid session."
             );
         }
-
-        /*
-         * The request token must belong to this particular socket.
-         */
         if (sessionToken == null
                 || !sessionToken.equals(
                 request.getToken()
@@ -958,13 +862,11 @@ public class ClientHandler implements Runnable, MatchPeer {
                     "Session token does not belong to this connection."
             );
         }
-
         if (request.getData() == null) {
             return NetworkResponse.error(
                     "Missing command data."
             );
         }
-
         try {
             MatchCommand command =
                     gson.fromJson(
@@ -977,16 +879,13 @@ public class ClientHandler implements Runnable, MatchPeer {
                         "Invalid match command."
                 );
             }
-
             matchManager.handleCommand(
                     command,
                     sessionToken
             );
-
             return NetworkResponse.success(
                     "Action accepted."
             );
-
         } catch (IllegalArgumentException
                  | IllegalStateException exception) {
             return NetworkResponse.error(
@@ -1024,32 +923,25 @@ public class ClientHandler implements Runnable, MatchPeer {
         data.addProperty("status", result.status().name());
         return new NetworkResponse(success, result.message(), data);
     }
+
     private NetworkResponse handleSendReaction(NetworkRequest request) {
         if (!validSession(request.getToken())) {
             return NetworkResponse.error("Invalid session.");
         }
-
         if (request.getData() == null) {
             return NetworkResponse.error("Missing reaction data.");
         }
-
-        // Expect: { "kind": "EMOJI", "index": 1 }
         ReactionPayload payload;
         try {
             payload = ReactionPayload.fromJson(request.getData());
         } catch (Exception e) {
             return NetworkResponse.error("Invalid reaction payload: " + e.getMessage());
         }
-
         if (payload.index() < 0 || payload.index() > 2) {
             return NetworkResponse.error("Reaction index must be 0, 1 or 2.");
         }
-
         try {
-            // Reuse GAME_ACTION relay: wrap in a MatchCommand and hand to MatchManager.
-            // A unique actionId prevents retransmission collisions.
             String actionId = "reaction-" + sessionToken + "-" + System.nanoTime();
-
             MatchCommand command = new MatchCommand(
                     matchManager.findRoomByToken(request.getToken()) != null
                             ? matchManager.findRoomByToken(request.getToken()).matchId()
@@ -1058,10 +950,8 @@ public class ClientHandler implements Runnable, MatchPeer {
                     MatchActionType.REACTION,
                     payload.toJson()
             );
-
             matchManager.handleCommand(command, request.getToken());
             return NetworkResponse.success("Reaction sent.");
-
         } catch (IllegalArgumentException | IllegalStateException e) {
             return NetworkResponse.error(e.getMessage() != null
                     ? e.getMessage() : "Reaction rejected.");

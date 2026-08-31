@@ -8,6 +8,7 @@ import com.ussr.pvz.model.account.AdventureProgress;
 import com.ussr.pvz.model.dto.PlantTypeRequest;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class CollectionService {
     private final Gson gson = new Gson();
     private static final String PLANTS_PATH = "src/resources/plants.json";
     private static final String ZOMBIES_PATH = "src/resources/zombies.json";
+
     public static class PlantData {
         public String id;
         public String name;
@@ -35,6 +37,7 @@ public class CollectionService {
         public String pamPath;
         public boolean isBoosted = false; // always false for now
     }
+
     public static class ZombieData {
         public String name;
         public boolean encountered;
@@ -49,7 +52,8 @@ public class CollectionService {
     public List<ZombieData> getZombieDataForGUI() {
         Account current = App.getAccount();
         List<String> seenZombies = current != null ?
-                current.getAdventureProgress().getSeenZombies().stream().map(String::toUpperCase).toList() : new ArrayList<>();
+                current.getAdventureProgress().getSeenZombies().stream().map(String::toUpperCase).toList()
+                : new ArrayList<>();
 
         List<Map<String, Object>> allZombies = loadConfigFromDisk(ZOMBIES_PATH);
         List<ZombieData> result = new ArrayList<>();
@@ -93,33 +97,21 @@ public class CollectionService {
         Account current = App.getAccount();
         Map<String, Integer> userPlants = current != null ? current.getAdventureProgress().getPlantLvls() : null;
         Map<String, Integer> userPackets = current != null ? current.getAdventureProgress().getSeedPackets() : null;
-
-        if (App.getCachedPlantsData() == null) {
-            App.loadPlantsDataToMemory();
-        }
-
+        if (App.getCachedPlantsData() == null) App.loadPlantsDataToMemory();
         List<Map<String, Object>> allPlants = loadConfigFromDisk(PLANTS_PATH);
         List<PlantData> result = new ArrayList<>();
-
         for (Map<String, Object> plantMap : allPlants) {
             PlantData data = new PlantData();
             data.name = plantMap.get("name").toString();
             data.id = ChoosePlantService.normalizePlantKey(data.name);
             data.category = plantMap.getOrDefault("category", "UNKNOWN").toString();
-
-            if (userPlants != null && userPlants.containsKey(data.id) && userPlants.get(data.id) > 0) {
+            if (userPlants != null && userPlants.containsKey(data.id) && userPlants.get(data.id) > 0)
                 data.level = userPlants.get(data.id);
-            } else {
-                data.level = 0;
-            }
-
+            else data.level = 0;
             data.ownedPackets = (userPackets != null) ? userPackets.getOrDefault(data.id, 0) : 0;
             int previewLevel = Math.max(1, data.level);
-
             try {
-                Plant plantWithUpgrades =
-                        PlantFactory.createPlantByName(data.name, previewLevel);
-
+                Plant plantWithUpgrades = PlantFactory.createPlantByName(data.name, previewLevel);
                 data.cost = plantWithUpgrades.getCost();
                 data.damage = plantWithUpgrades.getDamage();
                 data.baseHp = plantWithUpgrades.getHp();
@@ -127,29 +119,20 @@ public class CollectionService {
                 data.actionInterval = plantWithUpgrades.getActionInterval();
                 data.abilityValue = plantWithUpgrades.getAbilityValue();
             } catch (Exception exception) {
-                System.err.println(
-                        "Could not calculate menu stats for " + data.name
-                                + ": " + exception.getMessage()
-                );
-
-                // Base-value fallback
+                System.err.println("Could not calculate menu stats for " + data.name + ": " + exception.getMessage());
                 data.cost = ((Number) plantMap.get("cost")).intValue();
                 data.damage = ((Number) plantMap.get("damage")).doubleValue();
                 data.baseHp = ((Number) plantMap.get("baseHp")).doubleValue();
                 data.recharge = ((Number) plantMap.get("recharge")).doubleValue();
-                data.actionInterval =
-                        ((Number) plantMap.get("actionInterval")).doubleValue();
-                data.abilityValue =
-                        ((Number) plantMap.getOrDefault("abilityValue", 0.0)).doubleValue();
+                data.actionInterval = ((Number) plantMap.get("actionInterval")).doubleValue();
+                data.abilityValue = ((Number) plantMap.getOrDefault("abilityValue", 0.0)).doubleValue();
             }
-
-            if (plantMap.containsKey("pamLocation")) {
-                data.pamPath = plantMap.get("pamLocation").toString();
-            } else {
-                String sanitizedName = data.name.toUpperCase().replace(" ", "_").replace("-", "");
+            if (plantMap.containsKey("pamLocation")) data.pamPath = plantMap.get("pamLocation").toString();
+            else {
+                String sanitizedName = data.name.toUpperCase().replace(" ", "_").replace("-",
+                        "");
                 data.pamPath = "768/INITIAL/PLANTS/" + sanitizedName + "/" + sanitizedName + ".PAM";
             }
-
             result.add(data);
         }
         return result;
@@ -168,7 +151,8 @@ public class CollectionService {
         int coinCost = currentLevel * 1000;
         int packetCost = currentLevel * 10;
 
-        if (progress.getCoin() < coinCost || progress.getSeedPackets().getOrDefault(canonicalName, 0) < packetCost) {
+        if (progress.getCoin() < coinCost ||
+                progress.getSeedPackets().getOrDefault(canonicalName, 0) < packetCost) {
             return "Not enough resources.";
         }
 
@@ -227,7 +211,8 @@ public class CollectionService {
         File file = new File(path);
         if (!file.exists()) return new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
-            Type listType = new TypeToken<List<Map<String, Object>>>() {}.getType();
+            Type listType = new TypeToken<List<Map<String, Object>>>() {
+            }.getType();
             List<Map<String, Object>> data = gson.fromJson(reader, listType);
             return data != null ? data : new ArrayList<>();
         } catch (IOException e) {

@@ -1,10 +1,6 @@
 package com.ussr.pvz.controller;
 
-import com.ussr.pvz.controller.command.GlobalCommand;
-import com.ussr.pvz.model.dto.MenuEnterRequest;
 import com.ussr.pvz.service.GlobalService;
-
-import java.util.regex.Matcher;
 
 public class GlobalController {
 
@@ -14,50 +10,12 @@ public class GlobalController {
         this.globalService = new GlobalService();
     }
 
-    public String handleCommand(String command) {
-        for (GlobalCommand cmd : GlobalCommand.values()) {
-            Matcher matcher = cmd.getMatcher(command);
-            if (matcher.matches()) {
-                return switch (cmd) {
-                    case MENU_ENTER -> handleMenuEnter(matcher);
-                    case MENU_SHOW_CURRENT -> handleMenuShowCurrent();
-                    case MENU_LOGOUT -> logout();
-                    case MENU_QUIT -> handMenuQuit();
-                    case MENU_SHOW_ALL -> handleMenuShowAll();
-                    case MENU_EXIT -> handleMenuExit();
-                    case HELP -> handleHelp();
-                };
-            }
-        }
-        return "";
-    }
-
-    private String handleHelp() {
-        return globalService.showHelp();
-    }
-    private String handleMenuShowAll() {
-       return globalService.handleMenuShowAll();
-    }
-
-    public String handMenuQuit() {
-        return globalService.handleQuit();
+    public void handMenuQuit() {
+        globalService.handleQuit();
     }
 
     public String logout() {
         return globalService.handleLogout();
-    }
-
-    private String handleMenuEnter(Matcher matcher) {
-        MenuEnterRequest request = new MenuEnterRequest(matcher.group("menuName"));
-        return globalService.menuEnter(request);
-    }
-
-    private String handleMenuShowCurrent() {
-        return globalService.menuShowCurrentMenu();
-    }
-
-    private String handleMenuExit() {
-        return exitCurrentMenu();
     }
 
     public String exitCurrentMenu() {

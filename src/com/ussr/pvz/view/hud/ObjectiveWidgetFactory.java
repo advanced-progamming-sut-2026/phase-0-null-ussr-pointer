@@ -17,17 +17,6 @@ import pvz.libpvz.textures.TextureBank;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Generates decoupled sub-widgets for arbitrary level behaviors.
- *
- * <p>Text-only objectives (TimedWar, Endless, AllowedPlantsLost) are NOT
- * rendered here anymore — they are shown in the {@link LevelIntroOverlay}
- * after Crazy Dave's dialogue finishes so they never fight the seed-bank
- * layout for horizontal space.</p>
- *
- * <p>Persistent visual widgets (BossHealthBar, DeadlineLine) still live
- * on-lawn because they need to be visible throughout play.</p>
- */
 public class ObjectiveWidgetFactory {
 
     public record ObjectiveWidgets(Actor topBarWidget, Actor lawnOverlayWidget) {}

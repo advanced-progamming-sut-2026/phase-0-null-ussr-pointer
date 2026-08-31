@@ -113,43 +113,29 @@ public class CollectionMenu extends FadingMenu {
     private Table buildTabsTable() {
         Table header = new Table();
         header.pad(12, 18, 10, 18);
-        if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class)) {
-            header.setBackground(skin.getDrawable(
-                    "image_ui_dialog_asset_inner_bkgd_10"
-            ));
-        }
-
+        if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class))
+            header.setBackground(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10"));
         Label title = new Label("COLLECTION", skin, "big_outline");
-        Label subtitle = new Label(
-                "Browse your plants and discovered zombies",
-                skin,
-                "default"
-        );
+        Label subtitle = new Label("Browse your plants and discovered zombies", skin, "default");
         subtitle.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
-
         Table heading = new Table();
         heading.left();
         heading.add(title).left().row();
         heading.add(subtitle).left().padTop(2f);
-
         resultsLabel = new Label("", skin, "default");
         resultsLabel.setColor(new Color(0.25f, 0.20f, 0.14f, 1f));
         resultsLabel.setAlignment(Align.right);
-
         header.add(heading).growX().left();
         header.add(resultsLabel).width(250f).right().row();
-
         plantsTabButton = new TextButton("PLANTS", skin, "green");
         zombiesTabButton = new TextButton("ZOMBIES", skin, "purple");
         plantsTabButton.getLabel().setFontScale(0.9f);
         zombiesTabButton.getLabel().setFontScale(0.9f);
-
         Table tabs = new Table();
         tabs.left();
         tabs.add(plantsTabButton).width(220f).height(52f).padRight(8f);
         tabs.add(zombiesTabButton).width(220f).height(52f);
         header.add(tabs).colspan(2).growX().left().padTop(12f);
-
         plantsTabButton.addListener(new ClickListener() {
             @Override public void clicked(InputEvent e, float x, float y) {
                 filterBar.setVisible(true);
@@ -164,7 +150,6 @@ public class CollectionMenu extends FadingMenu {
                 loadZombiesTab();
             }
         });
-
         setActiveTab(true);
         return header;
     }

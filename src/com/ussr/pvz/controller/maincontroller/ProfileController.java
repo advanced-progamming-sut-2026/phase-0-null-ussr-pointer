@@ -1,13 +1,11 @@
 package com.ussr.pvz.controller.maincontroller;
 
-import com.ussr.pvz.controller.command.maincommand.ProfileCommand;
 import com.ussr.pvz.service.ProfileService;
 import com.ussr.pvz.shared.dto.ChangeEmailRequest;
 import com.ussr.pvz.shared.dto.ChangeNicknameRequest;
 import com.ussr.pvz.shared.dto.ChangePasswordRequest;
 import com.ussr.pvz.shared.dto.ChangeUsernameRequest;
 
-import java.util.regex.Matcher;
 
 public class ProfileController {
 
@@ -16,107 +14,6 @@ public class ProfileController {
 
     public ProfileController() {
     }
-
-    public String handleCommand(
-            String command
-    ) {
-
-        for (ProfileCommand cmd :
-                ProfileCommand.values()) {
-
-            Matcher matcher =
-                    cmd.getMatcher(command);
-
-            if (matcher.matches()) {
-
-                return switch (cmd) {
-
-                    case CHANGE_USERNAME ->
-                            handleChangeUsername(
-                                    matcher
-                            );
-
-                    case CHANGE_NICKNAME ->
-                            handleChangeNickname(
-                                    matcher
-                            );
-
-                    case CHANGE_EMAIL ->
-                            handleChangeEmail(
-                                    matcher
-                            );
-
-                    case CHANGE_PASSWORD ->
-                            handleChangePassword(
-                                    matcher
-                            );
-
-                    case SHOW_INFO ->
-                            handleShowInfo();
-                };
-            }
-        }
-
-        return "";
-    }
-
-
-    private String handleChangeUsername(
-            Matcher matcher
-    ) {
-
-        return changeUsername(
-                matcher.group(
-                        "username"
-                )
-        );
-    }
-
-
-    private String handleChangeNickname(
-            Matcher matcher
-    ) {
-
-        return changeNickname(
-                matcher.group(
-                        "nickname"
-                )
-        );
-    }
-
-
-    private String handleChangeEmail(
-            Matcher matcher
-    ) {
-
-        return changeEmail(
-                matcher.group(
-                        "email"
-                )
-        );
-    }
-
-
-    private String handleChangePassword(
-            Matcher matcher
-    ) {
-
-        return changePassword(
-                matcher.group(
-                        "oldPassword"
-                ),
-                matcher.group(
-                        "newPassword"
-                )
-        );
-    }
-
-
-    private String handleShowInfo() {
-
-        return profileService.showInfo();
-    }
-
 
     public String changeUsername(
             String username

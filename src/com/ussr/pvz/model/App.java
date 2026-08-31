@@ -143,11 +143,6 @@ public class App {
         return value;
     }
 
-
-    // =========================================================
-    // ACCOUNT
-    // =========================================================
-
     public static void login(
             Account account
     ) {
@@ -155,8 +150,6 @@ public class App {
         App.account =
                 account;
     }
-
-
     public static void logout() {
 
         App.account =
@@ -169,60 +162,19 @@ public class App {
     public static Account getAccount() {
         return App.account;
     }
-
-
-    // =========================================================
-    // SERVER PERSISTENCE
-    // =========================================================
-
-    /*
-     * Kept temporarily so existing startup code does not break.
-     *
-     * Account persistence is now handled by the server,
-     * therefore the client has nothing to save on shutdown.
-     */
-    public static void registerShutdownHook() {
-
-        // Intentionally empty.
-        // Server owns account persistence.
-    }
-
-
-    // =========================================================
-    // PLANT DATA
-    // =========================================================
+    public static void registerShutdownHook() {}
 
     public static void loadPlantsDataToMemory() {
 
-        if (cachedPlantsData != null) {
+        if (cachedPlantsData != null)
             return;
-        }
-
-        Gson gson =
-                new GsonBuilder()
-                        .setObjectToNumberStrategy(
-                                ToNumberPolicy.LONG_OR_DOUBLE
-                        )
-                        .create();
-
-        File allPlantsFile =
-                new File(
-                        "src/resources/plants.json"
-                );
-
+        Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE).create();
+        File allPlantsFile = new File("src/resources/plants.json");
         if (!allPlantsFile.exists()) {
-
-            System.err.println(
-                    "Critical Error: plants.json "
-                            + "not found during App boot!"
-            );
-
-            cachedPlantsData =
-                    new ArrayList<>();
-
+            System.err.println("Critical Error: plants.json " + "not found during App boot!");
+            cachedPlantsData = new ArrayList<>();
             return;
         }
-
         try (FileReader reader =
                      new FileReader(
                              allPlantsFile
@@ -245,15 +197,9 @@ public class App {
                 cachedPlantsData =
                         new ArrayList<>();
             }
-
         } catch (IOException e) {
-
-            System.err.println(
-                    "Error caching plants.json "
-                            + "to memory: "
-                            + e.getMessage()
+            System.err.println("Error caching plants.json " + "to memory: " + e.getMessage()
             );
-
             cachedPlantsData =
                     new ArrayList<>();
         }
@@ -265,12 +211,6 @@ public class App {
 
         return cachedPlantsData;
     }
-
-
-    // =========================================================
-    // MENU
-    // =========================================================
-
     public static MenuState getMenuState() {
 
         return App.menuState;

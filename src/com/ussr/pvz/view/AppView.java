@@ -109,7 +109,6 @@ public class AppView implements ApplicationListener {
                             "localhost",
                             8080
                     );
-
             if (SessionManager.isLoggedIn()) {
                 LoginResult restore = new LoginController().restoreSession();
                 if (restore.status() == LoginStatus.LOGIN_SUCCESS) {
@@ -122,45 +121,29 @@ public class AppView implements ApplicationListener {
                             + e.getMessage()
             );
         }
-        // The lawn background, entities, hitboxes and mouse input all share
-        // this fixed logical canvas. Different monitor sizes/aspect ratios only
-        // scale the complete canvas; they never change its world dimensions.
         Viewport viewport = new FitViewport(MENU_WORLD_WIDTH, MENU_WORLD_HEIGHT);
-
         stage = new Stage(viewport);
         skin = PvzSkin.get();
         configureFontRendering();
         audioManager = new GdxAudioManager(new AudioSettings());
         AudioService.set(audioManager);
         installMissingSkinStyles();
-
         screenRoot = new Table();
         screenRoot.setFillParent(true);
         stage.addActor(screenRoot);
-
         globalMenuHud = new GlobalMenuHud(skin);
         stage.addActor(globalMenuHud);
-
         loadingOverlay = new LoadingOverlay(skin);
         stage.addActor(loadingOverlay);
         globalInviteOverlay = new GlobalInviteOverlay(skin);
         stage.addActor(globalInviteOverlay);
-
         notificationOverlay = new NotificationOverlay(skin);
         stage.addActor(notificationOverlay);
         menuDebugHud = new MenuDebugHud(skin);
         stage.addActor(menuDebugHud);
         showMenu(App.getMenuState());
-
         Gdx.input.setInputProcessor(stage);
     }
-
-    /**
-     * PvzSkin uses bitmap fonts. The stage is designed at 1280x720 and is
-     * enlarged on higher-resolution displays, so nearest filtering exposes
-     * the individual font texels. Linear filtering keeps scaled glyph edges
-     * smooth, while non-integer placement avoids fullscreen rounding jitter.
-     */
     private void configureFontRendering() {
         for (BitmapFont font
                 : skin.getAll(BitmapFont.class).values()) {
@@ -353,71 +336,34 @@ public class AppView implements ApplicationListener {
     private void rebuildMenu(MenuState state) {
         disposeCurrentScreen();
         screenRoot.clearChildren();
-
         configureViewportFor(state);
-
         switch (state) {
             case REGISTER -> screenRoot.add(new RegisterMenu(skin)).grow();
-
             case LOGIN -> screenRoot.add(new LoginMenu(skin)).grow();
-
             case PROFILE -> screenRoot.add(new ProfileMenu(skin)).grow();
-
             case MAIN -> screenRoot.add(new MainMenu(skin)).grow();
-
             case NEWS -> screenRoot.add(createNewsScreen()).grow();
-
             case SETTING -> screenRoot.add(new SettingMenu(skin)).grow();
-
             case GAME -> {
-                if (App.getGameSession() != null) {
-                    FileHandle assetsFolder =
-                            files.local("pvz-assets");
-                    TextureBank gameTextures =
-                            new TextureBank("ATLASES", assetsFolder);
-                    PamPlayer gamePamPlayer =
-                            new PamPlayer(gameTextures, assetsFolder);
-
-                    screenRoot.add(new com.ussr.pvz.view.gameplay.ActiveGameplayView(
-                            skin,
-                            gameTextures,
-                            gamePamPlayer,
+                if (App.getGameSession() != null) {FileHandle assetsFolder = files.local("pvz-assets");
+                    TextureBank gameTextures = new TextureBank("ATLASES", assetsFolder);
+                    PamPlayer gamePamPlayer = new PamPlayer(gameTextures, assetsFolder);
+                    screenRoot.add(new com.ussr.pvz.view.gameplay.ActiveGameplayView(skin, gameTextures, gamePamPlayer,
                             audioManager
                     )).grow();
-                } else {
+                } else
                     screenRoot.add(new GameMenu(skin)).grow();
-                }
             }
-
-            case LEVEL_SELECTION -> screenRoot.add(
-                    new GraphicalLevelSelectionMenu(skin)
-            ).grow();
-
+            case LEVEL_SELECTION -> screenRoot.add(new GraphicalLevelSelectionMenu(skin)).grow();
             case GREENHOUSE -> screenRoot.add(new GreenHouseMenu(skin)).grow();
-
             case SHOP -> screenRoot.add(new ShopMenu(skin)).grow();
-
             case TRAVEL_LOG -> screenRoot.add(new TravelLogMenu(skin)).grow();
-
             case LEADERBOARD -> screenRoot.add(new LeaderBoardMenu(skin)).grow();
-
-            case COLLECTION -> screenRoot.add(new CollectionMenu(
-                    skin
-            )).grow();
+            case COLLECTION -> screenRoot.add(new CollectionMenu(skin)).grow();
             case CHOOSE_PLANT -> screenRoot.add(new ChoosePlantMenu(skin)).grow();
-            case LOBBY -> screenRoot.add(
-                    new com.ussr.pvz.view.mainmenu.lobby.LobbyMenu(
-                            skin,
-                            globalInviteOverlay   // pass the overlay reference
-                    )
-            ).grow();
-            default -> screenRoot.add(
-                    new Label(
-                            state.getName(),
-                            skin,
-                            "big_outline"
-                    )
-            );
+            case LOBBY -> screenRoot.add(new com.ussr.pvz.view.mainmenu.lobby.LobbyMenu(skin, globalInviteOverlay))
+                    .grow();
+            default -> screenRoot.add(new Label(state.getName(), skin, "big_outline"));
         }
 
         configureGlobalHud(state);

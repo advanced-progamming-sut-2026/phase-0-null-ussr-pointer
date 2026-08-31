@@ -15,14 +15,12 @@ public class DebugToolsWidget extends Table {
                 if (App.getGameSession() != null) App.getGameSession().addSun(100);
             }
         });
-
         TextButton addPfBtn = new TextButton("+1 Food", skin, "default");
         addPfBtn.addListener(new ChangeListener() {
             @Override public void changed(ChangeEvent event, Actor actor) {
                 if (App.getGameSession() != null) App.getGameSession().addPlantFood();
             }
         });
-
         TextButton addCoinBtn = new TextButton("+500 Coin", skin, "default");
         addCoinBtn.addListener(new ChangeListener() {
             @Override public void changed(ChangeEvent event, Actor actor) {
@@ -30,7 +28,6 @@ public class DebugToolsWidget extends Table {
                     App.getAccount().getAdventureProgress().addCoin(500);
             }
         });
-
         TextButton addGemBtn = new TextButton("+50 Gem", skin, "default");
         addGemBtn.addListener(new ChangeListener() {
             @Override public void changed(ChangeEvent event, Actor actor) {
@@ -38,7 +35,6 @@ public class DebugToolsWidget extends Table {
                     App.getAccount().getAdventureProgress().addGem(50);
             }
         });
-
         TextButton gridDebugBtn = new TextButton("Grid", skin, "default");
         gridDebugBtn.addListener(new ChangeListener() {
             @Override public void changed(ChangeEvent event, Actor actor) {

@@ -21,7 +21,6 @@ public class QuestEventTracker {
 
     public void subscribeTo(GameSession session) {
         GameEventBus eventBus = session.getEventBus();
-
         eventBus.subscribe(GameEvent.SunCollected.class, event -> {
             QuestContext ctx = new QuestContext();
             questManager.onGameEvent("COLLECT_SUN", event.value(), ctx);
@@ -30,12 +29,9 @@ public class QuestEventTracker {
         eventBus.subscribe(GameEvent.LawnMowerTriggered.class, event -> lawnmowerTriggered = true);
         eventBus.subscribe(GameEvent.PlantPlanted.class, event -> {
             String name = event.plantName().toLowerCase();
-            if (name.contains("cherry") || name.contains("bomb") || name.contains("mine")
-                    || name.contains("jalapeno")) {
+            if (name.contains("cherry") || name.contains("bomb") || name.contains("mine") || name.contains("jalapeno")){
                 QuestContext ctx = new QuestContext();
-                questManager.onGameEvent("USE_EXPLOSIVE_PLANTS", 1, ctx);
-            }
-        });
+                questManager.onGameEvent("USE_EXPLOSIVE_PLANTS", 1, ctx);}});
         eventBus.subscribe(GameEvent.ZombieDied.class, event -> {
             QuestContext ctx = new QuestContext();
             ctx.rowIndex = (int) event.y();
@@ -45,21 +41,17 @@ public class QuestEventTracker {
             ctx.elapsedSeconds = (int) session.getElapsedSeconds();
             Chapter activeChapter = App.getLevelManager().getCurrentChapter();
             ctx.chapterId = activeChapter != null ? activeChapter.getId() : "any";
-            java.util.Map<String, Object> plantData =
-                    PlantFactory.getPlantData(event.killerPlantName());
+            java.util.Map<String, Object> plantData = PlantFactory.getPlantData(event.killerPlantName());
             String family = plantData != null ? (String) plantData.get("category") : null;
             if (family != null) sessionFamiliesUsed.add(family);
-            if ("LawnMower".equalsIgnoreCase(event.killerPlantName())) {
-                questManager.onGameEvent("KILL_ZOMBIES_WITH_LAWNMOWER", 1, ctx);
-            }
+            if ("LawnMower".equalsIgnoreCase(event.killerPlantName())) questManager.onGameEvent(
+                    "KILL_ZOMBIES_WITH_LAWNMOWER", 1, ctx);
             questManager.onGameEvent("KILL_ZOMBIES_WITH_SPECIFIC_PLANT", 1, ctx);
             questManager.onGameEvent("KILL_ZOMBIES_IN_CHAPTER", 1, ctx);
             questManager.onGameEvent("KILL_ZOMBIES_TIME_LIMIT", 1, ctx);
             questManager.onGameEvent("KILL_ZOMBIES_EXCLUSIVE_FAMILY", 1, ctx);
-            if (!ctx.hadLawnmower && ctx.columnIndex == 0) {
-                questManager.onGameEvent("KILL_ZOMBIES_FIRST_COLUMN_NO_LAWNMOWER", 1, ctx);
-            }
-        });
+            if (!ctx.hadLawnmower && ctx.columnIndex == 0)
+                questManager.onGameEvent("KILL_ZOMBIES_FIRST_COLUMN_NO_LAWNMOWER", 1, ctx);});
         eventBus.subscribe(GameEvent.GameWon.class, event -> {
             QuestContext ctx = new QuestContext();
             ctx.sunLeft = session.getSunCount();

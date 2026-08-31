@@ -196,20 +196,12 @@ public class GlobalInviteOverlay extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
-
-        // ── FIX: hide the card as soon as any game session is active ──────────
-        // The original code only hid the card in WAITING_FOR_SERVER mode; but if
-        // the player accepted an invite and the session starts before the next
-        // poll tick, INCOMING_INVITE mode could be left visible.  Now we hide
-        // for ALL non-HIDDEN modes the moment a session exists.
         if (App.getGameSession() != null) {
             if (mode != OverlayMode.HIDDEN) {
                 hideCard();
             }
             return;
         }
-
-        // Only poll when the card is not already showing something
         if (mode != OverlayMode.HIDDEN) return;
 
         pollTimer += delta;

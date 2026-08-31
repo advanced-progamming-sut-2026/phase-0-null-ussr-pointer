@@ -1,10 +1,8 @@
 package com.ussr.pvz.controller.maincontroller;
 
-import com.ussr.pvz.controller.command.maincommand.SettingCommand;
 import com.ussr.pvz.model.dto.ChangeDifficultyRequest;
 import com.ussr.pvz.service.SettingService;
 
-import java.util.regex.Matcher;
 
 public class SettingController {
     private final SettingService settingService = new SettingService();

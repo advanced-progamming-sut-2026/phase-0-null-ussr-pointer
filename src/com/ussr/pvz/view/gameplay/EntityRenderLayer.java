@@ -7,10 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.ussr.pvz.model.App;
-import com.ussr.pvz.model.board.structures.IceBlock;
-import com.ussr.pvz.model.board.structures.LawnMower;
-import com.ussr.pvz.model.board.structures.OctopusWrap;
-import com.ussr.pvz.model.board.structures.PushableStructure;
+import com.ussr.pvz.model.board.structures.*;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.projectiles.Projectile;
@@ -23,6 +20,9 @@ import com.ussr.pvz.model.entities.zombies.armor.Armor;
 import com.ussr.pvz.model.entities.zombies.armor.ArmorType;
 import com.ussr.pvz.model.entities.zombies.projectiles.*;
 import com.ussr.pvz.model.entities.zombies.zomboss.ZombossController;
+import com.ussr.pvz.model.level.behavior.CouchIZombieBehavior;
+import com.ussr.pvz.model.level.behavior.IZombieBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.util.Vec2;
 import com.ussr.pvz.view.animation.PamActor;
 import com.ussr.pvz.view.animation.PlantPamActor;
@@ -174,6 +174,15 @@ public class EntityRenderLayer extends Group {
 
     // ---- LawnMowers / Brains ------------------------------------------------
     private void syncLawnMowers(GameSession session, Set<Object> live) {
+        // In i,Zombie modes the lawnmower list is cleared and replaced with brains.
+        // Render brains in the same slot (zombieGroup, same position formula) so
+        // they appear exactly where lawnmowers would normally stand.
+        List<Brain> brains = getBrainsFromBehavior(session);
+        if (brains != null) {
+            syncBrains(session, live, brains);
+            return;
+        }
+
         for (LawnMower mower : session.getLawnMowers()) {
             if (!mower.isAlive()) continue;
             live.add(mower);
@@ -198,6 +207,39 @@ public class EntityRenderLayer extends Group {
                             + LawnGridLayout.MOWER_DRAW_OFFSET_Y
             );
         }
+    }
+
+    private void syncBrains(GameSession session, Set<Object> live, List<Brain> brains) {
+        for (Brain brain : brains) {
+            if (!brain.isAlive()) continue;
+            live.add(brain);
+
+            PamActor actor = zombieGroupActors.computeIfAbsent(brain, b -> {
+                PamActor pa = new PamActor(pamPlayer, ((Brain) b).getPamLocation(), "animation");
+                pa.setPamScale(0.5f);
+                pa.setLooping(true);
+                zombieGroup.addActor(pa);
+                return pa;
+            });
+
+            // Position using the same formula as lawnmowers — brain.position is (-0.5, lane)
+            actor.setPosition(
+                    LawnGridLayout.worldX(brain.getPosition().x())
+                            + LawnGridLayout.CELL_WIDTH / 2f
+                            + LawnGridLayout.MOWER_DRAW_OFFSET_X,
+                    LawnGridLayout.worldY(brain.getPosition().y())
+                            + LawnGridLayout.MOWER_DRAW_OFFSET_Y
+            );
+        }
+    }
+
+    private List<Brain> getBrainsFromBehavior(GameSession session) {
+        if (session.getLevel() == null) return null;
+        Object behavior = session.getLevel().getBehavior();
+        if (behavior instanceof IZombieBehavior iz) return new ArrayList<>(iz.getBrains());
+        if (behavior instanceof MultiplayerIZombieBehavior mp) return new ArrayList<>(mp.getBrains());
+        if (behavior instanceof CouchIZombieBehavior couch) return new ArrayList<>(couch.getBrains());
+        return null;
     }
 
     // ---- Plants -------------------------------------------------------------
@@ -691,8 +733,6 @@ public class EntityRenderLayer extends Group {
 
         return new float[]{x, y};
     }
-
-    // ---- Zombie projectiles -------------------------------------------------
     private void syncZombieProjectiles(GameSession session) {
         List<ZombieProjectile> live = new ArrayList<>(session.getZombieProjectiles());
         Set<ZombieProjectile> liveSet = new HashSet<>(live);
@@ -703,8 +743,6 @@ public class EntityRenderLayer extends Group {
                 continue;
             }
 
-            // Missile projectiles show only the ground reticle during TARGETING —
-            // the missile actor itself doesn't exist yet.
             if (proj instanceof MissileProjectile missile
                     && missile.getPhase() == MissileProjectile.Phase.TARGETING) {
                 continue;
@@ -714,8 +752,6 @@ public class EntityRenderLayer extends Group {
                     + LawnGridLayout.CELL_WIDTH / 2f;
             float screenY = LawnGridLayout.worldY((float) proj.getPosition().y())
                     + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
-
-            // BoneProjectile is atlas-only
             if (proj instanceof BoneProjectile) {
                 TextureRegion region = textures.region("IMAGE_ZOMBIE_BONE_PROJECTILE");
                 if (region != null) {
@@ -727,8 +763,6 @@ public class EntityRenderLayer extends Group {
                 }
                 continue;
             }
-
-            // PAM zombie projectiles go in zombieGroup so they Y-sort with zombies
             String clip = resolveZombieProjectileClip(proj);
             PamActor actor = zombieProjActors.computeIfAbsent(proj, p -> {
                 PamActor a = new PamActor(pamPlayer, p.getPamLocation(), clip);
@@ -739,15 +773,9 @@ public class EntityRenderLayer extends Group {
                 zombieGroup.addActor(a);
                 return a;
             });
-
-            // Missiles switch clip mid-flight (falling -> exploding); baby sharks
-            // switch through swim -> submerge -> attack. Keep both in sync.
             if (proj instanceof MissileProjectile || proj instanceof BabySharkProjectile) {
                 actor.setClip(clip);
             }
-
-            // Same fixed-tick-vs-render-frame mismatch as plant projectiles — tween
-            // toward the new model position instead of snapping every render frame.
             float targetX = screenX - actor.getWidth() / 2f;
             float[] lastTarget = zombieProjectileRenderTargets.get(proj);
             if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != screenY) {

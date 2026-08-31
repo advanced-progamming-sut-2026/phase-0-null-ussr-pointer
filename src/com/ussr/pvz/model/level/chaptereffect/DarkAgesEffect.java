@@ -32,7 +32,6 @@ public class DarkAgesEffect implements ChapterEffect {
                 Grave.Content content = Grave.Content.NONE;
                 if (RAND.nextInt(100) < 20) content = Grave.Content.SUN;
                 else if (RAND.nextInt(100) < 5) content = Grave.Content.PLANT_FOOD;
-
                 Grave grave = new Grave(null, content);
                 grave.setPosition(Vec2.of(targetCol, targetRow));
                 cell.setStructure(grave);
@@ -49,18 +48,13 @@ public class DarkAgesEffect implements ChapterEffect {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 Cell cell = lawn.getCell(r, c);
-                if (cell != null && cell.getInteractableStructure() instanceof Grave grave && grave.isAlive()) {
+                if (cell != null && cell.getInteractableStructure() instanceof Grave grave && grave.isAlive())
                     activeGraves.add(grave);
-                }
             }
         }
         Collections.shuffle(activeGraves);
         if (activeGraves.isEmpty()) return;
-        session.getEventBus().publish(
-                new GameEvent.SpecialLevelAnnouncement(
-                        "THE DEAD ARE RISING!"
-                )
-        );
+        session.getEventBus().publish(new GameEvent.SpecialLevelAnnouncement("THE DEAD ARE RISING!"));
         int spawned = 0;
         for (Grave grave : activeGraves) {
             if (spawned >= perWave) break;

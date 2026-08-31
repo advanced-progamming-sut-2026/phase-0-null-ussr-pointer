@@ -60,7 +60,6 @@ public class ConfigurableQuest implements Quest {
     }
 
     private boolean contextMatches(CriterionProgress c, QuestContext ctx) {
-        // Condition matching logic mapping to QuestContext state fields
         switch (c.getType().toUpperCase()) {
             case "WIN_LEVEL_EXACT_SUN_LEFT":
                 return ctx.sunLeft == c.getInt("exactSunLeft", 0);
@@ -83,8 +82,8 @@ public class ConfigurableQuest implements Quest {
             case "WIN_LEVEL_EMPTY_ROW_AND_COLUMN":
                 int rowIdx = c.getInt("targetRowIndex", -1);
                 int colIdx = c.getInt("targetColumnIndex", -1);
-                return ctx.emptyRows != null && ctx.emptyRows.contains(rowIdx) &&
-                        ctx.emptyColumns != null && ctx.emptyColumns.contains(colIdx);
+                return ctx.emptyRows != null && ctx.emptyRows.contains(rowIdx) && ctx.emptyColumns != null
+                        && ctx.emptyColumns.contains(colIdx);
             case "KILL_ZOMBIES_IN_CHAPTER":
                 String chapter = c.getString("chapter");
                 return chapter == null || chapter.equals("any") || chapter.equals(ctx.chapterId);
@@ -97,13 +96,11 @@ public class ConfigurableQuest implements Quest {
                 return ctx.elapsedSeconds <= timeLimit;
             case "KILL_ZOMBIES_EXCLUSIVE_FAMILY":
                 String reqFamily = c.getString("familyType");
-                return reqFamily != null && ctx.familiesUsed != null
-                        && ctx.familiesUsed.size() == 1
+                return reqFamily != null && ctx.familiesUsed != null && ctx.familiesUsed.size() == 1
                         && ctx.familiesUsed.contains(reqFamily);
             case "WIN_LEVEL_FORBIDDEN_FAMILY":
                 String forbidden = c.getString("forbiddenFamilyType");
-                return forbidden == null || ctx.familiesUsed == null
-                        || !ctx.familiesUsed.contains(forbidden);
+                return forbidden == null || ctx.familiesUsed == null || !ctx.familiesUsed.contains(forbidden);
             case "WIN_DAY_LEVEL_WITH_NIGHT_PLANTS":
                 return true; // Additional logic for mushrooms can be implemented
             case "WIN_CONSECUTIVE_LEVELS_MAX_DIFFICULTY":

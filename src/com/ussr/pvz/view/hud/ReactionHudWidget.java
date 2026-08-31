@@ -66,8 +66,10 @@ public class ReactionHudWidget extends Table {
         tabRow.setVisible(false);
 
         Button tabText  = createAtlasButton("IMAGE_NOTES_ZNOTE_FUTUREBG", "💬");
-        Button tabEmoji = createAtlasButton("IMAGE_ZOMBIE_ZOMBIE_FUTURE_ZOMBOSS_ZOMBIE_FUTURE_ZOMBOSS_229X117", "😀");
-        Button tabStick = createAtlasButton("IMAGE_ZOMBIE_ZOMBIE_ROMAN_ZOMBOSS_ZOMBIE_ROMAN_ZOMBOSS_108X141_10", "🎭");
+        Button tabEmoji = createAtlasButton("IMAGE_ZOMBIE_ZOMBIE_FUTURE_ZOMBOSS_ZOMBIE_FUTURE_ZOMBOSS_229X117",
+                "😀");
+        Button tabStick = createAtlasButton("IMAGE_ZOMBIE_ZOMBIE_ROMAN_ZOMBOSS_ZOMBIE_ROMAN_ZOMBOSS_108X141_10",
+                "🎭");
 
         tabText.addListener(new ClickListener() {
             @Override public void clicked(InputEvent e, float x, float y) { switchTab(ReactionKind.TEXT, tabRow); }
@@ -140,7 +142,8 @@ public class ReactionHudWidget extends Table {
                     final int idx = i;
                     TextButton btn = new TextButton(TEXT_OPTIONS[i], skin);
                     btn.addListener(new ClickListener() {
-                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(ReactionKind.TEXT, idx); }
+                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(ReactionKind.TEXT,
+                                idx); }
                     });
                     optionRow.add(btn).pad(3f).minWidth(80f);
                 }
@@ -150,7 +153,8 @@ public class ReactionHudWidget extends Table {
                     final int idx = i;
                     Button btn = createAtlasButton(EMOJI_KEYS[i], EMOJI_LABELS[i]);
                     btn.addListener(new ClickListener() {
-                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(ReactionKind.EMOJI, idx); }
+                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(ReactionKind.EMOJI,
+                                idx); }
                     });
                     optionRow.add(btn).size(56f, 56f).pad(3f);
                 }
@@ -164,7 +168,8 @@ public class ReactionHudWidget extends Table {
                     pamBtn.setSize(72f, 72f);
                     pamBtn.setTouchable(Touchable.enabled);
                     pamBtn.addListener(new ClickListener() {
-                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(ReactionKind.STICKER, idx); }
+                        @Override public void clicked(InputEvent e, float x, float y) { sendAndClose(
+                                ReactionKind.STICKER, idx); }
                     });
                     optionRow.add(pamBtn).size(72f, 72f).pad(3f);
                 }

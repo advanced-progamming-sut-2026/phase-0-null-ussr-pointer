@@ -1,6 +1,5 @@
 package com.ussr.pvz.controller.maincontroller;
 
-import com.ussr.pvz.controller.command.maincommand.LeaderBoardCommand;
 import com.ussr.pvz.model.dto.LeaderBoardSortRequest;
 import com.ussr.pvz.model.leaderboard.LeaderboardColumn;
 import com.ussr.pvz.model.leaderboard.LeaderboardEntry;
@@ -16,18 +15,6 @@ public class LeaderBoardController {
         this.leaderBoardService = new LeaderBoardService();
     }
 
-    public String handleCommand(String command) {
-        for (LeaderBoardCommand cmd : LeaderBoardCommand.values()) {
-            Matcher matcher = cmd.getMatcher(command);
-            if (matcher.matches()) {
-                return switch (cmd) {
-                    case SHOW -> handleShow();
-                    case SORT -> handleSort(matcher);
-                };
-            }
-        }
-        return "Invalid Leaderboard command.";
-    }
 
     public List<LeaderboardEntry> getEntries(
             LeaderboardColumn column,
@@ -37,17 +24,5 @@ public class LeaderBoardController {
                 column,
                 ascending
         );
-    }
-
-    private String handleShow() {
-        return leaderBoardService.show();
-    }
-
-    private String handleSort(Matcher matcher) {
-        LeaderBoardSortRequest request = new LeaderBoardSortRequest(
-                matcher.group("column"),
-                matcher.group("order")
-        );
-        return leaderBoardService.sort(request);
     }
 }

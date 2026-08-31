@@ -27,55 +27,28 @@ import pvz.libpvz.pam.PamPlayer;
 import pvz.libpvz.textures.TextureBank;
 
 public class ActiveGameplayView extends Table implements Disposable {
-
     static final float TICK_RATE = 0.1f;
-
-    /**
-     * Fixed pixel width of the left lawn panel (house/sidebar area) in the background texture.
-     * Decoupled from LawnGridLayout.OFFSET_X so background aspect ratio remains stable.
-     */
     private static final float BACKGROUND_LEFT_PANEL_WIDTH = 280f;
-
     private float accumulator = 0f;
-
     private final GameplayController controller;
     private final InGameHud inGameHud;
     private final EntityRenderLayer entityLayer;
     private final GameplayMusicDirector musicDirector;
-
-    public ActiveGameplayView(
-            Skin skin,
-            TextureBank textures,
-            PamPlayer pamPlayer,
-            AudioManager audioManager
-    ) {
+    public ActiveGameplayView(Skin skin, TextureBank textures, PamPlayer pamPlayer, AudioManager audioManager) {
         setFillParent(true);
-
         this.controller = new GameplayController();
-        this.musicDirector = new GameplayMusicDirector(
-                audioManager,
-                App.getGameSession()
-        );
-
+        this.musicDirector = new GameplayMusicDirector(audioManager, App.getGameSession());
         Actor background = createBackground(textures);
-
         this.entityLayer = new EntityRenderLayer(pamPlayer, textures);
-
         TerrainRenderLayer terrainLayer = new TerrainRenderLayer(pamPlayer, textures);
-
         GlacierRenderLayer glacierLayer = new GlacierRenderLayer(pamPlayer);
-
         this.inGameHud = new InGameHud(skin, textures, controller,pamPlayer);
-
         LawnWidget lawnWidget = new LawnWidget(controller);
-
         HoverCursorWidget hoverCursor = new HoverCursorWidget(textures, controller);
-
         SunRenderLayer sunLayer = new SunRenderLayer(pamPlayer);
         ItemRenderLayer itemLayer = new ItemRenderLayer(pamPlayer);
         StormRenderLayer stormRearLayer = new StormRenderLayer(pamPlayer, true);
         StormRenderLayer stormTopLayer = new StormRenderLayer(pamPlayer, false);
-
         Stack layers = new Stack() {
             @Override
             public void act(float delta) {
@@ -98,40 +71,16 @@ public class ActiveGameplayView extends Table implements Disposable {
         layers.add(sunLayer);
         layers.add(itemLayer);
         layers.add(stormTopLayer);
-
-        // ── Minigame overlays ─────────────────────────────────────────────────
-        // These sit above the entity/item layers so they can intercept input
-        // and draw highlights, but below the HUD so the HUD always reads on top.
         addMinigameOverlays(layers, textures, skin);
-
-        layers.add(lawnWidget);   // invisible click target — must stay here for
-        // standard gameplay clicks; overlays above it
-        // consume their own clicks first.
+        layers.add(lawnWidget);
         layers.add(new ZombieCursorWidget(controller));
         layers.add(new KeyboardZombieInputWidget(controller));
         layers.add(inGameHud);
         layers.add(hoverCursor);
-        layers.add(new LevelIntroOverlay(
-                skin,
-                textures,
-                pamPlayer,
-                controller,
-                App.getGameSession()
-        ));
-
-        layers.add(new PostGameDialogueOverlay(   // ← add this
-                skin,
-                textures,
-                pamPlayer
-        ));
-
+        layers.add(new LevelIntroOverlay(skin, textures, pamPlayer, controller, App.getGameSession()));
+        layers.add(new PostGameDialogueOverlay(skin, textures, pamPlayer));
         add(layers).grow();
     }
-
-    /**
-     * Inspects the current level's behavior and inserts the appropriate
-     * overlay widget into the layer stack.  Only one overlay is added per session.
-     */
     private void addMinigameOverlays(Stack layers, TextureBank textures, Skin skin) {
         GameSession session = App.getGameSession();
         if (session == null || session.getLevel() == null) return;

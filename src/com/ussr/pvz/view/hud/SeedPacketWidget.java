@@ -56,7 +56,8 @@ public class SeedPacketWidget extends Stack {
 
         Table portraitLayer = new Table();
         portraitLayer.setTouchable(Touchable.disabled);
-        TextureRegion bgRegion = textures.region(blueprint.isBuffed() ? "IMAGE_UI_PACKETS_BOOST" : "IMAGE_UI_PACKETS_EGYPT");
+        TextureRegion bgRegion = textures.region(blueprint.isBuffed() ? "IMAGE_UI_PACKETS_BOOST" :
+                "IMAGE_UI_PACKETS_EGYPT");
         portraitBackground = bgRegion != null ? new Image(bgRegion) : new Image();
         portraitBackground.setScaling(Scaling.fit);
         portraitBackground.setTouchable(Touchable.disabled);

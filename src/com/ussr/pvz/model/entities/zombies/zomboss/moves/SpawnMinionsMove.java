@@ -16,7 +16,7 @@ public class SpawnMinionsMove implements ZombossMove {
 
     @SuppressWarnings("unchecked")
     public SpawnMinionsMove(Map<String, Object> zombieData) {
-        if (zombieData.containsKey("ZombossMinionPool") && zombieData.get("ZombossMinionPool") instanceof List<?> list) {
+        if (zombieData.containsKey("ZombossMinionPool") && zombieData.get("ZombossMinionPool") instanceof List<?> list){
             for (Object obj : list) {
                 minionPool.add(obj.toString());
             }

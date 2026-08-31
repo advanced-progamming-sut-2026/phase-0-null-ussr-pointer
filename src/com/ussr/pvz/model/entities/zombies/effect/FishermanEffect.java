@@ -40,7 +40,8 @@ public class FishermanEffect implements EffectStatus {
             if (!repositioning && zombie.getPosition().x() < rightmostCol) {
                 repositioning = true;
                 session.registerTickable(new RepositionWatcher(
-                        new SmoothMoveTickable(zombie, Vec2.of(rightmostCol, zombie.getPosition().y()), REPOSITION_DURATION_SECONDS),
+                        new SmoothMoveTickable(zombie, Vec2.of(rightmostCol, zombie.getPosition().y()),
+                                REPOSITION_DURATION_SECONDS),
                         () -> repositioning = false
                 ));
             }
@@ -90,7 +91,8 @@ public class FishermanEffect implements EffectStatus {
             currentCell.setPlant(null);
             targetCell.setPlant(hookedPlant);
             hookedPlant.setLocation(new Plant.Location(targetX, zRow));
-            session.registerTickable(new SmoothMoveTickable(hookedPlant, Vec2.of(targetX, zRow), REEL_DURATION_SECONDS));
+            session.registerTickable(new SmoothMoveTickable(hookedPlant, Vec2.of(targetX, zRow),
+                    REEL_DURATION_SECONDS));
             zombie.queueAnimEvent("reel");
             return true;
         }
