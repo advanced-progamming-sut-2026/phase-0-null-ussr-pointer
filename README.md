@@ -191,6 +191,8 @@ Start the game server using the Gradle wrapper:
 
 #### Windows
 
+Double-click `run-server.bat` in the project root, or run manually:
+
 ```bat
 gradlew.bat server.run
 ```
@@ -211,9 +213,13 @@ Once the server is running, launch a client instance:
 
 #### Windows
 
+Double-click `run-client.bat` in the project root, or run manually:
+
 ```bat
 gradlew.bat run
 ```
+
+> On Windows, you can also double-click `play.bat` to start the server and a client together in one step.
 
 Multiple client instances can be launched simultaneously if required.
 
