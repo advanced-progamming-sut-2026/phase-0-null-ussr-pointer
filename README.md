@@ -116,6 +116,53 @@ The project also incorporates several design patterns where they provide a meani
 
 ---
 
+## ☕ Prerequisites
+
+This project requires **JDK 25** to build and run. Gradle will try to auto-download it if missing, but this can fail on restricted networks — installing it manually is more reliable.
+
+### Check if you already have it
+
+```bash
+java -version
+```
+
+If the output shows `25`, you're set and can skip to **Getting Started**.
+
+### Installing JDK 25
+
+Download a JDK 25 build (Eclipse Temurin is recommended) from one of the following:
+
+* **[Adoptium (Eclipse Temurin)](https://adoptium.net/temurin/releases/?version=25)** — official builds for Windows, Linux, and macOS.
+* **[Azul Zulu](https://www.azul.com/downloads/?version=java25&package=jdk)** — alternative distribution, useful if Adoptium/GitHub is unreachable on your network.
+
+#### Windows
+
+1. Download the `.msi` installer for JDK 25.
+2. Run it and make sure **"Set JAVA_HOME variable"** is checked during installation.
+3. Open a new terminal and confirm with `java -version`.
+
+#### Linux / macOS
+
+Use your package manager where possible, e.g.:
+
+```bash
+sdk install java 25-tem   # via SDKMAN
+```
+
+or install the downloaded archive manually and set `JAVA_HOME` accordingly.
+
+### If Gradle still can't find it
+
+Add the install path explicitly to `gradle.properties` in the project root:
+
+```properties
+org.gradle.java.installations.paths=/path/to/your/jdk-25
+```
+
+(On Windows, use a path like `C:/Program Files/Eclipse Adoptium/jdk-25.0.4.1-hotspot`.)
+
+---
+
 ## ⚙️ Getting Started
 
 The following instructions explain how to download, configure, and run the project locally.

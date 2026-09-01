@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://maven.myket.ir/gradle/plugins-portal' }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }/*
