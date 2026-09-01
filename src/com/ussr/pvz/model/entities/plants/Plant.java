@@ -819,6 +819,7 @@ public class Plant extends GameEntity implements Damageable {
         this.animationController.playIdle();
         this.state = PlantState.ACTIVE;
         this.justTransformed = true;
+        this.imitationOverlayActive = false;
     }
 
     private void copyFrom(Plant copy) {

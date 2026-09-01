@@ -255,6 +255,7 @@ public class EntityRenderLayer extends Group {
             if (plant.consumeJustTransformed()) {
                 PamActor stale = plantActors.remove(plant);
                 if (stale != null) plantGroup.removeActor(stale);
+                plantRenderTargets.remove(plant);
             }
             PamActor actor = plantActors.computeIfAbsent(plant, p -> {
                 PlantPamActor pa = new PlantPamActor(pamPlayer, plant.getPamPath(), plant.getAnimationClip());
@@ -446,7 +447,7 @@ public class EntityRenderLayer extends Group {
             boolean bossLocked  = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
             String idleClip = bossStunned ? boss.getStunClip()
                     : bossLocked  ? boss.getLockedClip()
-                      : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+                    : (boss != null ? boss.resolveClip(currentClip) : currentClip);
             if (!zombieActor.isPlayingSpecial()) {
                 List<String> animSeq = zombie.pollAnimSequence();
                 if (animSeq != null) zombieActor.playSequence(animSeq, idleClip, false);

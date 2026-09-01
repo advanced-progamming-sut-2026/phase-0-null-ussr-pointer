@@ -28,15 +28,15 @@ public class LobberBarrage implements PlantFoodEffect {
         List<GameEntity> targets = new ArrayList<>();
         if (session.getZombies() != null) {
             for (Zombie zombie : session.getZombies()) {
-                if (zombie != null && zombie.isAlive() && isInSameLine(user, zombie)) {
+                if (zombie != null && zombie.isAlive()) {
                     targets.add(zombie);
                 }
             }
         }
 
-        if (targets.isEmpty() && session.getLawn() != null) {
+        if (session.getLawn() != null) {
             for (InteractableStructure structure : session.getLawn().getAllInteractable()) {
-                if (structure instanceof Grave grave && grave.isAlive() && isInSameLine(user, grave)) {
+                if (structure instanceof Grave grave && grave.isAlive()) {
                     targets.add(grave);
                 }
             }
@@ -60,11 +60,6 @@ public class LobberBarrage implements PlantFoodEffect {
     @Override
     public void tickDurationEffect(Plant user, GameSession session, double deltaTime) {
         // Instant superpower trigger; no tick duration needed
-    }
-
-    private boolean isInSameLine(Plant user, GameEntity entity) {
-        return entity.getPosition() != null
-                && (Math.abs(user.getPosition().y() - entity.getPosition().y()) < 0.5);
     }
 
     private HitEffectStrategy handleHitEffect(Plant user) {

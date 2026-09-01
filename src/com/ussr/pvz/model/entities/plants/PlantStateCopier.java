@@ -16,7 +16,6 @@ public final class PlantStateCopier {
         target.specialUpgrades.clear();
         target.specialUpgrades.putAll(source.specialUpgrades);
         target.setState(Plant.PlantState.ACTIVE);
-        target.setLocation(source.getLocation());
         target.setActStrategy(source.getActStrategy());
         target.setPlantFoodEffect(source.getPlantFoodEffect());
         target.setWrampUp(source.getWrampUp());
