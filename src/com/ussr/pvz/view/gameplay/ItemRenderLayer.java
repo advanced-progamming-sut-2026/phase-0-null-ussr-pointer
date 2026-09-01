@@ -47,54 +47,34 @@ public class ItemRenderLayer extends Group {
     @Override
     public void act(float delta) {
         super.act(delta); // advances all child actors
-
         GameSession session = App.getGameSession();
         if (session == null) return;
-
         boolean collectAll = Gdx.input.isKeyJustPressed(Input.Keys.A);
-
-        // Mouse in stage coords
         Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         getStage().getViewport().unproject(mouse);
-
-        // ---- sync actors with live items ------------------------------------
         for (GroundItem item : session.getItems()) {
             if (item.getItemType() == ItemType.SUN) continue; // SunRenderLayer owns these
             if (item.isCollected() || !item.isAlive())        continue;
-
-            // Screen position for this item
-            float screenX = LawnGridLayout.worldX(item.getPosition().x())
-                    + LawnGridLayout.CELL_WIDTH / 2f;
+            float screenX = LawnGridLayout.worldX(item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
             float screenY = LawnGridLayout.worldY(item.getPosition().y());
-
             GroundItemActor actor = itemActors.computeIfAbsent(item, i -> {
                 GroundItemActor a = new GroundItemActor(pamPlayer, i);
                 addActor(a);
                 return a;
             });
-
-            // Keep actor positioned at item world position (centered)
-            actor.setPosition(
-                    screenX - actor.getWidth()  / 2f,
-                    screenY - actor.getHeight() / 2f
-            );
-
+            actor.setPosition(screenX - actor.getWidth()  / 2f, screenY - actor.getHeight() / 2f);
             if (actor.isDone()) continue;
-
-            // Collection: hover or collect-all key
             boolean hovered = mouse.dst(screenX, screenY) < COLLECT_RADIUS_PX;
             if (collectAll || hovered) {
                 actor.onCollected();
             }
         }
 
-        // ---- clean up done/dead actors --------------------------------------
         Iterator<Map.Entry<GroundItem, GroundItemActor>> it = itemActors.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<GroundItem, GroundItemActor> entry = it.next();
             GroundItemActor actor = entry.getValue();
             GroundItem      item  = entry.getKey();
-
             if (actor.isDone() || !item.isAlive() || item.isCollected()) {
                 actor.remove();
                 it.remove();

@@ -12,7 +12,6 @@ public class CriterionProgress {
 
     private static final int DEFAULT_COLS = 9;
     private static final int DEFAULT_ROWS = 5;
-    private static final int CHAPTER_COUNT = 4;
     private static final String[] CHAPTER_IDS = {
             "ancient_egypt", "big_wave_beach", "dark_ages", "frostbite_caves"
     };

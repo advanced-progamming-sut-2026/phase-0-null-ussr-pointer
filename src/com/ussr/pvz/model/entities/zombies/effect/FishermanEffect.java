@@ -4,6 +4,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.engine.SmoothMoveTickable;
 import com.ussr.pvz.model.engine.Tickable;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.zombies.Faction;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -90,7 +91,7 @@ public class FishermanEffect implements EffectStatus {
             Cell currentCell = session.getLawn().getCell(zRow, hookedX);
             currentCell.setPlant(null);
             targetCell.setPlant(hookedPlant);
-            hookedPlant.setLocation(new Plant.Location(targetX, zRow));
+            hookedPlant.setLocation(new Location(targetX, zRow));
             session.registerTickable(new SmoothMoveTickable(hookedPlant, Vec2.of(targetX, zRow),
                     REEL_DURATION_SECONDS));
             zombie.queueAnimEvent("reel");

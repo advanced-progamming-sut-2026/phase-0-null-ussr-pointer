@@ -42,7 +42,6 @@ public class ReactionHudWidget extends Table {
     private final PamPlayer   pamPlayer;
 
     private boolean panelOpen = false;
-    private ReactionKind activeTab = ReactionKind.TEXT;
 
     private final Table optionRow = new Table();
 
@@ -128,7 +127,6 @@ public class ReactionHudWidget extends Table {
     }
 
     private void switchTab(ReactionKind kind, Table tabRow) {
-        activeTab = kind;
         rebuildOptions(kind, tabRow);
     }
 

@@ -50,14 +50,11 @@ public class MeowScoreWidget extends Table {
 
     // ── State ─────────────────────────────────────────────────────────────────
     private int  lastDisplayedScore = -1;
-    private int  nextMilestoneIdx   = 0;
     private boolean subscribed      = false;
 
     // =========================================================================
     public MeowScoreWidget(Skin skin, TextureBank textures) {
         setTouchable(Touchable.disabled);
-
-        // ── Score label ───────────────────────────────────────────────────────
         Label scoreTitleLabel = new Label("SCORE", skin, "default");
         scoreTitleLabel.setFontScale(0.6f);
         scoreTitleLabel.setColor(new Color(1f, 0.9f, 0.5f, 1f));
@@ -68,7 +65,6 @@ public class MeowScoreWidget extends Table {
         scoreValueLabel.setColor(Color.WHITE);
         scoreValueLabel.setAlignment(Align.center);
 
-        // ── Best label ────────────────────────────────────────────────────────
         Label bestTitleLabel = new Label("BEST", skin, "default");
         bestTitleLabel.setFontScale(0.55f);
         bestTitleLabel.setColor(new Color(0.8f, 0.8f, 0.8f, 1f));
@@ -79,7 +75,6 @@ public class MeowScoreWidget extends Table {
         bestValueLabel.setColor(new Color(1f, 0.85f, 0.2f, 1f));
         bestValueLabel.setAlignment(Align.center);
 
-        // ── Inner layout ──────────────────────────────────────────────────────
         Table inner = new Table();
         inner.pad(6f, 10f, 6f, 10f);
         inner.add(scoreTitleLabel).expandX().center().row();
@@ -87,7 +82,6 @@ public class MeowScoreWidget extends Table {
         inner.add(bestTitleLabel).expandX().center().row();
         inner.add(bestValueLabel).expandX().center();
 
-        // ── Background panel ──────────────────────────────────────────────────
         panelStack = new Stack();
         if (textures != null) {
             var bg = textures.region("image_ui_hud_ingame_background_3slice");
@@ -101,8 +95,6 @@ public class MeowScoreWidget extends Table {
         panelStack.add(inner);
 
         add(panelStack).width(130f).top().padTop(4f);
-
-        // Start hidden — act() will reveal when in a Meow session
         setVisible(false);
     }
 
@@ -120,7 +112,6 @@ public class MeowScoreWidget extends Table {
             setVisible(false);
             subscribed   = false;
             lastDisplayedScore = -1;
-            nextMilestoneIdx   = 0;
             return;
         }
 

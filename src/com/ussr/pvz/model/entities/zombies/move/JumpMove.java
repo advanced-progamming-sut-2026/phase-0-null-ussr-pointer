@@ -34,11 +34,7 @@ public class JumpMove implements MoveBehavior {
     }
 
     @Override
-    public void move(
-            Zombie zombie,
-            GameSession session,
-            float delta
-    ) {
+    public void move(Zombie zombie, GameSession session, float delta) {
         if (cooldownTimer > 0) {
             cooldownTimer -= delta;
             if (cooldownTimer < 0) cooldownTimer = 0;
@@ -84,12 +80,7 @@ public class JumpMove implements MoveBehavior {
             gridAccumulator = 0;
         } else {
             Vec2 newPos = pos.add(vel.scale(delta));
-            newPos = applySlipperyShift(
-                    zombie,
-                    pos,
-                    newPos,
-                    session
-            );
+            newPos = applySlipperyShift(zombie, pos, newPos, session);
             zombie.setPosition(newPos);
         }
     }

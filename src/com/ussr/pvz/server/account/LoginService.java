@@ -31,77 +31,25 @@ public class LoginService {
     // LOGIN
     // =========================================================
 
-    public ServerLoginResult login(
-            LoginRequest request
-    ) {
-
-        if (request == null ||
-                request.username() == null ||
-                request.password() == null) {
-
-            return ServerLoginResult.error(
-                    LoginResult.error(
-                            "Invalid login request."
-                    )
-            );
+    public ServerLoginResult login(LoginRequest request) {
+        if (request == null || request.username() == null || request.password() == null) {
+            return ServerLoginResult.error(LoginResult.error("Invalid login request."));
         }
-
-        Account account =
-                accountRepository.findByUsername(
-                        request.username()
-                );
-
+        Account account = accountRepository.findByUsername(request.username());
         if (account == null) {
-
-            return ServerLoginResult.error(
-                    LoginResult.error(
-                            "Username not found."
-                    )
-            );
+            return ServerLoginResult.error(LoginResult.error("Username not found."));
         }
-
-        String hashedPassword =
-                SecurityUtil.hashPassword(
-                        request.password()
-                );
-
-        if (!account
-                .getPassword()
-                .equals(hashedPassword)) {
-
-            return ServerLoginResult.error(
-                    LoginResult.error(
-                            "Invalid password."
-                    )
-            );
+        String hashedPassword = SecurityUtil.hashPassword(request.password());
+        if (!account.getPassword().equals(hashedPassword)) {
+            return ServerLoginResult.error(LoginResult.error("Invalid password."));
         }
-
         account.updateLoginTime();
-
         accountRepository.save();
-
-        String token =
-                sessionManager.createSession(
-                        account
-                );
-
-        LoginResult result =
-                LoginResult.of(
-                        LoginStatus.LOGIN_SUCCESS,
-                        "Logged in successfully."
-                );
-
-        return ServerLoginResult.success(
-                result,
-                token,
-                account
-        );
+        String token = sessionManager.createSession(account);
+        LoginResult result = LoginResult.of(LoginStatus.LOGIN_SUCCESS, "Logged in successfully.");
+        return ServerLoginResult.success(result, token, account);
     }
 
-
-    // =========================================================
-    // SESSION
-    // =========================================================
 
     public boolean isLoggedIn(
             String token
@@ -127,23 +75,15 @@ public class LoginService {
     // FORGOT PASSWORD
     // =========================================================
 
-    public PasswordResetStartResult forgetPassword(
-            ForgetPasswordRequest request
-    ) {
+    public PasswordResetStartResult forgetPassword(ForgetPasswordRequest request) {
 
         if (request == null ||
                 request.username() == null ||
                 request.email() == null) {
 
-            return PasswordResetStartResult.error(
-                    "Invalid password recovery request."
-            );
+            return PasswordResetStartResult.error("Invalid password recovery request.");
         }
-
-        Account account =
-                accountRepository.findByUsername(
-                        request.username()
-                );
+        Account account = accountRepository.findByUsername(request.username());
 
         if (account == null) {
 

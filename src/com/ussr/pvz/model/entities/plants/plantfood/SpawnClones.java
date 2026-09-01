@@ -2,6 +2,7 @@ package com.ussr.pvz.model.entities.plants.plantfood;
 
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.plants.Tag;
@@ -91,7 +92,7 @@ public class SpawnClones implements PlantFoodEffect {
 
         for (Plant p : session.getPlants()) {
             if (p != null && p.isAlive()) {
-                Plant.Location loc = p.getLocation();
+                Location loc = p.getLocation();
                 if (loc != null && loc.x() - x < 0.2 && loc.y() - y < 0.2) {
                     // For Lily Pad (waterOnly), a cell is occupied if another Lily Pad / Base plant is present
                     if (this.waterOnly) {

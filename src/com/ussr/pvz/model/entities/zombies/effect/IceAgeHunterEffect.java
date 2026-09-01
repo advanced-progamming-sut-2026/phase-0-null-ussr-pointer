@@ -86,7 +86,8 @@ public class IceAgeHunterEffect implements EffectStatus {
 
             if (closestZombie != null && closestDistance >= nearAttackRange && closestDistance <= farAttackRange) {
                 zombie.queueAnimEvent("throw");
-                session.addZombieProjectile(new SnowballProjectile(startPos, closestZombie.getPosition(), 0.8, snowballHitPam));
+                session.addZombieProjectile(new SnowballProjectile(startPos, closestZombie.getPosition(), 0.8,
+                        snowballHitPam));
                 return true;
             }
         }

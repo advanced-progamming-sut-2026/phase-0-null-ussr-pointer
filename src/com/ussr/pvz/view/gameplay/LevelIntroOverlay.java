@@ -67,44 +67,29 @@ public final class LevelIntroOverlay extends Table {
     // =========================================================================
     // Constructor
     // =========================================================================
-    public LevelIntroOverlay(
-            Skin         skin,
-            TextureBank  textures,
-            PamPlayer    pamPlayer,
-            GameplayController controller,
-            GameSession  session
-    ) {
+    public LevelIntroOverlay(Skin skin, TextureBank textures, PamPlayer pamPlayer, GameplayController controller,
+            GameSession  session) {
         this.controller = controller;
         this.session    = session;
         this.dialogue   = resolveDialogue(session);
         this.objectives = ObjectiveWidgetFactory.collectTextObjectives(session);
-
         setFillParent(true);
         setTouchable(Touchable.disabled);
         setVisible(false);
         setBackground(skin.newDrawable("white-pixel", new Color(0f, 0f, 0f, 0.48f)));
-
-        // ── Dave actor ────────────────────────────────────────────────────────
         daveActor = new PamActor(pamPlayer, DAVE_PAM, "anim_enter");
         daveActor.setPamScale(0.82f);
         daveActor.setLooping(false);
-
-        // ── Speech bubble ─────────────────────────────────────────────────────
         dialogueLabel = new Label("", skin, "big_outline");
         dialogueLabel.setWrap(true);
         dialogueLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
         dialogueLabel.setColor(Color.WHITE);
         speechBubble = createSpeechBubble(skin, textures);
-
-        // ── Objective card ────────────────────────────────────────────────────
         objectiveLabel = new Label("", skin, "medium_outline");
         objectiveLabel.setWrap(true);
         objectiveLabel.setAlignment(com.badlogic.gdx.utils.Align.center);
         objectiveCard  = buildObjectiveCard(skin, textures);
-
         buildLayout();
-
-        // ── Click to advance / dismiss ────────────────────────────────────────
         addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -115,11 +100,7 @@ public final class LevelIntroOverlay extends Table {
                 }
             }
         });
-
-        // ── Boot ──────────────────────────────────────────────────────────────
         if (session == null || session.isLevelIntroShown()) {
-            // No intro at all — but we still might need to show objective card.
-            // Show it immediately (briefly paused) if there are text objectives.
             if (!objectives.isEmpty()) {
                 addAction(sequence(delay(0.5f), run(this::openObjectiveCardDirectly)));
             } else {
@@ -133,10 +114,6 @@ public final class LevelIntroOverlay extends Table {
             }
         }
     }
-
-    // =========================================================================
-    // Layout helpers
-    // =========================================================================
     private List<String> resolveDialogue(GameSession gs) {
         if (gs == null || gs.getLevel() == null) return List.of();
         return LevelDialogueRegistry.getDialogue(

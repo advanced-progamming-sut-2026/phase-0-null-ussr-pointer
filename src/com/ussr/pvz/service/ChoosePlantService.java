@@ -236,7 +236,6 @@ public class ChoosePlantService {
     public List<CollectionService.PlantData> getSelectablePlants() {
         Chapter chapter = App.getLevelManager().getCurrentChapter();
         List<String> allowed = chapter != null ? chapter.getAllowedPlants() : null;
-        AdventureProgress adv = App.getAccount().getAdventureProgress();
 
         return new CollectionService().getPlantDataForGUI().stream()
                 .filter(p -> {

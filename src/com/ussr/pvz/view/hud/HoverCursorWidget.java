@@ -87,7 +87,8 @@ public class HoverCursorWidget extends Actor {
                         } catch (Exception e2) {
                             currentPlantActor = null;
                             Gdx.app.error("HoverCursorWidget",
-                                    "[PAM ASSET MISSING] Could not load idle PAM animation for plant key: '" + selectedKey + "'");
+                                    "[PAM ASSET MISSING] Could not load idle PAM animation for plant key: '"
+                                            + selectedKey + "'");
                         }
                     }
                 }
@@ -105,59 +106,40 @@ public class HoverCursorWidget extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (controller.isPaused()) return;
-
         Vector2 mouse = getLocalMousePosition();
         boolean inBounds = LawnGridLayout.contains(mouse.x, mouse.y);
-
         int column = -1;
         int row = -1;
         if (inBounds) {
             column = LawnGridLayout.columnAt(mouse.x);
             row = LawnGridLayout.rowAt(mouse.y);
         }
-
-        // ── 1. Plant food mode ───────────────────────────────────────────
         if (controller.isPlantFoodModeActive()) {
             if (inBounds) {
-                drawHighlight(batch, parentAlpha,
-                        LawnGridLayout.cellX(column),
-                        LawnGridLayout.cellY(row));
+                drawHighlight(batch, parentAlpha, LawnGridLayout.cellX(column), LawnGridLayout.cellY(row));
             }
             drawPlantFoodPreview(batch, parentAlpha, mouse, inBounds);
             return;
         }
-
-        // ── 2. Shovel mode ───────────────────────────────────────────────
         if (controller.isShovelModeActive()) {
             if (inBounds) {
-                drawHighlight(batch, parentAlpha,
-                        LawnGridLayout.cellX(column),
-                        LawnGridLayout.cellY(row));
+                drawHighlight(batch, parentAlpha, LawnGridLayout.cellX(column), LawnGridLayout.cellY(row));
             }
             drawShovelPreview(batch, parentAlpha, mouse, inBounds);
             return;
         }
-
-        // ── 3. Zombie selection mode ─────────────────────────────────────
         String selectedZombieKey = controller.getSelectedZombieKey();
         if (selectedZombieKey != null) {
             if (inBounds) {
-                drawHighlight(batch, parentAlpha,
-                        LawnGridLayout.cellX(column),
-                        LawnGridLayout.cellY(row));
+                drawHighlight(batch, parentAlpha, LawnGridLayout.cellX(column), LawnGridLayout.cellY(row));
             }
-            drawZombiePreview(batch, parentAlpha,
-                    selectedZombieKey, mouse.x, mouse.y, inBounds);
+            drawZombiePreview(batch, parentAlpha, selectedZombieKey, mouse.x, mouse.y, inBounds);
             return;
         }
-
-        // ── 4. Plant selection mode ──────────────────────────────────────
         String selectedKey = controller.getSelectedSeedKey();
         if (selectedKey != null) {
             if (inBounds) {
-                drawHighlight(batch, parentAlpha,
-                        LawnGridLayout.cellX(column),
-                        LawnGridLayout.cellY(row));
+                drawHighlight(batch, parentAlpha, LawnGridLayout.cellX(column), LawnGridLayout.cellY(row));
             }
             drawPlantPreview(batch, parentAlpha, selectedKey, mouse.x, mouse.y, inBounds);
         }
@@ -196,36 +178,32 @@ public class HoverCursorWidget extends Actor {
         batch.setColor(prev);
     }
 
-    private void drawZombiePreview(
-            Batch batch, float parentAlpha,
-            String selectedKey, float mouseX, float mouseY, boolean inBounds
-    ) {
-        // Synchronize zombie PAM animation actor when selected zombie changes
+    private void drawZombiePreview(Batch batch, float parentAlpha,
+            String selectedKey, float mouseX, float mouseY, boolean inBounds) {
         if (selectedKey != null) {
             if (!selectedKey.equals(currentZombieKey)) {
                 currentZombieKey = selectedKey;
                 currentZombieActor = null;
-
                 if (pamPlayer != null) {
                     try {
-                        String sanitized = selectedKey.toUpperCase().replace(" ", "_").replace("-", "");
+                        String sanitized = selectedKey.toUpperCase().replace(" ", "_")
+                                .replace("-", "");
                         String pamPath = "768/INITIAL/ZOMBIES/" + sanitized + "/" + sanitized + ".PAM";
                         currentZombieActor = new ZombiePamActor(pamPlayer, pamPath, "walk");
                     } catch (Exception e) {
                         currentZombieActor = null;
                         Gdx.app.error("HoverCursorWidget",
-                                "[PAM ASSET MISSING] Could not load walk PAM animation for zombie key: '" + selectedKey + "'");
+                                "[PAM ASSET MISSING] Could not load walk PAM animation for zombie key: '" +
+                                        selectedKey + "'");
                     }
                 }
             }
-
             if (currentZombieActor != null) {
                 float width  = LawnGridLayout.CELL_WIDTH  * 0.8f;
                 float height = LawnGridLayout.CELL_HEIGHT * 0.8f;
                 currentZombieActor.setSize(width, height);
                 currentZombieActor.setPosition(mouseX - width / 2f, mouseY - height / 2f - 10f);
                 currentZombieActor.act(Gdx.graphics.getDeltaTime());
-
                 Color prev = new Color(batch.getColor());
                 batch.setColor(inBounds ? 1f : 1f, inBounds ? 1f : 0.25f, inBounds ? 1f : 0.25f, 0.8f * parentAlpha);
                 currentZombieActor.draw(batch, parentAlpha);
@@ -237,27 +215,17 @@ public class HoverCursorWidget extends Actor {
             currentZombieActor = null;
         }
 
-        // Fallback to static texture region if PAM is unavailable
-        TextureRegion zombieRegion = textures.region(
-                ZombieFactory.getZombieTextureRegion(selectedKey)
-        );
+        TextureRegion zombieRegion = textures.region(ZombieFactory.getZombieTextureRegion(selectedKey));
         if (zombieRegion == null) return;
-
         float maxWidth  = LawnGridLayout.CELL_WIDTH  * 0.8f;
         float maxHeight = LawnGridLayout.CELL_HEIGHT * 0.85f;
-        float scale = Math.min(
-                maxWidth  / Math.max(1f, zombieRegion.getRegionWidth()),
-                maxHeight / Math.max(1f, zombieRegion.getRegionHeight())
-        );
+        float scale = Math.min(maxWidth  / Math.max(1f, zombieRegion.getRegionWidth()),
+                maxHeight / Math.max(1f, zombieRegion.getRegionHeight()));
         float previewWidth  = zombieRegion.getRegionWidth()  * scale;
         float previewHeight = zombieRegion.getRegionHeight() * scale;
-
         Color prev = new Color(batch.getColor());
         batch.setColor(inBounds ? 1f : 1f, inBounds ? 1f : 0.25f, inBounds ? 1f : 0.25f, 0.8f * parentAlpha);
-        batch.draw(zombieRegion,
-                mouseX - previewWidth / 2f,
-                mouseY - previewHeight / 2f - 10f,
-                previewWidth,
+        batch.draw(zombieRegion, mouseX - previewWidth / 2f, mouseY - previewHeight / 2f - 10f, previewWidth,
                 previewHeight);
         batch.setColor(prev);
     }

@@ -252,21 +252,17 @@ public class EntityRenderLayer extends Group {
         for (Plant plant : session.getPlants()) {
             if (!plant.isAlive() && plant.getState() != Plant.PlantState.DYING) continue;
             live.add(plant);
-
             if (plant.consumeJustTransformed()) {
                 PamActor stale = plantActors.remove(plant);
                 if (stale != null) plantGroup.removeActor(stale);
             }
-
             PamActor actor = plantActors.computeIfAbsent(plant, p -> {
                 PlantPamActor pa = new PlantPamActor(pamPlayer, plant.getPamPath(), plant.getAnimationClip());
                 plantGroup.addActor(pa);
                 return pa;
             });
-
             String clip = plant.getAnimationClip();
-            boolean isPlantFoodIntro = "plantfood".equals(clip)
-                    && plant.isPlantFoodIntroActive();
+            boolean isPlantFoodIntro = "plantfood".equals(clip) && plant.isPlantFoodIntroActive();
             boolean isImitateIdle = plant.getState() == Plant.PlantState.IMITATE_IDLE;
             boolean isImitateAttack = plant.getState() == Plant.PlantState.IMITATE_ATTACK;
             actor.setLooping(!isPlantFoodIntro && !isImitateIdle && !isImitateAttack);
@@ -283,21 +279,14 @@ public class EntityRenderLayer extends Group {
                 actor.resetAnimation();
             }
             actor.setGreyTint(plant.isImitationOverlayActive());
-
-            float targetX = LawnGridLayout.cellX(plant.getLocation().x())
-                    + LawnGridLayout.CELL_WIDTH / 2f
+            float targetX = LawnGridLayout.cellX(plant.getLocation().x()) + LawnGridLayout.CELL_WIDTH / 2f
                     + LawnGridLayout.PLANT_DRAW_OFFSET_X;
-            float targetY = LawnGridLayout.cellY(plant.getLocation().y())
-                    + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
+            float targetY = LawnGridLayout.cellY(plant.getLocation().y()) + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
 
             float[] lastTarget = plantRenderTargets.get(plant);
             if (lastTarget == null) {
-                // First time we see this actor — snap instantly so it doesn't
-                // fly in from the origin.
                 actor.setPosition(targetX, targetY);
             } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
-                // Grid location changed since last frame (e.g. Beghouled swap) —
-                // slide smoothly to the new cell instead of snapping.
                 actor.clearActions();
                 actor.addAction(Actions.moveTo(targetX, targetY, BEGHOULED_SWAP_DURATION, Interpolation.smooth));
             }
@@ -305,7 +294,6 @@ public class EntityRenderLayer extends Group {
         }
     }
 
-    // ---- On-plant overlays: IceBlock, OctopusWrap ---------------------------
     private void syncOverlays(GameSession session, Set<Object> live) {
         if (session.getLawn() == null) return;
 
@@ -407,136 +395,113 @@ public class EntityRenderLayer extends Group {
             if (zombie.isBossMirror()) continue;
             if (!zombie.isAlive() && zombie.isDeathAnimDone()) continue;
             live.add(zombie);
-
             boolean isNewActor = !zombieGroupActors.containsKey(zombie);
-            PamActor actor = zombieGroupActors.computeIfAbsent(zombie, key -> {
-                Zombie z = (Zombie) key;
-                String animation = resolveZombieClip(z);
-                if (z.getZombossController() != null) {
-                    animation = z.getZombossController().getPreferredClip();
-                }
-                // SunProducerZombie has no PAM yet — use a placeholder actor.
-                if ("SunProducerZombie".equals(z.getAlias())) {
-                    SunProducerPlaceholderActor ph = new SunProducerPlaceholderActor();
-                    zombieGroup.addActor(ph);
-                    return ph;
-                }
-                ZombiePamActor za = new ZombiePamActor(pamPlayer, z.getPamPath(), animation);
-
-                if (z.getZombossController() != null) {
-                    ZombossController zc = z.getZombossController();
-                    za.setPamScale(zc.getDrawScale());
-                    za.setOffsetX(zc.getDrawOffsetX());
-                    za.setOffsetY(zc.getDrawOffsetY());
-                }
-
-                zombieGroup.addActor(za);
-                return za;
-            });
-
+            PamActor actor = getOrCreateZombieActor(zombie);
             String currentClip = resolveZombieCurrentClip(zombie, actor);
+            applyZombieAnimation(zombie, actor, currentClip, isNewActor, delta);
+            applyZombiePosition(zombie, actor);
+        }
+    }
 
-            if (actor instanceof ZombiePamActor zombieActor) {
-                ZombossController boss = zombie.getZombossController();
-
-                if (zombie.getState() == ZombieActivity.DEAD) {
-                    if (!zombieActor.isPlayingSpecial()) {
-                        List<String> deathSeq = zombie.pollAnimSequence();
-                        if (deathSeq != null) {
-                            zombieActor.playDeathSequence(deathSeq);
-                        } else {
-                            String deathClip = boss != null ? boss.resolveClip("die") : currentClip;
-                            zombieActor.playDeath(deathClip);
-                        }
-                    }
-                } else {
-                    boolean bossStunned = boss != null && boss.isStunned();
-                    boolean bossLocked = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
-                    String idleClip = bossStunned ? boss.getStunClip()
-                            : bossLocked ? boss.getLockedClip()
-                            : (boss != null ? boss.resolveClip(currentClip) : currentClip);
-                    if (!zombieActor.isPlayingSpecial()) {
-                        List<String> animSeq = zombie.pollAnimSequence();
-                        if (animSeq != null) {
-                            zombieActor.playSequence(animSeq, idleClip, false);
-                        } else if (!isNewActor) {
-                            // Guard against re-setting clip on initial spawn frame to prevent double intro playback
-                            zombieActor.setClip(idleClip);
-                        }
-                    }
-                }
-
-                zombieActor.setArmor(zombie.getArmor());
-
-                zombieActor.setFrozenSolid(zombie.isAnimationPaused());
-
-                // --- Glow effect -------------------------------------------
-                // Stay glowing until the zombie actually dies (death anim may
-                // still be playing after isAlive goes false).
-                zombieActor.setGlowing(zombie.isGlowing() && zombie.isAlive());
-
-                // --- Danger flicker -----------------------------------------
-                float zombieX = (float) zombie.getPosition().x();
-                if (zombieX <= DANGER_THRESHOLD_X && zombie.isAlive()) {
-                    // Advance this zombie's personal sine-wave clock
-                    float t = dangerTime.getOrDefault(zombie, 0f) + delta;
-                    dangerTime.put(zombie, t);
-
-                    // Map proximity to [0..1]: 0 at threshold, 1 at x=0
-                    float proximity = 1f - (zombieX / DANGER_THRESHOLD_X);
-                    proximity = Math.max(0f, Math.min(1f, proximity));
-
-                    // Sine flicker — always positive, scaled by proximity
-                    float flicker = (float) ((Math.sin(t * DANGER_FLICKER_SPEED) + 1.0) * 0.5);
-                    // Min alpha of 0.08 so the overlay never fully disappears
-                    float alpha = proximity * (0.08f + 0.30f * flicker);
-
-                    zombieActor.setDangerAlpha(alpha);
-                } else {
-                    // Out of danger zone — clear the overlay and the timer
-                    dangerTime.remove(zombie);
-                    zombieActor.setDangerAlpha(0f);
-                }
-
-                // --- Status colour overlay ----------------------------------
-                zombieActor.setZombieStatus(zombie.getStatus());
-
-                // --- Horizontal mirror (moving right = hypnotized / Prospector reverse) ---
-                zombieActor.setMirroredHorizontally(
-                        zombie.isAlive()
-                                && zombie.getSpeed() != null
-                                && zombie.getSpeed().x() > 0
-                );
-
-            } else {
-                actor.setClip(currentClip);
+    private PamActor getOrCreateZombieActor(Zombie zombie) {
+        return zombieGroupActors.computeIfAbsent(zombie, key -> {
+            Zombie z = (Zombie) key;
+            String animation = resolveZombieClip(z);
+            if (z.getZombossController() != null) {
+                animation = z.getZombossController().getPreferredClip();
             }
-
-            float targetX = LawnGridLayout.worldX(zombie.getPosition().x())
-                    + LawnGridLayout.CELL_WIDTH / 2f
-                    + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X;
-
-            float logicalY = (float) zombie.getPosition().y();
-            if ("ZombossMammoth".equals(zombie.getAlias())) {
-                logicalY = (LawnGridLayout.ROWS / 2) - 0.5f;
+            // SunProducerZombie has no PAM yet — use a placeholder actor.
+            if ("SunProducerZombie".equals(z.getAlias())) {
+                SunProducerPlaceholderActor ph = new SunProducerPlaceholderActor();
+                zombieGroup.addActor(ph);
+                return ph;
             }
-            float targetY = LawnGridLayout.worldY(logicalY)
-                    + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y;
+            ZombiePamActor za = new ZombiePamActor(pamPlayer, z.getPamPath(), animation);
+            if (z.getZombossController() != null) {
+                ZombossController zc = z.getZombossController();
+                za.setPamScale(zc.getDrawScale());
+                za.setOffsetX(zc.getDrawOffsetX());
+                za.setOffsetY(zc.getDrawOffsetY());
+            }
+            zombieGroup.addActor(za);
+            return za;
+        });
+    }
 
-            // Interpolate position for Boss/dashing units to prevent tick-stepping jumps
-            if (zombie.getZombossController() != null) {
-                float[] lastTarget = zombieRenderTargets.get(zombie);
-                if (lastTarget == null) {
-                    actor.setPosition(targetX, targetY);
-                    zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
-                } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
-                    actor.clearActions();
-                    actor.addAction(Actions.moveTo(targetX, targetY, ActiveGameplayView.TICK_RATE));
-                    zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
-                }
-            } else {
+    private void applyZombieAnimation(Zombie zombie, PamActor actor, String currentClip,
+                                      boolean isNewActor, float delta) {
+        if (!(actor instanceof ZombiePamActor zombieActor)) {
+            actor.setClip(currentClip);
+            return;
+        }
+        ZombossController boss = zombie.getZombossController();
+        if (zombie.getState() == ZombieActivity.DEAD) {
+            if (!zombieActor.isPlayingSpecial()) {
+                List<String> deathSeq = zombie.pollAnimSequence();
+                if (deathSeq != null) zombieActor.playDeathSequence(deathSeq);
+                else zombieActor.playDeath(boss != null ? boss.resolveClip("die") : currentClip);
+            }
+        } else {
+            boolean bossStunned = boss != null && boss.isStunned();
+            boolean bossLocked  = boss != null && boss.isMoveLocked() && boss.getLockedClip() != null;
+            String idleClip = bossStunned ? boss.getStunClip()
+                    : bossLocked  ? boss.getLockedClip()
+                      : (boss != null ? boss.resolveClip(currentClip) : currentClip);
+            if (!zombieActor.isPlayingSpecial()) {
+                List<String> animSeq = zombie.pollAnimSequence();
+                if (animSeq != null) zombieActor.playSequence(animSeq, idleClip, false);
+                else if (!isNewActor) zombieActor.setClip(idleClip);
+                // Guard against re-setting clip on initial spawn frame to prevent double intro playback
+            }
+        }
+        applyZombieVisualEffects(zombie, zombieActor, delta);
+    }
+
+    private void applyZombieVisualEffects(Zombie zombie, ZombiePamActor zombieActor, float delta) {
+        zombieActor.setArmor(zombie.getArmor());
+        zombieActor.setFrozenSolid(zombie.isAnimationPaused());
+        // Stay glowing until the zombie actually dies (death anim may still be playing after isAlive goes false).
+        zombieActor.setGlowing(zombie.isGlowing() && zombie.isAlive());
+        zombieActor.setZombieStatus(zombie.getStatus());
+        // Horizontal mirror (moving right = hypnotized / Prospector reverse)
+        zombieActor.setMirroredHorizontally(
+                zombie.isAlive() && zombie.getSpeed() != null && zombie.getSpeed().x() > 0);
+        // Danger flicker
+        float zombieX = (float) zombie.getPosition().x();
+        if (zombieX <= DANGER_THRESHOLD_X && zombie.isAlive()) {
+            float t = dangerTime.getOrDefault(zombie, 0f) + delta;
+            dangerTime.put(zombie, t);
+            float proximity = Math.max(0f, Math.min(1f, 1f - (zombieX / DANGER_THRESHOLD_X)));
+            float flicker = (float) ((Math.sin(t * DANGER_FLICKER_SPEED) + 1.0) * 0.5);
+            // Min alpha of 0.08 so the overlay never fully disappears
+            zombieActor.setDangerAlpha(proximity * (0.08f + 0.30f * flicker));
+        } else {
+            // Out of danger zone — clear the overlay and the timer
+            dangerTime.remove(zombie);
+            zombieActor.setDangerAlpha(0f);
+        }
+    }
+
+    private void applyZombiePosition(Zombie zombie, PamActor actor) {
+        float targetX = LawnGridLayout.worldX(zombie.getPosition().x())
+                + LawnGridLayout.CELL_WIDTH / 2f
+                + LawnGridLayout.ZOMBIE_DRAW_OFFSET_X;
+        float logicalY = (float) zombie.getPosition().y();
+        if ("ZombossMammoth".equals(zombie.getAlias())) logicalY = (LawnGridLayout.ROWS / 2) - 0.5f;
+        float targetY = LawnGridLayout.worldY(logicalY) + LawnGridLayout.ZOMBIE_DRAW_OFFSET_Y;
+        // Interpolate position for Boss/dashing units to prevent tick-stepping jumps
+        if (zombie.getZombossController() != null) {
+            float[] lastTarget = zombieRenderTargets.get(zombie);
+            if (lastTarget == null) {
                 actor.setPosition(targetX, targetY);
+                zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
+            } else if (lastTarget[0] != targetX || lastTarget[1] != targetY) {
+                actor.clearActions();
+                actor.addAction(Actions.moveTo(targetX, targetY, ActiveGameplayView.TICK_RATE));
+                zombieRenderTargets.put(zombie, new float[]{targetX, targetY});
             }
+        } else {
+            actor.setPosition(targetX, targetY);
         }
     }
 
@@ -552,36 +517,33 @@ public class EntityRenderLayer extends Group {
 
     private String resolveZombieCurrentClip(Zombie zombie, PamActor actor) {
         if ("ZombieBarrelRoller".equals(zombie.getAlias())
-                && (zombie.getPushedStructure() == null
-                || !zombie.getPushedStructure().isAlive())) {
-            return switch (zombie.getState()) {
-                case WALKING -> "walk2";
-                case EATING -> "eat2";
-                case DEAD -> "die2";
-                case PUSHING -> "walk2";
-                case null -> "idle2";
-            };
+                && (zombie.getPushedStructure() == null || !zombie.getPushedStructure().isAlive())) {
+            return resolveBarrelRollerClip(zombie);
         }
-
         Armor armor = zombie.getArmor();
-        boolean hasNewspaper = armor != null
-                && armor.getArmorType() == ArmorType.NEWSPAPER
-                && !armor.isDestroyed();
-        boolean hadNewspaper = armor != null
-                && armor.getArmorType() == ArmorType.NEWSPAPER;
+        boolean hadNewspaper = armor != null && armor.getArmorType() == ArmorType.NEWSPAPER;
+        if (!hadNewspaper) return resolveZombieClip(zombie);
+        return resolveNewspaperClip(zombie, armor, actor);
+    }
 
-        if (!hadNewspaper) {
-            return resolveZombieClip(zombie);
-        }
+    private String resolveBarrelRollerClip(Zombie zombie) {
+        return switch (zombie.getState()) {
+            case WALKING -> "walk2";
+            case EATING  -> "eat2";
+            case DEAD    -> "die2";
+            case PUSHING -> "walk2";
+            case null    -> "idle2";
+        };
+    }
 
+    private String resolveNewspaperClip(Zombie zombie, Armor armor, PamActor actor) {
+        boolean hasNewspaper = !armor.isDestroyed();
         NewspaperPhase phase = newspaperPhase.computeIfAbsent(zombie, z -> NewspaperPhase.HAS_PAPER);
-
         // Transition: newspaper just destroyed
         if (phase == NewspaperPhase.HAS_PAPER && !hasNewspaper) {
             newspaperPhase.put(zombie, NewspaperPhase.DEFEAT_PLAYING);
             return "newspaper_defeat";
         }
-
         return switch (phase) {
             case DEFEAT_PLAYING -> {
                 if (actor instanceof ZombiePamActor za && !za.isPlaying()) {
@@ -590,11 +552,11 @@ public class EntityRenderLayer extends Group {
                 yield "newspaper_defeat";
             }
             case HAS_PAPER -> switch (zombie.getState()) {
-                case EATING -> "eat_newspaper";
+                case EATING  -> "eat_newspaper";
                 case WALKING -> "walk_newspaper";
-                case DEAD -> "die";
+                case DEAD    -> "die";
                 case PUSHING -> "walk_newspaper";
-                case null -> "idle";
+                case null    -> "idle";
             };
             case GONE -> resolveZombieClip(zombie);
         };
@@ -637,93 +599,88 @@ public class EntityRenderLayer extends Group {
     private void syncPlantProjectiles(GameSession session) {
         List<Projectile> liveProjectiles = new ArrayList<>(session.getProjectiles());
         Set<Projectile> liveSet = new HashSet<>(liveProjectiles);
-
         for (Projectile proj : liveProjectiles) {
-            ProjectilePamActor actor = projectileActors.computeIfAbsent(proj, p -> {
-                String projPam;
-                String hitPam;
-                if (p instanceof BowlingNutProjectile nut) {
-                    projPam = nut.getVisualPamPath();
-                    hitPam = null;
-                } else {
-                    Plant user = p.getUser();
-                    boolean useFoodVariant = user != null
-                            && user.isBuffed()
-                            && user.getPlantFoodProjectilePam() != null
-                            && !user.getPlantFoodProjectilePam().isBlank();
-                    boolean isButterHit = p.getHitEffectStrategy() instanceof ButterHit;
-                    if (useFoodVariant) {
-                        projPam = user.getPlantFoodProjectilePam();
-                        String foodHitPam = user.getPlantFoodHitPam();
-                        hitPam = (foodHitPam != null && !foodHitPam.isBlank())
-                                ? foodHitPam : user.getHitPam();
-                    } else {
-                        projPam = user != null ? user.getProjectilePam() : null;
-                        String butterHitPam = user != null ? user.getButterHitPam() : null;
-                        hitPam = (isButterHit && butterHitPam != null && !butterHitPam.isBlank())
-                                ? butterHitPam
-                                : (user != null ? user.getHitPam() : null);
-                    }
-                }
-                ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
-                if (p instanceof BowlingNutProjectile nut) {
-                    pa.setPamScale(nut.getVisualScale());
-                    pa.setClockwiseSpinDegPerSec(nut.getRollSpinDegPerSec());
-                }
-
-                float[] start = plantProjectileScreenPosition(p);
-                float startX = start[0];
-                float startY = start[1];
-                pa.setPosition(startX, startY);
-                plantProjectileRenderTargets.put(p, new float[]{startX, startY});
-
-                plantProjectileGroup.addActor(pa);
-                return pa;
-            });
-
+            ProjectilePamActor actor = getOrCreatePlantProjectileActor(proj);
             if (actor.isDone()) {
                 actor.remove();
                 projectileActors.remove(proj);
                 plantProjectileRenderTargets.remove(proj);
                 continue;
             }
+            updatePlantProjectileMovement(proj, actor);
+        }
+        sweepOrphanedPlantProjectiles(liveSet);
+    }
 
-            if (!proj.isAlive() && actor.phase == ProjectilePamActor.Phase.FLYING) {
-                float[] impact = plantProjectileScreenPosition(proj);
-                actor.clearActions();
-                actor.triggerHit(impact[0], impact[1]);
-                plantProjectileRenderTargets.remove(proj);
-            } else if (proj.isAlive()) {
-                float[] target = plantProjectileScreenPosition(proj);
-                float targetX = target[0];
-                float targetY = target[1];
-
-                float[] lastTarget = plantProjectileRenderTargets.get(proj);
-                if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != targetY) {
-                    actor.clearActions();
-                    actor.addAction(Actions.moveTo(targetX, targetY, ActiveGameplayView.TICK_RATE));
-                    plantProjectileRenderTargets.put(proj, new float[]{targetX, targetY});
+    private ProjectilePamActor getOrCreatePlantProjectileActor(Projectile proj) {
+        return projectileActors.computeIfAbsent(proj, p -> {
+            String projPam;
+            String hitPam;
+            if (p instanceof BowlingNutProjectile nut) {
+                projPam = nut.getVisualPamPath();
+                hitPam  = null;
+            } else {
+                Plant user = p.getUser();
+                boolean useFoodVariant = user != null && user.isBuffed()
+                        && user.getPlantFoodProjectilePam() != null
+                        && !user.getPlantFoodProjectilePam().isBlank();
+                boolean isButterHit = p.getHitEffectStrategy() instanceof ButterHit;
+                if (useFoodVariant) {
+                    projPam = user.getPlantFoodProjectilePam();
+                    String foodHitPam = user.getPlantFoodHitPam();
+                    hitPam = (foodHitPam != null && !foodHitPam.isBlank()) ? foodHitPam : user.getHitPam();
+                } else {
+                    projPam = user != null ? user.getProjectilePam() : null;
+                    String butterHitPam = user != null ? user.getButterHitPam() : null;
+                    hitPam = (isButterHit && butterHitPam != null && !butterHitPam.isBlank())
+                            ? butterHitPam : (user != null ? user.getHitPam() : null);
                 }
             }
-        }
+            ProjectilePamActor pa = new ProjectilePamActor(pamPlayer, projPam, hitPam);
+            if (p instanceof BowlingNutProjectile nut) {
+                pa.setPamScale(nut.getVisualScale());
+                pa.setClockwiseSpinDegPerSec(nut.getRollSpinDegPerSec());
+            }
+            float[] start = plantProjectileScreenPosition(p);
+            pa.setPosition(start[0], start[1]);
+            plantProjectileRenderTargets.put(p, new float[]{start[0], start[1]});
+            plantProjectileGroup.addActor(pa);
+            return pa;
+        });
+    }
 
-        // Sweep orphaned plant projectile actors
+    private void updatePlantProjectileMovement(Projectile proj, ProjectilePamActor actor) {
+        if (!proj.isAlive() && actor.phase == ProjectilePamActor.Phase.FLYING) {
+            float[] impact = plantProjectileScreenPosition(proj);
+            actor.clearActions();
+            actor.triggerHit(impact[0], impact[1]);
+            plantProjectileRenderTargets.remove(proj);
+        } else if (proj.isAlive()) {
+            float[] target = plantProjectileScreenPosition(proj);
+            float[] lastTarget = plantProjectileRenderTargets.get(proj);
+            if (lastTarget == null || lastTarget[0] != target[0] || lastTarget[1] != target[1]) {
+                actor.clearActions();
+                actor.addAction(Actions.moveTo(target[0], target[1], ActiveGameplayView.TICK_RATE));
+                plantProjectileRenderTargets.put(proj, target);
+            }
+        }
+    }
+
+    private void sweepOrphanedPlantProjectiles(Set<Projectile> liveSet) {
         Iterator<Map.Entry<Projectile, ProjectilePamActor>> it = projectileActors.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Projectile, ProjectilePamActor> entry = it.next();
+            if (liveSet.contains(entry.getKey())) continue;
             ProjectilePamActor actor = entry.getValue();
-            if (!liveSet.contains(entry.getKey())) {
-                if (actor.phase == ProjectilePamActor.Phase.FLYING) {
-                    Projectile proj = entry.getKey();
-                    float[] impact = plantProjectileScreenPosition(proj);
-                    actor.clearActions();
-                    actor.triggerHit(impact[0], impact[1]);
-                    plantProjectileRenderTargets.remove(proj);
-                } else if (actor.isDone()) {
-                    actor.remove();
-                    it.remove();
-                    plantProjectileRenderTargets.remove(entry.getKey());
-                }
+            if (actor.phase == ProjectilePamActor.Phase.FLYING) {
+                float[] impact = plantProjectileScreenPosition(entry.getKey());
+                actor.clearActions();
+                actor.triggerHit(impact[0], impact[1]);
+                plantProjectileRenderTargets.remove(entry.getKey());
+            } else if (actor.isDone()) {
+                actor.remove();
+                it.remove();
+                plantProjectileRenderTargets.remove(entry.getKey());
             }
         }
     }
@@ -753,56 +710,51 @@ public class EntityRenderLayer extends Group {
     private void syncZombieProjectiles(GameSession session) {
         List<ZombieProjectile> live = new ArrayList<>(session.getZombieProjectiles());
         Set<ZombieProjectile> liveSet = new HashSet<>(live);
-
         for (ZombieProjectile proj : live) {
-            if (!proj.isAlive()) {
-                triggerZombieProjectileHit(proj);
-                continue;
-            }
-
+            if (!proj.isAlive()) { triggerZombieProjectileHit(proj); continue; }
             if (proj instanceof MissileProjectile missile
-                    && missile.getPhase() == MissileProjectile.Phase.TARGETING) {
-                continue;
-            }
-
-            float screenX = LawnGridLayout.worldX((float) proj.getPosition().x())
-                    + LawnGridLayout.CELL_WIDTH / 2f;
+                    && missile.getPhase() == MissileProjectile.Phase.TARGETING) continue;
+            float screenX = LawnGridLayout.worldX((float) proj.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
             float screenY = LawnGridLayout.worldY((float) proj.getPosition().y())
                     + (float) proj.getVisualHeight() * LawnGridLayout.CELL_HEIGHT;
-            if (proj instanceof BoneProjectile) {
-                TextureRegion region = textures.region("IMAGE_ZOMBIE_BONE_PROJECTILE");
-                if (region != null) {
-                    pendingZombieAtlasDraws.add(new ZombieAtlasDrawCall(
-                            region,
-                            screenX - region.getRegionWidth() / 2f,
-                            screenY
-                    ));
-                }
-                continue;
-            }
-            String clip = resolveZombieProjectileClip(proj);
-            PamActor actor = zombieProjActors.computeIfAbsent(proj, p -> {
-                PamActor a = new PamActor(pamPlayer, p.getPamLocation(), clip);
-                a.setPamScale(pamScaleForZombieProjectile(p));
-                float startX = screenX - a.getWidth() / 2f;
-                a.setPosition(startX, screenY);
-                zombieProjectileRenderTargets.put(p, new float[]{startX, screenY});
-                zombieGroup.addActor(a);
-                return a;
-            });
-            if (proj instanceof MissileProjectile || proj instanceof BabySharkProjectile) {
-                actor.setClip(clip);
-            }
-            float targetX = screenX - actor.getWidth() / 2f;
-            float[] lastTarget = zombieProjectileRenderTargets.get(proj);
-            if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != screenY) {
-                actor.clearActions();
-                actor.addAction(Actions.moveTo(targetX, screenY, ActiveGameplayView.TICK_RATE));
-                zombieProjectileRenderTargets.put(proj, new float[]{targetX, screenY});
-            }
+            if (drawZombieProjAsAtlas(proj, screenX, screenY)) continue;
+            updateZombieProjActor(proj, screenX, screenY);
         }
-
         cleanupZombieProjActors(liveSet);
+    }
+
+    /** Returns true if the projectile was handled as a plain atlas draw (BoneProjectile, etc.). */
+    private boolean drawZombieProjAsAtlas(ZombieProjectile proj, float screenX, float screenY) {
+        if (!(proj instanceof BoneProjectile)) return false;
+        TextureRegion region = textures.region("IMAGE_ZOMBIE_BONE_PROJECTILE");
+        if (region != null) {
+            pendingZombieAtlasDraws.add(
+                    new ZombieAtlasDrawCall(region, screenX - region.getRegionWidth() / 2f, screenY));
+        }
+        return true;
+    }
+
+    private void updateZombieProjActor(ZombieProjectile proj, float screenX, float screenY) {
+        String clip = resolveZombieProjectileClip(proj);
+        PamActor actor = zombieProjActors.computeIfAbsent(proj, p -> {
+            PamActor a = new PamActor(pamPlayer, p.getPamLocation(), clip);
+            a.setPamScale(pamScaleForZombieProjectile(p));
+            float startX = screenX - a.getWidth() / 2f;
+            a.setPosition(startX, screenY);
+            zombieProjectileRenderTargets.put(p, new float[]{startX, screenY});
+            zombieGroup.addActor(a);
+            return a;
+        });
+        if (proj instanceof MissileProjectile || proj instanceof BabySharkProjectile) {
+            actor.setClip(clip);
+        }
+        float targetX = screenX - actor.getWidth() / 2f;
+        float[] lastTarget = zombieProjectileRenderTargets.get(proj);
+        if (lastTarget == null || lastTarget[0] != targetX || lastTarget[1] != screenY) {
+            actor.clearActions();
+            actor.addAction(Actions.moveTo(targetX, screenY, ActiveGameplayView.TICK_RATE));
+            zombieProjectileRenderTargets.put(proj, new float[]{targetX, screenY});
+        }
     }
 
     private void cleanupZombieProjActors(GameSession session) {
@@ -915,66 +867,5 @@ public class EntityRenderLayer extends Group {
         }
     }
 
-    // =========================================================================
-    // SunProducerPlaceholderActor
-    // =========================================================================
-    /**
-     * Temporary stand-in for SunProducerZombie until its PAM file is available.
-     * Draws a pulsing golden sun circle using WhitePixel so it's clearly visible
-     * without any asset dependency. Swap this out by removing the
-     * "SunProducerZombie" check in {@code syncZombies} once the PAM is added.
-     */
-    private static final class SunProducerPlaceholderActor extends PamActor {
-        private static final float RADIUS   = 28f;
-        private static final float PULSE    = 1.8f; // cycles per second
-        private float time = 0f;
 
-        SunProducerPlaceholderActor() {
-            super(null, null, null); // PamActor with null player — no PAM drawn
-            setSize(RADIUS * 2f, RADIUS * 2f);
-            setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
-        }
-
-        @Override
-        public void act(float delta) {
-            // Don't call super — no PamPlayer to tick
-            time += delta;
-        }
-
-        @Override
-        public void draw(Batch batch, float parentAlpha) {
-            float pulse = 0.75f + 0.25f * (float) Math.sin(time * PULSE * 2 * Math.PI);
-
-            float cx = getX() + RADIUS;
-            float cy = getY() + RADIUS;
-            float r  = RADIUS * pulse;
-
-            // Outer glow (semi-transparent amber)
-            Color old = batch.getColor().cpy();
-            batch.setColor(1f, 0.80f, 0.10f, 0.40f * parentAlpha);
-            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(),
-                    cx - r - 6f, cy - r - 6f, (r + 6f) * 2f, (r + 6f) * 2f);
-
-            // Core (opaque yellow)
-            batch.setColor(1f, 0.92f, 0.15f, 0.95f * parentAlpha);
-            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(),
-                    cx - r, cy - r, r * 2f, r * 2f);
-
-            // Sun symbol "☀" label — drawn as a tiny text actor if available,
-            // but since we have no font here, just draw a small dark cross.
-            batch.setColor(0.6f, 0.45f, 0f, 0.85f * parentAlpha);
-            float arm = r * 0.35f;
-            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(),
-                    cx - arm * 0.2f, cy - arm, arm * 0.4f, arm * 2f);
-            batch.draw(com.ussr.pvz.view.util.WhitePixel.get(),
-                    cx - arm, cy - arm * 0.2f, arm * 2f, arm * 0.4f);
-
-            batch.setColor(old);
-        }
-
-        // PamActor stubs — nothing to do
-        @Override public void setClip(String clip) {}
-        @Override public void resetAnimation() {}
-        @Override public boolean isPlaying() { return true; }
-    }
 }

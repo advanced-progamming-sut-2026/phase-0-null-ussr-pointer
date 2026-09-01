@@ -31,7 +31,6 @@ import java.util.Map;
 
 public class GameSession {
     private boolean progressTracked = true;
-    private double skySunTimer = 0.0;
     private boolean outroShown = false;
 
     public boolean isOutroShown()      { return outroShown; }
@@ -585,7 +584,6 @@ public class GameSession {
 
     public void setLevel(Level level) {
         this.level = level;
-        this.skySunTimer = 0.0;
         if (level != null) {
             ChapterEffect effect = ChapterEffectRegistry.get(level.getChapter());
             if (effect != null) {

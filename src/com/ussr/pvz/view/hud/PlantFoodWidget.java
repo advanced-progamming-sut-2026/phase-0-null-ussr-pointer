@@ -31,18 +31,15 @@ public class PlantFoodWidget extends Stack {
         setSize(70f, 70f);
         setTouchable(Touchable.enabled);
 
-        // Background button
         Image bankImage = new Image(textures.region("IMAGE_UI_GENERIC_BROWNBUTTON"));
         bankImage.setScaling(Scaling.fit);
         bankImage.setTouchable(Touchable.disabled);
         add(bankImage);
 
-        // Plant food icon
         TextureRegion pfRegion = textures != null ? textures.region(REGION_PLANTFOOD) : null;
         if (pfRegion == null && textures != null) {
             pfRegion = textures.region("IMAGE_UI_HUD_INGAME_PLANTFOOD_BUTTON");
         }
-
         iconImage = pfRegion != null
                 ? new Image(new TextureRegionDrawable(pfRegion))
                 : new Image(skin.getDrawable("IMAGE_UI_GENERIC_GEM_ICON_SMALL"));

@@ -33,13 +33,12 @@ public class Plant extends GameEntity implements Damageable {
     private String name;
     private int level = 1;
     private int hp;
-    private int maxHp;
+    int maxHp;
     private double maxRecharge;
     private double recharge;
     private double actionInterval;
-    private double attackOffset = -1.0;
+    double attackOffset = -1.0;
     private int cost;
-    private Location location;
     private final ArrayList<Tag> tags = new ArrayList<>();
     private int damage;
     private PlantType type;
@@ -47,8 +46,8 @@ public class Plant extends GameEntity implements Damageable {
     private int stackNumber = 1;
     private boolean isBuffed = false;
 
-    private ModifiableStat hpStat;
-    private ModifiableStat actionIntervalStat;
+    ModifiableStat hpStat;
+    ModifiableStat actionIntervalStat;
 
     private ActStrategy actStrategy;
     private PlantFoodEffect plantFoodEffect;
@@ -56,7 +55,7 @@ public class Plant extends GameEntity implements Damageable {
     private double internalTimer = 0.0;
     private double abilityValue;
     private int chillLevel = 0;
-    private GrowthTracker growthTracker;
+    GrowthTracker growthTracker;
     private List<Vec2> projectileOrigins = new ArrayList<>();
     private String pamPath;
     private String projectilePam;
@@ -64,32 +63,18 @@ public class Plant extends GameEntity implements Damageable {
     private String plantFoodProjectilePam;
     private String plantFoodHitPam;
     private String butterHitPam;
-    // Animation State Manager Variables
-    private final PlantAnimationController animationController =
-            new PlantAnimationController();
+
+    private final PlantAnimationController animationController = new PlantAnimationController();
     private double plantFoodTimer = 0.0;
-    // Visual fallback: how long the "plantfood" animation state is held when
-    // the triggered PlantFoodEffect doesn't drive its own gameplay-tied timer.
-    private double plantFoodDuration = 4.0;
-    // How many times the one-shot "plantfood" PAM clip should play back to
-    // back before the plant returns to its normal animation. Comes from the
-    // "plantFoodAnimReplays" key in plants.json; defaults to 1 (play once)
-    // when the key is absent.
+    double plantFoodDuration = 4.0;
     private int plantFoodAnimReplays = 1;
-    // How many replays of the "plantfood" clip remain. Decremented by the
-    // render layer each time it observes the PAM clip has finished playing
-    // (see EntityRenderLayer#syncPlants / PamActor#isPlaying) - never a
-    // guessed duration, since the actual clip length comes from the PAM
-    // asset itself.
     private int plantFoodIntroReplaysRemaining = 0;
-    // True while the one-shot "plantfood" intro clip is still meant to be
-    // playing (i.e. replays remain). Cleared once all replays finish.
     private boolean plantFoodIntroActive = false;
 
     private PlantArmor armor;
 
-    private double lifetime = Double.MAX_VALUE;
-    private int remainingSmashes = -1;
+    double lifetime = Double.MAX_VALUE;
+    int remainingSmashes = -1;
 
     public String getPamPath() {
         return pamPath;
@@ -139,30 +124,21 @@ public class Plant extends GameEntity implements Damageable {
         this.butterHitPam = butterHitPam;
     }
 
+    public String getAnimationClip() {
+        return AnimClips.getAnimationClip(this);
+    }
+
     public enum PlantState {
         ACTIVE,
         INCAPACITATED,
         PREPPING,
         DYING,
-        // Imitater-only: plays its own idle clip once, then its own attack
-        // clip once, before fully turning into the last plant planted.
         IMITATE_IDLE,
         IMITATE_ATTACK
     }
 
-    // ---- Imitater support -------------------------------------------------
-    // Set on THIS plant instance when some Imitater elsewhere on the lawn is
-    // currently copying it. Drives the grey lawn overlay and persists until
-    // the resulting Imitater clone dies (not until this plant itself dies).
     private boolean imitationOverlayActive = false;
-    // Set on the Imitater instance: the name of the plant it locked onto at
-    // plant-time, and the specific instance it copied (used purely so we can
-    // clear that instance's overlay bookkeeping through the session).
     private String imitationTargetName;
-    private Plant imitationSourcePlant;
-    // One-shot flag the render layer consumes to know it must rebuild this
-    // plant's PamActor (pamPath changed because the Imitater just turned
-    // into an entirely different plant).
     private boolean justTransformed = false;
 
     private PlantState state;
@@ -175,7 +151,7 @@ public class Plant extends GameEntity implements Damageable {
     private float mineRecoverTimer;
     private double defensiveReactionCharge;
 
-    private final EnumMap<SpecialUpgrade, Double> specialUpgrades =
+    final EnumMap<SpecialUpgrade, Double> specialUpgrades =
             new EnumMap<>(SpecialUpgrade.class);
     private List<Vec2> shootingVectors = new ArrayList<>();
 
@@ -183,107 +159,21 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public Plant(Plant blueprint) {
-        this.id = blueprint.id;
-        this.name = blueprint.name;
-        this.level = blueprint.level;
-        this.type = blueprint.type;
-        this.tags.addAll(blueprint.tags);
-        this.specialUpgrades.putAll(blueprint.specialUpgrades);
-        this.state = PlantState.ACTIVE;
-        this.location = blueprint.location;
-        this.actStrategy = blueprint.actStrategy;
-        this.plantFoodEffect = blueprint.plantFoodEffect;
-        this.setWrampUp(blueprint.getWrampUp());
-        this.plantFoodType = blueprint.plantFoodType;
-        this.shootingVectors = new ArrayList<>(blueprint.shootingVectors);
-        this.projectileOrigins = new ArrayList<>(blueprint.projectileOrigins);
-
-        this.hp = blueprint.hp;
-        this.maxHp = blueprint.maxHp;
-        this.cost = blueprint.cost;
-        this.damage = blueprint.damage;
-        this.actionInterval = blueprint.actionInterval;
-        this.attackOffset = blueprint.attackOffset;
-        this.recharge = blueprint.recharge;
-        this.maxRecharge = blueprint.maxRecharge;
-        this.abilityValue = blueprint.abilityValue;
-        this.lifetime = blueprint.lifetime;
-        this.remainingSmashes = blueprint.remainingSmashes;
-
-        this.hpStat = new ModifiableStat(this.hp);
-        this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
-        this.actStrategy = blueprint.actStrategy;
-        this.plantFoodTimer = blueprint.plantFoodTimer;
-        this.plantFoodDuration = blueprint.plantFoodDuration;
-        this.armor = blueprint.armor;
-        this.plantFoodEffect = blueprint.plantFoodEffect;
-        this.projectilePam = blueprint.projectilePam;
-        this.hitPam = blueprint.hitPam;
-        this.butterHitPam = blueprint.butterHitPam;
-        this.plantFoodHitPam = blueprint.plantFoodHitPam;
-        this.plantFoodProjectilePam = blueprint.plantFoodProjectilePam;
-        this.growthTracker = blueprint.growthTracker;
-        this.pamPath = blueprint.pamPath;
-        if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
-            this.internalTimer = this.actionInterval;
-        } else if (this.actStrategy instanceof SunProduceStrategy) {
-            this.internalTimer = this.actionInterval / 2.0;
-        } else {
-            this.internalTimer = 0.0;
-        }
+        copyFrom(blueprint);
     }
 
     @Override
     public void update(float delta) {
-        if (!isAlive && state != PlantState.DYING) {
-            return; // Allow DYING state to process for explosive animations
-        }
+        if (!isAlive && state != PlantState.DYING) return;
         animationController.update(delta);
-
-        if (state == PlantState.DYING) {
-            deathAnimationTimer -= delta;
-            if (deathImpactAction != null) {
-                deathImpactTimer -= delta;
-                if (deathImpactTimer <= 0f) {
-                    Runnable impact = deathImpactAction;
-                    deathImpactAction = null;
-                    impact.run();
-                }
-            }
-            if (deathAnimationTimer <= 0f) {
-                if (deathImpactAction != null) {
-                    Runnable impact = deathImpactAction;
-                    deathImpactAction = null;
-                    impact.run();
-                }
-                deathAnimationTimer = 0f;
-                isAlive = false;
-                state = PlantState.ACTIVE;
-            }
-            return;
-        }
-
+        if (handleDyingState(delta)) return;
         if (state == PlantState.INCAPACITATED) {
             animationController.playIncapacitated();
             return;
         }
+        if (state == PlantState.IMITATE_IDLE || state == PlantState.IMITATE_ATTACK) return;
 
-        if (state == PlantState.IMITATE_IDLE || state == PlantState.IMITATE_ATTACK) {
-            // Clip selection and stage advancement for these two states is
-            // driven by EntityRenderLayer via onImitateIdleClipFinished() /
-            // onImitateAttackClipFinished(), which fire off the actual PAM
-            // clip finishing (never a guessed duration). Nothing to tick here.
-            return;
-        }
-
-        if (pendingAttackAction != null) {
-            pendingAttackTimer -= delta;
-            if (pendingAttackTimer <= 0f) {
-                Runnable attack = pendingAttackAction;
-                pendingAttackAction = null;
-                attack.run();
-            }
-        }
+        processPendingAttack(delta);
 
         lifetime -= delta;
         if (lifetime < 0) {
@@ -294,13 +184,47 @@ public class Plant extends GameEntity implements Damageable {
         updateStats(delta);
         updatePlantFood(delta);
         updateGrowth(delta);
-        boolean pauseAction = isBuffed
-                && (plantFoodEffect == null || plantFoodEffect.pausesNormalAction());
-        if (pauseAction || actStrategy == null) {
-            return;
-        }
+
+        boolean pauseAction = isBuffed && (plantFoodEffect == null || plantFoodEffect.pausesNormalAction());
+        if (pauseAction || actStrategy == null) return;
 
         updateAction(delta);
+    }
+
+    private boolean handleDyingState(float delta) {
+        if (state != PlantState.DYING) return false;
+
+        deathAnimationTimer -= delta;
+        if (deathImpactAction != null) {
+            deathImpactTimer -= delta;
+            if (deathImpactTimer <= 0f) {
+                Runnable impact = deathImpactAction;
+                deathImpactAction = null;
+                impact.run();
+            }
+        }
+        if (deathAnimationTimer <= 0f) {
+            if (deathImpactAction != null) {
+                Runnable impact = deathImpactAction;
+                deathImpactAction = null;
+                impact.run();
+            }
+            deathAnimationTimer = 0f;
+            isAlive = false;
+            state = PlantState.ACTIVE;
+        }
+        return true;
+    }
+
+    private void processPendingAttack(float delta) {
+        if (pendingAttackAction != null) {
+            pendingAttackTimer -= delta;
+            if (pendingAttackTimer <= 0f) {
+                Runnable attack = pendingAttackAction;
+                pendingAttackAction = null;
+                attack.run();
+            }
+        }
     }
 
     private void killPlant() {
@@ -325,65 +249,33 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     private void updateStats(float delta) {
-        if (hpStat != null) {
-            hpStat.update(delta);
-        }
-
-        if (actionIntervalStat != null) {
-            actionIntervalStat.update(delta);
-        }
-
+        if (hpStat != null) hpStat.update(delta);
+        if (actionIntervalStat != null) actionIntervalStat.update(delta);
     }
 
     private void updatePlantFood(float delta) {
-        if (!isBuffed) {
-            return;
-        }
+        if (!isBuffed) return;
 
         plantFoodTimer -= delta;
 
         if (plantFoodTimer <= 0f) {
             isBuffed = false;
-            // Safety cleanup: if the buff somehow ends before the render
-            // layer told us the intro clip finished (e.g. a very short
-            // plant food duration), don't leave the plant stuck.
             plantFoodIntroActive = false;
             plantFoodIntroReplaysRemaining = 0;
             return;
         }
 
         if (plantFoodEffect != null) {
-            plantFoodEffect.tickDurationEffect(
-                    this,
-                    App.getGameSession(),
-                    delta
-            );
+            plantFoodEffect.tickDurationEffect(this, App.getGameSession(), delta);
         }
     }
 
     private void updateAction(float delta) {
         internalTimer += delta;
-
         double interval = getActionInterval() * getChillIntervalMultiplier();
 
         if (isPotatoMine()) {
-            if (!mineArmed) {
-                if (internalTimer >= interval) {
-                    mineArmed = true;
-                    mineRecoverTimer = 0.83f;
-                    internalTimer = 0.0;
-                }
-                return;
-            }
-
-            if (mineRecoverTimer > 0f) {
-                mineRecoverTimer = Math.max(0f, mineRecoverTimer - delta);
-                return;
-            }
-
-            // Once armed, mines must test their trigger radius every update;
-            // actionInterval is their one-time arming duration, not a cooldown.
-            actStrategy.act(this, App.getGameSession());
+            updatePotatoMineAction(delta, interval);
             return;
         }
 
@@ -393,29 +285,38 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
+    private void updatePotatoMineAction(float delta, double interval) {
+        if (!mineArmed) {
+            if (internalTimer >= interval) {
+                mineArmed = true;
+                mineRecoverTimer = 0.83f;
+                internalTimer = 0.0;
+            }
+            return;
+        }
+
+        if (mineRecoverTimer > 0f) {
+            mineRecoverTimer = Math.max(0f, mineRecoverTimer - delta);
+            return;
+        }
+
+        actStrategy.act(this, App.getGameSession());
+    }
+
     @Override
     public void takeDamage(int damage) {
         takeDamage(damage, null);
     }
 
     public void takeDamage(int damage, Zombie dealer) {
-//        System.out.println("o yeah");
-//        if(dealer != null)
-//            System.out.println("x : " + dealer.getPosition().x() + " y : " + dealer.getPosition().y());
-        if (!isAlive || state == PlantState.DYING) return;
-        if (isIndestructibleIceTrap()) return;
+        if (!isAlive || state == PlantState.DYING || isIndestructibleIceTrap()) return;
 
         int remainingDamage = damage;
-
         if (this.armor != null && !this.armor.isDestroyed()) {
             remainingDamage = this.armor.absorbDamage(remainingDamage, this);
             this.armor.handleReflection(dealer, this);
-
-            if (this.armor.isDestroyed()) {
-                this.armor = null;
-            }
+            if (this.armor.isDestroyed()) this.armor = null;
         }
-
 
         if (remainingDamage > 0) {
             if (this.actStrategy instanceof WallNutStrategy strategy) {
@@ -423,42 +324,48 @@ public class Plant extends GameEntity implements Damageable {
             }
             int newHp = getHp() - remainingDamage;
             if (newHp <= 0) {
-                if (name.equalsIgnoreCase("Hypno-shroom")) {
-                    if (dealer instanceof Zombie zombie) {
-                        double hpMultiplier = getSpecialUpgradeValue(
-                                SpecialUpgrade.ZOMBIE_HEALTH_MULTIPLIER);
-                        double damageMultiplier = getSpecialUpgradeValue(
-                                SpecialUpgrade.ZOMBIE_DAMAGE_MULTIPLIER);
-                        if (hpMultiplier > 0) {
-                            zombie.setMaxHp((int) Math.round(zombie.getMaxHp() * hpMultiplier));
-                            zombie.setHp((int) Math.round(zombie.getHp() * hpMultiplier));
-                        }
-                        if (damageMultiplier > 0) {
-                            zombie.setEatDps(zombie.getEatDps() * damageMultiplier);
-                        }
-                        zombie.hypnotize();
-                    }
-                } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy
-                        && !"Explode-o-nut".equalsIgnoreCase(name)) {
-                    wallNutStrategy.onDie(this);
-                }
-                applySpecialDeathEffect();
-                setHp(0);
-                if ("Explode-o-nut".equalsIgnoreCase(name)) {
-                    WallNutStrategy strategy = (WallNutStrategy) actStrategy;
-                    beginDeathAnimation(1.0f, 0.85f, () -> strategy.onDie(this));
-                } else {
-                    isAlive = false;
-                }
+                handleFatalDamage(dealer);
             } else {
                 setHp(newHp);
             }
         }
     }
 
+    private void handleFatalDamage(Zombie dealer) {
+        if (name.equalsIgnoreCase("Hypno-shroom")) {
+            if (dealer instanceof Zombie zombie) {
+                applyHypnoEffect(zombie);
+            }
+        } else if (this.actStrategy instanceof WallNutStrategy wallNutStrategy
+                && !"Explode-o-nut".equalsIgnoreCase(name)) {
+            wallNutStrategy.onDie(this);
+        }
+
+        applySpecialDeathEffect();
+        setHp(0);
+
+        if ("Explode-o-nut".equalsIgnoreCase(name)) {
+            WallNutStrategy strategy = (WallNutStrategy) actStrategy;
+            beginDeathAnimation(1.0f, 0.85f, () -> strategy.onDie(this));
+        } else {
+            isAlive = false;
+        }
+    }
+
+    private void applyHypnoEffect(Zombie zombie) {
+        double hpMultiplier = getSpecialUpgradeValue(SpecialUpgrade.ZOMBIE_HEALTH_MULTIPLIER);
+        double damageMultiplier = getSpecialUpgradeValue(SpecialUpgrade.ZOMBIE_DAMAGE_MULTIPLIER);
+        if (hpMultiplier > 0) {
+            zombie.setMaxHp((int) Math.round(zombie.getMaxHp() * hpMultiplier));
+            zombie.setHp((int) Math.round(zombie.getHp() * hpMultiplier));
+        }
+        if (damageMultiplier > 0) {
+            zombie.setEatDps(zombie.getEatDps() * damageMultiplier);
+        }
+        zombie.hypnotize();
+    }
+
     public void updateGrowth(double deltaTimeSeconds) {
-        // Kiwibeast's stage is driven by its own HP (see ShockwaveStrategy),
-        // not by elapsed time, so skip the generic time-based advance here.
         if (growthTracker != null && !"Kiwibeast".equalsIgnoreCase(name)) {
             double reduction = getSpecialUpgradeValue(SpecialUpgrade.GROW_TIME_REDUCTION);
             double speedMultiplier = reduction < 0 ? 1.0 + (-reduction / 24.0) : 1.0;
@@ -466,7 +373,6 @@ public class Plant extends GameEntity implements Damageable {
         }
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -476,7 +382,6 @@ public class Plant extends GameEntity implements Damageable {
     }
 
     public void setLocation(Location location) {
-        this.location = location;
     }
 
     public Location getLocation() {
@@ -559,18 +464,8 @@ public class Plant extends GameEntity implements Damageable {
         if (actionIntervalStat != null) actionIntervalStat.setBaseValue((float) actionInterval);
     }
 
-    public double getAttackOffset() {
-        return attackOffset;
-    }
-
     public void setAttackOffset(double attackOffset) {
         this.attackOffset = attackOffset;
-    }
-
-    public float getAttackDelay(float defaultSeconds) {
-        return attackOffset >= 0.0
-                ? (float) attackOffset
-                : defaultSeconds;
     }
 
     public int getCost() {
@@ -664,22 +559,12 @@ public class Plant extends GameEntity implements Damageable {
         return growthTracker != null ? growthTracker.getCurrentStage() : 1;
     }
 
-    /** Forces the growth stage directly (see ShockwaveStrategy). No-op without a growthTracker. */
     public void setGrowthStage(int stage) {
         if (growthTracker != null) {
             growthTracker.setStage(stage);
         }
     }
 
-    public record Location(int x, int y) {
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Plant.Location(int x1, int y1))) return false;
-            return x == x1 && y == y1;
-        }
-    }
 
     public double getIntervalTimer() {
         return internalTimer;
@@ -705,7 +590,7 @@ public class Plant extends GameEntity implements Damageable {
         shootingVectors.add(vec2);
     }
 
-    private boolean isPotatoMine() {
+    public boolean isPotatoMine() {
         return "Potato Mine".equalsIgnoreCase(name)
                 || "Primal Potato Mine".equalsIgnoreCase(name);
     }
@@ -773,24 +658,12 @@ public class Plant extends GameEntity implements Damageable {
         this.plantFoodTimer = duration;
     }
 
-    public double getPlantFoodDuration() {
-        return plantFoodDuration;
-    }
-
     public void setPlantFoodDuration(double plantFoodDuration) {
         this.plantFoodDuration = plantFoodDuration;
     }
 
     public boolean isPlantFoodIntroActive() {
         return plantFoodIntroActive;
-    }
-
-    public void setPlantFoodIntroActive(boolean plantFoodIntroActive) {
-        this.plantFoodIntroActive = plantFoodIntroActive;
-    }
-
-    public int getPlantFoodAnimReplays() {
-        return plantFoodAnimReplays;
     }
 
     public void setPlantFoodAnimReplays(int plantFoodAnimReplays) {
@@ -856,18 +729,6 @@ public class Plant extends GameEntity implements Damageable {
         return animationController.playGrow(name, getCurrentStage(), pamPath);
     }
 
-    public void scheduleAttack(float delay, Runnable action) {
-        if (action == null) {
-            return;
-        }
-        if (delay <= 0f) {
-            action.run();
-            return;
-        }
-        pendingAttackTimer = delay;
-        pendingAttackAction = action;
-    }
-
     public boolean triggerProduceAnimation() {
         return animationController.playProduce(name, pamPath);
     }
@@ -875,109 +736,9 @@ public class Plant extends GameEntity implements Damageable {
     public PlantAnimationController getAnimationController() {
         return animationController;
     }
-    /**
-     * Evaluates the plant's current situation and returns the correct PAM clip.
-     */
-    public String getAnimationClip() {
-        // 1. Explosive / Dying State (e.g., Cherry Bomb)
-        if (state == PlantState.DYING) {
-            if ("Doom-shroom".equalsIgnoreCase(name)) {
-                int stage = Math.max(1, Math.min(3, getCurrentStage()));
-                return "stage" + stage + "_explode";
-            }
-            if ("Squash".equalsIgnoreCase(name)) {
-                return "jump_down_left";
-            }
-            if ("Explode-o-nut".equalsIgnoreCase(name)) {
-                return "damage3";
-            }
-            return "attack";
-        }
-
-        if (state == PlantState.IMITATE_IDLE) {
-            return "idle";
-        }
-        if (state == PlantState.IMITATE_ATTACK) {
-            return "attack";
-        }
-
-        // 2. Plant Food State
-        if (plantFoodTimer > 0 || isBuffed) {
-            if (plantFoodIntroActive) {
-                return "plantfood";
-            }
-            if ("Cactus".equalsIgnoreCase(name)) {
-                return animationController.getCurrentClip() + "_plantfood";
-            }
-        }
-
-        // 3. Prepping State (Mints intro, or Potato Mine charging)
-        if (state == PlantState.PREPPING) {
-            // According to image_24af05.jpg, Mints have an intro and Charge plants have an unready animation.
-            // You may need to change "prepping" to the exact PAM string (like "intro" or "unarmed").
-            return "prepping";
-        }
-
-        // 4. Defensive Plants Damage States (Wall-nut, Tall-nut)
-        // According to image_24af05.jpg, defensive plants change appearance 2 to 3 times as health decreases.
-        if (this.actStrategy instanceof WallNutStrategy) {
-            float hpPercent = (float) getHp() / (float) getMaxHp();
-
-            if ("Sweet Potato".equalsIgnoreCase(name)) {
-                if (hpPercent <= 0.15f) return "idle_damage3";
-                if (hpPercent <= 0.40f) return "idle_damage2";
-                if (hpPercent <= 0.70f) return "idle_damage";
-            } else if ("Wall-nut".equalsIgnoreCase(name)
-                    || "Explode-o-nut".equalsIgnoreCase(name)
-                    || "Endurian".equalsIgnoreCase(name)) {
-                if (hpPercent <= 0.15f) return "damage3";
-                if (hpPercent <= 0.40f) return "damage2";
-                if (hpPercent <= 0.70f) return "damage";
-            } else if ("Tall-nut".equalsIgnoreCase(name)) {
-                if (hpPercent <= 0.40f) return "damage2";
-                if (hpPercent <= 0.70f) return "damage";
-            } else if ("Garlic".equalsIgnoreCase(name)) {
-                if (hpPercent <= 0.40f) return "idle_damage2";
-                if (hpPercent <= 0.70f) return "idle_damage";
-            } else if ("Pumpkin".equalsIgnoreCase(name)) {
-                if (hpPercent <= 0.40f) return "idle3";
-                if (hpPercent <= 0.70f) return "idle2";
-            }
-        }
-
-        if (isPotatoMine()) {
-            if (!mineArmed) return "plant_idle";
-            if (mineRecoverTimer > 0f) return "recover";
-            return "idle";
-        }
-
-        // 4b. Kiwibeast: HP-driven stage changes idle art (attack/grow
-        // clips are already stage-tagged by PlantAnimationController).
-        if ("Kiwibeast".equalsIgnoreCase(name)
-                && "idle".equals(animationController.getCurrentClip())) {
-            return "idle_stage" + Math.max(1, Math.min(3, getCurrentStage()));
-        }
-
-        // 5. Default Action or Idle State
-        String currentClip = animationController.getCurrentClip();
-        if ("Pea Pod".equalsIgnoreCase(name)) {
-            int visiblePods = Math.max(1, Math.min(MAX_PEA_POD_STACK, stackNumber));
-            if ("idle".equals(currentClip)) {
-                return visiblePods == 1 ? "idle" : "idle" + visiblePods;
-            }
-            if ("attack".equals(currentClip)) {
-                return visiblePods == 1 ? "attack" : "attack " + visiblePods;
-            }
-        }
-        return currentClip;
-    }
 
     public void setLifetime(double lifetime) {
         this.lifetime = lifetime;
-    }
-
-    public double getLifetime() {
-        return lifetime;
     }
 
     public void addSpecialUpgrade(SpecialUpgrade upgrade, double value) {
@@ -998,10 +759,6 @@ public class Plant extends GameEntity implements Damageable {
 
     public int getSpecialUpgradeInt(SpecialUpgrade upgrade) {
         return (int) Math.round(getSpecialUpgradeValue(upgrade));
-    }
-
-    public Map<SpecialUpgrade, Double> getSpecialUpgrades() {
-        return Map.copyOf(specialUpgrades);
     }
 
     public boolean consumeSmashCharge() {
@@ -1029,22 +786,13 @@ public class Plant extends GameEntity implements Damageable {
         this.imitationTargetName = imitationTargetName;
     }
 
-    public Plant getImitationSourcePlant() {
-        return imitationSourcePlant;
-    }
-
     public void setImitationSourcePlant(Plant imitationSourcePlant) {
-        this.imitationSourcePlant = imitationSourcePlant;
     }
 
     public boolean consumeJustTransformed() {
         boolean value = justTransformed;
         justTransformed = false;
         return value;
-    }
-
-    public void markJustTransformed() {
-        this.justTransformed = true;
     }
 
     public void beginImitation(Plant target) {
@@ -1067,63 +815,37 @@ public class Plant extends GameEntity implements Damageable {
 
     public void transformInto(String targetPlantName) {
         Plant copy = PlantFactory.createPlantByName(targetPlantName, 1);
-
-        this.id = copy.id;
-        this.name = copy.name;
-        this.level = copy.level;
-        this.type = copy.type;
-        this.tags.clear();
-        this.tags.addAll(copy.tags);
-        this.specialUpgrades.clear();
-        this.specialUpgrades.putAll(copy.specialUpgrades);
-        this.actStrategy = copy.actStrategy;
-        this.plantFoodEffect = copy.plantFoodEffect;
-        this.setWrampUp(copy.getWrampUp());
-        this.plantFoodType = copy.plantFoodType;
-        this.shootingVectors = new ArrayList<>(copy.shootingVectors);
-        this.projectileOrigins = new ArrayList<>(copy.projectileOrigins);
-
-        this.hp = copy.hp;
-        this.maxHp = copy.maxHp;
-        this.cost = copy.cost;
-        this.damage = copy.damage;
-        this.actionInterval = copy.actionInterval;
-        this.attackOffset = copy.attackOffset;
-        this.recharge = copy.recharge;
-        this.maxRecharge = copy.maxRecharge;
-        this.abilityValue = copy.abilityValue;
-        this.lifetime = copy.lifetime;
-        this.remainingSmashes = copy.remainingSmashes;
-
-        this.hpStat = new ModifiableStat(this.hp);
-        this.actionIntervalStat = new ModifiableStat((float) this.actionInterval);
-        this.plantFoodTimer = 0.0;
-        this.plantFoodDuration = copy.plantFoodDuration;
-        this.armor = copy.armor;
-        this.projectilePam = copy.projectilePam;
-        this.hitPam = copy.hitPam;
-        this.plantFoodHitPam = copy.plantFoodHitPam;
-        this.butterHitPam = copy.butterHitPam;
-        this.plantFoodProjectilePam = copy.plantFoodProjectilePam;
-        this.growthTracker = copy.growthTracker;
-        this.pamPath = copy.pamPath;
-
-        if (this.actStrategy instanceof MeleeStrategy || this.actStrategy instanceof ShockwaveStrategy) {
-            this.internalTimer = this.actionInterval;
-        } else if (this.actStrategy instanceof SunProduceStrategy) {
-            this.internalTimer = this.actionInterval / 2.0;
-        } else {
-            this.internalTimer = 0.0;
-        }
-
+        copyFrom(copy);
         this.animationController.playIdle();
         this.state = PlantState.ACTIVE;
         this.justTransformed = true;
+    }
+
+    private void copyFrom(Plant copy) {
+        PlantStateCopier.copy(this, copy);
     }
 
     private boolean isIndestructibleIceTrap() {
         return this.getTags().contains(Tag.ICE)
                 && this.getTags().contains(Tag.TRAP)
                 && this.getDamage() <= 0;
+    }
+
+    public boolean isMineArmed(){
+        return this.mineArmed;
+    }
+
+    public float getMineRecoverTimer() {
+        return this.mineRecoverTimer;
+    }
+    public void updateInternalTimer() {
+        if (actStrategy instanceof MeleeStrategy
+                || actStrategy instanceof ShockwaveStrategy) {
+            internalTimer = actionInterval;
+        } else if (actStrategy instanceof SunProduceStrategy) {
+            internalTimer = actionInterval / 2.0;
+        } else {
+            internalTimer = 0.0;
+        }
     }
 }

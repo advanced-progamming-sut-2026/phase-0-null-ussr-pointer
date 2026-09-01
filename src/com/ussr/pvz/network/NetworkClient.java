@@ -113,73 +113,33 @@ public final class NetworkClient {
      *
      * Only the reader thread reads from the socket.
      */
-    public synchronized NetworkResponse send(
-            NetworkRequest request
-    ) throws IOException {
+    public synchronized NetworkResponse send(NetworkRequest request) throws IOException {
         Objects.requireNonNull(request, "request");
-
-        if (!isConnected()
-                || reader == null
-                || writer == null
-                || !readerRunning) {
-            throw new IOException(
-                    "Not connected to server."
-            );
+        if (!isConnected() || reader == null || writer == null || !readerRunning) {
+            throw new IOException("Not connected to server.");
         }
-
-        CompletableFuture<NetworkResponse> pending =
-                new CompletableFuture<>();
-
-        /*
-         * Add the pending response before writing. This prevents a
-         * very fast response from arriving before it is registered.
-         */
+        CompletableFuture<NetworkResponse> pending = new CompletableFuture<>();
         pendingResponses.add(pending);
-
         writer.println(gson.toJson(request));
-
         if (writer.checkError()) {
             pendingResponses.remove(pending);
-
-            throw new IOException(
-                    "Failed to send request to server."
-            );
+            throw new IOException("Failed to send request to server.");
         }
-
         try {
-            return pending.get(
-                    RESPONSE_TIMEOUT_SECONDS,
-                    TimeUnit.SECONDS
-            );
-
+            return pending.get(RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (TimeoutException exception) {
             pendingResponses.remove(pending);
-
-            throw new IOException(
-                    "Server response timed out.",
-                    exception
-            );
-
+            throw new IOException("Server response timed out.", exception);
         } catch (InterruptedException exception) {
             pendingResponses.remove(pending);
             Thread.currentThread().interrupt();
-
-            throw new IOException(
-                    "Interrupted while waiting for server response.",
-                    exception
-            );
-
+            throw new IOException("Interrupted while waiting for server response.", exception);
         } catch (ExecutionException exception) {
             Throwable cause = exception.getCause();
-
             if (cause instanceof IOException ioException) {
                 throw ioException;
             }
-
-            throw new IOException(
-                    "Failed to receive server response.",
-                    cause
-            );
+            throw new IOException("Failed to receive server response.", cause);
         }
     }
 

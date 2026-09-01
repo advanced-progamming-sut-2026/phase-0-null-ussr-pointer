@@ -71,50 +71,28 @@ public final class NotificationOverlay extends Table {
     }
 
     private void display(Notification notification) {
-        Label label = new Label(
-                notification.text(),
-                skin,
-                "default"
-        );
-
+        Label label = new Label(notification.text(), skin, "default");
         label.setWrap(false);
         label.setEllipsis("...");
         label.setAlignment(Align.center);
         label.setColor(colorFor(notification.type()));
-
         Container<Label> toast = new Container<>(label);
-
-        toast.setBackground(
-                skin.getDrawable("image_ui_generic_brownbutton_10")
-        );
-
+        toast.setBackground(skin.getDrawable("image_ui_generic_brownbutton_10"));
         toast.pad(3f, 16f, 4f, 16f);
         toast.setTouchable(Touchable.disabled);
         toast.getColor().a = 0f;
-
         Table slot = new Table();
         slot.setTouchable(Touchable.disabled);
         slot.setClip(true);
         slot.addActor(toast);
+        toast.setBounds(0f, DROP_DISTANCE, TOAST_WIDTH, TOAST_HEIGHT);
 
-        toast.setBounds(
-                0f,
-                DROP_DISTANCE,
-                TOAST_WIDTH,
-                TOAST_HEIGHT
-        );
-
-        Cell<Table> newCell = notificationList.add(slot)
-                .width(TOAST_WIDTH)
-                .height(TOAST_HEIGHT)
+        Cell<Table> newCell = notificationList.add(slot).width(TOAST_WIDTH).height(TOAST_HEIGHT)
                 .padBottom(TOAST_SPACING);
-
         newCell.row();
-
         notificationList.getCells().removeValue(newCell, true);
         notificationList.getCells().insert(0, newCell);
         notificationList.invalidateHierarchy();
-
         toast.addAction(sequence(
                 parallel(
                         fadeIn(0.18f),

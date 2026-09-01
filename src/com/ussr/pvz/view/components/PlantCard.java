@@ -141,27 +141,16 @@ public class PlantCard extends Table {
     private Table buildInformation(Skin skin, TextureBank textures) {
         Table information = new Table();
         information.left().top();
-
         Label name = new Label(plant.name, skin, "default");
         name.setFontScale(0.68f);
         name.setAlignment(Align.left);
         name.setEllipsis("...");
         name.setColor(TEXT_DARK);
         information.add(name).growX().left().row();
-
-        Label status = new Label(
-                plant.level > 0 ? "LEVEL " + plant.level : "LOCKED",
-                skin,
-                "default"
-        );
+        Label status = new Label(plant.level > 0 ? "LEVEL " + plant.level : "LOCKED", skin, "default");
         status.setFontScale(0.58f);
-        status.setColor(
-                plant.level > 0
-                        ? TEXT_SUCCESS
-                        : TEXT_ERROR
-        );
+        status.setColor(plant.level > 0 ? TEXT_SUCCESS : TEXT_ERROR);
         information.add(status).growX().left().padTop(2f).row();
-
         information.add().growY().row();
         information.add(buildCostRow(skin, textures))
                 .growX()

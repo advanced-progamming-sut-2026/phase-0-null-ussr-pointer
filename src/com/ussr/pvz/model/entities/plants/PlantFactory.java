@@ -23,9 +23,7 @@ public class PlantFactory {
         String searchName = normalizeForLookup(name);
         for (Map<String, Object> data : App.getCachedPlantsData()) {
             String plantName = normalizeForLookup((String) data.get("name"));
-            if (plantName.equals(searchName)) {
-                return data;
-            }
+            if (plantName.equals(searchName)) return data;
         }
         return null;
     }
@@ -40,10 +38,18 @@ public class PlantFactory {
 
     public static Plant createPlantByName(String name, int level) {
         Map<String, Object> data = getPlantData(name);
-        if (data == null) {
-            throw new IllegalArgumentException("Plant name not found in registry: " + name);
-        }
+        if (data == null) throw new IllegalArgumentException("Plant name not found in registry: " + name);
         Plant plant = new Plant();
+        applyBasicFields(plant, data);
+        applyPamPaths(plant, data);
+        applyNumericAndEnumFields(plant, data, level);
+        applyStrategiesAndSpecialCases(plant, data);
+        return plant;
+    }
+
+    // ── 1. Basic fields ───────────────────────────────────────────────────────
+
+    private static void applyBasicFields(Plant plant, Map<String, Object> data) {
         plant.setId(((Number) data.getOrDefault("id", 0)).intValue());
         plant.setName((String) data.get("name"));
         String catStr = (String) data.get("category");
@@ -55,51 +61,43 @@ public class PlantFactory {
                 if (t != null) plant.getTags().add(t);
             }
         }
+        if (data.containsKey("attackOffset")) {
+            plant.setAttackOffset(((Number) data.get("attackOffset")).doubleValue());
+        }
+    }
+
+    // ── 2. PAM paths ──────────────────────────────────────────────────────────
+
+    private static void applyPamPaths(Plant plant, Map<String, Object> data) {
+        String pamLocation = (String) data.get("pamLocation");
+        if (pamLocation != null) plant.setPamPath(pamLocation);
+
+        String projectilePam = (String) data.get("projectilePam");
+        if (projectilePam != null) plant.setProjectilePam(projectilePam);
+
+        String hitPam = (String) data.get("hitPam");
+        if (hitPam != null) plant.setHitPam(hitPam);
+
+        String plantFoodPam = (String) data.get("plantFoodProjectilePam");
+        if (plantFoodPam != null) plant.setPlantFoodProjectilePam(plantFoodPam);
+
+        String plantFoodHitPam = (String) data.get("plantFoodHitPam");
+        if (plantFoodHitPam != null) plant.setPlantFoodHitPam(plantFoodHitPam);
+
+        String butterHitPam = (String) data.get("butterHitPam");
+        if (butterHitPam != null) plant.setButterHitPam(butterHitPam);
+    }
+
+    // ── 3. Numeric and enum fields ────────────────────────────────────────────
+
+    private static void applyNumericAndEnumFields(Plant plant, Map<String, Object> data, int level) {
         Result result = getResult(level, data, plant);
         plant.setHp(Math.max(0, result.runtimeHp()));
         plant.setCost(Math.max(0, result.runtimeCost()));
         plant.setActionInterval(Math.max(0.05, result.runtimeInterval()));
         plant.setDamage(result.runtimeDamage());
-        if (data.containsKey("attackOffset")) {
-            plant.setAttackOffset(
-                    ((Number) data.get("attackOffset")).doubleValue());
-        }
-
-        // Set the PAM location/path from the data map
-        String pamLocation = (String) data.get("pamLocation");
-        if (pamLocation != null) {
-            plant.setPamPath(pamLocation); // Or plant.setPamLocation(pamLocation);
-        }
-        String projectilePam = (String) data.get("projectilePam");
-        if (projectilePam != null) {
-            plant.setProjectilePam(projectilePam); // Or plant.setPamLocation(pamLocation);
-        }
-
-        String hitPam = (String) data.get("hitPam");
-        if (hitPam != null) {
-            plant.setHitPam(hitPam); // Or plant.setPamLocation(pamLocation);
-        }
-
-        String plantFoodPam = (String) data.get("plantFoodProjectilePam");
-        if (plantFoodPam != null) {
-            plant.setPlantFoodProjectilePam(plantFoodPam);
-        }
-        String plantFoodHitPam = (String) data.get("plantFoodHitPam");
-        if (plantFoodHitPam != null) {
-            plant.setPlantFoodHitPam(plantFoodHitPam);
-        }
-        String butterHitPam = (String) data.get("butterHitPam");
-        if (butterHitPam != null) {
-            plant.setButterHitPam(butterHitPam);
-        }
-        if (data.containsKey("plantFoodDuration")) {
-            plant.setPlantFoodDuration(
-                    ((Number) data.get("plantFoodDuration")).doubleValue());
-        }
-        if (data.containsKey("plantFoodAnimReplays")) {
-            plant.setPlantFoodAnimReplays(
-                    ((Number) data.get("plantFoodAnimReplays")).intValue());
-        }
+        plant.setAbilityValue(result.runtimeAbility());
+        plant.setLevel(level);
         try {
             plant.getClass().getMethod("setMaxRecharge", double.class).invoke(plant,
                     Math.max(0.0, result.runtimeRecharge()));
@@ -107,8 +105,12 @@ public class PlantFactory {
         } catch (Exception e) {
             plant.setRecharge((int) Math.max(0.0, result.runtimeRecharge()));
         }
-        plant.setAbilityValue(result.runtimeAbility());
-        plant.setLevel(level);
+        if (data.containsKey("plantFoodDuration")) {
+            plant.setPlantFoodDuration(((Number) data.get("plantFoodDuration")).doubleValue());
+        }
+        if (data.containsKey("plantFoodAnimReplays")) {
+            plant.setPlantFoodAnimReplays(((Number) data.get("plantFoodAnimReplays")).intValue());
+        }
         String pfType = (String) data.get("plantFoodType");
         if (pfType != null && !pfType.trim().isEmpty() && !pfType.trim().equalsIgnoreCase("NONE")) {
             try {
@@ -119,6 +121,11 @@ public class PlantFactory {
         } else {
             plant.setPlantFoodType(PlantFoodType.NONE);
         }
+    }
+
+    // ── 4. Strategies and special cases ───────────────────────────────────────
+
+    private static void applyStrategiesAndSpecialCases(Plant plant, Map<String, Object> data) {
         List<Map<String, Object>> wrampUp = (List<Map<String, Object>>) data.get("wramp-up");
         plant.setWrampUp(wrampUp);
         plant.setShootingVectors(ShootingVectorRegistry.getVectors(data));
@@ -127,24 +134,18 @@ public class PlantFactory {
         plant.setPlantFoodEffect(PlantFoodEffectRegistry.create(data));
         if (plant.getName().equalsIgnoreCase("puff-shroom")
                 || plant.getName().equalsIgnoreCase("sea-shroom")) {
-            plant.setLifetime(60.0
-                    + plant.getSpecialUpgradeValue(SpecialUpgrade.LIFESPAN_EXT));
+            plant.setLifetime(60.0 + plant.getSpecialUpgradeValue(SpecialUpgrade.LIFESPAN_EXT));
         }
-        return plant;
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static List<Vec2> parseProjectileOrigins(Map<String, Object> data) {
         Object rawOrigins = data.get("projectileOrigins");
-        if (!(rawOrigins instanceof List<?> originList)) {
-            return List.of();
-        }
-
+        if (!(rawOrigins instanceof List<?> originList)) return List.of();
         List<Vec2> origins = new java.util.ArrayList<>();
         for (Object rawOrigin : originList) {
-            if (!(rawOrigin instanceof Map<?, ?> originMap)) {
-                continue;
-            }
-
+            if (!(rawOrigin instanceof Map<?, ?> originMap)) continue;
             Object rawX = originMap.get("x");
             Object rawY = originMap.get("y");
             if (rawX instanceof Number x && rawY instanceof Number y) {
@@ -155,49 +156,41 @@ public class PlantFactory {
     }
 
     private static Result getResult(int level, Map<String, Object> data, Plant plant) {
-        int runtimeHp = ((Number) data.getOrDefault("baseHp", 0)).intValue();
-        int runtimeCost = ((Number) data.getOrDefault("cost", 0)).intValue();
+        int runtimeHp       = ((Number) data.getOrDefault("baseHp",          0  )).intValue();
+        int runtimeCost     = ((Number) data.getOrDefault("cost",             0  )).intValue();
         double runtimeInterval = ((Number) data.getOrDefault("actionInterval", 0.0)).doubleValue();
-        int runtimeDamage = ((Number) data.getOrDefault("damage", 0)).intValue();
-        double runtimeRecharge = ((Number) data.getOrDefault("recharge", 0.0)).doubleValue();
-        double runtimeAbility = ((Number) data.getOrDefault("abilityValue", 0.0)).doubleValue();
+        int runtimeDamage   = ((Number) data.getOrDefault("damage",           0  )).intValue();
+        double runtimeRecharge = ((Number) data.getOrDefault("recharge",      0.0)).doubleValue();
+        double runtimeAbility  = ((Number) data.getOrDefault("abilityValue",  0.0)).doubleValue();
 
-        @SuppressWarnings("unchecked")
         List<Map<String, Object>> upgrades = (List<Map<String, Object>>) data.get("upgrades");
         if (upgrades != null) {
             for (Map<String, Object> upgrade : upgrades) {
                 int upLevel = ((Number) upgrade.getOrDefault("level", 0)).intValue();
-                if (upLevel <= level) {
-                    String upType = (String) upgrade.get("type");
-                    double upVal = ((Number) upgrade.getOrDefault("value", 0.0)).doubleValue();
-                    String specialTag = (String) upgrade.get("specialTag");
-
-                    if (upType != null) {
-                        switch (upType) {
-                            case "BUFF_HP" -> runtimeHp += (int) upVal;
-                            case "BUFF_COST" -> runtimeCost += (int) upVal;
-                            case "BUFF_ACTION_INTERVAL" -> runtimeInterval += upVal;
-                            case "BUFF_DAMAGE" -> runtimeDamage += (int) upVal;
-                            case "BUFF_RECHARGE" -> runtimeRecharge += upVal;
-                            case "SPECIAL_MECHANIC" -> {
-                                SpecialUpgrade upgradee = SpecialUpgrade.fromJson(specialTag);
-                                if (upgradee != null) {
-                                    plant.addSpecialUpgrade(upgradee, upVal);
-                                }
-                            }
+                if (upLevel > level) continue;
+                String upType    = (String) upgrade.get("type");
+                double upVal     = ((Number) upgrade.getOrDefault("value", 0.0)).doubleValue();
+                String specialTag = (String) upgrade.get("specialTag");
+                if (upType != null) {
+                    switch (upType) {
+                        case "BUFF_HP"              -> runtimeHp       += (int) upVal;
+                        case "BUFF_COST"            -> runtimeCost     += (int) upVal;
+                        case "BUFF_ACTION_INTERVAL" -> runtimeInterval += upVal;
+                        case "BUFF_DAMAGE"          -> runtimeDamage   += (int) upVal;
+                        case "BUFF_RECHARGE"        -> runtimeRecharge += upVal;
+                        case "SPECIAL_MECHANIC"     -> {
+                            SpecialUpgrade upgradee = SpecialUpgrade.fromJson(specialTag);
+                            if (upgradee != null) plant.addSpecialUpgrade(upgradee, upVal);
                         }
                     }
                 }
             }
         }
-        Result result = new Result(runtimeHp, runtimeCost, runtimeInterval, runtimeDamage, runtimeRecharge,
-                runtimeAbility);
-        return result;
+        return new Result(runtimeHp, runtimeCost, runtimeInterval, runtimeDamage, runtimeRecharge, runtimeAbility);
     }
 
     private record Result(int runtimeHp, int runtimeCost, double runtimeInterval, int runtimeDamage,
-                          double runtimeRecharge, double runtimeAbility) {
-    }
+                          double runtimeRecharge, double runtimeAbility) {}
 
     public static Plant createPlant(int id, int level) {
         if (App.getCachedPlantsData() != null) {

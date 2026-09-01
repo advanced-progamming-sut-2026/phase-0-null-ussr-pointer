@@ -8,6 +8,7 @@ import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.engine.event.GameEvent;
 import com.ussr.pvz.model.entities.items.sun.ProducedSun;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.level.Level;
@@ -176,8 +177,8 @@ public class BeghouledBehavior extends LevelBehavior {
     private void swapCells(Cell cell1, Cell cell2, Plant p1, Plant p2, int r1, int c1, int r2, int c2) {
         cell1.setPlant(p2);
         cell2.setPlant(p1);
-        if (p2 != null) { p2.setLocation(new Plant.Location(c1, r1)); p2.setPosition(Vec2.of(c1, r1)); }
-        if (p1 != null) { p1.setLocation(new Plant.Location(c2, r2)); p1.setPosition(Vec2.of(c2, r2)); }
+        if (p2 != null) { p2.setLocation(new Location(c1, r1)); p2.setPosition(Vec2.of(c1, r1)); }
+        if (p1 != null) { p1.setLocation(new Location(c2, r2)); p1.setPosition(Vec2.of(c2, r2)); }
     }
 
     private void queueResolvePass(GameSession session, boolean isCascade) {
@@ -315,7 +316,7 @@ public class BeghouledBehavior extends LevelBehavior {
                         cell.setPlant(null);
                         Cell dest = lawn.getCell(writeRow, c);
                         dest.setPlant(p);
-                        p.setLocation(new Plant.Location(c, writeRow));
+                        p.setLocation(new Location(c, writeRow));
                         p.setPosition(Vec2.of(c, writeRow));
                     }
                     writeRow++;
@@ -401,7 +402,7 @@ public class BeghouledBehavior extends LevelBehavior {
 
     private Plant spawnPlant(String alias, int row, int col) {
         Plant p = PlantFactory.createPlantByName(alias, 1);
-        p.setLocation(new Plant.Location(col, row));
+        p.setLocation(new Location(col, row));
         p.setPosition(Vec2.of(col, row));
         p.setState(Plant.PlantState.ACTIVE);
         p.setAlive(true);

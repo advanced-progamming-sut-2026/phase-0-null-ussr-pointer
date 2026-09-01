@@ -8,7 +8,7 @@ public enum PushableType {
     PIANO(1100, null,
             "768/FULL/ZOMBIE/PIANO/PIANO.PAM"),
     BARREL(500, "ZombieImp",
-            "768/FULL/ZOMBIE/ZOMBIE_PIRATE_BARREL_PUSHER_BARREL/ZOMBIE_PIRATE_BARREL_PUSHER_BARREL.PAM"); // Barrel added, spawns Imps upon breaking
+            "768/FULL/ZOMBIE/ZOMBIE_PIRATE_BARREL_PUSHER_BARREL/ZOMBIE_PIRATE_BARREL_PUSHER_BARREL.PAM");
 
     private final int baseHp;
     private final String spawnAlias;

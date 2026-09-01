@@ -125,81 +125,36 @@ public final class MatchRoom {
      * are global for the room. The sender's client advances its
      * action buffer but does not reapply its own action.
      */
-    public synchronized void relay(
-            MatchCommand command,
-            String senderToken
-    ) {
+    public synchronized void relay(MatchCommand command, String senderToken) {
         Objects.requireNonNull(command, "command");
         requireNonBlank(senderToken, "senderToken");
-
         if (!started) {
-            throw new IllegalStateException(
-                    "Match has not started."
-            );
+            throw new IllegalStateException("Match has not started.");
         }
-
         if (closed) {
-            throw new IllegalStateException(
-                    "Match is already closed."
-            );
+            throw new IllegalStateException("Match is already closed.");
         }
-
         if (!matchId.equals(command.matchId())) {
-            throw new IllegalArgumentException(
-                    "Command belongs to another match."
-            );
+            throw new IllegalArgumentException("Command belongs to another match.");
         }
-
         MatchRole senderRole = roleOf(senderToken);
-
         if (senderRole == null) {
-            throw new IllegalArgumentException(
-                    "Sender is not a member of this match."
-            );
+            throw new IllegalArgumentException("Sender is not a member of this match.");
         }
+        validateRolePermission(senderRole, command.type());
 
-        validateRolePermission(
-                senderRole,
-                command.type()
-        );
-
-        MatchAction existing =
-                actionsById.get(command.actionId());
-
+        MatchAction existing = actionsById.get(command.actionId());
         if (existing != null) {
-            validateRetransmission(
-                    existing,
-                    command,
-                    senderRole
-            );
-
-            /*
-             * Rebroadcasting is safe. MatchActionBuffer ignores
-             * an already-applied sequence.
-             */
+            validateRetransmission(existing, command, senderRole);
             broadcast(existing);
             return;
         }
-
         validateLifecycle(command);
-
         MatchAction action =
-                new MatchAction(
-                        matchId,
-                        command.actionId(),
-                        sequenceCounter.getAndIncrement(),
-                        senderRole,
-                        command.type(),
-                        command.payload()
-                );
-
-        actionsById.put(
-                action.actionId(),
-                action
-        );
-
+                new MatchAction(matchId, command.actionId(), sequenceCounter.getAndIncrement(), senderRole,
+                        command.type(), command.payload());
+        actionsById.put(action.actionId(), action);
         broadcast(action);
-
         switch (action.type()) {
             case PLAYER_READY -> {
                 readyRoles.add(senderRole);

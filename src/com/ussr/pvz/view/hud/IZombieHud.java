@@ -191,37 +191,24 @@ public class IZombieHud extends Table {
         private static final Color UNAFFORDABLE = new Color(0.5f, 0.5f, 0.5f, 1f);
         private static final Color BORDER_COLOR = new Color(1f, 0.72f, 0.08f, 1f);
 
-        private final String          zombieId;
         private final int             cost;
         private final Image           portrait;
         private final Label           costLabel;
         private final Actor           selectionFrame;
         private final CooldownOverlay cooldownOverlay;
 
-        private boolean selected   = false;
         private boolean affordable = true;
 
         // cooldown state
         private float cooldownTotal     = 0f;
         private float cooldownRemaining = 0f;
 
-        ZombieSlotWidget(
-                String zombieId,
-                int cost,
-                Skin skin,
-                TextureBank textures,
-                Runnable onClick
-        ) {
-            this.zombieId = zombieId;
+        ZombieSlotWidget(String zombieId, int cost, Skin skin, TextureBank textures, Runnable onClick) {
             this.cost     = cost;
             setTouchable(Touchable.enabled);
-
-            // Card background
             if (skin.has("image_ui_dialog_asset_inner_bkgd_10", Drawable.class)) {
                 add(new Image(skin.getDrawable("image_ui_dialog_asset_inner_bkgd_10")));
             }
-
-            // Portrait
             String texKey = com.ussr.pvz.model.entities.zombies.ZombieFactory.getZombieTextureRegion(zombieId);
             TextureRegion portRegion = textures.region(texKey);
             portrait = portRegion != null ? new Image(portRegion) : new Image();
@@ -231,8 +218,6 @@ public class IZombieHud extends Table {
             portraitLayer.setTouchable(Touchable.disabled);
             portraitLayer.add(portrait).grow().pad(4f);
             add(portraitLayer);
-
-            // Fallback name label when no portrait
             if (portRegion == null) {
                 Table nameLayer = new Table();
                 nameLayer.setTouchable(Touchable.disabled);
@@ -243,8 +228,6 @@ public class IZombieHud extends Table {
                 nameLayer.add(nameLabel).growX().center().pad(4f);
                 add(nameLayer);
             }
-
-            // Cost label
             Table costLayer = new Table();
             costLayer.setTouchable(Touchable.disabled);
             costLayer.bottom().left();
@@ -253,23 +236,17 @@ public class IZombieHud extends Table {
             costLabel.setAlignment(Align.left);
             costLayer.add(costLabel).pad(2f);
             add(costLayer);
-
-            // Cooldown overlay — reuses the same class as SeedPacketWidget
             cooldownOverlay = new CooldownOverlay();
             add(cooldownOverlay);
-
-            // Gold selection frame
-            Drawable goldPixel = skin.has("white-pixel", Drawable.class)
-                    ? skin.newDrawable("white-pixel", BORDER_COLOR) : null;
+            Drawable goldPixel = skin.has("white-pixel", Drawable.class) ? skin.newDrawable("white-pixel",
+                    BORDER_COLOR) : null;
             selectionFrame = new BorderFrameActor(goldPixel);
             selectionFrame.setTouchable(Touchable.disabled);
             selectionFrame.setVisible(false);
             add(selectionFrame);
-
             addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Blocked while cooling down
                     if (isOnCooldown()) return;
                     onClick.run();
                 }
@@ -308,7 +285,6 @@ public class IZombieHud extends Table {
         // ── Selection ─────────────────────────────────────────────────────────
 
         void setSelected(boolean sel) {
-            selected = sel;
             setScale(sel ? 1.05f : 1f);
             setOrigin(Align.center);
             selectionFrame.setVisible(sel);

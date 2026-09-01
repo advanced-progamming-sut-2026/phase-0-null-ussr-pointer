@@ -13,38 +13,22 @@ public interface MoveBehavior {
             float delta
     );
 
-    default Vec2 applySlipperyShift(
-            Zombie zombie,
-            Vec2 previousPosition,
-            Vec2 newPosition,
-            GameSession session
-    ) {
+    default Vec2 applySlipperyShift(Zombie zombie, Vec2 previousPosition, Vec2 newPosition, GameSession session) {
         com.ussr.pvz.model.board.Lawn lawn = session.getLawn();
-        if (lawn == null
-                || previousPosition == null
-                || newPosition == null
-                || zombie.isSlidingBetweenRows()) {
+        if (lawn == null || previousPosition == null || newPosition == null || zombie.isSlidingBetweenRows()) {
             return newPosition;
         }
-
         int row = (int) Math.round(newPosition.y());
         int col = (int) Math.round(newPosition.x());
-
-        if (row < 0 || row >= lawn.getRows()
-                || col < 0 || col >= lawn.getCols()) {
+        if (row < 0 || row >= lawn.getRows() || col < 0 || col >= lawn.getCols()) {
             return newPosition;
         }
-
         double previousX = previousPosition.x();
         double newX = newPosition.x();
         double tileCenterX = col;
 
-        boolean crossedCenter = newX < previousX
-                ? previousX >= tileCenterX && newX <= tileCenterX
-                : newX > previousX
-                && previousX <= tileCenterX
-                && newX >= tileCenterX;
-
+        boolean crossedCenter = newX < previousX ? previousX >= tileCenterX && newX <= tileCenterX : newX > previousX
+                && previousX <= tileCenterX && newX >= tileCenterX;
         if (!crossedCenter) {
             return newPosition;
         }

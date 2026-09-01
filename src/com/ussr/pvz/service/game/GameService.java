@@ -16,6 +16,7 @@ import com.ussr.pvz.model.dto.PlantPlantRequest;
 import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.plants.plantfood.PlantFoodType;
@@ -430,20 +431,13 @@ public class GameService {
         return session;
     }
 
-    private Cell requirePlantableCell(
-            GameSession session,
-            int x,
-            int y,
-            Plant blueprint
-    ) {
+    private Cell requirePlantableCell(GameSession session, int x, int y,Plant blueprint) {
         if (blueprint == null) {
             throw new IllegalStateException(
                     "Plant profile is missing."
             );
         }
-
         Lawn lawn = session.getLawn();
-
         if (lawn == null
                 || x < 0
                 || x >= lawn.getCols()
@@ -696,7 +690,7 @@ public class GameService {
             throw new IllegalArgumentException("Cannot instantiate a null blueprint copy.");
         }
         Plant plant = new Plant(blueprint);
-        plant.setLocation(new Plant.Location(x, y));
+        plant.setLocation(new Location(x, y));
         plant.setPosition(Vec2.of(x, y));
         plant.setState(Plant.PlantState.ACTIVE);
         plant.setAlive(true);

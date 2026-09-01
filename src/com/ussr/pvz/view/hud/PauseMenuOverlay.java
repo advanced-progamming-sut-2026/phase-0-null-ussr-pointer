@@ -80,15 +80,9 @@ public final class PauseMenuOverlay extends WidgetGroup {
         panel.pad(24f, 30f, 30f, 30f);
         panel.setTouchable(Touchable.childrenOnly);
         panel.setBackground(assets.cardDrawable());
-
-        Image topper = new Image(
-                assets.windowTopperDrawable()
-        );
+        Image topper = new Image(assets.windowTopperDrawable());
         topper.setScaling(Scaling.fit);
-
-        Image sunflower = new Image(
-                assets.sunflowerTopperDrawable()
-        );
+        Image sunflower = new Image(assets.sunflowerTopperDrawable());
         sunflower.setScaling(Scaling.fit);
 
         Label title = new Label(
@@ -176,106 +170,51 @@ public final class PauseMenuOverlay extends WidgetGroup {
         return stack;
     }
 
-    private void addPauseButtons(
-            Table panel,
-            Skin skin
-    ) {
-        TextButton.TextButtonStyle style =
-                assets.createButtonStyle(skin);
-
-        TextButton resumeButton =
-                new TextButton("RESUME", style);
-
-        TextButton settingsButton =
-                new TextButton("SETTINGS", style);
-
-        TextButton restartButton =
-                new TextButton("RESTART LEVEL", style);
-
-        TextButton exitButton =
-                new TextButton("SAVE & EXIT", style);
-
+    private void addPauseButtons(Table panel, Skin skin) {
+        TextButton.TextButtonStyle style = assets.createButtonStyle(skin);
+        TextButton resumeButton = new TextButton("RESUME", style);
+        TextButton settingsButton = new TextButton("SETTINGS", style);
+        TextButton restartButton = new TextButton("RESTART LEVEL", style);
+        TextButton exitButton = new TextButton("SAVE & EXIT", style);
         resumeButton.addListener(new ChangeListener() {
             @Override
-            public void changed(
-                    ChangeEvent event,
-                    Actor actor
-            ) {
+            public void changed(ChangeEvent event, Actor actor) {
                 controller.togglePauseMenu();
             }
         });
-
         settingsButton.addListener(new ChangeListener() {
             @Override
-            public void changed(
-                    ChangeEvent event,
-                    Actor actor
-            ) {
+            public void changed(ChangeEvent event, Actor actor) {
                 App.setResumeToPauseMenu(true);
                 App.setMenuState(MenuState.SETTING);
             }
         });
-
         restartButton.addListener(new ChangeListener() {
             @Override
-            public void changed(
-                    ChangeEvent event,
-                    Actor actor
-            ) {
+            public void changed(ChangeEvent event, Actor actor) {
                 if (controller.isMultiplayerMatch()) {
-                    MultiplayerIZombieService.getInstance()
-                            .forfeitMatch();
+                    MultiplayerIZombieService.getInstance().forfeitMatch();
                     App.setMenuState(MenuState.LEVEL_SELECTION);
                     App.setGameSession(null);
                     return;
                 }
-
-                App.getLevelManager().startLevel(
-                        App.getGameSession()
-                                .getLevel()
-                                .getId()
-                );
-
+                App.getLevelManager().startLevel(App.getGameSession().getLevel().getId());
                 App.setGameSession(null);
                 ChoosePlantService.proceedPastLevelStart();
             }
         });
-
         exitButton.addListener(new ChangeListener() {
             @Override
-            public void changed(
-                    ChangeEvent event,
-                    Actor actor
-            ) {
-                MultiplayerIZombieService.getInstance()
-                        .forfeitMatch();
+            public void changed(ChangeEvent event, Actor actor) {
+                MultiplayerIZombieService.getInstance().forfeitMatch();
                 App.setMenuState(MenuState.LEVEL_SELECTION);
                 App.setGameSession(null);
             }
         });
-
-        panel.add(resumeButton)
-                .width(300f)
-                .height(62f)
-                .padBottom(14f)
-                .row();
-
-        panel.add(settingsButton)
-                .width(300f)
-                .height(62f)
-                .padBottom(14f)
-                .row();
-
-        panel.add(restartButton)
-                .width(300f)
-                .height(62f)
-                .padBottom(14f)
-                .row();
-
-        panel.add(exitButton)
-                .width(300f)
-                .height(62f)
-                .row();
+        panel.add(resumeButton).width(300f).height(62f).padBottom(14f).row();
+        panel.add(settingsButton).width(300f).height(62f).padBottom(14f).row();
+        panel.add(restartButton).width(300f).height(62f).padBottom(14f).row();
+        panel.add(exitButton).width(300f).height(62f).row();
     }
 
     @Override

@@ -141,4 +141,8 @@ public class ActiveGameplayView extends Table implements Disposable {
     public void dispose() {
         inGameHud.dispose();
     }
+
+    public GameplayMusicDirector getMusicDirector() {
+        return this.musicDirector;
+    }
 }

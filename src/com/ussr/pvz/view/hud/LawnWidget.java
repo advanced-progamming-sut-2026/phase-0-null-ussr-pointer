@@ -12,21 +12,12 @@ public class LawnWidget extends Actor {
     public LawnWidget(GameplayController controller) {
         setTouchable(Touchable.enabled);
         addListener(new ClickListener() {
-
             private int dragStartRow = -1;
             private int dragStartCol = -1;
             private boolean dragSwapPerformed = false;
-
             @Override
-            public boolean touchDown(
-                    InputEvent event,
-                    float x,
-                    float y,
-                    int pointer,
-                    int button
-            ) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 boolean accepted = super.touchDown(event, x, y, pointer, button);
-
                 if (accepted && LawnGridLayout.contains(x, y)) {
                     dragStartRow = LawnGridLayout.rowAt(y);
                     dragStartCol = LawnGridLayout.columnAt(x);
@@ -35,48 +26,28 @@ public class LawnWidget extends Actor {
                     dragStartCol = -1;
                 }
                 dragSwapPerformed = false;
-
                 return accepted;
             }
-
             @Override
-            public void touchDragged(
-                    InputEvent event,
-                    float x,
-                    float y,
-                    int pointer
-            ) {
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
-
-                if (dragSwapPerformed
-                        || dragStartRow == -1
-                        || !LawnGridLayout.contains(x, y)) {
+                if (dragSwapPerformed || dragStartRow == -1 || !LawnGridLayout.contains(x, y)) {
                     return;
                 }
-
                 int curRow = LawnGridLayout.rowAt(y);
                 int curCol = LawnGridLayout.columnAt(x);
-
                 if (curRow == dragStartRow && curCol == dragStartCol) {
                     return;
                 }
-
                 if (Math.abs(curRow - dragStartRow) + Math.abs(curCol - dragStartCol) == 1) {
-                    boolean swapped = controller.handleBeghouledDrag(
-                            dragStartRow, dragStartCol, curRow, curCol
-                    );
+                    boolean swapped = controller.handleBeghouledDrag(dragStartRow, dragStartCol, curRow, curCol);
                     if (swapped) {
                         dragSwapPerformed = true;
                     }
                 }
             }
-
             @Override
-            public void clicked(
-                    InputEvent event,
-                    float x,
-                    float y
-            ) {
+            public void clicked(InputEvent event, float x, float y) {
                 if (dragSwapPerformed) {
                     dragSwapPerformed = false;
                     return;

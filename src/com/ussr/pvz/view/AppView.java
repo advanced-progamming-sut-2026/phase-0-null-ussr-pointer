@@ -461,20 +461,13 @@ public class AppView implements ApplicationListener {
 
         overlay.setTouchable(Touchable.enabled);
 
-        NewsMenu newsMenu = new NewsMenu(
-                skin,
-                this::closeNews
-        );
+        NewsMenu newsMenu = new NewsMenu(skin);
 
         overlay.add(newsMenu)
                 .width(760f)
                 .height(590f);
 
         return overlay;
-    }
-
-    private void closeNews() {
-        App.setMenuState(MenuState.MAIN);
     }
 
     private void transitionTo(MenuState targetMenu) {

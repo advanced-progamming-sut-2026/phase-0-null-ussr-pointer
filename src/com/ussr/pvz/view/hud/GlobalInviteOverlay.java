@@ -37,11 +37,17 @@ public class GlobalInviteOverlay extends Table {
 
     private static final String CONTENT_PANEL  = "IMAGE_UI_SETTINGS_CONTENT_PANEL";
     private static final String ROW_LARGE      = "IMAGE_UI_SETTINGS_ROW_LARGE";
-    private static final String TAB_GREEN      = "IMAGE_UI_SETTINGS_TAB_GREEN";
-    private static final String TAB_DARK       = "IMAGE_UI_SETTINGS_TAB_DARK";
     private static final String VALUE_PANEL    = "IMAGE_UI_SETTINGS_VALUE_PANEL";
     private static final String ACCEPT_BUTTON  = "button_green";
     private static final String REJECT_BUTTON  = "button_orange";
+
+    public String getIncomingInviter() {
+        return incomingInviter;
+    }
+
+    public void setIncomingInviter(String incomingInviter) {
+        this.incomingInviter = incomingInviter;
+    }
 
     // ── Listener ──────────────────────────────────────────────────────────────
 
@@ -183,30 +189,23 @@ public class GlobalInviteOverlay extends Table {
             return;
         }
         if (mode != OverlayMode.HIDDEN) return;
-
         pollTimer += delta;
         if (pollTimer < POLL_INTERVAL) return;
         pollTimer = 0f;
-
         if (justFinishedSession) {
             justFinishedSession = false;
             return;
         }
-
-        // 1. Incoming invite
         String inviter = lobbyService.checkIncomingInvite();
         if (inviter != null) {
             showIncomingInvite(inviter);
             return;
         }
-
-        // 2. Result of the invite WE sent
         if (pendingInviteTarget != null) {
             String result = lobbyService.checkInviteResult();
             if (result != null) {
                 String target = pendingInviteTarget;
                 pendingInviteTarget = null;
-
                 if ("ACCEPTED".equals(result)) {
                     if (inviteListener != null) inviteListener.onInviteAccepted(target);
                     showInviteAccepted(target);
@@ -216,8 +215,6 @@ public class GlobalInviteOverlay extends Table {
                 }
             }
         }
-
-        // 3. Random match result
         if (inRandomQueue) {
             String opponent = lobbyService.checkRandomMatch();
             if (opponent != null) {
@@ -275,25 +272,6 @@ public class GlobalInviteOverlay extends Table {
     private void showMatchFound(String opponentUsername) {
         hideCard();
     }
-
-    private void showWaitingForServer(String detail) {
-        mode = OverlayMode.WAITING_FOR_SERVER;
-
-        titleLabel.setText("✔  Match Confirmed");
-        titleLabel.setColor(new Color(0.25f, 0.95f, 0.35f, 1f));
-
-        bodyLabel.setText(detail + "\n\nWaiting for the server to start the match…");
-
-        acceptButton.setVisible(false);
-        rejectButton.setVisible(false);
-        okButton    .setVisible(false);
-        acceptLabel .setVisible(false);
-        rejectLabel .setVisible(false);
-        okLabel     .setVisible(false);
-
-        showCard();
-    }
-
     // ─────────────────────────────────────────────────────────────────────────
     // Button handlers
     // ─────────────────────────────────────────────────────────────────────────

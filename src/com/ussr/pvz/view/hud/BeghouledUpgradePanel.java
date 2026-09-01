@@ -145,7 +145,6 @@ public class BeghouledUpgradePanel extends Table {
         private static final Color COLOR_BORDER       = new Color(0f, 0f, 0f, 0.85f);
         private static final float BORDER             = 2f;
 
-        private final String        plantType;
         private final UpgradeInfo   info;
         private final Label         nameLabel;
         private final Label         costLabel;
@@ -153,7 +152,6 @@ public class BeghouledUpgradePanel extends Table {
 
         UpgradeButton(Skin skin, String plantType, UpgradeInfo info,
                       GameplayController controller) {
-            this.plantType = plantType;
             this.info      = info;
 
             setTouchable(Touchable.enabled);

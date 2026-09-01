@@ -127,13 +127,8 @@ public class Projectile extends GameEntity {
     private ArrayList<GameEntity> checkCollision() {
         GameSession session = App.getGameSession();
         if (session == null) return null;
-
-        if (target instanceof Plant) {
-            return checkPlantCollision(session);
-        }
-
+        if (target instanceof Plant) return checkPlantCollision(session);
         GameEntity physicalImpactTarget = null;
-
         ArrayList<InteractableStructure> interactableStructures = session.getLawn().getAllInteractable();
         for (InteractableStructure structure : interactableStructures) {
             if (!structure.isAlive()) continue;
@@ -144,7 +139,6 @@ public class Projectile extends GameEntity {
                 break;
             }
         }
-
         if (physicalImpactTarget == null) {
             List<Zombie> zombies = session.getZombies();
             for (Zombie zombie : zombies) {
@@ -153,26 +147,22 @@ public class Projectile extends GameEntity {
                 if (crossedEntity(zombie.getPosition(), 0.2)) {
                     if (zombie.getDefenseBehavior() instanceof com.ussr.pvz.model.entities.zombies.defense
                             .JesterDefense jester) {
-                        if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy()
-                                instanceof ArcMove) {
+                        if (this.getMoveStrategy() instanceof StraightMove || this.getMoveStrategy() instanceof ArcMove)
+                        {
                             this.setSpeed(this.getSpeed().scale(-1));
                             this.target = jester.findNearestPlantInLane(zombie, session);
                             jester.triggerSpin(zombie);
-
                             return new ArrayList<>();
                         }
                     }
-
                     physicalImpactTarget = zombie;
                     break;
                 }
             }
         }
-
         if (physicalImpactTarget == null) {
             return null;
         }
-
         if (physicalImpactTarget.getPosition() != null
                 && (hitEffectStrategy == null || !hitEffectStrategy.continuesAfterHit())) {
             setPosition(physicalImpactTarget.getPosition());

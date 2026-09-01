@@ -22,7 +22,6 @@ public class ExplodeStrategy implements ActStrategy {
 
     @Override
     public void act(Plant user, GameSession session) {
-
         ArrayList<Zombie> targets = null;
         switch ((int) user.getAbilityValue()) {
             case 1:
@@ -32,12 +31,8 @@ public class ExplodeStrategy implements ActStrategy {
             case 2:
                 targets = areaDetect(user, session);
                 if(user.getName().equalsIgnoreCase("grapeshot"))
-                    App.getGameSession().addProjectile(new Projectile(user.getPosition(),
-                            new Vec2(4 , 0),
-                            null,
-                            50,
-                            new BounceMove(),
-                            new PierceHit(Integer.MAX_VALUE),user));
+                    App.getGameSession().addProjectile(new Projectile(user.getPosition(), new Vec2(4 , 0),
+                            null, 50, new BounceMove(), new PierceHit(Integer.MAX_VALUE),user));
                 break;
             case 3:
                 targets = lineDetect(user, session);
@@ -46,7 +41,7 @@ public class ExplodeStrategy implements ActStrategy {
                 targets = wholePitchDetect(user, session);
                 makeHole(user, session);
                 break;
-            case 5: // Complete the nearest target functionality
+            case 5:
                 targets = nearestZombieDetect(user, session);
                 break;
             case 6:
@@ -58,7 +53,6 @@ public class ExplodeStrategy implements ActStrategy {
                 finishUtilityPlant(user, session);
                 return;
         }
-
         if (targets == null || targets.isEmpty()) return;
         if (user.getName().equalsIgnoreCase("squash") && user.consumeSmashCharge()) {
             userAct(user, targets);
@@ -70,12 +64,8 @@ public class ExplodeStrategy implements ActStrategy {
             user.beginDeathAnimation(0.5f);
             return;
         }
-        // Keep the entity rendered long enough for its one-shot explosion PAM
-        // clip to reach its impact frame. DYING plants no longer run their
-        // strategy, so the delayed damage cannot trigger twice.
         ArrayList<Zombie> impactTargets = new ArrayList<>(targets);
-        user.beginDeathAnimation(2.0f, 1.75f,
-                () -> userAct(user, impactTargets));
+        user.beginDeathAnimation(2.0f, 1.75f, () -> userAct(user, impactTargets));
     }
 
     private boolean isInstantIceTrap(Plant user) {

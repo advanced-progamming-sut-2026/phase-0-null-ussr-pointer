@@ -12,6 +12,7 @@ import com.ussr.pvz.model.board.structures.*;
 import com.ussr.pvz.model.board.terrain.Tile;
 import com.ussr.pvz.model.board.terrain.TileType;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.level.behavior.SaveOurSeedsBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
 import com.ussr.pvz.model.entities.plants.Plant;
@@ -313,7 +314,7 @@ public class TerrainRenderLayer extends Group {
 
         for (Plant plant : sos.getEndangeredPlants()) {
             if (plant == null || !plant.isAlive()) continue;
-            Plant.Location loc = plant.getLocation();
+            Location loc = plant.getLocation();
             if (loc == null) continue;
 
             float x = LawnGridLayout.cellX(loc.x()) + LawnGridLayout.TILE_DRAW_OFFSET_X;

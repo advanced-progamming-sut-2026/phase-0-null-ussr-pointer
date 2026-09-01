@@ -7,6 +7,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.entities.items.GroundItem;
 import com.ussr.pvz.model.entities.items.ItemType;
 import com.ussr.pvz.model.entities.items.SeedPackDrop;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 
 public class VaseBreakerService {
@@ -53,7 +54,7 @@ public class VaseBreakerService {
         try {
             Plant newPlant = com.ussr.pvz.model.entities.plants.PlantFactory.createPlant(targetPack.getPlantId(), 1);
             Plant plant = new Plant(newPlant);
-            plant.setLocation(new Plant.Location(x, y));
+            plant.setLocation(new Location(x, y));
             plant.setPosition(com.ussr.pvz.model.util.Vec2.of(x, y));
             cell.setPlant(plant);
             session.addPlant(plant);

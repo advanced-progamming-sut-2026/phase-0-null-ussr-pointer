@@ -65,7 +65,8 @@ public class PamActor extends Actor {
 
         warmClipTimings(player, pamPath);
 
-        String[] candidates = {preferredClip, "idle", "almanac_idle", "animation", "main", "sprout", "grow", "boost", "default", ""};
+        String[] candidates = {preferredClip, "idle", "almanac_idle", "animation", "main", "sprout", "grow", "boost",
+                "default", ""};
         for (String candidate : candidates) {
             if (candidate == null) continue;
             try {

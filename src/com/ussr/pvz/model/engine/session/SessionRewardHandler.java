@@ -10,7 +10,6 @@ public final class SessionRewardHandler {
     private static final int COIN_CHANCE = 15;
     private static final int DIAMOND_CHANCE = 2;
     private static final int DIAMOND_AMOUNT = 1;
-    private static final int LEVEL_REWARD = 1000;
 
     private final GameSession session;
     private final Random random = new Random();

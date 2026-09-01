@@ -19,7 +19,6 @@ import com.badlogic.gdx.utils.Align;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -31,7 +30,6 @@ public final class NewsMenu extends Table {
 
     private final Skin skin;
     private final NewsController controller;
-    private final Runnable onClose;
     private final Table contentPanel;
     private final Table newsList;
 
@@ -39,9 +37,8 @@ public final class NewsMenu extends Table {
     private TextButton allTab;
     private NewsTab selectedTab;
 
-    public NewsMenu(Skin skin, Runnable onClose) {
+    public NewsMenu(Skin skin) {
         this.skin = skin;
-        this.onClose = onClose;
         this.controller = new NewsController();
         this.contentPanel = new Table();
         this.newsList = new Table();
@@ -259,23 +256,6 @@ public final class NewsMenu extends Table {
                         0.22f,
                         Interpolation.smooth
                 )
-        ));
-    }
-
-    private void close() {
-        clearActions();
-
-        addAction(sequence(
-                parallel(
-                        fadeOut(0.15f, Interpolation.fade),
-                        scaleTo(
-                                0.92f,
-                                0.92f,
-                                0.15f,
-                                Interpolation.smooth
-                        )
-                ),
-                run(onClose)
         ));
     }
 }

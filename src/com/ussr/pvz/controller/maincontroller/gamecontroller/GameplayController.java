@@ -327,83 +327,40 @@ public final class GameplayController {
     // Main lawn click
     // =========================================================
 
-    public void handleGridClick(
-            int gridX,
-            int gridY
-    ) {
+    public void handleGridClick(int gridX, int gridY) {
         if (isPaused()) {
             return;
         }
-
-        GameSession session =
-                App.getGameSession();
-
-        if (session == null
-                || session.getLevel() == null) {
+        GameSession session = App.getGameSession();
+        if (session == null || session.getLevel() == null) {
             return;
         }
-
-        LevelBehavior behavior =
-                session.getLevel().getBehavior();
-
+        LevelBehavior behavior = session.getLevel().getBehavior();
         if (behavior instanceof BeghouledBehavior) {
-            handleBeghouledClick(
-                    gridX,
-                    gridY
-            );
+            handleBeghouledClick(gridX, gridY);
             return;
         }
-
         if (behavior instanceof VaseBreakerBehavior) {
-            handleVaseBreakerClick(
-                    gridX,
-                    gridY,
-                    session
-            );
+            handleVaseBreakerClick(gridX, gridY, session);
             return;
         }
-
         if (behavior instanceof CouchIZombieBehavior) {
-            /*
-             * In couch play the mouse always drives the plant side;
-             * the zombie side is placed through the keyboard cursor.
-             */
-            handlePlantPlayerClick(
-                    gridX,
-                    gridY
-            );
+            handlePlantPlayerClick(gridX, gridY);
             return;
         }
-
         if (behavior instanceof IZombieBehavior) {
-            handleIZombieClick(
-                    gridX,
-                    gridY
-            );
+            handleIZombieClick(gridX, gridY);
             return;
         }
-
-        if (behavior
-                instanceof MultiplayerIZombieBehavior multiplayer) {
+        if (behavior instanceof MultiplayerIZombieBehavior multiplayer) {
             if (multiplayer.isZombiesPlayer()) {
-                handleIZombieClick(
-                        gridX,
-                        gridY
-                );
+                handleIZombieClick(gridX, gridY);
             } else {
-                handlePlantPlayerClick(
-                        gridX,
-                        gridY
-                );
+                handlePlantPlayerClick(gridX, gridY);
             }
-
             return;
         }
-
-        handlePlantPlayerClick(
-                gridX,
-                gridY
-        );
+        handlePlantPlayerClick(gridX, gridY);
     }
 
     private void handlePlantPlayerClick(
@@ -503,92 +460,37 @@ public final class GameplayController {
     // VaseBreaker
     // =========================================================
 
-    private void handleVaseBreakerClick(
-            int column,
-            int row,
-            GameSession session
-    ) {
+    private void handleVaseBreakerClick(int column, int row, GameSession session) {
         if (heldSeedPack != null) {
-            int sourceX =
-                    (int) heldSeedPack
-                            .getLocation()
-                            .x();
-
-            int sourceY =
-                    (int) heldSeedPack
-                            .getLocation()
-                            .y();
-
-            String result =
-                    vaseBreakerService
-                            .plantFromSeedPack(
-                                    sourceX,
-                                    sourceY,
-                                    column,
-                                    row
-                            );
-
+            int sourceX = (int) heldSeedPack.getLocation().x();
+            int sourceY = (int) heldSeedPack.getLocation().y();
+            String result = vaseBreakerService.plantFromSeedPack(sourceX, sourceY, column, row);
             if (result.contains("Successfully")) {
                 heldSeedPack = null;
             }
-
             return;
         }
-
-        float clickX =
-                LawnGridLayout.cellX(column)
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-
-        float clickY =
-                LawnGridLayout.cellY(row)
-                        + LawnGridLayout.CELL_HEIGHT / 2f;
-
+        float clickX = LawnGridLayout.cellX(column) + LawnGridLayout.CELL_WIDTH / 2f;
+        float clickY = LawnGridLayout.cellY(row) + LawnGridLayout.CELL_HEIGHT / 2f;
         for (GroundItem item : session.getItems()) {
-            if (item.getItemType()
-                    != ItemType.SEED_PACK) {
+            if (item.getItemType() != ItemType.SEED_PACK) {
                 continue;
             }
-
-            if (!item.isAlive()
-                    || item.isCollected()) {
+            if (!item.isAlive() || item.isCollected()) {
                 continue;
             }
-
-            float itemX =
-                    LawnGridLayout.worldX(
-                            item.getPosition().x()
-                    )
-                            + LawnGridLayout.CELL_WIDTH / 2f;
-
-            float itemY =
-                    LawnGridLayout.worldY(
-                            item.getPosition().y()
-                    );
-
+            float itemX = LawnGridLayout.worldX(item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
+            float itemY = LawnGridLayout.worldY(item.getPosition().y());
             float deltaX = clickX - itemX;
             float deltaY = clickY - itemY;
-
-            if (deltaX * deltaX
-                    + deltaY * deltaY
-                    < 75f * 75f) {
-                heldSeedPack =
-                        (SeedPackDrop) item;
+            if (deltaX * deltaX + deltaY * deltaY < 75f * 75f) {
+                heldSeedPack = (SeedPackDrop) item;
                 return;
             }
         }
-
-        Cell cell =
-                session.getLawn()
-                        .getCell(row, column);
-
-        if (cell != null
-                && cell.getInteractableStructure()
-                instanceof Vase vase
-                && vase.isAlive()) {
-            vaseBreakerService.smashVase(
-                    column,
-                    row
-            );
+        Cell cell = session.getLawn().getCell(row, column);
+        if (cell != null && cell.getInteractableStructure() instanceof Vase vase && vase.isAlive()) {
+            vaseBreakerService.smashVase(column, row);
         }
     }
 

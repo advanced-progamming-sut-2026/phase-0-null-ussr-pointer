@@ -81,7 +81,7 @@ public class IZombieBehavior extends LevelBehavior {
                 int randomPlantId = random.nextInt(50) + 1;
                 Plant plant = PlantFactory.createPlant(randomPlantId, 1);
                 Plant newPlant = new Plant(plant);
-                newPlant.setLocation(new com.ussr.pvz.model.entities.plants.Plant.Location(c, r));
+                newPlant.setLocation(new com.ussr.pvz.model.entities.plants.Location(c, r));
                 newPlant.setPosition(Vec2.of(c, r));
                 Cell cell = session.getLawn().getCell(r, c);
                 if (cell != null) {

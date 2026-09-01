@@ -5,6 +5,7 @@ import com.ussr.pvz.model.board.Cell;
 import com.ussr.pvz.model.board.structures.Brain;
 import com.ussr.pvz.model.engine.GameEntity;
 import com.ussr.pvz.model.engine.session.GameSession;
+import com.ussr.pvz.model.entities.plants.Location;
 import com.ussr.pvz.model.entities.plants.Plant;
 import com.ussr.pvz.model.entities.plants.PlantFactory;
 import com.ussr.pvz.model.entities.zombies.Zombie;
@@ -69,7 +70,7 @@ public final class RemoteActionApplier {
             throw new IllegalStateException("Remote plant cell is occupied");
         }
         Plant plant = PlantFactory.createPlantByName(string(payload, "plantName"), 1);
-        plant.setLocation(new Plant.Location(col, row));
+        plant.setLocation(new Location(col, row));
         plant.setPosition(Vec2.of(col, row));
         plant.setState(Plant.PlantState.ACTIVE);
         plant.setAlive(true);
@@ -82,7 +83,7 @@ public final class RemoteActionApplier {
         String id = string(payload, "entityId");
         Plant plant = registry.find(id, Plant.class).orElse(null);
         if (plant == null) return;
-        Plant.Location location = plant.getLocation();
+        Location location = plant.getLocation();
         session.removePlantAt(location.x(), location.y());
         registry.unregister(id);
     }

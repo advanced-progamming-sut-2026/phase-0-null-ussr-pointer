@@ -22,8 +22,7 @@ public class SunActor extends Actor {
     }
 
     private static final float TRANSITION_DURATION = 1.2f; // tweak to match transition clip length
-    private static final float EXPLODE_DURATION = 0.8f;
-    private static final float FALL_START_Y = 8f;   // world-unit height sun falls from
+    private static final float EXPLODE_DURATION = 0.8f;// world-unit height sun falls from
 
     private static final float BASE_SCALE = 0.45f;
     private static final float MIN_SCALE_MULTIPLIER = 0.5f;

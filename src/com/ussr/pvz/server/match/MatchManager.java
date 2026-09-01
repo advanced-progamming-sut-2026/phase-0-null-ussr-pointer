@@ -52,147 +52,44 @@ public final class MatchManager {
      * @throws IllegalStateException if a peer is unavailable or
      *                               already belongs to another room
      */
-    public synchronized MatchRoom createRoom(
-            String plantsToken,
-            String zombiesToken
-    ) {
-        requireNonBlank(
-                plantsToken,
-                "plantsToken"
-        );
-
-        requireNonBlank(
-                zombiesToken,
-                "zombiesToken"
-        );
-
-        if (plantsToken.equals(zombiesToken)) {
-            throw new IllegalArgumentException(
-                    "A player cannot be matched with itself."
-            );
-        }
-
-        MatchRoom plantsExistingRoom =
-                roomByToken.get(plantsToken);
-
-        MatchRoom zombiesExistingRoom =
-                roomByToken.get(zombiesToken);
-
-        /*
-         * Repeated matchmaking confirmation for the same pair is
-         * idempotent.
-         */
-        if (plantsExistingRoom != null
-                && plantsExistingRoom
-                == zombiesExistingRoom) {
-            return plantsExistingRoom;
-        }
+    public synchronized MatchRoom createRoom(String plantsToken, String zombiesToken) {
+        requireNonBlank(plantsToken, "plantsToken");
+        requireNonBlank(zombiesToken, "zombiesToken");
+        if (plantsToken.equals(zombiesToken))
+            throw new IllegalArgumentException("A player cannot be matched with itself.");
+        MatchRoom plantsExistingRoom = roomByToken.get(plantsToken);
+        MatchRoom zombiesExistingRoom = roomByToken.get(zombiesToken);
+        if (plantsExistingRoom != null && plantsExistingRoom == zombiesExistingRoom) return plantsExistingRoom;
 
         if (plantsExistingRoom != null) {
-            throw new IllegalStateException(
-                    "Plants player is already in a match."
-            );
+            throw new IllegalStateException("Plants player is already in a match.");
         }
-
         if (zombiesExistingRoom != null) {
-            throw new IllegalStateException(
-                    "Zombies player is already in a match."
-            );
+            throw new IllegalStateException("Zombies player is already in a match.");
         }
-
-        MatchPeer plants =
-                connectedPeers.get(plantsToken);
-
-        MatchPeer zombies =
-                connectedPeers.get(zombiesToken);
-
-        if (plants == null) {
-            throw new IllegalStateException(
-                    "Plants player is not connected."
-            );
-        }
-
-        if (zombies == null) {
-            throw new IllegalStateException(
-                    "Zombies player is not connected."
-            );
-        }
-
-        validatePeer(
-                plants,
-                plantsToken,
-                "plants"
-        );
-
-        validatePeer(
-                zombies,
-                zombiesToken,
-                "zombies"
-        );
-
-        MatchRoom room =
-                new MatchRoom(
-                        plants,
-                        zombies
-                );
-
-        /*
-         * Register the room before sending MATCH_STARTED. If a
-         * client sends a command immediately, routing is already
-         * available.
-         */
-        rooms.put(
-                room.matchId(),
-                room
-        );
-
-        roomByToken.put(
-                plantsToken,
-                room
-        );
-
-        roomByToken.put(
-                zombiesToken,
-                room
-        );
-
-        long seed =
-                seedGenerator.nextLong();
-
+        MatchPeer plants = connectedPeers.get(plantsToken);
+        MatchPeer zombies = connectedPeers.get(zombiesToken);
+        if (plants == null) throw new IllegalStateException("Plants player is not connected.");
+        if (zombies == null) throw new IllegalStateException("Zombies player is not connected.");
+        validatePeer(plants, plantsToken, "plants");
+        validatePeer(zombies, zombiesToken, "zombies");
+        MatchRoom room = new MatchRoom(plants, zombies);
+        rooms.put(room.matchId(), room);
+        roomByToken.put(plantsToken,room);
+        roomByToken.put(zombiesToken, room);
+        long seed = seedGenerator.nextLong();
         try {
-            room.start(
-                    DEFAULT_LEVEL_ID,
-                    seed
-            );
-
-            System.out.println(
-                    "[MatchManager] Match started: "
-                            + plants.username()
-                            + " (PLANTS) vs "
-                            + zombies.username()
-                            + " (ZOMBIES) - "
-                            + room.matchId()
-            );
-
+            room.start(DEFAULT_LEVEL_ID, seed);
+            System.out.println("[MatchManager] Match started: " + plants.username() + " (PLANTS) vs "
+                    + zombies.username() + " (ZOMBIES) - " + room.matchId());
             return room;
 
         } catch (RuntimeException exception) {
             cleanupRoom(room);
-
             try {
-                room.close(
-                        "MATCH_START_FAILED"
-                );
-            } catch (RuntimeException ignored) {
-                /*
-                 * The original start exception is more useful.
-                 */
-            }
-
-            throw new IllegalStateException(
-                    "Failed to start match.",
-                    exception
-            );
+                room.close("MATCH_START_FAILED");
+            } catch (RuntimeException ignored) {}
+            throw new IllegalStateException("Failed to start match.", exception);
         }
     }
 

@@ -25,10 +25,7 @@ public class SunRenderLayer extends Group {
     private final PamPlayer pamPlayer;
     private final Map<GroundItem, SunActor> sunActors = new HashMap<>();
 
-    // collect radius in screen pixels — tune as needed
     private static final float COLLECT_RADIUS_PX = 55f;
-
-    /** How high above the plant's own PAM anchor the sun pops before falling to rest, in world pixels. */
     private static final float SUN_POP_HEIGHT_PX = 90f;
 
     public SunRenderLayer(PamPlayer pamPlayer) {
@@ -39,101 +36,96 @@ public class SunRenderLayer extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
-
         GameSession session = App.getGameSession();
         if (session == null) return;
-
         boolean collectAll = Gdx.input.isKeyJustPressed(Input.Keys.A);
-
-        // mouse position in stage coords
         Vector2 mouse = new Vector2(Gdx.input.getX(), Gdx.input.getY());
         getStage().getViewport().unproject(mouse);
-
-        // sync actors with live sun items
         for (GroundItem item : session.getItems()) {
             if (item.getItemType() != ItemType.SUN) continue;
             if (item.isCollected() || !item.isAlive()) continue;
-
-            SunActor actor = sunActors.computeIfAbsent(item, i -> {
-                SunActor sa = new SunActor(pamPlayer, i);
-                addActor(sa);
-                return sa;
-            });
-
-            // position the actor
-            float screenX, screenY;
-            if (item instanceof SunToken token) {
-                // during fall: interpolate Y from top of screen down to target row
-                float targetScreenY = LawnGridLayout.worldY(token.getTargetRow());
-                float targetScreenX = LawnGridLayout.worldX(token.getTargetCol())
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-
-                if (token.isFalling()) {
-                    float progress = (float)(token.getCurrentY() /
-                            Math.max(token.getTargetRow(), 1));
-                    float startY = getStage().getViewport().getWorldHeight() + 40f;
-                    screenY = startY + (targetScreenY - startY) * progress;
-                } else {
-                    screenY = targetScreenY;
-                }
-                screenX = targetScreenX;
-            } else if (item instanceof ProducedSun sun) {
-                // Resting spot — same fixed position it always used.
-                float restX = LawnGridLayout.worldX(item.getPosition().x())
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-                float restY = LawnGridLayout.worldY(item.getPosition().y());
-
-                if (sun.isPopping()) {
-                    float startX = LawnGridLayout.cellX((int) item.getPosition().x())
-                            + LawnGridLayout.CELL_WIDTH / 2f
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_X;
-                    float startY = LawnGridLayout.cellY((int) item.getPosition().y())
-                            + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
-
-                    float t = sun.getPopProgress();
-                    float peakY = Math.max(startY, restY) + SUN_POP_HEIGHT_PX;
-                    float arc = 4f * t * (1f - t); // 0 -> 1 -> 0 across the pop
-                    screenX = startX + (restX - startX) * t;
-                    screenY = startY + (restY - startY) * t + arc * (peakY - Math.max(startY, restY));
-                } else {
-                    screenX = restX;
-                    screenY = restY;
-                }
-            } else {
-                // Fallback for any other fixed-position sun item.
-                screenX = LawnGridLayout.worldX(item.getPosition().x())
-                        + LawnGridLayout.CELL_WIDTH / 2f;
-                screenY = LawnGridLayout.worldY(item.getPosition().y());
-            }
-
-            actor.setPosition(
-                    screenX - actor.getWidth()  / 2f,
-                    screenY - actor.getHeight() / 2f
-            );
-
-            // collection logic
+            SunActor actor = getOrCreateActor(item);
+            Vector2 screenPos = computeScreenPosition(item);
+            actor.setPosition(screenPos.x - actor.getWidth() / 2f, screenPos.y - actor.getHeight() / 2f);
             if (actor.isDone()) continue;
-
-            boolean hovered = mouse.dst(screenX, screenY) < COLLECT_RADIUS_PX;
-            boolean collect = collectAll || hovered;
-
-            if (collect) {
-                boolean explode = item instanceof SunToken token2
-                        && token2.getDropType() == SunDropType.RADIOACTIVE
-                        && token2.isFalling();
-
-                actor.onCollected(explode);
-                item.collect(); // applies reward to session
-            }
+            handleCollection(item, actor, mouse, collectAll, screenPos);
         }
+        removeDeadActors();
+    }
 
-        // cleanup done actors
+    // ── Submethod 1: actor cache ──────────────────────────────────────────────
+
+    private SunActor getOrCreateActor(GroundItem item) {
+        return sunActors.computeIfAbsent(item, i -> {
+            SunActor sa = new SunActor(pamPlayer, i);
+            addActor(sa);
+            return sa;
+        });
+    }
+
+    // ── Submethod 2: screen position ──────────────────────────────────────────
+
+    private Vector2 computeScreenPosition(GroundItem item) {
+        if (item instanceof SunToken token)       return computeSunTokenPosition(token);
+        if (item instanceof ProducedSun sun)      return computeProducedSunPosition(item, sun);
+        return new Vector2(
+                LawnGridLayout.worldX(item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f,
+                LawnGridLayout.worldY(item.getPosition().y())
+        );
+    }
+
+    private Vector2 computeSunTokenPosition(SunToken token) {
+        float screenX = LawnGridLayout.worldX(token.getTargetCol()) + LawnGridLayout.CELL_WIDTH / 2f;
+        float targetScreenY = LawnGridLayout.worldY(token.getTargetRow());
+        float screenY;
+        if (token.isFalling()) {
+            float progress = (float)(token.getCurrentY() / Math.max(token.getTargetRow(), 1));
+            float startY = getStage().getViewport().getWorldHeight() + 40f;
+            screenY = startY + (targetScreenY - startY) * progress;
+        } else {
+            screenY = targetScreenY;
+        }
+        return new Vector2(screenX, screenY);
+    }
+
+    private Vector2 computeProducedSunPosition(GroundItem item, ProducedSun sun) {
+        float restX = LawnGridLayout.worldX(item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f;
+        float restY = LawnGridLayout.worldY(item.getPosition().y());
+        if (!sun.isPopping()) return new Vector2(restX, restY);
+        float startX = LawnGridLayout.cellX((int) item.getPosition().x()) + LawnGridLayout.CELL_WIDTH / 2f
+                + LawnGridLayout.PLANT_DRAW_OFFSET_X;
+        float startY = LawnGridLayout.cellY((int) item.getPosition().y())
+                + LawnGridLayout.PLANT_DRAW_OFFSET_Y;
+        float t    = sun.getPopProgress();
+        float peakY = Math.max(startY, restY) + SUN_POP_HEIGHT_PX;
+        float arc   = 4f * t * (1f - t);
+        return new Vector2(
+                startX + (restX - startX) * t,
+                startY + (restY - startY) * t + arc * (peakY - Math.max(startY, restY))
+        );
+    }
+
+    // ── Submethod 3: collection ───────────────────────────────────────────────
+
+    private void handleCollection(GroundItem item, SunActor actor,
+                                  Vector2 mouse, boolean collectAll, Vector2 screenPos) {
+        boolean hovered = mouse.dst(screenPos.x, screenPos.y) < COLLECT_RADIUS_PX;
+        if (!collectAll && !hovered) return;
+        boolean explode = item instanceof SunToken token2
+                && token2.getDropType() == SunDropType.RADIOACTIVE
+                && token2.isFalling();
+        actor.onCollected(explode);
+        item.collect();
+    }
+
+    // ── Submethod 4: cleanup ──────────────────────────────────────────────────
+
+    private void removeDeadActors() {
         Iterator<Map.Entry<GroundItem, SunActor>> it = sunActors.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<GroundItem, SunActor> entry = it.next();
-            SunActor actor = entry.getValue();
+            SunActor  actor = entry.getValue();
             GroundItem item = entry.getKey();
-
             if (actor.isDone() || !item.isAlive() || item.isCollected()) {
                 actor.remove();
                 it.remove();

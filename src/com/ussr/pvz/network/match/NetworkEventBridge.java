@@ -135,7 +135,8 @@ public final class NetworkEventBridge {
         send(MatchActionType.PLANT_PLACED, p);
     }
     private void plantPlucked(GameEvent.PlantPlucked e) { sendRemovedPlant(MatchActionType.PLANT_PLUCKED, e.plant()); }
-    private void plantFoodUsed(GameEvent.PlantFoodUsed e) { sendEntity(MatchRole.PLANTS, MatchActionType.PLANT_FOOD_USED, e.plant()); }
+    private void plantFoodUsed(GameEvent.PlantFoodUsed e) { sendEntity(MatchRole.PLANTS,
+            MatchActionType.PLANT_FOOD_USED, e.plant()); }
     private void plantDied(GameEvent.PlantDied e) { sendRemovedPlant(MatchActionType.PLANT_DIED, e.plant()); }
     private void zombieSpawned(GameEvent.ZombieSpawned event) {
         if (!canSend(MatchRole.ZOMBIES)) return;
@@ -193,8 +194,9 @@ public final class NetworkEventBridge {
     private void send(MatchActionType type, JsonObject payload) {
         if (canSendAnyRole()) commandSender.accept(context.createCommand(type, payload));
     }
-    private MatchRole oppositeRole() { return context.role() == MatchRole.PLANTS ? MatchRole.ZOMBIES : MatchRole.PLANTS; }
-    private static JsonObject property(String key, String value) { JsonObject p = new JsonObject(); p.addProperty(key, value); return p; }
+    private MatchRole oppositeRole(){ return context.role() == MatchRole.PLANTS ? MatchRole.ZOMBIES : MatchRole.PLANTS;}
+    private static JsonObject property(String key, String value) { JsonObject p = new JsonObject(); p.
+            addProperty(key, value); return p; }
 
     public synchronized void dispose() {
         subscriptions.forEach(GameEventBus.Subscription::unsubscribe);
