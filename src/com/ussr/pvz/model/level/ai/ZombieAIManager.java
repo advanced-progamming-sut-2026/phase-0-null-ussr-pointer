@@ -29,8 +29,6 @@ public class ZombieAIManager {
             case 4, 5   -> Difficulty.HARD;
             default     -> Difficulty.MEDIUM;
         };
-
-        // Rule: Scale point budgets larger based on the exact intensity level selected
         this.costMultiplier = switch (difficultyLevel) {
             case 1 -> 0.50;
             case 2 -> 0.75;
@@ -43,15 +41,11 @@ public class ZombieAIManager {
 
     public void tick(GameSession session, double deltaTime) {
         if (!session.isWavesStarted() || session.isGameOver()) return;
-
         Level level = session.getLevel();
         if (level == null) return;
-
         List<Level.Wave> waves = level.getWaves();
         if (waves == null || waves.isEmpty()) return;
-
         elapsedSinceStart += deltaTime;
-
         boolean isConveyorLevel = level.getDeliveryStrategy()
                 instanceof ConveyorDeliveryStrategy;
         boolean isBeghouledLevel = level.getBehavior() instanceof BeghouledBehavior;
@@ -77,8 +71,6 @@ public class ZombieAIManager {
                 spawnNextWaveDirector(waves, session);
             }
         }
-
-        // 4. Clean up any directors that have exhausted their budget and cleared their spawned zombies
         Iterator<WaveDirector> iterator =
                 activeDirectors.iterator();
 

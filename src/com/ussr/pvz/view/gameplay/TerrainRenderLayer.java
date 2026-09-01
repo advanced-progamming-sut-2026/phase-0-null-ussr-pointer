@@ -324,67 +324,36 @@ public class TerrainRenderLayer extends Group {
         batch.setColor(prev);
     }
 
-    private void drawContinuousWater(
-            Batch batch,
-            float parentAlpha,
-            Lawn lawn,
-            int coastColumn
-    ) {
-        TextureRegion water = textures.region(
-                "IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_174X209"
-        );
-
+    private void drawContinuousWater(Batch batch, float parentAlpha, Lawn lawn, int coastColumn) {
+        TextureRegion water = textures.region("IMAGE_BACKGROUNDS_WATER_SQUARE_WATER_SQUARE_174X209");
         if (water == null) {
             return;
         }
-
         float x =
-                LawnGridLayout.cellX(coastColumn)
-                        + LawnGridLayout.WATER_DRAW_OFFSET_X
-                        + (LawnGridLayout.CELL_WIDTH
+                LawnGridLayout.cellX(coastColumn) + LawnGridLayout.WATER_DRAW_OFFSET_X + (LawnGridLayout.CELL_WIDTH
                         - LawnGridLayout.WATER_DRAW_WIDTH) / 2f;
 
-        float y =
-                LawnGridLayout.cellY(0)
+        float y = LawnGridLayout.cellY(0)
                         + LawnGridLayout.WATER_DRAW_OFFSET_Y
                         + (LawnGridLayout.CELL_HEIGHT
                         - LawnGridLayout.WATER_DRAW_HEIGHT) / 2f;
 
         Color previous = new Color(batch.getColor());
-        float drawWidth = LawnGridLayout.WATER_DRAW_WIDTH
-                + (lawn.getCols() - coastColumn - 1) * LawnGridLayout.CELL_WIDTH;
-        float drawHeight = LawnGridLayout.WATER_DRAW_HEIGHT
-                + (lawn.getRows() - 1) * LawnGridLayout.CELL_HEIGHT
+        float drawWidth = LawnGridLayout.WATER_DRAW_WIDTH + (lawn.getCols() - coastColumn - 1) * LawnGridLayout
+                .CELL_WIDTH;
+        float drawHeight = LawnGridLayout.WATER_DRAW_HEIGHT + (lawn.getRows() - 1) * LawnGridLayout.CELL_HEIGHT
                 + LawnGridLayout.WATER_TOP_ROW_EXTENSION;
-
         TextureRegion base = textures.region(
                 "IMAGE_BACKGROUNDS_WATER_UNDERLAYER_WATER_UNDERLAYER_1586X49"
         );
         if (base != null) {
             batch.setColor(0.38f, 0.70f, 0.96f, parentAlpha);
-            batch.draw(
-                    base,
-                    x,
-                    y,
-                    drawWidth,
-                    drawHeight
-            );
+            batch.draw(base, x, y, drawWidth, drawHeight);
         }
 
-        batch.setColor(
-                0.68f,
-                0.90f,
-                1f,
-                parentAlpha * 0.78f
-        );
+        batch.setColor(0.68f, 0.90f, 1f, parentAlpha * 0.78f);
 
-        batch.draw(
-                water,
-                x,
-                y,
-                drawWidth,
-                drawHeight
-        );
+        batch.draw(water, x, y, drawWidth, drawHeight);
 
         batch.setColor(previous);
     }

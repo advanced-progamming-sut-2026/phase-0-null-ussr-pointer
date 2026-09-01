@@ -64,10 +64,11 @@ public class GlobalInviteOverlay extends Table {
         WAITING_FOR_SERVER
     }
 
-    private OverlayMode mode               = OverlayMode.HIDDEN;
+    private OverlayMode mode                = OverlayMode.HIDDEN;
     private String      pendingInviteTarget;
     private String      incomingInviter;
-    private boolean     inRandomQueue      = false;
+    private boolean     inRandomQueue       = false;
+    private boolean     justFinishedSession = false;
 
     private InviteListener inviteListener;
 
@@ -173,8 +174,12 @@ public class GlobalInviteOverlay extends Table {
         super.act(delta);
         if (App.getGameSession() != null) {
             if (mode != OverlayMode.HIDDEN) {
+                pendingInviteTarget = null;
+                inRandomQueue = false;
                 hideCard();
             }
+            pollTimer = 0f;
+            justFinishedSession = true;
             return;
         }
         if (mode != OverlayMode.HIDDEN) return;
@@ -182,6 +187,11 @@ public class GlobalInviteOverlay extends Table {
         pollTimer += delta;
         if (pollTimer < POLL_INTERVAL) return;
         pollTimer = 0f;
+
+        if (justFinishedSession) {
+            justFinishedSession = false;
+            return;
+        }
 
         // 1. Incoming invite
         String inviter = lobbyService.checkIncomingInvite();
@@ -241,7 +251,7 @@ public class GlobalInviteOverlay extends Table {
     }
 
     private void showInviteAccepted(String targetUsername) {
-        showWaitingForServer(targetUsername + " accepted your invitation.");
+        hideCard();
     }
 
     private void showInviteRejected(String targetUsername) {
@@ -263,7 +273,7 @@ public class GlobalInviteOverlay extends Table {
     }
 
     private void showMatchFound(String opponentUsername) {
-        showWaitingForServer("Opponent found: " + opponentUsername);
+        hideCard();
     }
 
     private void showWaitingForServer(String detail) {
@@ -299,11 +309,8 @@ public class GlobalInviteOverlay extends Table {
             return;
         }
 
-        String opponent = incomingInviter;
         incomingInviter = null;
-        showWaitingForServer(
-                opponent == null ? "Invitation accepted." : "Opponent: " + opponent
-        );
+        hideCard();
     }
 
     private void onReject() {

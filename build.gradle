@@ -108,6 +108,28 @@ run {
     systemProperties System.getProperties()
 }
 
+// ---------- Server ----------
+tasks.register('server.run', JavaExec) {
+    group = 'application'
+    description = 'Runs the PvZ server'
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.ussr.pvz.server.ServerMain'
+
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+
+    standardInput = System.in
+
+    // Same JVM args libPVZ uses
+    jvmArgs(
+            '--enable-native-access=ALL-UNNAMED',
+            '-Dorg.lwjgl.system.JNINativeInterfaceSize=233'
+    )
+
+    systemProperties System.getProperties()
+}
 test {
     useJUnitPlatform()
 

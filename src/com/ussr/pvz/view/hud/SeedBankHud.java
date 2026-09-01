@@ -93,16 +93,13 @@ public class SeedBankHud extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
-
         GameSession session = App.getGameSession();
-
         if (session == null || session.getLevel() == null) {
             setVisible(false);
             setTouchable(Touchable.disabled);
             lastSession = null;
             return;
         }
-
         boolean conveyorLevel =
                 session.getLevel().getDeliveryStrategy()
                         instanceof ConveyorDeliveryStrategy;

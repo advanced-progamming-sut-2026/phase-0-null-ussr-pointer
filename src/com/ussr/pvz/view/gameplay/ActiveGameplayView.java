@@ -14,6 +14,7 @@ import com.ussr.pvz.model.engine.session.GameSession;
 import com.ussr.pvz.model.level.Chapter;
 import com.ussr.pvz.model.level.behavior.BeghouledBehavior;
 import com.ussr.pvz.model.level.behavior.LevelBehavior;
+import com.ussr.pvz.model.level.behavior.MultiplayerIZombieBehavior;
 import com.ussr.pvz.model.level.behavior.VaseBreakerBehavior;
 import com.ussr.pvz.view.components.LawnBackgroundLayer;
 import com.ussr.pvz.view.hud.BeghouledOverlayWidget;
@@ -119,7 +120,10 @@ public class ActiveGameplayView extends Table implements Disposable {
         if (session == null || session.isGameOver()) return;
 
         if (!controller.isPaused()) {
-            accumulator += delta * getGameSpeedMultiplier();
+            if(!(session.getLevel().getBehavior() instanceof MultiplayerIZombieBehavior))
+                 accumulator += delta * getGameSpeedMultiplier();
+            else
+                accumulator += delta;
             while (accumulator >= TICK_RATE) {
                 session.update(TICK_RATE);
                 accumulator -= TICK_RATE;

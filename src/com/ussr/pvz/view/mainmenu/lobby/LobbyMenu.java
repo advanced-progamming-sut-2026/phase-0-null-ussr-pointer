@@ -42,6 +42,20 @@ public class LobbyMenu extends Table implements Disposable {
         setFillParent(true);
         build();
         refresh();
+        if (overlay != null) {
+            overlay.setInviteListener(new GlobalInviteOverlay.InviteListener() {
+                @Override public void onInviteAccepted(String opponentUsername) { /* handled by overlay */ }
+                @Override public void onInviteRejected(String opponentUsername) { autoResetAfterRejection(); }
+            });
+        }
+    }
+
+    /** Called automatically when the overlay detects the opponent rejected our invite. */
+    private void autoResetAfterRejection() {
+        state = State.BROWSING;
+        cancelInvite.setVisible(false);
+        status.setText("");
+        rebuild();
     }
 
     private void build() {

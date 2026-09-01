@@ -20,79 +20,35 @@ import com.ussr.pvz.service.CollectionService.PlantData;
  */
 public class SeedPacketPurchaseOverlay extends Dialog {
 
-    public SeedPacketPurchaseOverlay(
-            PlantData plant,
-            int missingPackets,
-            int gemCost,
-            Skin skin,
-            TextureRegionDrawable dimBg,
-            CollectionService service,
-            Runnable onPurchased
-    ) {
+    public SeedPacketPurchaseOverlay(PlantData plant, int missingPackets, int gemCost, Skin skin,
+            TextureRegionDrawable dimBg, CollectionService service, Runnable onPurchased) {
         super("", buildStyle(skin, dimBg));
-
         var content = getContentTable();
         content.pad(20f);
+        content.add(new Label("Not Enough Seed Packets", skin, "big_outline")).padBottom(15f).row();
 
-        content.add(new Label(
-                "Not Enough Seed Packets",
-                skin,
-                "big_outline"
-        )).padBottom(15f).row();
-
-        content.add(new Label(
-                "You need " + missingPackets + " more seed packet"
-                        + (missingPackets == 1 ? "" : "s")
-                        + " to upgrade " + plant.name + ".",
-                skin,
-                "default"
-        )).width(320f).row();
-
-        content.add(new Label(
-                "Buy " + missingPackets + " seed packet"
-                        + (missingPackets == 1 ? "" : "s")
-                        + " for " + gemCost + " gem"
-                        + (gemCost == 1 ? "" : "s") + "?",
-                skin,
-                "secondary"
-        )).padTop(10f).row();
-
+        content.add(new Label("You need " + missingPackets + " more seed packet" + (missingPackets == 1 ? "" : "s")
+                        + " to upgrade " + plant.name + ".", skin, "default")).width(320f).row();
+        content.add(new Label("Buy " + missingPackets + " seed packet" + (missingPackets == 1 ? "" : "s") + " for "
+                + gemCost + " gem" + (gemCost == 1 ? "" : "s") + "?", skin, "secondary")).padTop(10f).row();
         getButtonTable().pad(20f);
-
         TextButton buyButton = new TextButton(
-                "Buy  " + gemCost + " gem" + (gemCost == 1 ? "" : "s"),
-                skin,
-                "green"
-        );
-
+                "Buy  " + gemCost + " gem" + (gemCost == 1 ? "" : "s"), skin, "green");
         buyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String result = service.buySeedPacketsWithGems(
-                        new PlantTypeRequest(plant.id),
-                        missingPackets
-                );
-
+                String result = service.buySeedPacketsWithGems(new PlantTypeRequest(plant.id), missingPackets);
                 if (result != null && result.contains("Purchased")) {
-                    NotificationCenter.success(
-                            missingPackets + " seed packet"
-                                    + (missingPackets == 1 ? "" : "s")
-                                    + " purchased!"
-                    );
-
-                    if (onPurchased != null) {
-                        onPurchased.run();
-                    }
+                    NotificationCenter.success(missingPackets + " seed packet" + (missingPackets == 1 ? "" : "s")
+                                    + " purchased!");
+                    if (onPurchased != null) onPurchased.run();
                 } else {
                     NotificationCenter.error(result);
                 }
-
                 hide();
             }
         });
-
         getButtonTable().add(buyButton).padRight(10f);
-
         TextButton cancelButton = new TextButton("Cancel", skin, "brown");
         button(cancelButton, true);
     }
